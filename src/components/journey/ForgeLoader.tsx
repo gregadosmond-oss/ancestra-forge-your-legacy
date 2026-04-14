@@ -6,6 +6,10 @@ type Props = { messages: string[]; onComplete: () => void; perMessageMs?: number
 const ForgeLoader = ({ messages, onComplete, perMessageMs = 1200 }: Props) => {
   const [index, setIndex] = useState(0);
 
+  // Intentionally omit onComplete from deps — callers often pass an inline
+  // arrow that changes every render, which would tear the effect down and
+  // restart the message cycle.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (index >= messages.length) {
       const done = setTimeout(onComplete, 300);
@@ -13,7 +17,7 @@ const ForgeLoader = ({ messages, onComplete, perMessageMs = 1200 }: Props) => {
     }
     const next = setTimeout(() => setIndex((i) => i + 1), perMessageMs);
     return () => clearTimeout(next);
-  }, [index, messages.length, onComplete, perMessageMs]);
+  }, [index, messages.length, perMessageMs]);
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center">

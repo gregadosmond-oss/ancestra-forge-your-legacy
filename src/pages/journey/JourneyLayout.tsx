@@ -1,10 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Outlet, useLocation, useParams } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 const JourneyLayout = () => {
   const location = useLocation();
-  const { stop } = useParams();
-  const stopNumber = stop ?? "1";
+  // Child routes are declared with literal paths (path="1"…"6"), so useParams
+  // has no :stop key. Derive the number from the URL instead.
+  const match = location.pathname.match(/\/journey\/(\d+)/);
+  const stopNumber = match ? match[1] : "1";
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
