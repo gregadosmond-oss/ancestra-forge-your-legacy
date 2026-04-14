@@ -14,7 +14,10 @@ function CrestMedallion({
   const autoRotY = useRef(0);
 
   const texture = useLoader(TextureLoader, '/crest.png');
-  texture.colorSpace = SRGBColorSpace;
+
+  useEffect(() => {
+    texture.colorSpace = SRGBColorSpace;
+  }, [texture]);
 
   const materials = useMemo(
     () => [
@@ -28,9 +31,15 @@ function CrestMedallion({
     [texture],
   );
 
+  useEffect(() => {
+    return () => {
+      materials.forEach((m) => m.dispose());
+    };
+  }, [materials]);
+
   useFrame((_state, delta) => {
     if (!meshRef.current) return;
-    autoRotY.current += delta * ((Math.PI * 2) / 20);
+    autoRotY.current = (autoRotY.current + delta * ((Math.PI * 2) / 20)) % (Math.PI * 2);
     const targetRotY = autoRotY.current + pointerRef.current.x * MAX_TILT_RAD;
     const targetRotX = -pointerRef.current.y * MAX_TILT_RAD;
     meshRef.current.rotation.y += (targetRotY - meshRef.current.rotation.y) * 0.06;
@@ -38,7 +47,7 @@ function CrestMedallion({
   });
 
   return (
-    <Float speed={1} rotationIntensity={0.2} floatIntensity={0.5}>
+    <Float speed={1} rotationIntensity={0} floatIntensity={0.5}>
       <mesh ref={meshRef} material={materials}>
         <boxGeometry args={[3, 3, 0.05]} />
       </mesh>
@@ -65,6 +74,7 @@ const LandingCrestHero = () => {
       aria-label="Ancestra family crest"
     >
       <Canvas
+        dpr={[1, 2]}
         camera={{ position: [0, 0, 5], fov: 45 }}
         gl={{ alpha: true, antialias: true }}
         style={{ background: 'transparent' }}
