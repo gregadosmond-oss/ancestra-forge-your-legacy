@@ -14,6 +14,7 @@ import Stop5Story from "./pages/journey/Stop5Story.tsx";
 import Stop6PassItOn from "./pages/journey/Stop6PassItOn.tsx";
 import SurnameLookup from "./pages/tools/SurnameLookup.tsx";
 import MottoGenerator from "./pages/tools/MottoGenerator.tsx";
+import BloodlineQuiz from "./pages/tools/BloodlineQuiz.tsx";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/tools/surname" element={<SurnameLookup />} />
           <Route path="/tools/motto" element={<MottoGenerator />} />
+          <Route path="/tools/quiz" element={<BloodlineQuiz />} />
           <Route path="/journey" element={<JourneyLayout />}>
             <Route index element={<Navigate to="/journey/1" replace />} />
             <Route path="1" element={<Stop1EnterName />} />
