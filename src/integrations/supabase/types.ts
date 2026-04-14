@@ -14,7 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      crests: {
+        Row: {
+          created_at: string
+          crest_url: string | null
+          id: string
+          motto_english: string | null
+          motto_latin: string | null
+          prompt_used: string | null
+          surname: string
+          user_id: string | null
+          variables_json: Json | null
+        }
+        Insert: {
+          created_at?: string
+          crest_url?: string | null
+          id?: string
+          motto_english?: string | null
+          motto_latin?: string | null
+          prompt_used?: string | null
+          surname: string
+          user_id?: string | null
+          variables_json?: Json | null
+        }
+        Update: {
+          created_at?: string
+          crest_url?: string | null
+          id?: string
+          motto_english?: string | null
+          motto_latin?: string | null
+          prompt_used?: string | null
+          surname?: string
+          user_id?: string | null
+          variables_json?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          birth_year: number | null
+          country_of_origin: string | null
+          created_at: string
+          email: string | null
+          first_name: string | null
+          id: string
+          surname: string | null
+          updated_at: string
+        }
+        Insert: {
+          birth_year?: number | null
+          country_of_origin?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id: string
+          surname?: string | null
+          updated_at?: string
+        }
+        Update: {
+          birth_year?: number | null
+          country_of_origin?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          surname?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
