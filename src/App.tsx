@@ -12,6 +12,7 @@ import Stop3Bloodline from "./pages/journey/Stop3Bloodline.tsx";
 import Stop4CrestForge from "./pages/journey/Stop4CrestForge.tsx";
 import Stop5Story from "./pages/journey/Stop5Story.tsx";
 import Stop6PassItOn from "./pages/journey/Stop6PassItOn.tsx";
+import SurnameLookup from "./pages/tools/SurnameLookup.tsx";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/tools/surname" element={<SurnameLookup />} />
           <Route path="/journey" element={<JourneyLayout />}>
             <Route index element={<Navigate to="/journey/1" replace />} />
             <Route path="1" element={<Stop1EnterName />} />
