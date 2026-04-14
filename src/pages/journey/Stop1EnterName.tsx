@@ -1,16 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import SectionLabel from "@/components/journey/SectionLabel";
 import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
+import { useJourney } from "@/contexts/JourneyContext";
 
 const Stop1EnterName = () => {
   const navigate = useNavigate();
+  const { startJourney, unknownSurname, reset } = useJourney();
   const [surname, setSurname] = useState("");
-  const [expanded, setExpanded] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Coming back to Stop 1 after an UNKNOWN bounce: clear provider state
+  // so the error message only shows once and subsequent submits start clean.
+  useEffect(() => {
+    if (unknownSurname && surname.length === 0) {
+      // show the error, don't wipe yet — user hasn't started typing
+      return;
+    }
+    if (surname.length > 0 && unknownSurname) {
+      reset();
+    }
+  }, [surname, unknownSurname, reset]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting || surname.trim().length === 0) return;
+    setSubmitting(true);
+    // Fire in the background and navigate immediately — cinematic reveals
+    // on Stops 2-5 absorb the latency.
+    void startJourney(surname.trim());
     navigate("/journey/2");
   };
 
@@ -35,6 +54,16 @@ const Stop1EnterName = () => {
           Every family has a story. Yours is waiting.
         </motion.p>
 
+        {unknownSurname && (
+          <motion.p
+            variants={staggerItem}
+            className="mt-6 font-serif text-sm italic text-amber-dim"
+          >
+            We couldn&apos;t find that name in the archives. Try the surname as it
+            appears on a birth certificate.
+          </motion.p>
+        )}
+
         <motion.form
           variants={staggerItem}
           onSubmit={handleSubmit}
@@ -46,40 +75,14 @@ const Stop1EnterName = () => {
             onChange={(e) => setSurname(e.target.value)}
             placeholder="e.g. Osmond"
             autoFocus
-            className="w-full rounded-pill border border-amber-dim/30 bg-input px-8 py-5 text-center font-display text-2xl text-cream-warm placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30"
+            disabled={submitting}
+            className="w-full rounded-pill border border-amber-dim/30 bg-input px-8 py-5 text-center font-display text-2xl text-cream-warm placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30 disabled:opacity-60"
           />
 
           <button
-            type="button"
-            onClick={() => setExpanded((v) => !v)}
-            className="font-sans text-[11px] uppercase tracking-[3px] text-amber-dim transition-colors hover:text-amber"
-          >
-            {expanded ? "− Hide details" : "+ Add more details"}
-          </button>
-
-          {expanded && (
-            <div className="grid w-full gap-3 text-left">
-              <input
-                type="text"
-                placeholder="Parents' names (optional)"
-                className="rounded-[14px] border border-amber-dim/20 bg-input px-5 py-3 font-sans text-sm text-foreground placeholder:text-text-dim focus:border-amber focus:outline-none"
-              />
-              <input
-                type="text"
-                placeholder="Country of origin (optional)"
-                className="rounded-[14px] border border-amber-dim/20 bg-input px-5 py-3 font-sans text-sm text-foreground placeholder:text-text-dim focus:border-amber focus:outline-none"
-              />
-              <input
-                type="text"
-                placeholder="Birth year (optional)"
-                className="rounded-[14px] border border-amber-dim/20 bg-input px-5 py-3 font-sans text-sm text-foreground placeholder:text-text-dim focus:border-amber focus:outline-none"
-              />
-            </div>
-          )}
-
-          <button
             type="submit"
-            className="mt-6 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
+            disabled={submitting || surname.trim().length === 0}
+            className="mt-6 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-60"
             style={{
               background: "linear-gradient(135deg, #e8943a, #c47828)",
               transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
