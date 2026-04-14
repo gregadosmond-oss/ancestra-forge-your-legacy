@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const TOOLS = [
@@ -5,16 +6,19 @@ const TOOLS = [
     icon: "🧬",
     heading: "Bloodline Quiz",
     body: "5 questions → your ancestry archetype. Warrior, Builder, Explorer, Healer, or Scholar.",
+    href: "/tools/quiz",
   },
   {
     icon: "🔍",
     heading: "Surname Lookup",
     body: "Instant meaning, origin, and historical role for any surname.",
+    href: "/tools/surname",
   },
   {
     icon: "⚔️",
     heading: "Motto Generator",
     body: "Enter 3 values → get a Latin motto with English translation.",
+    href: "/tools/motto",
   },
 ] as const;
 
@@ -34,7 +38,7 @@ const FreeToolsSection = () => (
       Curious? Start here — no commitment.
     </h2>
     <p className="mx-auto mt-4 max-w-md font-serif italic text-foreground">
-      Six free tools to explore your heritage. No account needed.
+      Free tools to explore your heritage. No account needed.
     </p>
 
     <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -43,22 +47,26 @@ const FreeToolsSection = () => (
           key={tool.heading}
           {...reveal}
           transition={{ ...reveal.transition, delay: i * 0.08 }}
-          className="relative rounded-lg border border-gold-line bg-card p-6 text-left opacity-80"
-          style={{ cursor: "default" }}
         >
-          <span
-            className="absolute right-3 top-3 rounded text-[9px] uppercase tracking-[1px] text-amber-dim"
-            style={{ background: "#221c14", padding: "3px 8px" }}
+          <Link
+            to={tool.href}
+            className="block rounded-lg border border-gold-line bg-card p-6 text-left transition-all duration-[400ms] hover:-translate-y-0.5"
+            style={{ borderColor: "rgba(232,148,58,0.08)" }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(232,148,58,0.20)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(232,148,58,0.08)";
+            }}
           >
-            Coming Soon
-          </span>
-          <div className="mb-3 text-xl">{tool.icon}</div>
-          <h3 className="mb-2 font-display text-base text-cream-soft">
-            {tool.heading}
-          </h3>
-          <p className="text-sm leading-relaxed text-text-dim">
-            {tool.body}
-          </p>
+            <div className="mb-3 text-xl">{tool.icon}</div>
+            <h3 className="mb-2 font-display text-base text-cream-soft">
+              {tool.heading}
+            </h3>
+            <p className="text-sm leading-relaxed text-text-dim">
+              {tool.body}
+            </p>
+          </Link>
         </motion.div>
       ))}
     </div>
