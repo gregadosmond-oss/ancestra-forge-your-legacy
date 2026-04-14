@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import CrestHero from "@/components/CrestHero";
 
 const Index = () => {
@@ -38,21 +39,22 @@ const Index = () => {
           Discover your name. Forge your crest. Pass it on.
         </p>
 
-        <button
-          className="mt-10 rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-400"
+        <Link
+          to="/journey"
+          className="mt-10 inline-block rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-400"
           style={{
             background: 'linear-gradient(135deg, #e8943a, #c47828)',
             transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
           }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background = 'linear-gradient(135deg, #f0a848, #e8943a)';
+            (e.currentTarget as HTMLAnchorElement).style.background = 'linear-gradient(135deg, #f0a848, #e8943a)';
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background = 'linear-gradient(135deg, #e8943a, #c47828)';
+            (e.currentTarget as HTMLAnchorElement).style.background = 'linear-gradient(135deg, #e8943a, #c47828)';
           }}
         >
           Begin Your Journey
-        </button>
+        </Link>
       </div>
     </div>
   );
