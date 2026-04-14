@@ -56,6 +56,7 @@ function Crest({
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
 }) {
   const meshRef = useRef<Mesh>(null);
+  const initializedRef = useRef(false);
   const texture = useLoader(TextureLoader, '/crest.png');
   texture.colorSpace = SRGBColorSpace;
 
@@ -81,6 +82,15 @@ function Crest({
     if (!meshRef.current) return;
     const targetRotY = pointerRef.current.x * MAX_TILT_RAD;
     const targetRotX = -pointerRef.current.y * MAX_TILT_RAD;
+    // On first frame after mount, snap to target so the crest doesn't
+    // visibly lerp from flat (0,0) to the current pointer angle — that
+    // ~1s drift read as "not lined up" on the Stop 4 reveal.
+    if (!initializedRef.current) {
+      meshRef.current.rotation.y = targetRotY;
+      meshRef.current.rotation.x = targetRotX;
+      initializedRef.current = true;
+      return;
+    }
     meshRef.current.rotation.y +=
       (targetRotY - meshRef.current.rotation.y) * 0.06;
     meshRef.current.rotation.x +=
