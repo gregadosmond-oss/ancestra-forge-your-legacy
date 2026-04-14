@@ -54,7 +54,7 @@ function Crest() {
   const aspect = texture.image
     ? texture.image.width / texture.image.height
     : 1;
-  const planeHeight = 4.5;
+  const planeHeight = 6.5;
   const planeWidth = planeHeight * aspect;
 
   const material = useMemo(
@@ -92,11 +92,11 @@ const CrestHero = () => {
   return (
     <div
       className="relative w-full"
-      style={{ minHeight: '55vh' }}
+      style={{ minHeight: '38vh' }}
       aria-label="Ancestra family crest"
     >
       <Canvas
-        camera={{ position: [0, 0, 4.5], fov: 45 }}
+        camera={{ position: [0, 0, 3.8], fov: 45 }}
         gl={{ alpha: true, antialias: true }}
         style={{ background: 'transparent' }}
       >
