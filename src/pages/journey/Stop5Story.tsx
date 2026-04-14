@@ -69,16 +69,17 @@ const Stop5Story = () => {
                 ))}
               </ul>
 
-              <Link
-                to="/journey/6"
+              <a
+                href="https://buy.stripe.com/28EaEwFYM8polaw76Cbo400"
                 className="mt-8 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
                 style={{
                   background: "linear-gradient(135deg, #e8943a, #c47828)",
                   transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                  color: "#1a1208",
                 }}
               >
-                See The Full Legacy
-              </Link>
+                Unlock Your Legacy Pack — $29
+              </a>
             </motion.div>
           )}
         </>
