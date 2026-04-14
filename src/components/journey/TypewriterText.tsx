@@ -9,7 +9,7 @@ type Props = {
 
 const TypewriterText = ({
   text,
-  msPerChar = 28,
+  msPerChar = 12,
   onDone,
   className = "",
 }: Props) => {
