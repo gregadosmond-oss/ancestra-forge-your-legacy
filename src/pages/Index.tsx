@@ -1,6 +1,8 @@
+import CrestHero from "@/components/CrestHero";
+
 const Index = () => {
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background">
       {/* SVG grain texture overlay */}
       <svg className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-[0.018]">
         <filter id="grain">
@@ -19,8 +21,13 @@ const Index = () => {
         }}
       />
 
+      {/* 3D Crest Hero */}
+      <div className="relative z-10 w-full max-w-4xl">
+        <CrestHero />
+      </div>
+
       {/* Hero content */}
-      <div className="relative z-10 flex flex-col items-center px-6 text-center">
+      <div className="relative z-10 flex flex-col items-center px-6 pb-16 text-center">
         <h1 className="font-display text-4xl leading-tight tracking-tight text-cream-warm sm:text-5xl md:text-6xl lg:text-7xl">
           Every family has a story
           <br />
