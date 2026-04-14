@@ -12,6 +12,7 @@ import Stop3Bloodline from "./pages/journey/Stop3Bloodline.tsx";
 import Stop4CrestForge from "./pages/journey/Stop4CrestForge.tsx";
 import Stop5Story from "./pages/journey/Stop5Story.tsx";
 import Stop6PassItOn from "./pages/journey/Stop6PassItOn.tsx";
+import SurnameLookup from "./pages/tools/SurnameLookup.tsx";
 
 const queryClient = new QueryClient();
 
