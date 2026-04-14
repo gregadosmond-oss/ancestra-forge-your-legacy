@@ -11,6 +11,7 @@ import Stop1EnterName from "./pages/journey/Stop1EnterName.tsx";
 import Stop2NameMeaning from "./pages/journey/Stop2NameMeaning.tsx";
 import Stop3Bloodline from "./pages/journey/Stop3Bloodline.tsx";
 import Stop4CrestForge from "./pages/journey/Stop4CrestForge.tsx";
+import Stop5Story from "./pages/journey/Stop5Story.tsx";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="2" element={<Stop2NameMeaning />} />
             <Route path="3" element={<Stop3Bloodline />} />
             <Route path="4" element={<Stop4CrestForge />} />
+            <Route path="5" element={<Stop5Story />} />
             <Route path=":stop" element={<JourneyPlaceholder />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
