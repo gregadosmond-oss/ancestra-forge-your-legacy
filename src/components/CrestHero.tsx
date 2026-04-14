@@ -5,6 +5,7 @@ import {
   BufferGeometry,
   DoubleSide,
   DynamicDrawUsage,
+  Group,
   Mesh,
   Points,
   ShaderMaterial,
@@ -12,12 +13,11 @@ import {
   TextureLoader,
 } from 'three';
 
-const MAX_TILT_RAD = (15 * Math.PI) / 180; // 15 degrees
+const MAX_TILT_RAD = (15 * Math.PI) / 180;
 
-/**
- * Vertex shader — passes UVs to the fragment stage.
- */
-const vertexShader = /* glsl */ `
+// ─── Crest shader ────────────────────────────────────────────────────────────
+
+const crestVertex = /* glsl */ `
   varying vec2 vUv;
   void main() {
     vUv = uv;
@@ -26,114 +26,142 @@ const vertexShader = /* glsl */ `
 `;
 
 /**
- * Fragment shader — chroma-keys the dark textured background of the source
- * PNG by combining a saturation test (keep anything colourful) with a
- * luminance test (keep anything very bright, e.g. the white banner). This
- * lets the crest float cleanly over the page background without needing a
- * pre-cut transparent PNG.
+ * Chroma-keys the dark background of the PNG so the crest floats cleanly
+ * over the page. Keeps colourful pixels (saturation test) and bright pixels
+ * (luminance test — the white banner).
  */
-const fragmentShader = /* glsl */ `
+const crestFragment = /* glsl */ `
   uniform sampler2D map;
   varying vec2 vUv;
   void main() {
     vec4 tex = texture2D(map, vUv);
-    float mx = max(max(tex.r, tex.g), tex.b);
-    float mn = min(min(tex.r, tex.g), tex.b);
+    float mx  = max(max(tex.r, tex.g), tex.b);
+    float mn  = min(min(tex.r, tex.g), tex.b);
     float sat = mx > 0.001 ? (mx - mn) / mx : 0.0;
     float lum = dot(tex.rgb, vec3(0.299, 0.587, 0.114));
-    float satAlpha = smoothstep(0.05, 0.18, sat);
-    float lumAlpha = smoothstep(0.32, 0.50, lum);
-    float alpha = max(satAlpha, lumAlpha);
+    float alpha = max(smoothstep(0.05, 0.18, sat), smoothstep(0.32, 0.50, lum));
     if (alpha < 0.01) discard;
     gl_FragColor = vec4(tex.rgb, alpha);
   }
 `;
 
+// ─── Glow border shader ───────────────────────────────────────────────────────
+
+const glowVertex = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
 /**
- * Crest — renders the family crest as a tilting plane that tracks the
- * user's cursor anywhere on the page (not just over the canvas).
+ * Transparent in the centre, amber at the edges — creates a soft glowing
+ * border rect behind the crest plane.
  */
-function Crest({
+const glowFragment = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vec2  d      = abs(vUv - 0.5) * 2.0;   // 0 = centre, 1 = corner
+    float edge   = max(d.x, d.y);           // box distance
+    float border = smoothstep(0.60, 1.00, edge) * 0.80;
+    float corona = smoothstep(0.35, 0.65, edge) * 0.28;
+    float alpha  = border + corona;
+    gl_FragColor = vec4(0.91, 0.58, 0.22, alpha);
+  }
+`;
+
+// ─── CrestWithGlow ────────────────────────────────────────────────────────────
+
+/**
+ * Renders the crest plane + the glowing border rect as a single group so
+ * both tilt together with the mouse.
+ */
+function CrestWithGlow({
   pointerRef,
 }: {
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
 }) {
-  const meshRef = useRef<Mesh>(null);
+  const groupRef      = useRef<Group>(null);
   const initializedRef = useRef(false);
+
   const texture = useLoader(TextureLoader, '/crest.png');
   texture.colorSpace = SRGBColorSpace;
 
-  const aspect = texture.image
-    ? texture.image.width / texture.image.height
-    : 1;
+  const aspect      = texture.image ? texture.image.width / texture.image.height : 1;
   const planeHeight = 4.3;
-  const planeWidth = planeHeight * aspect;
+  const planeWidth  = planeHeight * aspect;
 
-  const material = useMemo(
-    () =>
-      new ShaderMaterial({
-        uniforms: { map: { value: texture } },
-        vertexShader,
-        fragmentShader,
-        transparent: true,
-        side: DoubleSide,
-      }),
+  const crestMat = useMemo(
+    () => new ShaderMaterial({
+      uniforms: { map: { value: texture } },
+      vertexShader: crestVertex,
+      fragmentShader: crestFragment,
+      transparent: true,
+      side: DoubleSide,
+    }),
     [texture],
   );
 
+  const glowMat = useMemo(
+    () => new ShaderMaterial({
+      vertexShader: glowVertex,
+      fragmentShader: glowFragment,
+      transparent: true,
+      depthWrite: false,
+    }),
+    [],
+  );
+
   useFrame(() => {
-    if (!meshRef.current) return;
+    if (!groupRef.current) return;
     const targetRotY = pointerRef.current.x * MAX_TILT_RAD;
     const targetRotX = -pointerRef.current.y * MAX_TILT_RAD;
     if (!initializedRef.current) {
-      meshRef.current.rotation.y = targetRotY;
-      meshRef.current.rotation.x = targetRotX;
+      groupRef.current.rotation.y = targetRotY;
+      groupRef.current.rotation.x = targetRotX;
       initializedRef.current = true;
       return;
     }
-    meshRef.current.rotation.y +=
-      (targetRotY - meshRef.current.rotation.y) * 0.06;
-    meshRef.current.rotation.x +=
-      (targetRotX - meshRef.current.rotation.x) * 0.06;
+    groupRef.current.rotation.y += (targetRotY - groupRef.current.rotation.y) * 0.06;
+    groupRef.current.rotation.x += (targetRotX - groupRef.current.rotation.x) * 0.06;
   });
 
   return (
-    <mesh ref={meshRef} material={material}>
-      <planeGeometry args={[planeWidth, planeHeight]} />
-    </mesh>
+    <group ref={groupRef}>
+      {/* Glow border — slightly behind and slightly larger than the crest */}
+      <mesh position={[0, 0, -0.08]} material={glowMat}>
+        <planeGeometry args={[planeWidth + 0.55, planeHeight + 0.55]} />
+      </mesh>
+      {/* Crest plane */}
+      <mesh material={crestMat}>
+        <planeGeometry args={[planeWidth, planeHeight]} />
+      </mesh>
+    </group>
   );
 }
 
-/**
- * Embers — rising spark particles that drift up past the crest, cycling
- * back to the bottom when they escape the top. Gives a forge-fire feel
- * without blocking the crest itself.
- */
+// ─── Embers ───────────────────────────────────────────────────────────────────
+
 function Embers() {
-  const count = 32;
-  const geoRef = useRef<BufferGeometry>(null!);
+  const count     = 32;
+  const geoRef    = useRef<BufferGeometry>(null!);
   const pointsRef = useRef<Points>(null!);
   const positions = useRef(new Float32Array(count * 3));
-  const speeds = useRef(new Float32Array(count));
-  const drifts = useRef(new Float32Array(count));
+  const speeds    = useRef(new Float32Array(count));
+  const drifts    = useRef(new Float32Array(count));
 
   useEffect(() => {
     const geo = geoRef.current;
     if (!geo) return;
-
     for (let i = 0; i < count; i++) {
-      positions.current[i * 3]     = (Math.random() - 0.5) * 5.5; // x spread
-      positions.current[i * 3 + 1] = (Math.random() - 0.5) * 7;   // y spread (random start height)
-      positions.current[i * 3 + 2] = 0.2 + Math.random() * 0.8;   // z in front of crest
-      speeds.current[i] = 0.35 + Math.random() * 0.6;
-      drifts.current[i] = (Math.random() - 0.5) * 0.5;
+      positions.current[i * 3]     = (Math.random() - 0.5) * 5.5;
+      positions.current[i * 3 + 1] = (Math.random() - 0.5) * 7;
+      positions.current[i * 3 + 2] = 0.2 + Math.random() * 0.8;
+      speeds.current[i]  = 0.35 + Math.random() * 0.6;
+      drifts.current[i]  = (Math.random() - 0.5) * 0.5;
     }
-
-    geo.setAttribute(
-      'position',
-      new BufferAttribute(positions.current, 3).setUsage(DynamicDrawUsage),
-    );
-
+    geo.setAttribute('position', new BufferAttribute(positions.current, 3).setUsage(DynamicDrawUsage));
     return () => { geo.dispose(); };
   }, []);
 
@@ -143,7 +171,6 @@ function Embers() {
     for (let i = 0; i < count; i++) {
       pos[i * 3 + 1] += speeds.current[i] * delta;
       pos[i * 3]     += drifts.current[i] * delta;
-      // reset particle when it drifts above the top
       if (pos[i * 3 + 1] > 4) {
         pos[i * 3]     = (Math.random() - 0.5) * 5.5;
         pos[i * 3 + 1] = -4;
@@ -157,22 +184,15 @@ function Embers() {
   return (
     <points ref={pointsRef}>
       <bufferGeometry ref={geoRef} />
-      <pointsMaterial
-        color="#e8943a"
-        size={0.038}
-        transparent
-        opacity={0.7}
-        sizeAttenuation
-      />
+      <pointsMaterial color="#e8943a" size={0.038} transparent opacity={0.7} sizeAttenuation />
     </points>
   );
 }
 
+// ─── CrestHero ────────────────────────────────────────────────────────────────
+
 type CrestHeroProps = {
-  /**
-   * Explicit canvas height in vh. Default 42 (landing thumbnail).
-   * Stop 4 uses ~75 to make the crest dominate the reveal.
-   */
+  /** Canvas height in vh. Default 42. Stop 4 uses ~75. */
   heightVh?: number;
 };
 
@@ -180,20 +200,20 @@ const CrestHero = ({ heightVh = 42 }: CrestHeroProps = {}) => {
   const pointerRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      pointerRef.current.x = (e.clientX / window.innerWidth) * 2 - 1;
+    const onMove = (e: MouseEvent) => {
+      pointerRef.current.x =  (e.clientX / window.innerWidth)  * 2 - 1;
       pointerRef.current.y = -((e.clientY / window.innerHeight) * 2 - 1);
     };
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', onMove, { passive: true });
+    return () => window.removeEventListener('mousemove', onMove);
   }, []);
 
   return (
     <>
       <style>{`
         @keyframes crestPulse {
-          0%   { opacity: 0.55; transform: scale(1); }
-          100% { opacity: 0.95; transform: scale(1.1); }
+          0%   { opacity: 0.55; transform: scale(1);    }
+          100% { opacity: 0.95; transform: scale(1.10); }
         }
       `}</style>
       <div
@@ -201,13 +221,12 @@ const CrestHero = ({ heightVh = 42 }: CrestHeroProps = {}) => {
         style={{ height: `${heightVh}vh` }}
         aria-label="Ancestra family crest"
       >
-        {/* Pulsing amber glow backdrop */}
+        {/* Pulsing ambient glow behind the canvas */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            background:
-              'radial-gradient(ellipse 55% 60% at 50% 50%, rgba(232,148,58,0.25) 0%, rgba(200,80,20,0.10) 45%, transparent 72%)',
+            background: 'radial-gradient(ellipse 55% 60% at 50% 50%, rgba(232,148,58,0.25) 0%, rgba(200,80,20,0.10) 45%, transparent 72%)',
             animation: 'crestPulse 3s ease-in-out infinite alternate',
             pointerEvents: 'none',
           }}
@@ -218,7 +237,7 @@ const CrestHero = ({ heightVh = 42 }: CrestHeroProps = {}) => {
           style={{ background: 'transparent', position: 'relative', zIndex: 1 }}
         >
           <Suspense fallback={null}>
-            <Crest pointerRef={pointerRef} />
+            <CrestWithGlow pointerRef={pointerRef} />
             <Embers />
           </Suspense>
         </Canvas>
