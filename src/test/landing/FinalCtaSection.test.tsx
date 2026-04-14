@@ -38,4 +38,13 @@ describe("FinalCtaSection", () => {
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute("href", "/journey");
   });
+
+  it("renders the section label", () => {
+    render(
+      <MemoryRouter>
+        <FinalCtaSection />
+      </MemoryRouter>
+    );
+    expect(screen.getByText("Your Legacy Awaits")).toBeInTheDocument();
+  });
 });
