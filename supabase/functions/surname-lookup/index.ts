@@ -78,8 +78,10 @@ Deno.serve(async (req: Request) => {
     }
 
     const data = await res.json();
-    const text = data.content?.[0]?.text;
+    let text = data.content?.[0]?.text;
     if (!text) return json({ error: "empty AI response" }, 502);
+
+    text = text.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
 
     const parsed = JSON.parse(text);
     return json({ code: "OK", surname: body.surname.trim(), ...parsed });
