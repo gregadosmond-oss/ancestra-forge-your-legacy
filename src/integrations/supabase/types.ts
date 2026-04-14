@@ -58,6 +58,42 @@ export type Database = {
           },
         ]
       }
+      generation_logs: {
+        Row: {
+          cache_hit: boolean
+          call_type: string
+          created_at: string
+          duration_ms: number
+          error_reason: string | null
+          id: string
+          model_version: string
+          success: boolean
+          surname: string
+        }
+        Insert: {
+          cache_hit: boolean
+          call_type: string
+          created_at?: string
+          duration_ms: number
+          error_reason?: string | null
+          id?: string
+          model_version: string
+          success: boolean
+          surname: string
+        }
+        Update: {
+          cache_hit?: boolean
+          call_type?: string
+          created_at?: string
+          duration_ms?: number
+          error_reason?: string | null
+          id?: string
+          model_version?: string
+          success?: boolean
+          surname?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           birth_year: number | null
@@ -88,6 +124,27 @@ export type Database = {
           id?: string
           surname?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      surname_facts: {
+        Row: {
+          created_at: string
+          model_version: string
+          payload: Json
+          surname: string
+        }
+        Insert: {
+          created_at?: string
+          model_version: string
+          payload: Json
+          surname: string
+        }
+        Update: {
+          created_at?: string
+          model_version?: string
+          payload?: Json
+          surname?: string
         }
         Relationships: []
       }
