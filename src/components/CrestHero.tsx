@@ -192,11 +192,11 @@ function Embers() {
 // ─── CrestHero ────────────────────────────────────────────────────────────────
 
 type CrestHeroProps = {
-  /** Canvas height in vh. Default 42. Stop 4 uses ~75. */
+  /** Canvas height in vh. Default 52. Stop 4 uses ~75. */
   heightVh?: number;
 };
 
-const CrestHero = ({ heightVh = 42 }: CrestHeroProps = {}) => {
+const CrestHero = ({ heightVh = 52 }: CrestHeroProps = {}) => {
   const pointerRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -232,7 +232,7 @@ const CrestHero = ({ heightVh = 42 }: CrestHeroProps = {}) => {
           }}
         />
         <Canvas
-          camera={{ position: [0, 0, 5], fov: 45 }}
+          camera={{ position: [0, 0, 6], fov: 45 }}
           gl={{ alpha: true, antialias: true }}
           style={{ background: 'transparent', position: 'relative', zIndex: 1 }}
         >
