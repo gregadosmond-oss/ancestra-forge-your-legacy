@@ -1,98 +1,88 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import TypewriterText from "@/components/journey/TypewriterText";
-import { osmondMock } from "@/data/osmondMock";
+import RetryInline from "@/components/journey/RetryInline";
+import { useJourney } from "@/contexts/JourneyContext";
 
 const Stop5Story = () => {
-  const d = osmondMock;
-  const firstChapter = d.chapters[0];
-  const hiddenChapters = d.chapters.slice(1);
+  const navigate = useNavigate();
+  const { unknownSurname, surname, story } = useJourney();
   const [typed, setTyped] = useState(false);
 
-  return (
-    <div className="flex min-h-screen flex-col items-center px-6 py-24">
-      <div className="w-full max-w-2xl">
-        <div className="text-center">
-          <SectionLabel>CHAPTER {firstChapter.number}</SectionLabel>
-          <motion.h1
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-4 font-display text-3xl text-amber-light sm:text-4xl"
-          >
-            {firstChapter.title}
-          </motion.h1>
-        </div>
+  useEffect(() => {
+    if (unknownSurname) navigate("/journey/1", { replace: true });
+    else if (!surname) navigate("/journey/1", { replace: true });
+  }, [unknownSurname, surname, navigate]);
 
-        <div className="mt-12">
-          {firstChapter.body && (
+  if (!surname) return null;
+
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
+      <SectionLabel>YOUR STORY</SectionLabel>
+
+      {story.status === "loading" && (
+        <p className="mt-10 font-serif text-sm italic text-amber-dim">
+          The quill is still writing…
+        </p>
+      )}
+
+      {story.status === "error" && (
+        <div className="mt-10">
+          <RetryInline onRetry={story.retry} />
+        </div>
+      )}
+
+      {story.status === "ready" && story.data && (
+        <>
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="mt-6 max-w-3xl text-center font-display text-3xl text-cream-warm sm:text-4xl"
+          >
+            {story.data.chapterOneTitle}
+          </motion.h1>
+
+          <div className="mt-10 w-full max-w-2xl">
             <TypewriterText
-              text={firstChapter.body}
+              text={story.data.chapterOneBody}
               onDone={() => setTyped(true)}
               className="font-serif text-lg leading-relaxed text-text-body"
             />
-          )}
-        </div>
+          </div>
 
-        {/* Fade-to-dark mask + hidden chapter list */}
-        {typed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.2 }}
-            className="relative mt-12"
-          >
-            <div className="pointer-events-none absolute -top-24 left-0 right-0 h-24 bg-gradient-to-b from-transparent to-background" />
-            <ul className="space-y-2 text-center opacity-40">
-              {hiddenChapters.map((c) => (
-                <li
-                  key={c.number}
-                  className="font-serif text-sm italic text-text-dim"
-                >
-                  Chapter {c.number}: {c.title}
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        )}
-
-        {/* Paywall */}
-        {typed && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-16 rounded-[22px] border border-amber-dim/40 bg-card/60 p-10 text-center backdrop-blur-sm"
-          >
-            <h2 className="font-display text-2xl text-cream-warm sm:text-3xl">
-              Unlock your full Legacy Pack
-            </h2>
-            <ul className="mx-auto mt-6 max-w-sm space-y-2 text-left font-sans text-sm text-text-body">
-              <li>· Full 9 chapters of your family story</li>
-              <li>· High-resolution crest (print-ready)</li>
-              <li>· Legacy certificate (PDF)</li>
-              <li>· Visual family tree print</li>
-              <li>· Ancestor chat (beta)</li>
-            </ul>
-            <p className="mt-8 font-display text-5xl text-amber-light">$29</p>
-            <Link
-              to="/journey/6"
-              className="mt-8 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
-              style={{
-                background: "linear-gradient(135deg, #e8943a, #c47828)",
-                transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-              }}
+          {typed && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.2 }}
+              className="mt-14 w-full max-w-xl rounded-[22px] border border-amber-dim/25 bg-card/60 p-8 text-center"
             >
-              See the Full Legacy
-            </Link>
-            <p className="mt-5 font-serif text-xs italic text-text-dim">
-              prototype mode — payment skipped
-            </p>
-          </motion.div>
-        )}
-      </div>
+              <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
+                EIGHT CHAPTERS REMAIN
+              </p>
+              <ul className="mt-5 space-y-2 font-serif text-sm italic text-text-dim">
+                {story.data.teaserChapters.map((t, i) => (
+                  <li key={`${t}-${i}`}>{t}</li>
+                ))}
+              </ul>
+
+              <Link
+                to="/journey/6"
+                className="mt-8 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
+                style={{
+                  background: "linear-gradient(135deg, #e8943a, #c47828)",
+                  transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                }}
+              >
+                See The Full Legacy
+              </Link>
+            </motion.div>
+          )}
+        </>
+      )}
     </div>
   );
 };
