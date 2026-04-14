@@ -52,10 +52,8 @@ const fragmentShader = /* glsl */ `
  */
 function Crest({
   pointerRef,
-  scale = 1,
 }: {
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
-  scale?: number;
 }) {
   const meshRef = useRef<Mesh>(null);
   const texture = useLoader(TextureLoader, '/crest.png');
@@ -91,7 +89,7 @@ function Crest({
 
   return (
     <Float speed={0.8} rotationIntensity={0.08} floatIntensity={0.2}>
-      <mesh ref={meshRef} material={material} scale={scale}>
+      <mesh ref={meshRef} material={material}>
         <planeGeometry args={[planeWidth, planeHeight]} />
       </mesh>
     </Float>
@@ -99,13 +97,17 @@ function Crest({
 }
 
 type CrestHeroProps = {
-  /** Min-height of the canvas in vh. Default 42 (landing). Stop 4 uses 75. */
-  minHeightVh?: number;
-  /** Mesh scale multiplier. Default 1 (landing). Stop 4 uses 1.7 to fill. */
-  scale?: number;
+  /**
+   * Explicit canvas height in vh. Default 42 (landing thumbnail).
+   * Stop 4 uses ~75 to make the crest dominate the reveal.
+   * Using `height` (not `minHeight`) so the R3F canvas, which sizes to
+   * parent, actually grows. `minHeight` alone leaves the child height
+   * ambiguous and the canvas collapses to content.
+   */
+  heightVh?: number;
 };
 
-const CrestHero = ({ minHeightVh = 42, scale = 1 }: CrestHeroProps = {}) => {
+const CrestHero = ({ heightVh = 42 }: CrestHeroProps = {}) => {
   // Track the mouse globally (window) so the crest reacts anywhere on the
   // page, not only when hovering the canvas. Stored in a ref so we don't
   // re-render on every mousemove — useFrame reads it directly.
@@ -125,7 +127,7 @@ const CrestHero = ({ minHeightVh = 42, scale = 1 }: CrestHeroProps = {}) => {
   return (
     <div
       className="relative w-full"
-      style={{ minHeight: `${minHeightVh}vh` }}
+      style={{ height: `${heightVh}vh` }}
       aria-label="Ancestra family crest"
     >
       <Canvas
@@ -134,7 +136,7 @@ const CrestHero = ({ minHeightVh = 42, scale = 1 }: CrestHeroProps = {}) => {
         style={{ background: 'transparent' }}
       >
         <Suspense fallback={null}>
-          <Crest pointerRef={pointerRef} scale={scale} />
+          <Crest pointerRef={pointerRef} />
         </Suspense>
       </Canvas>
     </div>
