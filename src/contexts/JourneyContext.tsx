@@ -88,8 +88,11 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
     surnameRef.current = surname;
     try {
       const resp = await fetchLegacy(surname);
+      // Bail if another startJourney has taken ownership since this one started.
+      if (surnameRef.current !== surname) return;
       applyResponse(resp);
     } catch (err) {
+      if (surnameRef.current !== surname) return;
       const reason = (err as Error).message;
       setState((s) => ({
         ...s,
