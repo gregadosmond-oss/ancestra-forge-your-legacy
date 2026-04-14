@@ -1,15 +1,15 @@
 // Cache wrapper around the surname_facts table.
 // Called from the edge function handler which has a service-role client.
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import type { LegacyFacts } from "./types.ts";
+import type { DbClient } from "./db_client.ts";
 
 export function normalizeSurname(input: string): string {
   return input.trim().toLowerCase();
 }
 
 export async function readFacts(
-  client: SupabaseClient,
+  client: DbClient,
   surname: string,
   modelVersion: string,
 ): Promise<LegacyFacts | null> {
@@ -30,7 +30,7 @@ export async function readFacts(
 }
 
 export async function writeFacts(
-  client: SupabaseClient,
+  client: DbClient,
   surname: string,
   modelVersion: string,
   payload: LegacyFacts,
