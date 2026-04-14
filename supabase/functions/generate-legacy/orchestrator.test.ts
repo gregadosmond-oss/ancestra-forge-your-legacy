@@ -165,4 +165,5 @@ Deno.test("orchestrator returns UNKNOWN_SURNAME when facts origin is UNKNOWN", a
   });
 
   assertEquals(result.code, "UNKNOWN_SURNAME");
+  assertEquals(cache.size, 0); // UNKNOWN must not be cached
 });
