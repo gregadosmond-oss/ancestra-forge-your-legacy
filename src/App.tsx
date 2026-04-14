@@ -9,6 +9,7 @@ import JourneyLayout from "./pages/journey/JourneyLayout.tsx";
 import JourneyPlaceholder from "./pages/journey/JourneyPlaceholder.tsx";
 import Stop1EnterName from "./pages/journey/Stop1EnterName.tsx";
 import Stop2NameMeaning from "./pages/journey/Stop2NameMeaning.tsx";
+import Stop3Bloodline from "./pages/journey/Stop3Bloodline.tsx";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
             <Route index element={<Navigate to="/journey/1" replace />} />
             <Route path="1" element={<Stop1EnterName />} />
             <Route path="2" element={<Stop2NameMeaning />} />
+            <Route path="3" element={<Stop3Bloodline />} />
             <Route path=":stop" element={<JourneyPlaceholder />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
