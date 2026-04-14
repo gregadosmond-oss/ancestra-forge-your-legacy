@@ -96,7 +96,12 @@ function Crest({
   );
 }
 
-const CrestHero = () => {
+type CrestHeroProps = {
+  /** Min-height of the canvas in vh. Default 42 (landing). Stop 4 uses 70. */
+  minHeightVh?: number;
+};
+
+const CrestHero = ({ minHeightVh = 42 }: CrestHeroProps = {}) => {
   // Track the mouse globally (window) so the crest reacts anywhere on the
   // page, not only when hovering the canvas. Stored in a ref so we don't
   // re-render on every mousemove — useFrame reads it directly.
@@ -116,7 +121,7 @@ const CrestHero = () => {
   return (
     <div
       className="relative w-full"
-      style={{ minHeight: '42vh' }}
+      style={{ minHeight: `${minHeightVh}vh` }}
       aria-label="Ancestra family crest"
     >
       <Canvas

@@ -32,18 +32,18 @@ const Stop4CrestForge = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-              className="relative w-full max-w-3xl"
+              className="relative w-full max-w-5xl"
             >
               <div
                 className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 style={{
-                  width: "700px",
-                  height: "700px",
+                  width: "900px",
+                  height: "900px",
                   background:
-                    "radial-gradient(circle at center, hsla(30, 80%, 50%, 0.15) 0%, transparent 60%)",
+                    "radial-gradient(circle at center, hsla(30, 80%, 50%, 0.18) 0%, transparent 60%)",
                 }}
               />
-              <CrestHero />
+              <CrestHero minHeightVh={70} />
             </motion.div>
 
             {/* Motto */}
