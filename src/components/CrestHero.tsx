@@ -1,4 +1,4 @@
-import { Suspense, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { Float } from '@react-three/drei';
 import {
@@ -46,7 +46,15 @@ const fragmentShader = /* glsl */ `
   }
 `;
 
-function Crest() {
+/**
+ * Crest — renders the family crest as a tilting plane that tracks the
+ * user's cursor anywhere on the page (not just over the canvas).
+ */
+function Crest({
+  pointerRef,
+}: {
+  pointerRef: React.MutableRefObject<{ x: number; y: number }>;
+}) {
   const meshRef = useRef<Mesh>(null);
   const texture = useLoader(TextureLoader, '/crest.png');
   texture.colorSpace = SRGBColorSpace;
@@ -54,7 +62,7 @@ function Crest() {
   const aspect = texture.image
     ? texture.image.width / texture.image.height
     : 1;
-  const planeHeight = 6.5;
+  const planeHeight = 4.3;
   const planeWidth = planeHeight * aspect;
 
   const material = useMemo(
@@ -69,10 +77,10 @@ function Crest() {
     [texture],
   );
 
-  useFrame((state) => {
+  useFrame(() => {
     if (!meshRef.current) return;
-    const targetRotY = state.pointer.x * MAX_TILT_RAD;
-    const targetRotX = -state.pointer.y * MAX_TILT_RAD;
+    const targetRotY = pointerRef.current.x * MAX_TILT_RAD;
+    const targetRotX = -pointerRef.current.y * MAX_TILT_RAD;
     meshRef.current.rotation.y +=
       (targetRotY - meshRef.current.rotation.y) * 0.06;
     meshRef.current.rotation.x +=
@@ -89,19 +97,35 @@ function Crest() {
 }
 
 const CrestHero = () => {
+  // Track the mouse globally (window) so the crest reacts anywhere on the
+  // page, not only when hovering the canvas. Stored in a ref so we don't
+  // re-render on every mousemove — useFrame reads it directly.
+  const pointerRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      // Normalize to [-1, 1] with y flipped to match three.js conventions
+      // (top of viewport = +1, bottom = -1).
+      pointerRef.current.x = (e.clientX / window.innerWidth) * 2 - 1;
+      pointerRef.current.y = -((e.clientY / window.innerHeight) * 2 - 1);
+    };
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   return (
     <div
       className="relative w-full"
-      style={{ minHeight: '38vh' }}
+      style={{ minHeight: '42vh' }}
       aria-label="Ancestra family crest"
     >
       <Canvas
-        camera={{ position: [0, 0, 3.8], fov: 45 }}
+        camera={{ position: [0, 0, 5], fov: 45 }}
         gl={{ alpha: true, antialias: true }}
         style={{ background: 'transparent' }}
       >
         <Suspense fallback={null}>
-          <Crest />
+          <Crest pointerRef={pointerRef} />
         </Suspense>
       </Canvas>
     </div>
