@@ -1,6 +1,5 @@
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
-import { Float } from '@react-three/drei';
 import {
   DoubleSide,
   Mesh,
@@ -97,12 +96,14 @@ function Crest({
       (targetRotX - meshRef.current.rotation.x) * 0.06;
   });
 
+  // No <Float> wrapper: drei's Float seeds each instance with random phase
+  // offsets on rotation/translation, so on mount the mesh appeared tilted a
+  // few degrees Y-axis ("loads to the left") and drifted back to centre
+  // over ~1s. Pointer tracking below gives the crest all the life it needs.
   return (
-    <Float speed={0.8} rotationIntensity={0.08} floatIntensity={0.2}>
-      <mesh ref={meshRef} material={material}>
-        <planeGeometry args={[planeWidth, planeHeight]} />
-      </mesh>
-    </Float>
+    <mesh ref={meshRef} material={material}>
+      <planeGeometry args={[planeWidth, planeHeight]} />
+    </mesh>
   );
 }
 
