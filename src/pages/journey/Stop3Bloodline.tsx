@@ -1,39 +1,66 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
-import BloodlineTree from "@/components/journey/BloodlineTree";
-import { osmondMock } from "@/data/osmondMock";
+import MigrationPath from "@/components/journey/MigrationPath";
+import RetryInline from "@/components/journey/RetryInline";
+import { useJourney } from "@/contexts/JourneyContext";
 
 const Stop3Bloodline = () => {
-  const d = osmondMock;
-  const totalReveal = d.tree.length * 0.18 + 0.5;
+  const navigate = useNavigate();
+  const { unknownSurname, surname, facts } = useJourney();
+
+  useEffect(() => {
+    if (unknownSurname) navigate("/journey/1", { replace: true });
+    else if (!surname) navigate("/journey/1", { replace: true });
+  }, [unknownSurname, surname, navigate]);
+
+  if (!surname) return null;
+
+  const waypoints = facts.data?.migration.waypoints ?? [];
+  const closingLine = facts.data?.migration.closingLine;
+  const totalReveal = waypoints.length * 0.18 + 0.5;
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
       <div className="mb-10 text-center">
-        <SectionLabel>YOUR BLOODLINE</SectionLabel>
+        <SectionLabel>WHERE YOUR NAME TRAVELED</SectionLabel>
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="mt-4 font-display text-4xl tracking-tight text-cream-warm sm:text-5xl"
         >
-          The line that led to you.
+          From hill to harbour.
         </motion.h1>
       </div>
 
-      <BloodlineTree generations={d.tree} />
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: totalReveal }}
-        className="mt-10 rounded-pill border border-amber-dim/40 bg-card/40 px-6 py-3"
-      >
-        <p className="font-sans text-xs uppercase tracking-[2px] text-amber-light">
-          {d.migration.from} → {d.migration.to} · {d.migration.year}
+      {facts.status === "loading" && (
+        <p className="font-serif text-sm italic text-amber-dim">
+          Tracing the path of your name…
         </p>
-      </motion.div>
+      )}
+
+      {facts.status === "error" && <RetryInline onRetry={facts.retry} />}
+
+      {facts.status === "ready" && facts.data && (
+        <>
+          <MigrationPath waypoints={waypoints} />
+
+          {closingLine && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: totalReveal }}
+              className="mt-10 max-w-xl text-center"
+            >
+              <p className="font-serif text-base italic text-amber-light">
+                {closingLine}
+              </p>
+            </motion.div>
+          )}
+        </>
+      )}
 
       <motion.div
         initial={{ opacity: 0 }}
