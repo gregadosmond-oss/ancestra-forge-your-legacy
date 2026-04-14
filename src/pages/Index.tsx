@@ -1,5 +1,11 @@
 import { Link } from "react-router-dom";
 import CrestHero from "@/components/CrestHero";
+import WarmDivider from "@/components/journey/WarmDivider";
+import HowItWorksSection from "@/components/landing/HowItWorksSection";
+import ProductPreviewSection from "@/components/landing/ProductPreviewSection";
+import FreeToolsSection from "@/components/landing/FreeToolsSection";
+import OccasionsSection from "@/components/landing/OccasionsSection";
+import FinalCtaSection from "@/components/landing/FinalCtaSection";
 
 const Index = () => {
   return (
@@ -55,6 +61,20 @@ const Index = () => {
         >
           Begin Your Journey
         </Link>
+      </div>
+
+      {/* ── Landing sections ── */}
+      <div className="relative z-10 w-full max-w-4xl px-6 pb-24">
+        <WarmDivider />
+        <HowItWorksSection />
+        <WarmDivider />
+        <ProductPreviewSection />
+        <WarmDivider />
+        <FreeToolsSection />
+        <WarmDivider />
+        <OccasionsSection />
+        <WarmDivider />
+        <FinalCtaSection />
       </div>
     </div>
   );
