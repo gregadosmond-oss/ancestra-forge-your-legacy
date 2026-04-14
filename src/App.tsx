@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import JourneyLayout from "./pages/journey/JourneyLayout.tsx";
 import JourneyPlaceholder from "./pages/journey/JourneyPlaceholder.tsx";
 
 const queryClient = new QueryClient();
@@ -17,8 +18,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/journey" element={<Navigate to="/journey/1" replace />} />
-          <Route path="/journey/:stop" element={<JourneyPlaceholder />} />
+          <Route path="/journey" element={<JourneyLayout />}>
+            <Route index element={<Navigate to="/journey/1" replace />} />
+            <Route path=":stop" element={<JourneyPlaceholder />} />
+          </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
