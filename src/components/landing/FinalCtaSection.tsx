@@ -12,7 +12,6 @@ const FinalCtaSection = () => (
   <motion.section
     {...reveal}
     className="py-20 text-center"
-    style={{ borderTop: "1px solid rgba(232,148,58,0.15)" }}
   >
     <p className="mb-3 text-[10px] uppercase tracking-[4px] text-amber-dim">
       Your Legacy Awaits
@@ -25,7 +24,7 @@ const FinalCtaSection = () => (
     </p>
     <Link
       to="/journey"
-      className="mt-10 inline-block rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-300 hover:-translate-y-0.5"
+      className="mt-10 inline-block rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
       style={{
         background: "linear-gradient(135deg, #e8943a, #c47828)",
         color: "#1a1208",
