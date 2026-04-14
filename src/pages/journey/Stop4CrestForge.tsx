@@ -40,10 +40,12 @@ const Stop4CrestForge = () => {
               live forge is online.
             </motion.p>
 
-            {/* Crest reveal */}
+            {/* Crest reveal — fade only, no scale. Scale entry was causing
+                the "loads to the left then lines up" effect because the
+                CSS transform scaled the 3D canvas wrapper during mount. */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
               className="relative w-full max-w-5xl"
             >
