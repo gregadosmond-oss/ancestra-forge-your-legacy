@@ -46,11 +46,11 @@ const CrestHero = () => {
   return (
     <div
       className="relative w-full"
-      style={{ minHeight: '60vh' }}
+      style={{ minHeight: '45vh' }}
       aria-label="Ancestra family crest"
     >
       <Canvas
-        camera={{ position: [0, 0, 6], fov: 45 }}
+        camera={{ position: [0, 0, 4], fov: 45 }}
         gl={{ alpha: true, antialias: true }}
         style={{ background: 'transparent' }}
       >
