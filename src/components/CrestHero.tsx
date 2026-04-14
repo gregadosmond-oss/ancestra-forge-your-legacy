@@ -52,8 +52,10 @@ const fragmentShader = /* glsl */ `
  */
 function Crest({
   pointerRef,
+  scale = 1,
 }: {
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
+  scale?: number;
 }) {
   const meshRef = useRef<Mesh>(null);
   const texture = useLoader(TextureLoader, '/crest.png');
@@ -89,7 +91,7 @@ function Crest({
 
   return (
     <Float speed={0.8} rotationIntensity={0.08} floatIntensity={0.2}>
-      <mesh ref={meshRef} material={material}>
+      <mesh ref={meshRef} material={material} scale={scale}>
         <planeGeometry args={[planeWidth, planeHeight]} />
       </mesh>
     </Float>
@@ -97,11 +99,13 @@ function Crest({
 }
 
 type CrestHeroProps = {
-  /** Min-height of the canvas in vh. Default 42 (landing). Stop 4 uses 70. */
+  /** Min-height of the canvas in vh. Default 42 (landing). Stop 4 uses 75. */
   minHeightVh?: number;
+  /** Mesh scale multiplier. Default 1 (landing). Stop 4 uses 1.7 to fill. */
+  scale?: number;
 };
 
-const CrestHero = ({ minHeightVh = 42 }: CrestHeroProps = {}) => {
+const CrestHero = ({ minHeightVh = 42, scale = 1 }: CrestHeroProps = {}) => {
   // Track the mouse globally (window) so the crest reacts anywhere on the
   // page, not only when hovering the canvas. Stored in a ref so we don't
   // re-render on every mousemove — useFrame reads it directly.
@@ -130,7 +134,7 @@ const CrestHero = ({ minHeightVh = 42 }: CrestHeroProps = {}) => {
         style={{ background: 'transparent' }}
       >
         <Suspense fallback={null}>
-          <Crest pointerRef={pointerRef} />
+          <Crest pointerRef={pointerRef} scale={scale} />
         </Suspense>
       </Canvas>
     </div>

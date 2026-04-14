@@ -43,7 +43,7 @@ const Stop4CrestForge = () => {
                     "radial-gradient(circle at center, hsla(30, 80%, 50%, 0.18) 0%, transparent 60%)",
                 }}
               />
-              <CrestHero minHeightVh={70} />
+              <CrestHero minHeightVh={75} scale={1.7} />
             </motion.div>
 
             {/* Motto */}
