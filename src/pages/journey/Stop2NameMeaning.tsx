@@ -1,22 +1,104 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+import SectionLabel from "@/components/journey/SectionLabel";
+import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
+import WarmDivider from "@/components/journey/WarmDivider";
+import RetryInline from "@/components/journey/RetryInline";
 import { useJourney } from "@/contexts/JourneyContext";
 
 const Stop2NameMeaning = () => {
   const navigate = useNavigate();
-  const { unknownSurname, surname } = useJourney();
+  const { unknownSurname, surname, facts } = useJourney();
 
   useEffect(() => {
-    if (unknownSurname) {
-      navigate("/journey/1", { replace: true });
-    } else if (!surname) {
-      // User landed here without starting a journey (direct URL nav);
-      // send them to Stop 1 so they enter a surname first.
-      navigate("/journey/1", { replace: true });
-    }
+    if (unknownSurname) navigate("/journey/1", { replace: true });
+    else if (!surname) navigate("/journey/1", { replace: true });
   }, [unknownSurname, surname, navigate]);
 
-  return null;
+  if (!surname) return null;
+
+  return (
+    <div className="flex min-h-screen items-center justify-center px-6 py-24">
+      <StaggerGroup
+        delay={0.3}
+        stagger={0.4}
+        className="w-full max-w-2xl text-center"
+      >
+        <motion.div variants={staggerItem}>
+          <SectionLabel>CHAPTER ONE</SectionLabel>
+        </motion.div>
+
+        <motion.h1
+          variants={staggerItem}
+          className="mt-5 font-display text-6xl tracking-[4px] text-cream-warm sm:text-7xl"
+        >
+          {(facts.data?.displaySurname ?? surname).toUpperCase()}
+        </motion.h1>
+
+        {facts.status === "loading" && (
+          <motion.p
+            variants={staggerItem}
+            className="mt-10 font-serif text-sm italic text-amber-dim"
+          >
+            Consulting the archives…
+          </motion.p>
+        )}
+
+        {facts.status === "error" && (
+          <motion.div variants={staggerItem} className="mt-10">
+            <RetryInline onRetry={facts.retry} />
+          </motion.div>
+        )}
+
+        {facts.status === "ready" && facts.data && (
+          <>
+            <motion.p
+              variants={staggerItem}
+              className="mt-10 font-serif text-xl italic text-amber-light"
+            >
+              {facts.data.meaning.etymology}
+            </motion.p>
+
+            <motion.p
+              variants={staggerItem}
+              className="mt-4 font-sans text-base text-foreground"
+            >
+              {facts.data.meaning.origin}
+            </motion.p>
+
+            <motion.p
+              variants={staggerItem}
+              className="mt-6 font-serif text-lg text-text-body"
+            >
+              {facts.data.meaning.role}
+            </motion.p>
+
+            <motion.div variants={staggerItem}>
+              <WarmDivider />
+              <p className="font-serif text-base italic text-amber-light">
+                &ldquo;{facts.data.meaning.historicalContext}&rdquo;
+              </p>
+              <WarmDivider />
+            </motion.div>
+          </>
+        )}
+
+        <motion.div variants={staggerItem} className="mt-8">
+          <Link
+            to="/journey/3"
+            className="inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
+            style={{
+              background: "linear-gradient(135deg, #e8943a, #c47828)",
+              transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+            }}
+          >
+            Meet Your Bloodline
+          </Link>
+        </motion.div>
+      </StaggerGroup>
+    </div>
+  );
 };
 
 export default Stop2NameMeaning;
