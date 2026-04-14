@@ -56,8 +56,7 @@ const HowItWorksSection = () => (
           </div>
           <h3 className="mb-2 font-display text-lg text-cream">{step.heading}</h3>
           <p
-            className="text-sm leading-relaxed"
-            style={{ color: "hsl(var(--text-dim))" }}
+            className="text-sm leading-relaxed text-text-dim"
           >
             {step.body}
           </p>
