@@ -11,7 +11,7 @@ function CrestMedallion({
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
 }) {
   const meshRef = useRef<Mesh>(null);
-  const autoRotY = useRef(0);
+  const REST_Y = (20 * Math.PI) / 180; // permanent 20° tilt so the edge always shows
 
   const texture = useLoader(TextureLoader, '/crest.png');
 
@@ -37,10 +37,9 @@ function CrestMedallion({
     };
   }, [materials]);
 
-  useFrame((_state, delta) => {
+  useFrame(() => {
     if (!meshRef.current) return;
-    autoRotY.current = (autoRotY.current + delta * ((Math.PI * 2) / 8)) % (Math.PI * 2);
-    const targetRotY = autoRotY.current + pointerRef.current.x * MAX_TILT_RAD;
+    const targetRotY = REST_Y + pointerRef.current.x * MAX_TILT_RAD;
     const targetRotX = -pointerRef.current.y * MAX_TILT_RAD;
     meshRef.current.rotation.y += (targetRotY - meshRef.current.rotation.y) * 0.06;
     meshRef.current.rotation.x += (targetRotX - meshRef.current.rotation.x) * 0.06;
