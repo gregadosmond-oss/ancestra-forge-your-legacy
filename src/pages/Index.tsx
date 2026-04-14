@@ -28,7 +28,7 @@ const Index = () => {
 
       {/* Hero content */}
       <div className="relative z-10 flex flex-col items-center px-6 pb-16 text-center">
-        <h1 className="font-display text-4xl leading-tight tracking-tight text-cream-warm sm:text-5xl md:text-6xl lg:text-7xl">
+        <h1 className="font-display text-3xl leading-tight tracking-tight text-cream-warm sm:text-4xl md:text-5xl lg:text-6xl">
           Every family has a story
           <br />
           worth telling.

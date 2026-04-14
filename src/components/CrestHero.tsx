@@ -13,7 +13,7 @@ function Crest() {
   const aspect = texture.image
     ? texture.image.width / texture.image.height
     : 1;
-  const planeHeight = 4;
+  const planeHeight = 8;
   const planeWidth = planeHeight * aspect;
 
   useFrame((state) => {
@@ -27,7 +27,7 @@ function Crest() {
   });
 
   return (
-    <Float speed={1} rotationIntensity={0.2} floatIntensity={0.5}>
+    <Float speed={0.8} rotationIntensity={0.08} floatIntensity={0.2}>
       <mesh ref={meshRef}>
         <planeGeometry args={[planeWidth, planeHeight]} />
         <meshStandardMaterial
@@ -50,7 +50,7 @@ const CrestHero = () => {
       aria-label="Ancestra family crest"
     >
       <Canvas
-        camera={{ position: [0, 0, 4], fov: 45 }}
+        camera={{ position: [0, 0, 5], fov: 45 }}
         gl={{ alpha: true, antialias: true }}
         style={{ background: 'transparent' }}
       >
