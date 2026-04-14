@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import LandingCrestHero from "@/components/LandingCrestHero";
+import CrestHero from "@/components/CrestHero";
 
 const Index = () => {
   return (
@@ -24,7 +24,7 @@ const Index = () => {
 
       {/* 3D Crest Hero */}
       <div className="relative z-10 w-full max-w-4xl">
-        <LandingCrestHero />
+        <CrestHero />
       </div>
 
       {/* Hero content */}
