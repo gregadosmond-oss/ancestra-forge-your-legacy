@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import type { Product } from "@/data/osmondMock";
+import type { MockProduct as Product } from "@/test/fixtures/legacy";
 
 type Props = { product: Product };
 

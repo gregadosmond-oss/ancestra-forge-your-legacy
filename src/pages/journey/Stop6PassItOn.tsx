@@ -5,11 +5,12 @@ import SectionLabel from "@/components/journey/SectionLabel";
 import WarmDivider from "@/components/journey/WarmDivider";
 import ProductCard from "@/components/journey/ProductCard";
 import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
-import { osmondMock } from "@/data/osmondMock";
+import { MOCK_PRODUCTS } from "@/test/fixtures/legacy";
+import { useJourney } from "@/contexts/JourneyContext";
 
 const Stop6PassItOn = () => {
   const [email, setEmail] = useState("");
-  const d = osmondMock;
+  const { surname } = useJourney();
 
   const sendPreview = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,7 +79,7 @@ const Stop6PassItOn = () => {
             Or gift a physical keepsake
           </p>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-            {d.recommendedProducts.map((p) => (
+            {MOCK_PRODUCTS.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>

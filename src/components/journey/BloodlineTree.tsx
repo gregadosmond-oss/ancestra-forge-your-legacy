@@ -1,5 +1,12 @@
 import { motion } from "framer-motion";
-import type { Generation } from "@/data/osmondMock";
+
+type Generation = {
+  name: string;
+  years: string;
+  location: string;
+  role?: string;
+  isYou?: boolean;
+};
 
 type Props = { generations: Generation[] };
 
