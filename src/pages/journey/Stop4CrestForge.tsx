@@ -27,6 +27,19 @@ const Stop4CrestForge = () => {
           </motion.div>
         ) : (
           <motion.div key="reveal" className="flex w-full flex-col items-center">
+            {/* Placeholder notice — real Osmond-specific crest arrives in Phase 2
+                (AI image gen). This line acknowledges the cognitive mismatch so
+                the emotional arc doesn't trip on "why does it say ANCESTRA?" */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="mb-4 max-w-md text-center font-serif text-xs italic text-amber-dim"
+            >
+              Placeholder crest shown — your Osmond crest will be forged here once the
+              live forge is online.
+            </motion.p>
+
             {/* Crest reveal */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
