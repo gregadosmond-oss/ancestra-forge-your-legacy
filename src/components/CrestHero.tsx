@@ -1,8 +1,12 @@
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import {
+  BufferAttribute,
+  BufferGeometry,
   DoubleSide,
+  DynamicDrawUsage,
   Mesh,
+  Points,
   ShaderMaterial,
   SRGBColorSpace,
   TextureLoader,
@@ -81,9 +85,6 @@ function Crest({
     if (!meshRef.current) return;
     const targetRotY = pointerRef.current.x * MAX_TILT_RAD;
     const targetRotX = -pointerRef.current.y * MAX_TILT_RAD;
-    // On first frame after mount, snap to target so the crest doesn't
-    // visibly lerp from flat (0,0) to the current pointer angle — that
-    // ~1s drift read as "not lined up" on the Stop 4 reveal.
     if (!initializedRef.current) {
       meshRef.current.rotation.y = targetRotY;
       meshRef.current.rotation.x = targetRotX;
@@ -96,10 +97,6 @@ function Crest({
       (targetRotX - meshRef.current.rotation.x) * 0.06;
   });
 
-  // No <Float> wrapper: drei's Float seeds each instance with random phase
-  // offsets on rotation/translation, so on mount the mesh appeared tilted a
-  // few degrees Y-axis ("loads to the left") and drifted back to centre
-  // over ~1s. Pointer tracking below gives the crest all the life it needs.
   return (
     <mesh ref={meshRef} material={material}>
       <planeGeometry args={[planeWidth, planeHeight]} />
@@ -107,27 +104,83 @@ function Crest({
   );
 }
 
+/**
+ * Embers — rising spark particles that drift up past the crest, cycling
+ * back to the bottom when they escape the top. Gives a forge-fire feel
+ * without blocking the crest itself.
+ */
+function Embers() {
+  const count = 32;
+  const geoRef = useRef<BufferGeometry>(null!);
+  const pointsRef = useRef<Points>(null!);
+  const positions = useRef(new Float32Array(count * 3));
+  const speeds = useRef(new Float32Array(count));
+  const drifts = useRef(new Float32Array(count));
+
+  useEffect(() => {
+    const geo = geoRef.current;
+    if (!geo) return;
+
+    for (let i = 0; i < count; i++) {
+      positions.current[i * 3]     = (Math.random() - 0.5) * 5.5; // x spread
+      positions.current[i * 3 + 1] = (Math.random() - 0.5) * 7;   // y spread (random start height)
+      positions.current[i * 3 + 2] = 0.2 + Math.random() * 0.8;   // z in front of crest
+      speeds.current[i] = 0.35 + Math.random() * 0.6;
+      drifts.current[i] = (Math.random() - 0.5) * 0.5;
+    }
+
+    geo.setAttribute(
+      'position',
+      new BufferAttribute(positions.current, 3).setUsage(DynamicDrawUsage),
+    );
+
+    return () => { geo.dispose(); };
+  }, []);
+
+  useFrame((_state, delta) => {
+    if (!geoRef.current?.attributes.position) return;
+    const pos = positions.current;
+    for (let i = 0; i < count; i++) {
+      pos[i * 3 + 1] += speeds.current[i] * delta;
+      pos[i * 3]     += drifts.current[i] * delta;
+      // reset particle when it drifts above the top
+      if (pos[i * 3 + 1] > 4) {
+        pos[i * 3]     = (Math.random() - 0.5) * 5.5;
+        pos[i * 3 + 1] = -4;
+        pos[i * 3 + 2] = 0.2 + Math.random() * 0.8;
+        drifts.current[i] = (Math.random() - 0.5) * 0.5;
+      }
+    }
+    geoRef.current.attributes.position.needsUpdate = true;
+  });
+
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry ref={geoRef} />
+      <pointsMaterial
+        color="#e8943a"
+        size={0.038}
+        transparent
+        opacity={0.7}
+        sizeAttenuation
+      />
+    </points>
+  );
+}
+
 type CrestHeroProps = {
   /**
    * Explicit canvas height in vh. Default 42 (landing thumbnail).
    * Stop 4 uses ~75 to make the crest dominate the reveal.
-   * Using `height` (not `minHeight`) so the R3F canvas, which sizes to
-   * parent, actually grows. `minHeight` alone leaves the child height
-   * ambiguous and the canvas collapses to content.
    */
   heightVh?: number;
 };
 
 const CrestHero = ({ heightVh = 42 }: CrestHeroProps = {}) => {
-  // Track the mouse globally (window) so the crest reacts anywhere on the
-  // page, not only when hovering the canvas. Stored in a ref so we don't
-  // re-render on every mousemove — useFrame reads it directly.
   const pointerRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      // Normalize to [-1, 1] with y flipped to match three.js conventions
-      // (top of viewport = +1, bottom = -1).
       pointerRef.current.x = (e.clientX / window.innerWidth) * 2 - 1;
       pointerRef.current.y = -((e.clientY / window.innerHeight) * 2 - 1);
     };
@@ -136,21 +189,41 @@ const CrestHero = ({ heightVh = 42 }: CrestHeroProps = {}) => {
   }, []);
 
   return (
-    <div
-      className="relative w-full"
-      style={{ height: `${heightVh}vh` }}
-      aria-label="Ancestra family crest"
-    >
-      <Canvas
-        camera={{ position: [0, 0, 5], fov: 45 }}
-        gl={{ alpha: true, antialias: true }}
-        style={{ background: 'transparent' }}
+    <>
+      <style>{`
+        @keyframes crestPulse {
+          0%   { opacity: 0.55; transform: scale(1); }
+          100% { opacity: 0.95; transform: scale(1.1); }
+        }
+      `}</style>
+      <div
+        className="relative w-full"
+        style={{ height: `${heightVh}vh` }}
+        aria-label="Ancestra family crest"
       >
-        <Suspense fallback={null}>
-          <Crest pointerRef={pointerRef} />
-        </Suspense>
-      </Canvas>
-    </div>
+        {/* Pulsing amber glow backdrop */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'radial-gradient(ellipse 55% 60% at 50% 50%, rgba(232,148,58,0.25) 0%, rgba(200,80,20,0.10) 45%, transparent 72%)',
+            animation: 'crestPulse 3s ease-in-out infinite alternate',
+            pointerEvents: 'none',
+          }}
+        />
+        <Canvas
+          camera={{ position: [0, 0, 5], fov: 45 }}
+          gl={{ alpha: true, antialias: true }}
+          style={{ background: 'transparent', position: 'relative', zIndex: 1 }}
+        >
+          <Suspense fallback={null}>
+            <Crest pointerRef={pointerRef} />
+            <Embers />
+          </Suspense>
+        </Canvas>
+      </div>
+    </>
   );
 };
 
