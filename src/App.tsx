@@ -24,6 +24,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/tools/surname" element={<SurnameLookup />} />
           <Route path="/journey" element={<JourneyLayout />}>
             <Route index element={<Navigate to="/journey/1" replace />} />
             <Route path="1" element={<Stop1EnterName />} />
