@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
@@ -15,6 +15,17 @@ const Stop5Story = () => {
     if (unknownSurname) navigate("/journey/1", { replace: true });
     else if (!surname) navigate("/journey/1", { replace: true });
   }, [unknownSurname, surname, navigate]);
+
+  // Stable callback so TypewriterText's effect doesn't loop on re-renders
+  const handleTyped = useCallback(() => setTyped(true), []);
+
+  // Fallback: show paywall after estimated typing time + 3s buffer
+  useEffect(() => {
+    if (story.status !== "ready" || !story.data) return;
+    const ms = (story.data.chapterOneBody?.length ?? 0) * 12 + 3000;
+    const t = setTimeout(() => setTyped(true), ms);
+    return () => clearTimeout(t);
+  }, [story.status, story.data]);
 
   if (!surname) return null;
 
@@ -48,7 +59,7 @@ const Stop5Story = () => {
           <div className="mt-10 w-full max-w-2xl">
             <TypewriterText
               text={story.data.chapterOneBody}
-              onDone={() => setTyped(true)}
+              onDone={handleTyped}
               className="font-serif text-lg leading-relaxed text-text-body"
             />
           </div>
