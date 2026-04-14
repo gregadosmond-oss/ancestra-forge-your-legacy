@@ -1,10 +1,11 @@
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import ForgeLoader from "@/components/journey/ForgeLoader";
 import CrestHero from "@/components/CrestHero";
-import { osmondMock } from "@/data/osmondMock";
+import RetryInline from "@/components/journey/RetryInline";
+import { useJourney } from "@/contexts/JourneyContext";
 
 const FORGE_MESSAGES = [
   "Consulting the archives…",
@@ -13,8 +14,16 @@ const FORGE_MESSAGES = [
 ];
 
 const Stop4CrestForge = () => {
+  const navigate = useNavigate();
+  const { unknownSurname, surname, facts } = useJourney();
   const [forged, setForged] = useState(false);
-  const d = osmondMock;
+
+  useEffect(() => {
+    if (unknownSurname) navigate("/journey/1", { replace: true });
+    else if (!surname) navigate("/journey/1", { replace: true });
+  }, [unknownSurname, surname, navigate]);
+
+  if (!surname) return null;
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
@@ -23,26 +32,26 @@ const Stop4CrestForge = () => {
       <AnimatePresence mode="wait">
         {!forged ? (
           <motion.div key="loader" exit={{ opacity: 0 }} className="w-full">
-            <ForgeLoader messages={FORGE_MESSAGES} onComplete={() => setForged(true)} />
+            <ForgeLoader
+              messages={FORGE_MESSAGES}
+              onComplete={() => setForged(true)}
+            />
           </motion.div>
         ) : (
-          <motion.div key="reveal" className="flex w-full flex-col items-center">
-            {/* Placeholder notice — real Osmond-specific crest arrives in Phase 2
-                (AI image gen). This line acknowledges the cognitive mismatch so
-                the emotional arc doesn't trip on "why does it say ANCESTRA?" */}
+          <motion.div
+            key="reveal"
+            className="flex w-full flex-col items-center"
+          >
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               className="mb-4 max-w-md text-center font-serif text-xs italic text-amber-dim"
             >
-              Placeholder crest shown — your Osmond crest will be forged here once the
-              live forge is online.
+              Placeholder crest shown — your {facts.data?.displaySurname ?? surname}{" "}
+              crest will be forged here once the live forge is online.
             </motion.p>
 
-            {/* Crest reveal — fade only, no scale. Scale entry was causing
-                the "loads to the left then lines up" effect because the
-                CSS transform scaled the 3D canvas wrapper during mount. */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -61,50 +70,64 @@ const Stop4CrestForge = () => {
               <CrestHero heightVh={75} />
             </motion.div>
 
-            {/* Motto */}
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="mt-2 text-center"
-            >
-              <p className="font-serif text-2xl italic text-amber-light">
-                {d.mottoLatin}
+            {facts.status === "loading" && (
+              <p className="mt-4 font-serif text-sm italic text-amber-dim">
+                Inscribing the motto…
               </p>
-              <p className="mt-2 font-sans text-sm tracking-[2px] text-amber-dim">
-                {d.mottoEnglish.toUpperCase()}
-              </p>
-            </motion.div>
+            )}
 
-            {/* Symbolism grid */}
-            <motion.div
-              initial="hidden"
-              animate="show"
-              variants={{
-                hidden: {},
-                show: { transition: { staggerChildren: 0.2, delayChildren: 1.2 } },
-              }}
-              className="mt-12 grid w-full max-w-4xl grid-cols-2 gap-4 md:grid-cols-4"
-            >
-              {d.symbolism.map((s) => (
+            {facts.status === "error" && (
+              <div className="mt-4">
+                <RetryInline onRetry={facts.retry} />
+              </div>
+            )}
+
+            {facts.status === "ready" && facts.data && (
+              <>
                 <motion.div
-                  key={s.element}
-                  variants={{
-                    hidden: { opacity: 0, y: 10 },
-                    show: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-                  }}
-                  className="rounded-[14px] border border-amber-dim/20 bg-card/50 p-5 text-center"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.6 }}
+                  className="mt-2 text-center"
                 >
-                  <div className="mx-auto mb-3 h-2 w-2 rounded-full bg-amber" />
-                  <h4 className="font-display text-base text-cream-warm">
-                    {s.element}
-                  </h4>
-                  <p className="mt-2 font-serif text-xs italic text-text-body">
-                    {s.meaning}
+                  <p className="font-serif text-2xl italic text-amber-light">
+                    {facts.data.mottoLatin}
+                  </p>
+                  <p className="mt-2 font-sans text-sm tracking-[2px] text-amber-dim">
+                    {facts.data.mottoEnglish.toUpperCase()}
                   </p>
                 </motion.div>
-              ))}
-            </motion.div>
+
+                <motion.div
+                  initial="hidden"
+                  animate="show"
+                  variants={{
+                    hidden: {},
+                    show: { transition: { staggerChildren: 0.2, delayChildren: 1.2 } },
+                  }}
+                  className="mt-12 grid w-full max-w-4xl grid-cols-2 gap-4 md:grid-cols-4"
+                >
+                  {facts.data.symbolism.map((s) => (
+                    <motion.div
+                      key={s.element}
+                      variants={{
+                        hidden: { opacity: 0, y: 10 },
+                        show: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+                      }}
+                      className="rounded-[14px] border border-amber-dim/20 bg-card/50 p-5 text-center"
+                    >
+                      <div className="mx-auto mb-3 h-2 w-2 rounded-full bg-amber" />
+                      <h4 className="font-display text-base text-cream-warm">
+                        {s.element}
+                      </h4>
+                      <p className="mt-2 font-serif text-xs italic text-text-body">
+                        {s.meaning}
+                      </p>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </>
+            )}
 
             <motion.div
               initial={{ opacity: 0 }}
