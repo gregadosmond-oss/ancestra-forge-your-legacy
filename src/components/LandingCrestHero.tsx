@@ -39,7 +39,7 @@ function CrestMedallion({
 
   useFrame((_state, delta) => {
     if (!meshRef.current) return;
-    autoRotY.current = (autoRotY.current + delta * ((Math.PI * 2) / 20)) % (Math.PI * 2);
+    autoRotY.current = (autoRotY.current + delta * ((Math.PI * 2) / 8)) % (Math.PI * 2);
     const targetRotY = autoRotY.current + pointerRef.current.x * MAX_TILT_RAD;
     const targetRotX = -pointerRef.current.y * MAX_TILT_RAD;
     meshRef.current.rotation.y += (targetRotY - meshRef.current.rotation.y) * 0.06;
@@ -49,7 +49,7 @@ function CrestMedallion({
   return (
     <Float speed={1} rotationIntensity={0} floatIntensity={0.5}>
       <mesh ref={meshRef} material={materials}>
-        <boxGeometry args={[3, 3, 0.05]} />
+        <boxGeometry args={[4.5, 4.5, 0.06]} />
       </mesh>
     </Float>
   );
@@ -70,7 +70,7 @@ const LandingCrestHero = () => {
   return (
     <div
       className="relative w-full"
-      style={{ minHeight: '60vh' }}
+      style={{ height: '60vh' }}
       aria-label="Ancestra family crest"
     >
       <Canvas
