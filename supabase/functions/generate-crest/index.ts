@@ -61,7 +61,7 @@ Deno.serve(async (req: Request) => {
       surname,
       facts,
       callImageApi: async (prompt: string) => {
-          const res = await fetch("https://api.ideogram.ai/v3/generate", {
+          const res = await fetch("https://api.ideogram.ai/generate/v3", {
             method: "POST",
             headers: {
               "Api-Key": ideogramKey,
