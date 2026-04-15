@@ -95,18 +95,24 @@ Deno.serve(async (req: Request) => {
         return url;
       },
       downloadAndUpload: async (normalized: string, tempUrl: string) => {
-        // Remove background via remove.bg API
+        // 1. Download from Ideogram
+        const imgRes = await fetch(tempUrl);
+        if (!imgRes.ok) throw new Error(`failed to download image: ${imgRes.status}`);
+        const imgBuffer = await imgRes.arrayBuffer();
+        const imgBlob = new Blob([imgBuffer], { type: "image/png" });
+
+        // 2. Send binary to remove.bg
+        const rbgForm = new FormData();
+        rbgForm.append("image_file", imgBlob, "crest.png");
+        rbgForm.append("size", "auto");
+
         const rbgRes = await fetch("https://api.remove.bg/v1.0/removebg", {
           method: "POST",
           headers: {
             "X-Api-Key": removeBgKey,
-            "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "image/png",
           },
-          body: new URLSearchParams({
-            image_url: tempUrl,
-            size: "auto",
-          }).toString(),
+          body: rbgForm,
         });
         if (!rbgRes.ok) {
           const errText = await rbgRes.text();
