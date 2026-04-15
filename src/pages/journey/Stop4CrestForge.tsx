@@ -44,6 +44,21 @@ const Stop4CrestForge = () => {
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
           className="flex w-full flex-col items-center"
         >
+          {/* Family name */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="mb-6 text-center"
+          >
+            <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
+              House
+            </p>
+            <h1 className="font-display text-4xl text-cream-warm sm:text-5xl">
+              {facts.data?.displaySurname ?? surname}
+            </h1>
+          </motion.div>
+
           {/* Amber glow behind crest */}
           <div
             className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
