@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { LegacyResponse, LegacyFacts } from "@/types/legacy";
 
 // We're going to mock the supabase client module entirely.
@@ -14,6 +14,10 @@ vi.mock("@/integrations/supabase/client", () => {
 
 import { supabase } from "@/integrations/supabase/client";
 import { fetchLegacy, fetchCrest } from "./legacyClient";
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 describe("fetchLegacy", () => {
   it("calls the generate-legacy function with the surname", async () => {
