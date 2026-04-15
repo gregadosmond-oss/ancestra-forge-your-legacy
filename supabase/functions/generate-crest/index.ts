@@ -63,7 +63,7 @@ Deno.serve(async (req: Request) => {
       callImageApi: async (prompt: string) => {
           const formData = new FormData();
           formData.append("prompt", prompt);
-          formData.append("aspect_ratio", "1:1");
+          formData.append("aspect_ratio", "1x1");
           formData.append("rendering_speed", "DEFAULT");
           formData.append("style_type", "REALISTIC");
 
