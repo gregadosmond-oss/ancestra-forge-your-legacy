@@ -94,9 +94,9 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
         : { data: resp.story, status: "ready", reason: null },
     }));
     // Fire crest generation in the background when facts are ready.
-    if (!factsErr && resp.facts) {
+    if (!factsErr && resp.facts && surnameRef.current) {
       factsRef.current = resp.facts;
-      void runCrestFetch(surnameRef.current!, resp.facts);
+      void runCrestFetch(surnameRef.current, resp.facts);
     }
   }, [runCrestFetch]);
 
