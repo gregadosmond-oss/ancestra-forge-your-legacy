@@ -6,19 +6,19 @@ export function normalizeSurname(input: string): string {
 }
 
 export function buildPrompt(facts: LegacyFacts): string {
-  const symbol1 = facts.symbolism[0]?.element ?? "oak tree";
-  const symbol2 = facts.symbolism[1]?.element ?? "chevron";
+  const symbols = facts.symbolism.map((s) => s.element).join(", ");
   const surname = facts.displaySurname.toUpperCase();
   return [
-    `Photorealistic 3D heraldic coat of arms for the ${facts.displaySurname} family.`,
-    `Central shield: deep crimson red with gold ${symbol1} and gold ${symbol2} in raised relief.`,
-    `Two rampant gold lions as supporters flanking the shield, standing on ornate gold base.`,
-    `Royal gold crown with crimson velvet cap on top, above ornate baroque gold acanthus leaf scrollwork flourishes extending wide on both sides.`,
-    `Silver brushed metal ribbon banner at bottom with "${surname}" engraved in bold serif capitals.`,
-    `Style: hyper-realistic 3D CGI sculpture, polished antique gold metalwork with deep cast shadows and bright specular highlights,`,
-    `ornate baroque heraldic design, museum-quality luxury feel, perfectly symmetrical composition.`,
-    `Background: solid pure black background, completely black, no texture, no leather, no environment, no room, no reflections, just black.`,
-    `Cinematic dramatic lighting from above, 8K detail.`,
+    `A photorealistic 3D rendered heraldic coat of arms for the ${facts.displaySurname} family.`,
+    `Family were ${facts.meaning.role} from ${facts.meaning.origin}.`,
+    `Shield bearing ${symbols}.`,
+    `Silver ribbon banner at the base clearly engraved with the text "${surname}".`,
+    `Golden lion supporters on each side, royal crown on top.`,
+    `Style: luxury 3D CGI render, physically sculpted gold and deep crimson shield,`,
+    `professional product photography against a pure black studio backdrop,`,
+    `black seamless background, no room, no furniture, no environment, no reflections on floor,`,
+    `dramatic overhead studio lighting, polished gold reflections, real depth and shadow,`,
+    `premium luxury brand quality, perfectly symmetrical, 8K.`,
   ].join(" ");
 }
 
