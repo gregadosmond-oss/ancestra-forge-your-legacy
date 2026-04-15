@@ -41,7 +41,7 @@ const GiftPage = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("surname_facts")
-        .select("payload")
+        .select("facts_payload")
         .eq("surname", gift!.surname.toLowerCase())
         .order("created_at", { ascending: false })
         .limit(1)
@@ -52,7 +52,9 @@ const GiftPage = () => {
     enabled: !!gift?.surname,
   });
 
-  const motto = (facts?.payload as Record<string, unknown>)?.motto_latin as string | undefined;
+  const factsPayload = facts?.facts_payload as Record<string, unknown> | null;
+  const motto = factsPayload?.mottoLatin as string | undefined;
+  const mottoEnglish = factsPayload?.mottoEnglish as string | undefined;
 
   const handleClaim = () => {
     navigate(`/journey/1?surname=${encodeURIComponent(gift?.surname ?? "")}`);
@@ -175,12 +177,16 @@ const GiftPage = () => {
 
       {/* Motto */}
       {motto && (
-        <p
-          className="font-serif italic text-center mb-4 max-w-md"
-          style={{ color: "hsl(var(--amber-light))", fontSize: "17px" }}
-        >
-          "{motto}"
-        </p>
+        <div className="text-center mb-4">
+          <p className="font-serif italic" style={{ color: "hsl(var(--amber-light))", fontSize: "17px" }}>
+            {motto}
+          </p>
+          {mottoEnglish && (
+            <p className="mt-1 font-sans uppercase tracking-[3px]" style={{ color: "#a07830", fontSize: "9px" }}>
+              {mottoEnglish}
+            </p>
+          )}
+        </div>
       )}
 
       {/* Subtitle */}
