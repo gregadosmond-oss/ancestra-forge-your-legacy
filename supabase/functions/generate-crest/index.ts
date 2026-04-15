@@ -69,9 +69,9 @@ Deno.serve(async (req: Request) => {
             },
             body: JSON.stringify({
               prompt,
-              model: "V_3",
               aspect_ratio: "1:1",
               rendering_speed: "DEFAULT",
+              style_type: "REALISTIC",
             }),
           });
         if (!res.ok) {
