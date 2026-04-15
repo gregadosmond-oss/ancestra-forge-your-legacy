@@ -14,6 +14,9 @@ CREATE POLICY "Anyone can read cached crests"
   ON public.surname_crests FOR SELECT
   USING (true);
 
+CREATE INDEX surname_crests_created_at_idx
+  ON public.surname_crests (created_at DESC);
+
 -- Supabase Storage: public crests bucket.
 -- Files stored as {normalized_surname}.png
 INSERT INTO storage.buckets (id, name, public)
