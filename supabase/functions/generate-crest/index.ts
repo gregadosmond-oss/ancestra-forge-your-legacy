@@ -65,7 +65,7 @@ Deno.serve(async (req: Request) => {
           formData.append("prompt", prompt);
           formData.append("aspect_ratio", "1x1");
           formData.append("rendering_speed", "DEFAULT");
-          formData.append("style_type", "DESIGN");
+          formData.append("style_type", "REALISTIC");
 
           const res = await fetch("https://api.ideogram.ai/v1/ideogram-v3/generate", {
             method: "POST",

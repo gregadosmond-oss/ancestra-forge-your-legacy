@@ -15,10 +15,11 @@ export function buildPrompt(facts: LegacyFacts): string {
     `Shield bearing ${symbol1} and ${symbol2}.`,
     `Silver ribbon banner at the base clearly engraved with the text "${surname}".`,
     `Golden lion supporters on each side, royal crown on top.`,
-    `Style: luxury heraldic emblem design, physically sculpted 3D gold metalwork,`,
-    `deep crimson shield, solid pure black background #000000, no environment, no room,`,
-    `no scene, isolated emblem on black only, dramatic lighting with gold reflections,`,
-    `real depth and shadow, premium luxury brand logo quality, perfectly symmetrical.`,
+    `Style: luxury 3D CGI render, physically sculpted gold and deep crimson shield,`,
+    `professional product photography against a pure black studio backdrop,`,
+    `black seamless background, no room, no furniture, no environment, no reflections on floor,`,
+    `dramatic overhead studio lighting, polished gold reflections, real depth and shadow,`,
+    `premium luxury brand quality, perfectly symmetrical, 8K.`,
   ].join(" ");
 }
 
