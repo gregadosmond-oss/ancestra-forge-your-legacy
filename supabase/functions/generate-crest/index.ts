@@ -40,8 +40,16 @@ Deno.serve(async (req: Request) => {
   if (typeof body.surname !== "string" || body.surname.trim().length === 0) {
     return json({ error: "surname required" }, 400);
   }
+  const surname = body.surname.trim();
+  if (surname.length > 60) {
+    return json({ error: "surname too long" }, 400);
+  }
   if (!body.facts || typeof body.facts !== "object") {
     return json({ error: "facts required" }, 400);
+  }
+  const factsObj = body.facts as Record<string, unknown>;
+  if (!Array.isArray(factsObj.symbolism) || factsObj.symbolism.length === 0) {
+    return json({ error: "facts.symbolism must be a non-empty array" }, 400);
   }
 
   const facts = body.facts as LegacyFacts;
@@ -50,7 +58,7 @@ Deno.serve(async (req: Request) => {
   try {
     const imageUrl = await generateCrest({
       client,
-      surname: body.surname,
+      surname,
       facts,
       callDalle: async (prompt: string) => {
         const res = await fetch("https://api.openai.com/v1/images/generations", {
@@ -101,7 +109,12 @@ Deno.serve(async (req: Request) => {
 
     return json({ code: "OK", imageUrl });
   } catch (err) {
-    console.error("generate-crest error:", (err as Error).message);
-    return json({ code: "ERROR", reason: (err as Error).message }, 502);
+    const msg = (err as Error).message;
+    console.error("generate-crest error:", msg);
+    const clientReason =
+      msg.startsWith("DALL-E error") || msg.startsWith("storage upload")
+        ? "image generation failed"
+        : msg;
+    return json({ code: "ERROR", reason: clientReason }, 502);
   }
 });
