@@ -45,7 +45,7 @@ const AuthGate = ({ onAuthenticated, onClose }: AuthGateProps) => {
 
   const handleGoogle = async () => {
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/checkout`,
+      redirect_uri: window.location.href,
     });
     if (result.error) {
       toast.error("Google sign-in failed. Try email instead.");
