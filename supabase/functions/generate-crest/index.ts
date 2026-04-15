@@ -73,7 +73,7 @@ Deno.serve(async (req: Request) => {
           formData.append("prompt", prompt);
           formData.append("aspect_ratio", "1x1");
           formData.append("rendering_speed", "TURBO");
-          formData.append("style_type", "REALISTIC");
+          formData.append("style_type", "DESIGN");
           formData.append("style_reference_images[0]", refBlob, "osmond-reference.png");
           formData.append("negative_prompt", "room, interior, furniture, walls, floor, ceiling, hallway, library, environment, building, table, surface, reflections");
 
