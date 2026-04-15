@@ -61,11 +61,23 @@ Deno.serve(async (req: Request) => {
       surname,
       facts,
       callImageApi: async (prompt: string) => {
+          // Download style reference image from storage
+          const styleRefUrl = `${supabaseUrl}/storage/v1/object/public/crests/style-reference.jpeg`;
+          const styleRes = await fetch(styleRefUrl);
+          if (!styleRes.ok) {
+            console.error("Failed to fetch style reference:", styleRes.status);
+          }
+          const styleBlob = styleRes.ok ? await styleRes.blob() : null;
+
           const formData = new FormData();
           formData.append("prompt", prompt);
           formData.append("aspect_ratio", "1x1");
           formData.append("rendering_speed", "DEFAULT");
           formData.append("style_type", "REALISTIC");
+
+          if (styleBlob) {
+            formData.append("style_reference_images[0]", styleBlob, "style-reference.jpeg");
+          }
 
           const res = await fetch("https://api.ideogram.ai/v1/ideogram-v3/generate", {
             method: "POST",
