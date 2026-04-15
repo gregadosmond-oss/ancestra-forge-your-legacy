@@ -14,7 +14,7 @@ export type CallOptions = {
   fetchImpl?: typeof fetch;
 };
 
-const DEFAULT_MODEL = "claude-3-5-haiku-20241022";
+const DEFAULT_MODEL = "claude-haiku-4-5-20250414";
 const DEFAULT_MAX_TOKENS = 2048;
 const DEFAULT_BACKOFF_MS = 500;
 const RETRYABLE_STATUSES = new Set([429, 500, 502, 503, 504]);
