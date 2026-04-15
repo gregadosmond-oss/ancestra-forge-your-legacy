@@ -127,6 +127,27 @@ export type Database = {
         }
         Relationships: []
       }
+      surname_crests: {
+        Row: {
+          created_at: string
+          image_url: string
+          prompt: string
+          surname: string
+        }
+        Insert: {
+          created_at?: string
+          image_url: string
+          prompt: string
+          surname: string
+        }
+        Update: {
+          created_at?: string
+          image_url?: string
+          prompt?: string
+          surname?: string
+        }
+        Relationships: []
+      }
       surname_facts: {
         Row: {
           created_at: string
