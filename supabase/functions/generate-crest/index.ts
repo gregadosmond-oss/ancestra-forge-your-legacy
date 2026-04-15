@@ -72,7 +72,7 @@ Deno.serve(async (req: Request) => {
           const formData = new FormData();
           formData.append("prompt", prompt);
           formData.append("aspect_ratio", "1x1");
-          formData.append("rendering_speed", "DEFAULT");
+          formData.append("rendering_speed", "TURBO");
           formData.append("style_type", "REALISTIC");
 
           if (styleBlob) {
