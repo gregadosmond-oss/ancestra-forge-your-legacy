@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import TypewriterText from "@/components/journey/TypewriterText";
 import RetryInline from "@/components/journey/RetryInline";
@@ -9,23 +9,11 @@ import { useJourney } from "@/contexts/JourneyContext";
 const Stop5Story = () => {
   const navigate = useNavigate();
   const { unknownSurname, surname, story } = useJourney();
-  const [typed, setTyped] = useState(false);
 
   useEffect(() => {
     if (unknownSurname) navigate("/journey/1", { replace: true });
     else if (!surname) navigate("/journey/1", { replace: true });
   }, [unknownSurname, surname, navigate]);
-
-  // Stable callback so TypewriterText's effect doesn't loop on re-renders
-  const handleTyped = useCallback(() => setTyped(true), []);
-
-  // Fallback: show paywall after estimated typing time + 3s buffer
-  useEffect(() => {
-    if (story.status !== "ready" || !story.data) return;
-    const ms = (story.data.chapterOneBody?.length ?? 0) * 12 + 3000;
-    const t = setTimeout(() => setTyped(true), ms);
-    return () => clearTimeout(t);
-  }, [story.status, story.data]);
 
   if (!surname) return null;
 
@@ -59,40 +47,37 @@ const Stop5Story = () => {
           <div className="mt-10 w-full max-w-2xl">
             <TypewriterText
               text={story.data.chapterOneBody}
-              onDone={handleTyped}
               className="font-serif text-lg leading-relaxed text-text-body"
             />
           </div>
 
-          {typed && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.2 }}
-              className="mt-14 w-full max-w-xl rounded-[22px] border border-amber-dim/25 bg-card/60 p-8 text-center"
-            >
-              <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
-                EIGHT CHAPTERS REMAIN
-              </p>
-              <ul className="mt-5 space-y-2 font-serif text-sm italic text-text-dim">
-                {story.data.teaserChapters.map((t, i) => (
-                  <li key={`${t}-${i}`}>{t}</li>
-                ))}
-              </ul>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.2, delay: 2 }}
+            className="mt-14 w-full max-w-xl rounded-[22px] border border-amber-dim/25 bg-card/60 p-8 text-center"
+          >
+            <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
+              EIGHT CHAPTERS REMAIN
+            </p>
+            <ul className="mt-5 space-y-2 font-serif text-sm italic text-text-dim">
+              {story.data.teaserChapters.map((t, i) => (
+                <li key={`${t}-${i}`}>{t}</li>
+              ))}
+            </ul>
 
-              <a
-                href="https://buy.stripe.com/28EaEwFYM8polaw76Cbo400"
-                className="mt-8 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
-                style={{
-                  background: "linear-gradient(135deg, #e8943a, #c47828)",
-                  transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-                  color: "#1a1208",
-                }}
-              >
-                Unlock Your Legacy Pack — $29
-              </a>
-            </motion.div>
-          )}
+            <a
+              href="https://buy.stripe.com/28EaEwFYM8polaw76Cbo400"
+              className="mt-8 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
+              style={{
+                background: "linear-gradient(135deg, #e8943a, #c47828)",
+                transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                color: "#1a1208",
+              }}
+            >
+              Unlock Your Legacy Pack — $29
+            </a>
+          </motion.div>
         </>
       )}
     </div>
