@@ -61,21 +61,19 @@ Deno.serve(async (req: Request) => {
       surname,
       facts,
       callImageApi: async (prompt: string) => {
-        const res = await fetch("https://api.ideogram.ai/generate", {
-          method: "POST",
-          headers: {
-            "Api-Key": ideogramKey,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            image_request: {
+          const res = await fetch("https://api.ideogram.ai/v3/generate", {
+            method: "POST",
+            headers: {
+              "Api-Key": ideogramKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
               prompt,
               model: "V_3",
-              aspect_ratio: "ASPECT_1_1",
-              style_type: "RENDER_3D",
-            },
-          }),
-        });
+              aspect_ratio: "1:1",
+              rendering_speed: "DEFAULT",
+            }),
+          });
         if (!res.ok) {
           const err = await res.text();
           throw new Error(`Ideogram error ${res.status}: ${err}`);
