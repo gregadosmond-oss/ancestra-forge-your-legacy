@@ -41,7 +41,7 @@ const GiftPage = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("surname_facts")
-        .select("facts_payload")
+        .select("payload")
         .eq("surname", gift!.surname.toLowerCase())
         .order("created_at", { ascending: false })
         .limit(1)
@@ -52,7 +52,7 @@ const GiftPage = () => {
     enabled: !!gift?.surname,
   });
 
-  const factsPayload = facts?.facts_payload as Record<string, unknown> | null;
+  const factsPayload = facts?.payload as Record<string, unknown> | null;
   const motto = factsPayload?.mottoLatin as string | undefined;
   const mottoEnglish = factsPayload?.mottoEnglish as string | undefined;
 
@@ -146,22 +146,13 @@ const GiftPage = () => {
       />
 
       {/* Crest image */}
-      <div className="relative w-64 h-64 sm:w-80 sm:h-80 mb-8 flex items-center justify-center">
-        {crest?.image_url ? (
-          <img
-            src={crest.image_url}
-            alt={`House ${surname} family crest`}
-            className="w-full h-full object-contain"
-            draggable={false}
-          />
-        ) : (
-          <img
-            src="/crest.png"
-            alt="Ancestra family crest"
-            className="w-full h-full object-contain"
-            draggable={false}
-          />
-        )}
+      <div className="mb-8 flex items-center justify-center" style={{ minHeight: "280px" }}>
+        <img
+          src={crest?.image_url ?? "/crest.png"}
+          alt={`House ${surname} family crest`}
+          style={{ width: "280px", height: "280px", objectFit: "contain" }}
+          draggable={false}
+        />
       </div>
 
       {/* Headline */}
