@@ -61,7 +61,7 @@ Deno.serve(async (req: Request) => {
       surname,
       facts,
       callImageApi: async (prompt: string) => {
-          // Download reference crest image from storage for remix
+          // Download reference crest image from storage for style reference
           const refUrl = `${supabaseUrl}/storage/v1/object/public/crests/reference/osmond-reference.png`;
           const refRes = await fetch(refUrl);
           if (!refRes.ok) {
@@ -74,10 +74,9 @@ Deno.serve(async (req: Request) => {
           formData.append("aspect_ratio", "1x1");
           formData.append("rendering_speed", "TURBO");
           formData.append("style_type", "REALISTIC");
-          formData.append("image_weight", "85");
-          formData.append("image", refBlob, "osmond-reference.png");
+          formData.append("style_reference_images[0]", refBlob, "osmond-reference.png");
 
-          const res = await fetch("https://api.ideogram.ai/v1/ideogram-v3/remix", {
+          const res = await fetch("https://api.ideogram.ai/v1/ideogram-v3/generate", {
             method: "POST",
             headers: {
               "Api-Key": ideogramKey,
