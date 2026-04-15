@@ -164,7 +164,7 @@ describe("crest piece", () => {
     (fetchCrest as ReturnType<typeof vi.fn>).mockReset();
   });
 
-  it("transitions idle -> loading -> ready when facts succeed", async () => {
+  it("transitions idle -> ready when facts succeed", async () => {
     (fetchLegacy as ReturnType<typeof vi.fn>).mockResolvedValue(OK_RESPONSE);
     (fetchCrest as ReturnType<typeof vi.fn>).mockResolvedValue({
       imageUrl: "https://storage.example.com/crests/reilly.png",
@@ -203,9 +203,10 @@ describe("crest piece", () => {
     } satisfies LegacyResponse);
 
     function CrestHarness() {
-      const { crest, startJourney } = useJourney();
+      const { crest, facts, startJourney } = useJourney();
       return (
         <div>
+          <div data-testid="facts-status">{facts.status}</div>
           <div data-testid="crest-status">{crest.status}</div>
           <button onClick={() => startJourney("Reilly")}>start</button>
         </div>
@@ -214,11 +215,10 @@ describe("crest piece", () => {
 
     render(<JourneyProvider><CrestHarness /></JourneyProvider>);
     act(() => { screen.getByText("start").click(); });
+    // Wait for facts to settle to error — confirms async work is complete
     await waitFor(() =>
-      expect(screen.getByTestId("crest-status").textContent).not.toBe("idle"),
-    ).catch(() => {/* stays idle — assertion passes below */});
-
-    // Wait a tick for any async side effects
+      expect(screen.getByTestId("facts-status").textContent).toBe("error"),
+    );
     await act(async () => {});
     expect(screen.getByTestId("crest-status").textContent).toBe("idle");
     expect(fetchCrest).not.toHaveBeenCalled();
