@@ -62,20 +62,11 @@ Deno.serve(async (req: Request) => {
       surname,
       facts,
       callImageApi: async (prompt: string) => {
-          // Download reference crest image from storage for style reference
-          const refUrl = `${supabaseUrl}/storage/v1/object/public/crests/reference/osmond-reference.png`;
-          const refRes = await fetch(refUrl);
-          if (!refRes.ok) {
-            throw new Error(`Failed to fetch reference image: ${refRes.status}`);
-          }
-          const refBlob = await refRes.blob();
-
           const formData = new FormData();
           formData.append("prompt", prompt);
           formData.append("aspect_ratio", "1x1");
           formData.append("rendering_speed", "TURBO");
-          formData.append("style_type", "DESIGN");
-          formData.append("style_reference_images[0]", refBlob, "osmond-reference.png");
+          formData.append("style_type", "REALISTIC");
           formData.append("negative_prompt", "room, interior, furniture, walls, floor, ceiling, hallway, library, environment, building, table, surface, reflections");
 
           const res = await fetch("https://api.ideogram.ai/v1/ideogram-v3/generate", {
