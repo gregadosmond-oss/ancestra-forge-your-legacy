@@ -95,11 +95,20 @@ Deno.serve(async (req: Request) => {
         return url;
       },
       downloadAndUpload: async (normalized: string, tempUrl: string) => {
-        const imgRes = await fetch(tempUrl);
-        if (!imgRes.ok) {
-          throw new Error(`failed to download image: ${imgRes.status}`);
+        // Remove background via remove.bg API
+        const rbgForm = new FormData();
+        rbgForm.append("image_url", tempUrl);
+        rbgForm.append("size", "regular");
+        const rbgRes = await fetch("https://api.remove.bg/v1.0/removebg", {
+          method: "POST",
+          headers: { "Api-Key": removeBgKey },
+          body: rbgForm,
+        });
+        if (!rbgRes.ok) {
+          const errText = await rbgRes.text();
+          throw new Error(`remove.bg error ${rbgRes.status}: ${errText}`);
         }
-        const buffer = await imgRes.arrayBuffer();
+        const buffer = await rbgRes.arrayBuffer();
 
         const filePath = `${normalized}.png`;
         const { error: uploadError } = await client.storage
