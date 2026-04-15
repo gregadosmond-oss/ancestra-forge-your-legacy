@@ -122,10 +122,20 @@ const GiftPage = () => {
         House {surname}
       </h1>
 
+      {/* Motto */}
+      {motto && (
+        <p
+          className="font-serif italic text-center mb-4 max-w-md"
+          style={{ color: "hsl(var(--amber-light))", fontSize: "17px" }}
+        >
+          "{motto}"
+        </p>
+      )}
+
       {/* Subtitle */}
       <p
-        className="font-serif italic text-center mb-10 max-w-md"
-        style={{ color: "hsl(var(--amber-light))", fontSize: "17px" }}
+        className="font-sans text-center mb-10 max-w-md"
+        style={{ color: "hsl(var(--text-body))", fontSize: "15px" }}
       >
         Someone special wants you to discover your legacy.
       </p>
