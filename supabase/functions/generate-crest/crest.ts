@@ -9,16 +9,16 @@ export function buildPrompt(facts: LegacyFacts): string {
   const symbols = facts.symbolism.map((s) => s.element).join(" and ");
   const surname = facts.displaySurname.toUpperCase();
   return [
-    `A photorealistic 3D rendered heraldic coat of arms floating in empty space, sculpted gold metalwork.`,
+    `A heraldic coat of arms floating on a pure black background.`,
+    `Sculpted gold metalwork, deep crimson shield.`,
     `Shield with ${symbols}.`,
     `Text "${surname}" engraved on a silver ribbon banner at the base.`,
     `Golden lion supporters on each side, royal crown on top.`,
-    `Style: luxury 3D CGI render, physically sculpted gold and deep crimson,`,
-    `soft diffused lighting, no harsh reflections, no specular highlights, matte gold finish with subtle depth,`,
-    `like a premium brand logo, perfectly symmetrical, 8K quality.`,
-    `The coat of arms floats alone with absolutely nothing behind or around it.`,
-    `No table, no surface, no pedestal, no floor, no room, no environment, no reflections on any surface.`,
-    `Background: perfectly uniform solid black void, pure #000000, zero texture, zero gradient, zero variation.`,
+    `No table. No surface. No floor. No reflections. No environment.`,
+    `Pure black background. Crest only.`,
+    `Style: luxury 3D CGI render, physically sculpted gold,`,
+    `dramatic studio lighting, polished metal reflections,`,
+    `like a premium luxury logo on black, perfectly symmetrical, 8K.`,
   ].join(" ");
 }
 
