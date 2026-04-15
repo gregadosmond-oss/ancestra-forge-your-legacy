@@ -27,7 +27,6 @@ const CrestHero = ({ heightVh = 52 }: CrestHeroProps = {}) => {
           height: '88%',
           width: 'auto',
           maxWidth: '100%',
-          mixBlendMode: 'screen',
           display: 'block',
         }}
       />
