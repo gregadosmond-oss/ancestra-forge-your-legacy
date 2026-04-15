@@ -16,9 +16,10 @@ export function buildPrompt(facts: LegacyFacts): string {
     `Silver ribbon banner at the base clearly engraved with the text "${surname}".`,
     `Golden lion supporters on each side, royal crown on top.`,
     `Style: luxury 3D CGI render, physically sculpted gold and deep crimson shield,`,
-    `dark leather textured background, dramatic warm studio lighting,`,
+    `isolated on a plain pure black background, no room, no environment, no scene, no table,`,
+    `no floor, no walls, coat of arms only floating on black, dramatic studio lighting,`,
     `polished metal reflections, real depth and shadow, premium brand quality,`,
-    `perfectly symmetrical, 8K resolution.`,
+    `perfectly symmetrical, 8K resolution, product photography on solid black.`,
   ].join(" ");
 }
 
