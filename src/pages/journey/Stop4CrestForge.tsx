@@ -69,29 +69,35 @@ const Stop4CrestForge = () => {
                 "radial-gradient(circle at center, hsla(30, 80%, 50%, 0.18) 0%, transparent 60%)",
             }}
           />
-          <img
-            src={crest.data.imageUrl}
-            alt={`${facts.data?.displaySurname ?? surname} family crest`}
-            className="relative z-10 w-full max-w-2xl rounded-[22px]"
-            style={{ maxHeight: "70vh", objectFit: "contain" }}
-          />
 
-          {/* Motto + symbolism — same as current, shown when facts ready */}
-          {facts.status === "ready" && facts.data && (
-            <>
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="mt-2 text-center"
+          {/* Crest image + motto ribbon overlay */}
+          <div className="relative z-10 w-full max-w-2xl">
+            <img
+              src={crest.data.imageUrl}
+              alt={`${facts.data?.displaySurname ?? surname} family crest`}
+              className="w-full rounded-[22px]"
+              style={{ maxHeight: "70vh", objectFit: "contain" }}
+            />
+            {facts.status === "ready" && facts.data && (
+              <div
+                className="absolute bottom-0 left-0 right-0 rounded-b-[22px] px-6 pb-5 pt-10 text-center"
+                style={{
+                  background: "linear-gradient(to top, rgba(13,10,7,0.92) 0%, rgba(13,10,7,0.6) 60%, transparent 100%)",
+                }}
               >
-                <p className="font-serif text-2xl italic text-amber-light">
+                <p className="font-serif text-xl italic text-amber-light drop-shadow-lg">
                   {facts.data.mottoLatin}
                 </p>
-                <p className="mt-2 font-sans text-sm tracking-[2px] text-amber-dim">
-                  {facts.data.mottoEnglish.toUpperCase()}
+                <p className="mt-1 font-sans text-[9px] uppercase tracking-[3px] text-amber-dim">
+                  {facts.data.mottoEnglish}
                 </p>
-              </motion.div>
+              </div>
+            )}
+          </div>
+
+          {/* Symbolism cards */}
+          {facts.status === "ready" && facts.data && (
+            <>
 
               <motion.div
                 initial="hidden"

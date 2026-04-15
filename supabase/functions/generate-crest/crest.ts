@@ -6,16 +6,14 @@ export function normalizeSurname(input: string): string {
 }
 
 export function buildPrompt(facts: LegacyFacts): string {
-  const symbol1 = facts.symbolism[0]?.element ?? "eagle";
-  const symbol2 = facts.symbolism[1]?.element ?? "chevron";
+  const symbols = facts.symbolism.slice(0, 4).map((s) => s.element).join(", ");
   return [
-    `A photorealistic 3D sculpted heraldic coat of arms for the ${facts.displaySurname} family,`,
-    `cast in polished gold metal with deep relief sculpting.`,
-    `Central shield featuring ${symbol1} and ${symbol2}.`,
-    `Style: photorealistic 3D render, gleaming gold and bronze metalwork,`,
-    `dramatic warm studio lighting, deep shadows and highlights giving physical depth,`,
-    `dark warm background, no supporters, no scroll, no text, no lettering of any kind,`,
-    `perfectly symmetrical, luxury product photography, museum display quality.`,
+    `A highly detailed heraldic coat of arms for the ${facts.displaySurname} family.`,
+    `Origin: ${facts.meaning.origin}. Family were ${facts.meaning.role}.`,
+    `Heraldic symbols to include: ${symbols}.`,
+    `Style: medieval European heraldry, ornate golden shield with supporters,`,
+    `rich amber and gold tones on a dark warm background, intricate engraving`,
+    `detail, perfectly symmetrical, no readable text, museum-quality illustration.`,
   ].join(" ");
 }
 
