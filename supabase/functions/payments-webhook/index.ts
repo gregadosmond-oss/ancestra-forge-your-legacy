@@ -241,6 +241,7 @@ async function sendGiftEmail({
   const claimUrl = giftId
     ? `https://ancestra.com/gift/${giftId}`
     : "https://ancestra.com/journey";
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=d4a04a&bgcolor=13100b&data=${encodeURIComponent(claimUrl)}`;
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -267,6 +268,10 @@ async function sendGiftEmail({
       <a href="${claimUrl}" style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg,#e8943a,#c47828);color:#1a1208;text-decoration:none;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:60px;">
         Claim Your Legacy
       </a>
+      <div style="margin-top:36px;padding-top:32px;border-top:1px solid #3d3020;">
+        <p style="margin:0 0 14px;font-size:11px;letter-spacing:3px;color:#a07830;text-transform:uppercase;font-family:Arial,sans-serif;">Or scan to open on your phone</p>
+        <img src="${qrUrl}" alt="Scan to claim your legacy" width="160" height="160" style="display:inline-block;border:2px solid #3d3020;border-radius:8px;" />
+      </div>
       <p style="margin:28px 0 0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;">Forged by Ancestra &nbsp;·&nbsp; ancestra.com</p>
     </div>
   </div>
