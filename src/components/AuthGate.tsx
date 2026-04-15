@@ -29,8 +29,14 @@ const AuthGate = ({ onAuthenticated, onClose }: AuthGateProps) => {
         setSubmitting(false);
         return;
       }
-      toast.success("Check your email to confirm, then come back and sign in.");
-      setIsSignUp(false);
+      // Auto-confirm is enabled, so sign in immediately after signup
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) {
+        toast.error(signInError.message);
+        setSubmitting(false);
+        return;
+      }
+      onAuthenticated();
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
