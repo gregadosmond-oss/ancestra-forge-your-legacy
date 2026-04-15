@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ancestra Landing Page — Full Layout</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d0a07;
+    color: #d0c4b4;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 14px;
+  }
+
+  /* ── layout ── */
+  .page { max-width: 860px; margin: 0 auto; padding: 24px 20px 60px; }
+  .section { margin-bottom: 12px; border-radius: 12px; overflow: hidden; border: 1px solid #2a2018; }
+  .section-inner { padding: 28px 32px; }
+
+  /* ── section labels ── */
+  .s-label {
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: #a07830; margin-bottom: 10px;
+  }
+  .s-title {
+    font-family: 'Libre Caslon Display', Georgia, serif;
+    font-size: 22px; color: #f0e8da; line-height: 1.3; margin-bottom: 8px;
+  }
+  .s-sub {
+    font-family: 'Libre Caslon Text', Georgia, serif;
+    font-style: italic; font-size: 14px; color: #d0c4b4; margin-bottom: 20px;
+  }
+
+  /* ── hero (existing) ── */
+  .hero {
+    background: #0d0a07;
+    border: 2px solid #e8943a44;
+    text-align: center;
+    padding: 32px;
+  }
+  .hero-crest {
+    width: 100px; height: 100px; margin: 0 auto 16px;
+    background: radial-gradient(circle, #3d2e1a, #1a1510);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+  }
+  .hero-title { font-family: 'Libre Caslon Display', Georgia, serif; font-size: 28px; color: #f0e8da; margin-bottom: 8px; }
+  .hero-sub { font-family: 'Libre Caslon Text', Georgia, serif; font-style: italic; color: #d0c4b4; margin-bottom: 20px; font-size: 15px; }
+  .btn-warm {
+    display: inline-block; background: linear-gradient(135deg, #e8943a, #c47828);
+    color: #1a1208; font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; padding: 12px 32px; border-radius: 60px; border: none;
+  }
+  .existing-badge {
+    display: inline-block; background: #1a4a1a; color: #4a9e6a; font-size: 10px;
+    padding: 2px 8px; border-radius: 4px; letter-spacing: 1px; margin-bottom: 12px;
+  }
+
+  /* ── divider ── */
+  .wd { display: flex; align-items: center; gap: 12px; margin: 6px 32px 6px; }
+  .wd-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #a07830, transparent); }
+  .wd-dot { width: 5px; height: 5px; background: #a07830; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── steps ── */
+  .steps { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 4px; }
+  .step { background: #13100b; border-radius: 10px; padding: 20px 16px; text-align: center; border: 1px solid #2a2018; }
+  .step-num { width: 32px; height: 32px; background: linear-gradient(135deg, #e8943a22, #e8943a11); border: 1px solid #e8943a44; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 13px; color: #e8943a; font-weight: 700; }
+  .step h4 { color: #e8ddd0; font-size: 13px; margin-bottom: 5px; }
+  .step p { font-size: 11px; color: #8a7e6e; line-height: 1.5; }
+
+  /* ── product cards ── */
+  .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+  .product-card { background: #13100b; border: 1px solid #3d3020; border-radius: 10px; padding: 18px; }
+  .product-card h4 { color: #e8ddd0; font-size: 13px; margin-bottom: 4px; }
+  .product-card p { font-size: 11px; color: #8a7e6e; line-height: 1.5; }
+  .product-icon { font-size: 22px; margin-bottom: 10px; }
+  .price-badge { margin-top: 20px; padding: 14px 20px; background: linear-gradient(135deg, #e8943a11, #c4782811); border: 1px solid #e8943a33; border-radius: 10px; text-align: center; }
+  .price-badge span { font-family: 'Libre Caslon Display', Georgia, serif; font-size: 28px; color: #e8943a; }
+  .price-badge p { font-size: 11px; color: #8a7e6e; margin-top: 3px; }
+
+  /* ── tools ── */
+  .tools-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 4px; }
+  .tool-card { background: #13100b; border: 1px solid #2a2018; border-radius: 10px; padding: 18px; position: relative; opacity: 0.75; }
+  .tool-card h4 { color: #e8ddd0; font-size: 13px; margin-bottom: 4px; }
+  .tool-card p { font-size: 11px; color: #8a7e6e; line-height: 1.5; }
+  .coming-soon { position: absolute; top: 12px; right: 12px; background: #2a2018; color: #a07830; font-size: 9px; padding: 3px 8px; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase; }
+  .tool-icon { font-size: 20px; margin-bottom: 8px; }
+
+  /* ── occasions ── */
+  .occasions-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .occasion-tag {
+    padding: 8px 16px; border-radius: 60px;
+    border: 1px solid #3d3020; color: #d0c4b4; font-size: 12px;
+    background: #13100b;
+  }
+  .occasion-tag.highlight { border-color: #e8943a55; color: #e8b85c; background: #e8943a0a; }
+
+  /* ── final cta ── */
+  .final-cta-inner { text-align: center; padding: 40px 32px; }
+  .final-cta-inner .s-title { font-size: 26px; margin-bottom: 6px; }
+
+  /* ── new badge ── */
+  .new-badge { display: inline-block; background: #1a2a3a; color: #4a8ebe; font-size: 10px; padding: 2px 8px; border-radius: 4px; letter-spacing: 1px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <p style="text-align:center;color:#8a7e6e;font-size:12px;margin-bottom:20px;letter-spacing:1px">LANDING PAGE — FULL LAYOUT MOCKUP</p>
+
+  <!-- HERO (existing) -->
+  <div class="section hero">
+    <div class="existing-badge">✓ EXISTS</div>
+    <div class="hero-crest">🏛</div>
+    <div class="hero-title">Every family has a story worth telling.</div>
+    <div class="hero-sub">Discover your name. Forge your crest. Pass it on.</div>
+    <div class="btn-warm">Begin Your Journey</div>
+  </div>
+
+  <div class="wd"><div class="wd-line"></div><div class="wd-dot"></div><div class="wd-line"></div></div>
+
+  <!-- HOW IT WORKS -->
+  <div class="section">
+    <div class="section-inner">
+      <div class="new-badge">NEW</div>
+      <div class="s-label">The Journey</div>
+      <div class="s-title">Five minutes to discover 900 years.</div>
+      <div class="s-sub">Enter your surname. We do the rest.</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h4>Enter Your Name</h4>
+          <p>Type your surname. Our AI searches centuries of history — origins, migration, ancestral role.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h4>Your Legacy Unfolds</h4>
+          <p>Your custom crest is forged, your bloodline mapped, your family story written by AI.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h4>Pass It On</h4>
+          <p>Download, gift, or display your legacy. Physical products shipped worldwide.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wd"><div class="wd-line"></div><div class="wd-dot"></div><div class="wd-line"></div></div>
+
+  <!-- PRODUCT PREVIEW -->
+  <div class="section">
+    <div class="section-inner">
+      <div class="new-badge">NEW</div>
+      <div class="s-label">What You Get</div>
+      <div class="s-title">Your complete family legacy, delivered instantly.</div>
+      <div class="s-sub">Everything in the Legacy Pack — one price, yours forever.</div>
+      <div class="product-grid">
+        <div class="product-card">
+          <div class="product-icon">🛡</div>
+          <h4>Custom Coat of Arms</h4>
+          <p>A unique crest forged from your surname's history, symbolism, and ancestral role. High-res PNG + SVG.</p>
+        </div>
+        <div class="product-card">
+          <div class="product-icon">📖</div>
+          <h4>AI Family Story</h4>
+          <p>Chapter I of your family narrative — written by Claude AI using real historical context from your bloodline.</p>
+        </div>
+        <div class="product-card">
+          <div class="product-icon">🌳</div>
+          <h4>Bloodline Tree</h4>
+          <p>Your ancestral migration mapped visually — where your family came from, and how they got here.</p>
+        </div>
+        <div class="product-card">
+          <div class="product-icon">📜</div>
+          <h4>Legacy Certificate</h4>
+          <p>A frameable certificate bearing your crest, motto, and lineage. Print it. Hang it. Own it.</p>
+        </div>
+      </div>
+      <div class="price-badge">
+        <span>$29</span>
+        <p>One-time · Instant digital delivery · No subscription</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wd"><div class="wd-line"></div><div class="wd-dot"></div><div class="wd-line"></div></div>
+
+  <!-- FREE TOOLS -->
+  <div class="section">
+    <div class="section-inner">
+      <div class="new-badge">NEW</div>
+      <div class="s-label">Free Tools</div>
+      <div class="s-title">Curious? Start here — no commitment.</div>
+      <div class="s-sub">Six free tools to explore your heritage before you unlock the full Legacy Pack.</div>
+      <div class="tools-grid">
+        <div class="tool-card">
+          <div class="coming-soon">Coming Soon</div>
+          <div class="tool-icon">🧬</div>
+          <h4>Bloodline Quiz</h4>
+          <p>5 questions → your ancestry archetype. Warrior, Builder, Explorer, Healer, or Scholar.</p>
+        </div>
+        <div class="tool-card">
+          <div class="coming-soon">Coming Soon</div>
+          <div class="tool-icon">🔍</div>
+          <h4>Surname Lookup</h4>
+          <p>Instant meaning, origin, and historical role for any surname.</p>
+        </div>
+        <div class="tool-card">
+          <div class="coming-soon">Coming Soon</div>
+          <div class="tool-icon">⚔️</div>
+          <h4>Motto Generator</h4>
+          <p>Enter 3 values → get a Latin motto with English translation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wd"><div class="wd-line"></div><div class="wd-dot"></div><div class="wd-line"></div></div>
+
+  <!-- OCCASIONS -->
+  <div class="section">
+    <div class="section-inner">
+      <div class="new-badge">NEW</div>
+      <div class="s-label">The Perfect Gift</div>
+      <div class="s-title">The gift they'll never forget.</div>
+      <div class="s-sub">For the people who already have everything — give them something that can never be bought twice.</div>
+      <div class="occasions-wrap">
+        <div class="occasion-tag highlight">Father's Day</div>
+        <div class="occasion-tag highlight">Christmas</div>
+        <div class="occasion-tag highlight">Wedding</div>
+        <div class="occasion-tag highlight">Graduation</div>
+        <div class="occasion-tag">Birthday</div>
+        <div class="occasion-tag">Anniversary</div>
+        <div class="occasion-tag">New Baby</div>
+        <div class="occasion-tag">Mother's Day</div>
+        <div class="occasion-tag">Housewarming</div>
+        <div class="occasion-tag">Retirement</div>
+        <div class="occasion-tag">Family Reunion</div>
+        <div class="occasion-tag">Valentine's Day</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wd"><div class="wd-line"></div><div class="wd-dot"></div><div class="wd-line"></div></div>
+
+  <!-- FINAL CTA -->
+  <div class="section" style="border-color:#e8943a33">
+    <div class="final-cta-inner">
+      <div class="new-badge">NEW</div>
+      <div class="s-label">Your Legacy Awaits</div>
+      <div class="s-title">Every family has a story worth telling.</div>
+      <div class="s-sub" style="margin-bottom:24px">Yours has been waiting centuries. It takes five minutes to discover it.</div>
+      <div class="btn-warm">Begin Your Journey</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

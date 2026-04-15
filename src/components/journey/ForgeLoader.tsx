@@ -1,23 +1,30 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-type Props = { messages: string[]; onComplete: () => void; perMessageMs?: number };
+type Props = {
+  messages: string[];
+  onComplete?: () => void;
+  loop?: boolean;
+  perMessageMs?: number;
+};
 
-const ForgeLoader = ({ messages, onComplete, perMessageMs = 1200 }: Props) => {
+const ForgeLoader = ({ messages, onComplete, loop = false, perMessageMs = 1200 }: Props) => {
   const [index, setIndex] = useState(0);
 
-  // Intentionally omit onComplete from deps — callers often pass an inline
-  // arrow that changes every render, which would tear the effect down and
-  // restart the message cycle.
+  // Intentionally omit onComplete from deps — callers often pass inline arrows.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (index >= messages.length) {
-      const done = setTimeout(onComplete, 300);
+      if (loop) {
+        setIndex(0);
+        return;
+      }
+      const done = setTimeout(() => onComplete?.(), 300);
       return () => clearTimeout(done);
     }
     const next = setTimeout(() => setIndex((i) => i + 1), perMessageMs);
     return () => clearTimeout(next);
-  }, [index, messages.length, perMessageMs]);
+  }, [index, messages.length, perMessageMs, loop]);
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center">
