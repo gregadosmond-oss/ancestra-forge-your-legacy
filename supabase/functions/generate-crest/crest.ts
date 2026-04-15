@@ -6,13 +6,12 @@ export function normalizeSurname(input: string): string {
 }
 
 export function buildPrompt(facts: LegacyFacts): string {
-  const symbol1 = facts.symbolism[0]?.element ?? "oak tree";
-  const symbol2 = facts.symbolism[1]?.element ?? "chevron";
+  const symbols = facts.symbolism.map((s) => s.element).join(", ");
   const surname = facts.displaySurname.toUpperCase();
   return [
     `A photorealistic 3D rendered heraldic coat of arms for the ${facts.displaySurname} family.`,
     `Family were ${facts.meaning.role} from ${facts.meaning.origin}.`,
-    `Shield bearing ${symbol1} and ${symbol2}.`,
+    `Shield bearing ${symbols}.`,
     `Silver ribbon banner at the base clearly engraved with the text "${surname}".`,
     `Golden lion supporters on each side, royal crown on top.`,
     `Style: luxury 3D CGI render, physically sculpted gold and deep crimson shield,`,
