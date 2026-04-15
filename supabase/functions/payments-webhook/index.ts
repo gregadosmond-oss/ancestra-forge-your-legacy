@@ -7,6 +7,11 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
+// TODO: switch to "Ancestra <legacy@ancestra.com>" once ancestra.com is
+// verified in Resend (Settings → Domains). Until then emails send from
+// the shared Resend domain so deliverability is limited.
+const FROM_ADDRESS = "Ancestra <onboarding@resend.dev>";
+
 serve(async (req) => {
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
@@ -44,6 +49,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
   const isGift = session.metadata?.isGift === 'true';
   const recipientEmail = session.metadata?.recipientEmail;
   const surname = session.metadata?.surname;
+  const buyerEmail = session.customer_details?.email ?? session.customer_email;
 
   if (!userId) {
     console.log("No userId in session metadata — anonymous purchase");
@@ -70,8 +76,8 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     console.log("Purchase recorded for user:", userId);
   }
 
-  // Handle gift: record in gifts table + send gift notification email
   if (isGift && recipientEmail) {
+    // Gift purchase — notify the recipient
     const { data: gift, error: giftError } = await supabase
       .from("gifts")
       .insert({
@@ -91,8 +97,130 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
       console.log("Gift recorded:", gift?.id);
       await sendGiftEmail({ recipientEmail, surname, giftId: gift?.id });
     }
+  } else if (buyerEmail) {
+    // Regular purchase — send confirmation to buyer
+    await sendBuyerConfirmationEmail({ buyerEmail, surname, userId });
   }
 }
+
+// ─── Buyer confirmation email ────────────────────────────────────────────────
+
+async function sendBuyerConfirmationEmail({
+  buyerEmail,
+  surname,
+  userId,
+}: {
+  buyerEmail: string;
+  surname?: string;
+  userId: string;
+}) {
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  if (!RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY not set — skipping buyer confirmation email");
+    return;
+  }
+
+  // Pull crest URL and motto from DB
+  const normalized = surname?.trim().toLowerCase() ?? "";
+  const [crestRow, factsRow] = await Promise.all([
+    normalized
+      ? supabase
+          .from("surname_crests")
+          .select("image_url")
+          .eq("surname", normalized)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    normalized
+      ? supabase
+          .from("surname_facts")
+          .select("facts_payload")
+          .eq("surname", normalized)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+
+  const crestUrl = (crestRow as any).data?.image_url ?? null;
+  const facts = (factsRow as any).data?.facts_payload ?? null;
+  const displaySurname = facts?.displaySurname ?? surname ?? "Your Family";
+  const mottoLatin = facts?.mottoLatin ?? null;
+  const mottoEnglish = facts?.mottoEnglish ?? null;
+  const journeyUrl = "https://ancestra.com/journey/5";
+
+  const crestSection = crestUrl
+    ? `<div style="text-align:center;padding:32px 40px;border-bottom:1px solid #3d3020;">
+        <img src="${crestUrl}" alt="${displaySurname} Crest" width="220" style="max-width:220px;display:inline-block;" />
+      </div>`
+    : "";
+
+  const mottoSection = mottoLatin
+    ? `<p style="margin:0 0 6px;font-size:20px;font-style:italic;color:#e8b85c;">${mottoLatin}</p>
+       <p style="margin:0;font-size:11px;letter-spacing:3px;color:#a07830;text-transform:uppercase;font-family:Arial,sans-serif;">${mottoEnglish}</p>`
+    : "";
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Your Legacy is Ready</title></head>
+<body style="margin:0;padding:0;background:#0d0a07;font-family:Georgia,serif;">
+  <div style="max-width:600px;margin:0 auto;background:#13100b;border:1px solid #3d3020;">
+
+    <div style="padding:48px 40px 32px;text-align:center;border-bottom:1px solid #3d3020;">
+      <p style="margin:0 0 16px;font-size:11px;letter-spacing:4px;color:#a07830;text-transform:uppercase;font-family:Arial,sans-serif;">YOUR LEGACY IS READY</p>
+      <h1 style="margin:0 0 12px;font-size:38px;color:#f0e8da;font-weight:400;line-height:1.2;">House ${displaySurname}</h1>
+      ${mottoSection}
+    </div>
+
+    ${crestSection}
+
+    <div style="padding:32px 40px;border-bottom:1px solid #3d3020;">
+      <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#d0c4b4;">Your Legacy Pack includes:</p>
+      <ul style="margin:0;padding:0 0 0 20px;color:#c4b8a6;font-size:14px;line-height:2.2;">
+        <li>Custom ${displaySurname} Coat of Arms (high-res PNG)</li>
+        <li>AI-written family story — 9 chapters</li>
+        <li>Full migration history &amp; ancestry</li>
+        <li>Family motto in Latin &amp; English</li>
+        <li>Heraldic symbolism breakdown</li>
+      </ul>
+    </div>
+
+    <div style="padding:40px;text-align:center;">
+      <p style="margin:0 0 28px;font-size:16px;font-style:italic;color:#c4b8a6;line-height:1.7;">
+        Every family has a story worth telling.<br>Yours has been forged.
+      </p>
+      <a href="${journeyUrl}" style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg,#e8943a,#c47828);color:#1a1208;text-decoration:none;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:60px;">
+        View Your Legacy
+      </a>
+      <p style="margin:32px 0 0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;line-height:1.8;">
+        Forged by Ancestra &nbsp;·&nbsp; ancestra.com<br>
+        Questions? Reply to this email.
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>`;
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: FROM_ADDRESS,
+      to: [buyerEmail],
+      subject: `Your ${displaySurname} Legacy Pack is ready`,
+      html,
+    }),
+  });
+
+  if (!res.ok) {
+    console.error("Failed to send buyer confirmation email:", await res.text());
+  } else {
+    console.log("Buyer confirmation email sent to:", buyerEmail);
+  }
+}
+
+// ─── Gift notification email ─────────────────────────────────────────────────
 
 async function sendGiftEmail({
   recipientEmail,
@@ -152,7 +280,7 @@ async function sendGiftEmail({
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Ancestra <legacy@ancestra.com>",
+      from: FROM_ADDRESS,
       to: [recipientEmail],
       subject: `You've received a ${surnameLabel}Legacy Pack`,
       html,
