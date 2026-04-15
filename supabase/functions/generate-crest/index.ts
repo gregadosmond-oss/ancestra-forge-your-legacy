@@ -96,13 +96,16 @@ Deno.serve(async (req: Request) => {
       },
       downloadAndUpload: async (normalized: string, tempUrl: string) => {
         // Remove background via remove.bg API
-        const rbgForm = new FormData();
-        rbgForm.append("image_url", tempUrl);
-        rbgForm.append("size", "regular");
         const rbgRes = await fetch("https://api.remove.bg/v1.0/removebg", {
           method: "POST",
-          headers: { "Api-Key": removeBgKey },
-          body: rbgForm,
+          headers: {
+            "X-Api-Key": removeBgKey,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            image_url: tempUrl,
+            size: "regular",
+          }).toString(),
         });
         if (!rbgRes.ok) {
           const errText = await rbgRes.text();
