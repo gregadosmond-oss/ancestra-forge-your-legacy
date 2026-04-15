@@ -12,11 +12,12 @@ import Stop3Bloodline from "./pages/journey/Stop3Bloodline.tsx";
 import Stop4CrestForge from "./pages/journey/Stop4CrestForge.tsx";
 import Stop5Story from "./pages/journey/Stop5Story.tsx";
 import Stop6PassItOn from "./pages/journey/Stop6PassItOn.tsx";
+import CheckoutPage from "./pages/CheckoutPage.tsx";
+import CheckoutReturn from "./pages/CheckoutReturn.tsx";
+import MyLegacy from "./pages/MyLegacy.tsx";
 import SurnameLookup from "./pages/tools/SurnameLookup.tsx";
 import MottoGenerator from "./pages/tools/MottoGenerator.tsx";
 import BloodlineQuiz from "./pages/tools/BloodlineQuiz.tsx";
-import CheckoutPage from "./pages/CheckoutPage.tsx";
-import CheckoutReturn from "./pages/CheckoutReturn.tsx";
 
 const queryClient = new QueryClient();
 
@@ -40,8 +41,11 @@ const App = () => (
             <Route path="5" element={<Stop5Story />} />
             <Route path="6" element={<Stop6PassItOn />} />
           </Route>
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/checkout/return" element={<CheckoutReturn />} />
+          <Route path="/checkout" element={<JourneyLayout />}>
+            <Route index element={<CheckoutPage />} />
+            <Route path="return" element={<CheckoutReturn />} />
+          </Route>
+          <Route path="/my-legacy" element={<MyLegacy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

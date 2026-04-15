@@ -8,7 +8,7 @@ const CheckoutReturn = () => {
   const sessionId = searchParams.get("session_id");
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24 bg-background">
+    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
       <SectionLabel>LEGACY UNLOCKED</SectionLabel>
 
       <motion.div
@@ -26,14 +26,14 @@ const CheckoutReturn = () => {
               Your full family story, crest, and tree are now unlocked.
             </p>
             <button
-              onClick={() => navigate("/journey/6")}
+              onClick={() => navigate("/my-legacy")}
               className="mt-10 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
               style={{
                 background: "linear-gradient(135deg, #e8943a, #c47828)",
                 color: "#1a1208",
               }}
             >
-              Pass It On
+              View Your Legacy
             </button>
           </>
         ) : (
