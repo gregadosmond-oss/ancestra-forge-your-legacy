@@ -68,20 +68,37 @@ const Stop5Story = () => {
             />
           </div>
 
-          {/* Purchased → skip paywall */}
           {!purchaseLoading && hasPurchased ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1.2, delay: 2 }}
-              className="mt-14 text-center"
+              className="mt-14 w-full max-w-xl text-center"
             >
-              <p className="font-serif text-sm italic text-amber-dim">
-                Your Legacy Pack is unlocked.
-              </p>
+              <div className="mb-8 rounded-pill border border-amber-dim/25 bg-amber-dim/10 px-6 py-3">
+                <p className="font-serif text-sm italic text-amber-light">
+                  Your story is unlocked
+                </p>
+              </div>
+
+              <ul className="space-y-3 text-left">
+                {story.data.teaserChapters.map((title, i) => (
+                  <motion.li
+                    key={`${title}-${i}`}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 2.2 + i * 0.1 }}
+                    className="flex items-center gap-3 font-serif text-sm text-text-body"
+                  >
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-amber-dim" />
+                    {title}
+                  </motion.li>
+                ))}
+              </ul>
+
               <button
                 onClick={() => navigate("/journey/6")}
-                className="mt-6 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                className="mt-10 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
                 style={{
                   background: "linear-gradient(135deg, #e8943a, #c47828)",
                   color: "#1a1208",
@@ -91,7 +108,6 @@ const Stop5Story = () => {
               </button>
             </motion.div>
           ) : (
-            /* Not purchased → paywall */
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
