@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
-import TypewriterText from "@/components/journey/TypewriterText";
 import RetryInline from "@/components/journey/RetryInline";
 import AuthGate from "@/components/AuthGate";
 import { useJourney } from "@/contexts/JourneyContext";
@@ -61,12 +60,45 @@ const Stop5Story = () => {
             {story.data.chapterOneTitle}
           </motion.h1>
 
-          <div className="mt-10 w-full max-w-2xl">
-            <TypewriterText
-              text={story.data.chapterOneBody}
-              className="font-serif text-lg leading-relaxed text-text-body"
-            />
-          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.6, delay: 0.4 }}
+            className="mt-10 w-full max-w-2xl"
+          >
+            {/* Ornamental rule */}
+            <div className="mb-6 flex items-center gap-3">
+              <div className="h-px flex-1" style={{ background: "linear-gradient(to right, transparent, #a07830)" }} />
+              <span className="font-serif text-base text-amber-dim">✦</span>
+              <div className="h-px flex-1" style={{ background: "linear-gradient(to left, transparent, #a07830)" }} />
+            </div>
+
+            {/* Manuscript body */}
+            <p
+              className="font-serif leading-[1.95] text-text-body"
+              style={{
+                fontSize: "1.0625rem",
+                textAlign: "justify",
+                textIndent: "0",
+              }}
+            >
+              {/* Drop cap */}
+              <span
+                className="float-left mr-2 font-display leading-none text-amber-light"
+                style={{ fontSize: "4.2rem", lineHeight: "0.82", marginTop: "6px" }}
+              >
+                {story.data.chapterOneBody.charAt(0)}
+              </span>
+              {story.data.chapterOneBody.slice(1)}
+            </p>
+
+            {/* Closing ornament */}
+            <div className="mt-6 flex items-center gap-3">
+              <div className="h-px flex-1" style={{ background: "linear-gradient(to right, transparent, #a07830)" }} />
+              <span className="font-serif text-base text-amber-dim">✦</span>
+              <div className="h-px flex-1" style={{ background: "linear-gradient(to left, transparent, #a07830)" }} />
+            </div>
+          </motion.div>
 
           {!purchaseLoading && hasPurchased ? (
             <motion.div
