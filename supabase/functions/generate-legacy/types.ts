@@ -55,3 +55,7 @@ export type LegacyResponse =
   | {
       code: "UNKNOWN_SURNAME";
     };
+
+export type LegacyCrest = {
+  imageUrl: string;
+};
