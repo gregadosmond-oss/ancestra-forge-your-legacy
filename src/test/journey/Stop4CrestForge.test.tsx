@@ -40,8 +40,8 @@ describe("Stop4CrestForge", () => {
 
   it("shows RetryInline on crest error", () => {
     renderStop4({ data: null, status: "error", reason: "boom", retry: vi.fn() });
-    // RetryInline renders a retry button
-    expect(screen.getByRole("button")).toBeInTheDocument();
+    // RetryInline renders a "Try again" button
+    expect(screen.getByRole("button", { name: /try again/i })).toBeInTheDocument();
   });
 
   it("shows crest image when ready", () => {
