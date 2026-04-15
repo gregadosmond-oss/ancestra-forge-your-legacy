@@ -71,12 +71,17 @@ const Stop4CrestForge = () => {
           />
 
           {/* Crest image + motto ribbon overlay */}
-          <div className="relative z-10 w-full max-w-2xl">
+          <div
+            className="relative z-10 w-full max-w-2xl rounded-[22px]"
+            style={{
+              boxShadow: "0 0 80px rgba(212,160,74,0.25), 0 0 0 1px rgba(212,160,74,0.15), 0 32px 80px rgba(0,0,0,0.6)",
+            }}
+          >
             <img
               src={crest.data.imageUrl}
               alt={`${facts.data?.displaySurname ?? surname} family crest`}
               className="w-full rounded-[22px]"
-              style={{ maxHeight: "70vh", objectFit: "contain" }}
+              style={{ maxHeight: "70vh", objectFit: "contain", display: "block" }}
             />
             {facts.status === "ready" && facts.data && (
               <div

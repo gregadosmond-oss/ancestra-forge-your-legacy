@@ -8,12 +8,15 @@ export function normalizeSurname(input: string): string {
 export function buildPrompt(facts: LegacyFacts): string {
   const symbols = facts.symbolism.slice(0, 4).map((s) => s.element).join(", ");
   return [
-    `A highly detailed heraldic coat of arms for the ${facts.displaySurname} family.`,
+    `A magnificent heraldic coat of arms for the ${facts.displaySurname} family.`,
     `Origin: ${facts.meaning.origin}. Family were ${facts.meaning.role}.`,
-    `Heraldic symbols to include: ${symbols}.`,
-    `Style: medieval European heraldry, ornate golden shield with supporters,`,
-    `rich amber and gold tones on a dark warm background, intricate engraving`,
-    `detail, perfectly symmetrical, no readable text, museum-quality illustration.`,
+    `Heraldic symbols: ${symbols}.`,
+    `Style: masterpiece European heraldry, gleaming polished gold shield with lion supporters,`,
+    `dramatic cinematic lighting, deep rich contrast, luxurious amber and gold tones,`,
+    `dark warm vignette background, intricate hand-engraved metalwork detail,`,
+    `absolutely no text anywhere — no words, no letters, no inscriptions,`,
+    `no scrolls with writing, no ribbons with text, no banners,`,
+    `perfectly symmetrical, Sotheby's auction quality illustration.`,
   ].join(" ");
 }
 
