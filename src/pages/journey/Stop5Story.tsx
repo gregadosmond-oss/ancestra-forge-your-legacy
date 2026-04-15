@@ -4,11 +4,15 @@ import { useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import TypewriterText from "@/components/journey/TypewriterText";
 import RetryInline from "@/components/journey/RetryInline";
+import AuthGate from "@/components/AuthGate";
 import { useJourney } from "@/contexts/JourneyContext";
+import { usePurchase } from "@/hooks/usePurchase";
 
 const Stop5Story = () => {
   const navigate = useNavigate();
   const { unknownSurname, surname, story } = useJourney();
+  const { user, hasPurchased, loading: purchaseLoading } = usePurchase();
+  const [showAuth, setShowAuth] = useState(false);
 
   useEffect(() => {
     if (unknownSurname) navigate("/journey/1", { replace: true });
@@ -16,6 +20,19 @@ const Stop5Story = () => {
   }, [unknownSurname, surname, navigate]);
 
   if (!surname) return null;
+
+  const handleUnlock = () => {
+    if (!user) {
+      setShowAuth(true);
+      return;
+    }
+    navigate("/checkout");
+  };
+
+  const handleAuthenticated = () => {
+    setShowAuth(false);
+    navigate("/checkout");
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
@@ -51,36 +68,82 @@ const Stop5Story = () => {
             />
           </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.2, delay: 2 }}
-            className="mt-14 w-full max-w-xl rounded-[22px] border border-amber-dim/25 bg-card/60 p-8 text-center"
-          >
-            <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
-              EIGHT CHAPTERS REMAIN
-            </p>
-            <ul className="mt-5 space-y-2 font-serif text-sm italic text-text-dim">
-              {story.data.teaserChapters.map((t, i) => (
-                <li key={`${t}-${i}`}>{t}</li>
-              ))}
-            </ul>
-
-            <a
-              href="https://buy.stripe.com/aFacN58CUfQkb14g4ZdIA00"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-8 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
-              style={{
-                background: "linear-gradient(135deg, #e8943a, #c47828)",
-                transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-                color: "#1a1208",
-              }}
+          {!purchaseLoading && hasPurchased ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.2, delay: 2 }}
+              className="mt-14 w-full max-w-xl text-center"
             >
-              Unlock Your Legacy Pack — $29.99
-            </a>
-          </motion.div>
+              <div className="mb-8 rounded-pill border border-amber-dim/25 bg-amber-dim/10 px-6 py-3">
+                <p className="font-serif text-sm italic text-amber-light">
+                  Your story is unlocked
+                </p>
+              </div>
+
+              <ul className="space-y-3 text-left">
+                {story.data.teaserChapters.map((title, i) => (
+                  <motion.li
+                    key={`${title}-${i}`}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 2.2 + i * 0.1 }}
+                    className="flex items-center gap-3 font-serif text-sm text-text-body"
+                  >
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-amber-dim" />
+                    {title}
+                  </motion.li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => navigate("/journey/6")}
+                className="mt-10 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                style={{
+                  background: "linear-gradient(135deg, #e8943a, #c47828)",
+                  color: "#1a1208",
+                }}
+              >
+                Pass It On
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.2, delay: 2 }}
+              className="mt-14 w-full max-w-xl rounded-[22px] border border-amber-dim/25 bg-card/60 p-8 text-center"
+            >
+              <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
+                EIGHT CHAPTERS REMAIN
+              </p>
+              <ul className="mt-5 space-y-2 font-serif text-sm italic text-text-dim">
+                {story.data.teaserChapters.map((t, i) => (
+                  <li key={`${t}-${i}`}>{t}</li>
+                ))}
+              </ul>
+
+              <button
+                onClick={handleUnlock}
+                className="mt-8 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
+                style={{
+                  background: "linear-gradient(135deg, #e8943a, #c47828)",
+                  transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                  color: "#1a1208",
+                }}
+              >
+                Unlock Your Legacy Pack — $29.99
+              </button>
+            </motion.div>
+          )}
         </>
+      )}
+
+      {showAuth && (
+        <AuthGate
+          onAuthenticated={handleAuthenticated}
+          onClose={() => setShowAuth(false)}
+        />
       )}
     </div>
   );

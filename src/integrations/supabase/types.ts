@@ -127,6 +127,45 @@ export type Database = {
         }
         Relationships: []
       }
+      purchases: {
+        Row: {
+          amount_total: number | null
+          created_at: string | null
+          currency: string | null
+          environment: string
+          id: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_session_id: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount_total?: number | null
+          created_at?: string | null
+          currency?: string | null
+          environment?: string
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_session_id: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount_total?: number | null
+          created_at?: string | null
+          currency?: string | null
+          environment?: string
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_session_id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       surname_crests: {
         Row: {
           created_at: string

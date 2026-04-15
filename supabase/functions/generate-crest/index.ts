@@ -25,9 +25,10 @@ Deno.serve(async (req: Request) => {
   }
 
   const ideogramKey = Deno.env.get("IDEOGRAM_API_KEY");
+  const removeBgKey = Deno.env.get("REMOVE_BG_API_KEY");
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!ideogramKey || !supabaseUrl || !supabaseKey) {
+  if (!ideogramKey || !removeBgKey || !supabaseUrl || !supabaseKey) {
     return json({ error: "missing env" }, 500);
   }
 
@@ -64,8 +65,9 @@ Deno.serve(async (req: Request) => {
           const formData = new FormData();
           formData.append("prompt", prompt);
           formData.append("aspect_ratio", "1x1");
-          formData.append("rendering_speed", "DEFAULT");
+          formData.append("rendering_speed", "TURBO");
           formData.append("style_type", "REALISTIC");
+          formData.append("negative_prompt", "room, interior, furniture, walls, floor, ceiling, hallway, library, environment, building, table, surface, reflections");
 
           const res = await fetch("https://api.ideogram.ai/v1/ideogram-v3/generate", {
             method: "POST",
@@ -84,11 +86,30 @@ Deno.serve(async (req: Request) => {
         return url;
       },
       downloadAndUpload: async (normalized: string, tempUrl: string) => {
+        // 1. Download from Ideogram
         const imgRes = await fetch(tempUrl);
-        if (!imgRes.ok) {
-          throw new Error(`failed to download image: ${imgRes.status}`);
+        if (!imgRes.ok) throw new Error(`failed to download image: ${imgRes.status}`);
+        const imgBuffer = await imgRes.arrayBuffer();
+        const imgBlob = new Blob([imgBuffer], { type: "image/png" });
+
+        // 2. Send binary to remove.bg
+        const rbgForm = new FormData();
+        rbgForm.append("image_file", imgBlob, "crest.png");
+        rbgForm.append("size", "auto");
+
+        const rbgRes = await fetch("https://api.remove.bg/v1.0/removebg", {
+          method: "POST",
+          headers: {
+            "X-Api-Key": removeBgKey,
+            "Accept": "image/png",
+          },
+          body: rbgForm,
+        });
+        if (!rbgRes.ok) {
+          const errText = await rbgRes.text();
+          throw new Error(`remove.bg error ${rbgRes.status}: ${errText}`);
         }
-        const buffer = await imgRes.arrayBuffer();
+        const buffer = await rbgRes.arrayBuffer();
 
         const filePath = `${normalized}.png`;
         const { error: uploadError } = await client.storage
