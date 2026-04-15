@@ -25,9 +25,10 @@ Deno.serve(async (req: Request) => {
   }
 
   const ideogramKey = Deno.env.get("IDEOGRAM_API_KEY");
+  const removeBgKey = Deno.env.get("REMOVE_BG_API_KEY");
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!ideogramKey || !supabaseUrl || !supabaseKey) {
+  if (!ideogramKey || !removeBgKey || !supabaseUrl || !supabaseKey) {
     return json({ error: "missing env" }, 500);
   }
 
