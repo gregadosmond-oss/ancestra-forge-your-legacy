@@ -70,10 +70,61 @@ const GiftPage = () => {
 
   if (giftError || !gift) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 px-6">
-        <h1 className="font-display text-2xl text-foreground">Gift Not Found</h1>
-        <p className="text-muted-foreground font-sans text-center max-w-md">
-          This gift link may have expired or doesn't exist.
+      <div
+        className="min-h-screen flex flex-col items-center justify-center gap-6 px-6 relative overflow-hidden"
+        style={{ background: "#0d0a07" }}
+      >
+        {/* Ambient glow */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 50% 40% at 50% 50%, hsla(var(--honey), 0.04) 0%, transparent 70%)",
+          }}
+        />
+
+        <img
+          src="/crest.png"
+          alt="Ancestra crest"
+          className="w-20 h-20 object-contain opacity-40"
+          draggable={false}
+        />
+
+        <h1
+          className="font-display text-center"
+          style={{ fontSize: "clamp(24px, 5vw, 36px)", color: "hsl(var(--cream))" }}
+        >
+          Gift Not Found
+        </h1>
+
+        <p
+          className="font-sans text-center max-w-md"
+          style={{ color: "#c4b8a6", fontSize: "15px", lineHeight: "1.7" }}
+        >
+          This gift link may have expired or doesn't exist. If someone sent you a legacy, ask them for a new link.
+        </p>
+
+        <button
+          onClick={() => navigate("/")}
+          className="font-sans font-semibold uppercase tracking-[1.5px] mt-4 transition-all duration-300"
+          style={{
+            background: "rgba(232,148,58,0.06)",
+            border: "1px solid rgba(232,148,58,0.18)",
+            color: "hsl(var(--amber))",
+            fontSize: "12px",
+            padding: "14px 36px",
+            borderRadius: "60px",
+            cursor: "pointer",
+          }}
+        >
+          Discover Your Legacy
+        </button>
+
+        <p
+          className="absolute bottom-6 font-sans text-center uppercase tracking-[3px]"
+          style={{ color: "hsl(var(--text-dim))", fontSize: "10px" }}
+        >
+          Forged by Ancestra
         </p>
       </div>
     );
