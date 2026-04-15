@@ -6,19 +6,22 @@ export function normalizeSurname(input: string): string {
 }
 
 export function buildPrompt(facts: LegacyFacts): string {
-  const symbols = facts.symbolism.map((s) => s.element).join(" and ");
+  const symbols = facts.symbolism.map((s) => s.element).join(", ");
   const surname = facts.displaySurname.toUpperCase();
   return [
-    `A photorealistic 3D rendered heraldic coat of arms,`,
-    `sculpted gold metalwork on a dark leather textured background.`,
-    `Shield with ${symbols}.`,
-    `Text "${surname}" engraved on a silver ribbon banner at the base.`,
-    `Golden lion supporters on each side, royal crown on top.`,
-    `Style: luxury 3D CGI render, physically sculpted gold and deep crimson,`,
-    `dramatic warm studio lighting, polished metal reflections, real depth and shadow,`,
-    `like a premium brand logo, perfectly symmetrical, 8K quality.`,
+    `A photorealistic heraldic coat of arms in the same style as the reference image.`,
+    `Two golden lion supporters standing on either side of a quartered heraldic shield.`,
+    `The shield features ${symbols}.`,
+    `A knight helmet or crown crest on top with ornate gold scrollwork and mantling.`,
+    `A silver ribbon banner at the base with the text "${surname}" engraved clearly.`,
+    `White transparent background. Perfectly symmetrical.`,
+    `Style: luxury 3D CGI render, polished gold metalwork, rich crimson and navy shield,`,
+    `warm studio lighting, photorealistic detail, premium brand quality, 8K.`,
   ].join(" ");
 }
+
+// Public URL of the Ancestra reference crest — used as Ideogram style image
+export const REFERENCE_CREST_URL = "https://legacy-forge-stories.lovable.app/crest.png";
 
 export async function readCrest(
   client: DbClient,
