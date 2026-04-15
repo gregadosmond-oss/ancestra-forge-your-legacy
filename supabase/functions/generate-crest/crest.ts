@@ -6,16 +6,16 @@ export function normalizeSurname(input: string): string {
 }
 
 export function buildPrompt(facts: LegacyFacts): string {
-  const symbols = facts.symbolism.map((s) => s.element).join(", ");
+  const symbol1 = facts.symbolism[0]?.element ?? "eagle";
+  const symbol2 = facts.symbolism[1]?.element ?? "chevron";
   return [
-    `A highly detailed heraldic coat of arms for the ${facts.displaySurname} family.`,
-    `Origin: ${facts.meaning.origin}.`,
-    `Family were ${facts.meaning.role}.`,
-    `Heraldic symbols to include: ${symbols}.`,
-    `Family motto scroll at the base.`,
-    `Style: medieval European heraldry, ornate golden shield with supporters,`,
-    `rich amber and gold tones on a dark warm background, intricate engraving`,
-    `detail, perfectly symmetrical, no readable text, museum-quality illustration.`,
+    `A clean elegant heraldic shield for the ${facts.displaySurname} family.`,
+    `Origin: ${facts.meaning.origin}. Family role: ${facts.meaning.role}.`,
+    `Central shield bearing only ${symbol1} and ${symbol2}.`,
+    `Style: classic European heraldry, simple centered composition, no supporters,`,
+    `no scroll, no text, no lettering of any kind, no banners,`,
+    `amber and gold tones on a warm dark background,`,
+    `generous negative space, flat graphic illustration, perfectly symmetrical.`,
   ].join(" ");
 }
 

@@ -67,15 +67,16 @@ Deno.test("normalizeSurname lowercases and trims", () => {
 
 // ── buildPrompt ───────────────────────────────────────────────────────────────
 
-Deno.test("buildPrompt includes displaySurname, origin, role, and all 4 symbols", () => {
+Deno.test("buildPrompt includes displaySurname, origin, role, and first 2 symbols", () => {
   const prompt = buildPrompt(SAMPLE_FACTS);
   assert(prompt.includes("Reilly"), "should include displaySurname");
   assert(prompt.includes("Gaelic Ireland"), "should include origin");
   assert(prompt.includes("Chieftains"), "should include role");
   assert(prompt.includes("Stag"), "should include symbol 1");
   assert(prompt.includes("Oak"), "should include symbol 2");
-  assert(prompt.includes("Crown"), "should include symbol 3");
-  assert(prompt.includes("Chevron"), "should include symbol 4");
+  // Simplified prompt uses only 2 symbols
+  assert(!prompt.includes("scroll"), "should not include scroll");
+  assert(!prompt.includes("supporters"), "should not include supporters");
 });
 
 // ── generateCrest ─────────────────────────────────────────────────────────────
