@@ -101,10 +101,11 @@ Deno.serve(async (req: Request) => {
           headers: {
             "X-Api-Key": removeBgKey,
             "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "image/png",
           },
           body: new URLSearchParams({
             image_url: tempUrl,
-            size: "regular",
+            size: "auto",
           }).toString(),
         });
         if (!rbgRes.ok) {
