@@ -9,13 +9,13 @@ export function buildPrompt(facts: LegacyFacts): string {
   const symbol1 = facts.symbolism[0]?.element ?? "eagle";
   const symbol2 = facts.symbolism[1]?.element ?? "chevron";
   return [
-    `A rich heraldic coat of arms for the ${facts.displaySurname} family.`,
-    `Origin: ${facts.meaning.origin}. Family role: ${facts.meaning.role}.`,
-    `Central shield bearing ${symbol1} and ${symbol2}.`,
-    `Style: classic European heraldry, painterly engraving illustration,`,
-    `no supporters, no scroll, no text, no lettering of any kind, no banners,`,
-    `rich amber and gold tones on a warm dark background,`,
-    `simple centered composition, museum-quality depth, perfectly symmetrical.`,
+    `A photorealistic 3D sculpted heraldic coat of arms for the ${facts.displaySurname} family,`,
+    `cast in polished gold metal with deep relief sculpting.`,
+    `Central shield featuring ${symbol1} and ${symbol2}.`,
+    `Style: photorealistic 3D render, gleaming gold and bronze metalwork,`,
+    `dramatic warm studio lighting, deep shadows and highlights giving physical depth,`,
+    `dark warm background, no supporters, no scroll, no text, no lettering of any kind,`,
+    `perfectly symmetrical, luxury product photography, museum display quality.`,
   ].join(" ");
 }
 
