@@ -67,7 +67,7 @@ const Stop5Story = () => {
             </ul>
 
             <a
-              href="https://buy.stripe.com/28EaEwFYM8polaw76Cbo400"
+              href="https://buy.stripe.com/28EaEWfYM8po1aw76Cbo400"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-8 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
