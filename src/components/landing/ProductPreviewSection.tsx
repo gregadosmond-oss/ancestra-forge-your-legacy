@@ -69,7 +69,7 @@ const ProductPreviewSection = () => (
         border: "1px solid rgba(232,148,58,0.18)",
       }}
     >
-      <span className="font-display text-4xl text-amber-light">$29</span>
+      <span className="font-display text-4xl text-amber-light">$29.99</span>
       <p className="mt-1 text-sm text-text-dim">
         One-time · Instant digital delivery · No subscription
       </p>

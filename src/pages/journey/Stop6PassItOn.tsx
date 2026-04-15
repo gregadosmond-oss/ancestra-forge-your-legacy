@@ -65,7 +65,7 @@ const Stop6PassItOn = () => {
             onClick={() => toast.info("Gift flow — launching soon.")}
             className="rounded-pill border border-amber/40 bg-amber/[0.06] px-10 py-4 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-amber-light transition-colors hover:bg-amber/[0.12]"
           >
-            Gift the Legacy · $29
+            Gift the Legacy · $29.99
           </button>
         </motion.div>
 

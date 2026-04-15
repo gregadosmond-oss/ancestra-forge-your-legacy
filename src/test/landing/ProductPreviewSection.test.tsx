@@ -20,7 +20,7 @@ describe("ProductPreviewSection", () => {
 
   it("renders the $29 price", () => {
     render(<ProductPreviewSection />);
-    expect(screen.getByText("$29")).toBeInTheDocument();
+    expect(screen.getByText("$29.99")).toBeInTheDocument();
   });
 
   it("renders the one-time delivery note", () => {

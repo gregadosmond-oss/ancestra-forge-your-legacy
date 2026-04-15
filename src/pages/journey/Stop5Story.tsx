@@ -77,7 +77,7 @@ const Stop5Story = () => {
                 color: "#1a1208",
               }}
             >
-              Unlock Your Legacy Pack — $29
+              Unlock Your Legacy Pack — $29.99
             </a>
           </motion.div>
         </>
