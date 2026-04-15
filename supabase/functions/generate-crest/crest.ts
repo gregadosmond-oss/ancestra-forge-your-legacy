@@ -17,7 +17,7 @@ export function buildPrompt(facts: LegacyFacts): string {
     `Silver brushed metal ribbon banner at bottom with "${surname}" engraved in bold serif capitals.`,
     `Style: hyper-realistic 3D CGI sculpture, polished antique gold metalwork with deep cast shadows and bright specular highlights,`,
     `ornate baroque heraldic design, museum-quality luxury feel, perfectly symmetrical composition.`,
-    `Background: dark black leather texture, subtle grain, no environment, no room, no reflections.`,
+    `Background: solid pure black background, completely black, no texture, no leather, no environment, no room, no reflections, just black.`,
     `Cinematic dramatic lighting from above, 8K detail.`,
   ].join(" ");
 }
