@@ -6,18 +6,19 @@ export function normalizeSurname(input: string): string {
 }
 
 export function buildPrompt(facts: LegacyFacts): string {
-  const symbols = facts.symbolism.slice(0, 4).map((s) => s.element).join(", ");
+  const symbol1 = facts.symbolism[0]?.element ?? "oak tree";
+  const symbol2 = facts.symbolism[1]?.element ?? "chevron";
+  const surname = facts.displaySurname.toUpperCase();
   return [
-    `A magnificent heraldic coat of arms for the ${facts.displaySurname} family.`,
-    `Origin: ${facts.meaning.origin}. Family were ${facts.meaning.role}.`,
-    `Heraldic symbols: ${symbols}.`,
-    `Style: masterpiece European heraldry, gleaming polished gold shield with lion supporters,`,
-    `dramatic cinematic lighting, deep rich contrast, luxurious amber and gold tones,`,
-    `pure dark warm background, no frame, no border, no picture frame, no outer decorative border,`,
-    `coat of arms floating directly on dark background, intricate hand-engraved metalwork detail,`,
-    `absolutely no text anywhere — no words, no letters, no inscriptions,`,
-    `no scrolls with writing, no ribbons with text, no banners,`,
-    `perfectly symmetrical, Sotheby's auction quality illustration.`,
+    `A photorealistic 3D rendered heraldic coat of arms for the ${facts.displaySurname} family.`,
+    `Family were ${facts.meaning.role} from ${facts.meaning.origin}.`,
+    `Shield bearing ${symbol1} and ${symbol2}.`,
+    `Silver ribbon banner at the base clearly engraved with the text "${surname}".`,
+    `Golden lion supporters on each side, royal crown on top.`,
+    `Style: luxury 3D CGI render, physically sculpted gold and deep crimson shield,`,
+    `dark leather textured background, dramatic warm studio lighting,`,
+    `polished metal reflections, real depth and shadow, premium brand quality,`,
+    `perfectly symmetrical, 8K resolution.`,
   ].join(" ");
 }
 
@@ -60,7 +61,7 @@ export type GenerateCrestOpts = {
   surname: string;
   facts: LegacyFacts;
   /** Returns an ephemeral DALL-E image URL. */
-  callDalle: (prompt: string) => Promise<string>;
+  callImageApi: (prompt: string) => Promise<string>;
   /** Downloads image from tempUrl, uploads to storage, returns permanent public URL. */
   downloadAndUpload: (normalized: string, tempUrl: string) => Promise<string>;
 };
@@ -72,7 +73,7 @@ export async function generateCrest(opts: GenerateCrestOpts): Promise<string> {
   if (cached) return cached;
 
   const prompt = buildPrompt(opts.facts);
-  const tempUrl = await opts.callDalle(prompt);
+  const tempUrl = await opts.callImageApi(prompt);
   const publicUrl = await opts.downloadAndUpload(normalized, tempUrl);
 
   await writeCrest(opts.client, normalized, publicUrl, prompt);

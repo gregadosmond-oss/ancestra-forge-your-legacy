@@ -24,10 +24,10 @@ Deno.serve(async (req: Request) => {
     return json({ error: "method not allowed" }, 405);
   }
 
-  const openaiKey = Deno.env.get("OPENAI_API_KEY");
+  const ideogramKey = Deno.env.get("IDEOGRAM_API_KEY");
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!openaiKey || !supabaseUrl || !supabaseKey) {
+  if (!ideogramKey || !supabaseUrl || !supabaseKey) {
     return json({ error: "missing env" }, 500);
   }
 
@@ -60,29 +60,29 @@ Deno.serve(async (req: Request) => {
       client,
       surname,
       facts,
-      callDalle: async (prompt: string) => {
-        const res = await fetch("https://api.openai.com/v1/images/generations", {
+      callImageApi: async (prompt: string) => {
+        const res = await fetch("https://api.ideogram.ai/generate", {
           method: "POST",
           headers: {
-            "content-type": "application/json",
-            "authorization": `Bearer ${openaiKey}`,
+            "Api-Key": ideogramKey,
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "dall-e-3",
-            prompt,
-            n: 1,
-            size: "1024x1024",
-            quality: "standard",
-            style: "vivid",
+            image_request: {
+              prompt,
+              model: "V_3",
+              aspect_ratio: "ASPECT_1_1",
+              style_type: "RENDER_3D",
+            },
           }),
         });
         if (!res.ok) {
           const err = await res.text();
-          throw new Error(`DALL-E error ${res.status}: ${err}`);
+          throw new Error(`Ideogram error ${res.status}: ${err}`);
         }
         const data = await res.json();
         const url: string | undefined = data.data?.[0]?.url;
-        if (!url) throw new Error("DALL-E: no image URL in response");
+        if (!url) throw new Error("Ideogram: no image URL in response");
         return url;
       },
       downloadAndUpload: async (normalized: string, tempUrl: string) => {
@@ -112,7 +112,7 @@ Deno.serve(async (req: Request) => {
     const msg = (err as Error).message;
     console.error("generate-crest error:", msg);
     const clientReason =
-      msg.startsWith("DALL-E error") || msg.startsWith("storage upload")
+      msg.startsWith("Ideogram error") || msg.startsWith("storage upload")
         ? "image generation failed"
         : msg;
     return json({ code: "ERROR", reason: clientReason }, 502);

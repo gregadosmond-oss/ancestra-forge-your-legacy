@@ -67,16 +67,15 @@ Deno.test("normalizeSurname lowercases and trims", () => {
 
 // ── buildPrompt ───────────────────────────────────────────────────────────────
 
-Deno.test("buildPrompt includes displaySurname, origin, role, and first 2 symbols", () => {
+Deno.test("buildPrompt includes displaySurname, origin, role, symbols, and surname banner text", () => {
   const prompt = buildPrompt(SAMPLE_FACTS);
   assert(prompt.includes("Reilly"), "should include displaySurname");
   assert(prompt.includes("Gaelic Ireland"), "should include origin");
   assert(prompt.includes("Chieftains"), "should include role");
   assert(prompt.includes("Stag"), "should include symbol 1");
   assert(prompt.includes("Oak"), "should include symbol 2");
-  // Simplified prompt uses only 2 symbols
-  assert(!prompt.includes("scroll"), "should not include scroll");
-  assert(!prompt.includes("supporters"), "should not include supporters");
+  assert(prompt.includes("REILLY"), "should include uppercased surname for banner");
+  assert(prompt.includes("3D"), "should specify 3D render style");
 });
 
 // ── generateCrest ─────────────────────────────────────────────────────────────
@@ -91,7 +90,7 @@ Deno.test("generateCrest returns cached URL and skips DALL-E on cache hit", asyn
     client,
     surname: "Reilly",
     facts: SAMPLE_FACTS,
-    callDalle: async () => { dalleCallCount++; return "https://dalle.com/temp.png"; },
+    callImageApi: async () => { dalleCallCount++; return "https://dalle.com/temp.png"; },
     downloadAndUpload: async () => { throw new Error("should not be called"); },
   });
 
@@ -108,7 +107,7 @@ Deno.test("generateCrest calls DALL-E, uploads, caches, and returns URL on miss"
     client,
     surname: "Bennett",
     facts: { ...SAMPLE_FACTS, displaySurname: "Bennett" },
-    callDalle: async (_prompt: string) => "https://dalle.com/temp123.png",
+    callImageApi: async (_prompt: string) => "https://dalle.com/temp123.png",
     downloadAndUpload: async (_normalized: string, _tempUrl: string) => permanentUrl,
   });
 
@@ -125,7 +124,7 @@ Deno.test("generateCrest normalizes surname before cache lookup", async () => {
     client,
     surname: "  OSMOND  ",
     facts: SAMPLE_FACTS,
-    callDalle: async () => { throw new Error("should not be called"); },
+    callImageApi: async () => { throw new Error("should not be called"); },
     downloadAndUpload: async () => { throw new Error("should not be called"); },
   });
 
