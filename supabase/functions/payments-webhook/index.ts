@@ -81,12 +81,10 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     const { data: gift, error: giftError } = await supabase
       .from("gifts")
       .insert({
-        sender_user_id: userId,
+        user_id: userId,
         recipient_email: recipientEmail,
         surname: surname || null,
-        stripe_session_id: session.id,
         status: "delivered",
-        delivered_at: new Date().toISOString(),
       })
       .select("id")
       .single();
