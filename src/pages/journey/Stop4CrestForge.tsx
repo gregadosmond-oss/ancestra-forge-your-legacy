@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import ForgeLoader from "@/components/journey/ForgeLoader";
 import RetryInline from "@/components/journey/RetryInline";
-import CrestLayered from "@/components/journey/CrestLayered";
 import { useJourney } from "@/contexts/JourneyContext";
 
 const FORGE_MESSAGES = [
@@ -71,25 +70,35 @@ const Stop4CrestForge = () => {
             }}
           />
 
-          {/* Layered crest */}
-          <CrestLayered surname={facts.data?.displaySurname ?? surname} />
-
-          {/* Motto */}
-          {facts.status === "ready" && facts.data && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="mt-4 text-center"
-            >
-              <p className="font-serif text-xl italic text-amber-light drop-shadow-lg">
-                {facts.data.mottoLatin}
-              </p>
-              <p className="mt-1 font-sans text-[9px] uppercase tracking-[3px] text-amber-dim">
-                {facts.data.mottoEnglish}
-              </p>
-            </motion.div>
-          )}
+          {/* Crest image + motto ribbon overlay */}
+          <div
+            className="relative z-10 w-full max-w-2xl rounded-[22px]"
+            style={{
+              boxShadow: "0 0 80px rgba(212,160,74,0.25), 0 0 0 1px rgba(212,160,74,0.15), 0 32px 80px rgba(0,0,0,0.6)",
+            }}
+          >
+            <img
+              src={crest.data.imageUrl}
+              alt={`${facts.data?.displaySurname ?? surname} family crest`}
+              className="w-full rounded-[22px]"
+              style={{ maxHeight: "70vh", objectFit: "contain", display: "block" }}
+            />
+            {facts.status === "ready" && facts.data && (
+              <div
+                className="absolute bottom-0 left-0 right-0 rounded-b-[22px] px-6 pb-5 pt-10 text-center"
+                style={{
+                  background: "linear-gradient(to top, rgba(13,10,7,0.92) 0%, rgba(13,10,7,0.6) 60%, transparent 100%)",
+                }}
+              >
+                <p className="font-serif text-xl italic text-amber-light drop-shadow-lg">
+                  {facts.data.mottoLatin}
+                </p>
+                <p className="mt-1 font-sans text-[9px] uppercase tracking-[3px] text-amber-dim">
+                  {facts.data.mottoEnglish}
+                </p>
+              </div>
+            )}
+          </div>
 
           {/* Symbolism cards */}
           {facts.status === "ready" && facts.data && (
