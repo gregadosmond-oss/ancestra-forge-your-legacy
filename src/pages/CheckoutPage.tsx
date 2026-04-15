@@ -1,17 +1,37 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import PaymentTestModeBanner from "@/components/PaymentTestModeBanner";
 import StripeEmbeddedCheckout from "@/components/StripeEmbeddedCheckout";
 import { useJourney } from "@/contexts/JourneyContext";
+import { usePurchase } from "@/hooks/usePurchase";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { surname } = useJourney();
+  const { user, hasPurchased, loading } = usePurchase();
+
+  // If already purchased, redirect to my-legacy
+  useEffect(() => {
+    if (!loading && hasPurchased) navigate("/my-legacy", { replace: true });
+  }, [loading, hasPurchased, navigate]);
+
+  // If not logged in, redirect back to journey
+  useEffect(() => {
+    if (!loading && !user) navigate("/journey/5", { replace: true });
+  }, [loading, user, navigate]);
+
+  if (loading || !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="font-serif text-sm italic text-amber-dim">Preparing checkout…</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-background">
+    <div className="flex min-h-screen flex-col items-center">
       <PaymentTestModeBanner />
 
       <div className="w-full max-w-2xl px-6 py-16">
@@ -43,6 +63,8 @@ const CheckoutPage = () => {
         >
           <StripeEmbeddedCheckout
             priceId="legacy_pack_once"
+            customerEmail={user.email ?? undefined}
+            userId={user.id}
             returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
           />
         </motion.div>
