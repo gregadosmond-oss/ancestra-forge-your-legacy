@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
@@ -66,10 +66,8 @@ const Stop5Story = () => {
               ))}
             </ul>
 
-            <a
-              href="https://buy.stripe.com/aFacN58CUfQkb14g4ZdIA00"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => navigate("/checkout")}
               className="mt-8 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
               style={{
                 background: "linear-gradient(135deg, #e8943a, #c47828)",
@@ -78,7 +76,7 @@ const Stop5Story = () => {
               }}
             >
               Unlock Your Legacy Pack — $29.99
-            </a>
+            </button>
           </motion.div>
         </>
       )}
