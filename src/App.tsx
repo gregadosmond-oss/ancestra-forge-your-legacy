@@ -16,6 +16,7 @@ import Stop6PassItOn from "./pages/journey/Stop6PassItOn.tsx";
 import CheckoutPage from "./pages/CheckoutPage.tsx";
 import CheckoutReturn from "./pages/CheckoutReturn.tsx";
 import MyLegacy from "./pages/MyLegacy.tsx";
+import GiftPage from "./pages/GiftPage.tsx";
 import SurnameLookup from "./pages/tools/SurnameLookup.tsx";
 import MottoGenerator from "./pages/tools/MottoGenerator.tsx";
 import BloodlineQuiz from "./pages/tools/BloodlineQuiz.tsx";
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="return" element={<CheckoutReturn />} />
           </Route>
           <Route path="/my-legacy" element={<MyLegacy />} />
+          <Route path="/gift/:giftId" element={<GiftPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

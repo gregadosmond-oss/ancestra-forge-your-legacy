@@ -36,6 +36,24 @@ const GiftPage = () => {
     enabled: !!gift?.surname,
   });
 
+  const { data: facts } = useQuery({
+    queryKey: ["surname_facts", gift?.surname],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("surname_facts")
+        .select("payload")
+        .eq("surname", gift!.surname.toLowerCase())
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!gift?.surname,
+  });
+
+  const motto = (facts?.payload as Record<string, unknown>)?.motto_latin as string | undefined;
+
   const handleClaim = () => {
     navigate(`/journey/1?surname=${encodeURIComponent(gift?.surname ?? "")}`);
   };
@@ -104,10 +122,20 @@ const GiftPage = () => {
         House {surname}
       </h1>
 
+      {/* Motto */}
+      {motto && (
+        <p
+          className="font-serif italic text-center mb-4 max-w-md"
+          style={{ color: "hsl(var(--amber-light))", fontSize: "17px" }}
+        >
+          "{motto}"
+        </p>
+      )}
+
       {/* Subtitle */}
       <p
-        className="font-serif italic text-center mb-10 max-w-md"
-        style={{ color: "hsl(var(--amber-light))", fontSize: "17px" }}
+        className="font-sans text-center mb-10 max-w-md"
+        style={{ color: "hsl(var(--text-body))", fontSize: "15px" }}
       >
         Someone special wants you to discover your legacy.
       </p>
