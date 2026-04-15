@@ -94,6 +94,45 @@ export type Database = {
         }
         Relationships: []
       }
+      gifts: {
+        Row: {
+          created_at: string
+          id: string
+          personal_message: string | null
+          recipient_email: string | null
+          recipient_name: string | null
+          sender_name: string | null
+          status: string
+          surname: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          personal_message?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
+          sender_name?: string | null
+          status?: string
+          surname: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          personal_message?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
+          sender_name?: string | null
+          status?: string
+          surname?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           birth_year: number | null
