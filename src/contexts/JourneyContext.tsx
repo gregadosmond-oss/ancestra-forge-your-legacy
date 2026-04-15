@@ -7,9 +7,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { fetchLegacy } from "@/lib/legacyClient";
+import { fetchLegacy, fetchCrest } from "@/lib/legacyClient";
 import type {
   LegacyFacts,
+  LegacyCrest,
   LegacyResponse,
   LegacyStory,
 } from "@/types/legacy";
@@ -28,6 +29,7 @@ type JourneyContextValue = {
   unknownSurname: boolean;
   facts: Piece<LegacyFacts>;
   story: Piece<LegacyStory>;
+  crest: Piece<LegacyCrest>;
   startJourney: (surname: string) => Promise<void>;
   reset: () => void;
 };
@@ -39,6 +41,7 @@ type InternalState = {
   unknownSurname: boolean;
   facts: { data: LegacyFacts | null; status: PieceStatus; reason: string | null };
   story: { data: LegacyStory | null; status: PieceStatus; reason: string | null };
+  crest: { data: LegacyCrest | null; status: PieceStatus; reason: string | null };
 };
 
 const INITIAL: InternalState = {
@@ -46,12 +49,27 @@ const INITIAL: InternalState = {
   unknownSurname: false,
   facts: { data: null, status: "idle", reason: null },
   story: { data: null, status: "idle", reason: null },
+  crest: { data: null, status: "idle", reason: null },
 };
 
 export function JourneyProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<InternalState>(INITIAL);
   // Pinned current surname used by retry callbacks so stale closures don't fire.
   const surnameRef = useRef<string | null>(null);
+  const factsRef = useRef<LegacyFacts | null>(null);
+
+  const runCrestFetch = useCallback(async (surname: string, facts: LegacyFacts) => {
+    setState((s) => ({ ...s, crest: { data: null, status: "loading", reason: null } }));
+    try {
+      const crest = await fetchCrest(surname, facts);
+      setState((s) => ({ ...s, crest: { data: crest, status: "ready", reason: null } }));
+    } catch (err) {
+      setState((s) => ({
+        ...s,
+        crest: { data: null, status: "error", reason: (err as Error).message },
+      }));
+    }
+  }, []);
 
   const applyResponse = useCallback((resp: LegacyResponse) => {
     if (resp.code === "UNKNOWN_SURNAME") {
@@ -75,7 +93,12 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
         ? { data: null, status: "error", reason: storyErr?.reason ?? "no story" }
         : { data: resp.story, status: "ready", reason: null },
     }));
-  }, []);
+    // Fire crest generation in the background when facts are ready.
+    if (!factsErr && resp.facts) {
+      factsRef.current = resp.facts;
+      void runCrestFetch(surnameRef.current!, resp.facts);
+    }
+  }, [runCrestFetch]);
 
   const runFetch = useCallback(async (surname: string) => {
     setState((s) => ({
@@ -108,12 +131,20 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
     void runFetch(current);
   }, [runFetch]);
 
+  const crestRetry = useCallback(() => {
+    const current = surnameRef.current;
+    const facts = factsRef.current;
+    if (!current || !facts) return;
+    void runCrestFetch(current, facts);
+  }, [runCrestFetch]);
+
   const startJourney = useCallback(async (surname: string) => {
     await runFetch(surname);
   }, [runFetch]);
 
   const reset = useCallback(() => {
     surnameRef.current = null;
+    factsRef.current = null;
     setState(INITIAL);
   }, []);
 
@@ -122,9 +153,10 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
     unknownSurname: state.unknownSurname,
     facts: { ...state.facts, retry },
     story: { ...state.story, retry },
+    crest: { ...state.crest, retry: crestRetry },
     startJourney,
     reset,
-  }), [state, retry, startJourney, reset]);
+  }), [state, retry, crestRetry, startJourney, reset]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
