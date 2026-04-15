@@ -15,6 +15,8 @@ import Stop6PassItOn from "./pages/journey/Stop6PassItOn.tsx";
 import SurnameLookup from "./pages/tools/SurnameLookup.tsx";
 import MottoGenerator from "./pages/tools/MottoGenerator.tsx";
 import BloodlineQuiz from "./pages/tools/BloodlineQuiz.tsx";
+import CheckoutPage from "./pages/CheckoutPage.tsx";
+import CheckoutReturn from "./pages/CheckoutReturn.tsx";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,8 @@ const App = () => (
             <Route path="5" element={<Stop5Story />} />
             <Route path="6" element={<Stop6PassItOn />} />
           </Route>
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/checkout/return" element={<CheckoutReturn />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
