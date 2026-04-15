@@ -1,6 +1,6 @@
 import type { LegacyFacts, LegacyResponse, LegacyStory } from "./types.ts";
 import type { DbClient } from "./db_client.ts";
-import { normalizeSurname, readFacts, writeFacts } from "./cache.ts";
+import { normalizeSurname, readFacts, writeFacts, readStory, writeStory } from "./cache.ts";
 import { writeLog } from "./logs.ts";
 
 export type OrchestratorOpts = {
@@ -49,14 +49,22 @@ async function loadFacts(
 
 async function loadStory(
   opts: OrchestratorOpts,
+  normalized: string,
   facts: LegacyFacts,
-): Promise<{ story: LegacyStory | null; error: string | null; ms: number }> {
+): Promise<{ story: LegacyStory | null; cacheHit: boolean; error: string | null; ms: number }> {
   const t0 = Date.now();
+
+  const cached = await readStory(opts.client, normalized, opts.modelVersion);
+  if (cached) {
+    return { story: cached, cacheHit: true, error: null, ms: Date.now() - t0 };
+  }
+
   try {
     const story = await opts.callStory(opts.surname, facts);
-    return { story, error: null, ms: Date.now() - t0 };
+    await writeStory(opts.client, normalized, story);
+    return { story, cacheHit: false, error: null, ms: Date.now() - t0 };
   } catch (err) {
-    return { story: null, error: (err as Error).message, ms: Date.now() - t0 };
+    return { story: null, cacheHit: false, error: (err as Error).message, ms: Date.now() - t0 };
   }
 }
 
@@ -93,11 +101,13 @@ export async function generateLegacy(
   let story: LegacyStory | null = null;
   let storyMs = 0;
   let storyErr: string | null = null;
+  let storyCacheHit = false;
   if (factsResult.facts) {
-    const storyResult = await loadStory(opts, factsResult.facts);
+    const storyResult = await loadStory(opts, normalized, factsResult.facts);
     story = storyResult.story;
     storyMs = storyResult.ms;
     storyErr = storyResult.error;
+    storyCacheHit = storyResult.cacheHit;
   } else {
     // Facts failed — skip story, record a synthetic log for observability.
     storyErr = "skipped: facts unavailable";
@@ -106,7 +116,7 @@ export async function generateLegacy(
   await writeLog(opts.client, {
     surname: normalized,
     callType: "story",
-    cacheHit: false,
+    cacheHit: storyCacheHit,
     durationMs: storyMs,
     success: story !== null,
     errorReason: storyErr,

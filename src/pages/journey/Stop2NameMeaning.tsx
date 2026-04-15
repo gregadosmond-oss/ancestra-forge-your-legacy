@@ -5,6 +5,7 @@ import SectionLabel from "@/components/journey/SectionLabel";
 import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
 import WarmDivider from "@/components/journey/WarmDivider";
 import RetryInline from "@/components/journey/RetryInline";
+import ArchiveLoader from "@/components/journey/ArchiveLoader";
 import { useJourney } from "@/contexts/JourneyContext";
 
 const Stop2NameMeaning = () => {
@@ -37,12 +38,9 @@ const Stop2NameMeaning = () => {
         </motion.h1>
 
         {facts.status === "loading" && (
-          <motion.p
-            variants={staggerItem}
-            className="mt-10 font-serif text-sm italic text-amber-dim"
-          >
-            Consulting the archives…
-          </motion.p>
+          <motion.div variants={staggerItem}>
+            <ArchiveLoader />
+          </motion.div>
         )}
 
         {facts.status === "error" && (

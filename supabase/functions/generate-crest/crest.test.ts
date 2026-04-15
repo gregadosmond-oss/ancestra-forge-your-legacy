@@ -74,6 +74,8 @@ Deno.test("buildPrompt includes displaySurname, origin, role, symbols, and surna
   assert(prompt.includes("Chieftains"), "should include role");
   assert(prompt.includes("Stag"), "should include symbol 1");
   assert(prompt.includes("Oak"), "should include symbol 2");
+  assert(prompt.includes("Crown"), "should include symbol 3");
+  assert(prompt.includes("Chevron"), "should include symbol 4");
   assert(prompt.includes("REILLY"), "should include uppercased surname for banner");
   assert(prompt.includes("3D"), "should specify 3D render style");
 });
