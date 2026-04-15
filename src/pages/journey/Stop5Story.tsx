@@ -68,6 +68,8 @@ const Stop5Story = () => {
 
             <a
               href="https://buy.stripe.com/28EaEwFYM8polaw76Cbo400"
+              target="_blank"
+              rel="noopener noreferrer"
               className="mt-8 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
               style={{
                 background: "linear-gradient(135deg, #e8943a, #c47828)",
