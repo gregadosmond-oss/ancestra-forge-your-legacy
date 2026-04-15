@@ -66,10 +66,10 @@ Deno.serve(async (req: Request) => {
           formData.append("prompt", prompt);
           formData.append("aspect_ratio", "1x1");
           formData.append("rendering_speed", "TURBO");
-          formData.append("style_type", "REALISTIC");
+          formData.append("style_type", "DESIGN");
           formData.append("image_url", REFERENCE_CREST_URL);
-          formData.append("image_weight", "60");
-          formData.append("negative_prompt", "text overlay, watermark, background scene, room, interior, furniture, walls, floor, environment, building, table, surface, reflections, grey background, dark background");
+          formData.append("image_weight", "80");
+          formData.append("negative_prompt", "3D render, photorealistic, gradient, shadow, depth, metallic sheen, lion supporters, background scene, room, interior, furniture, walls, floor, environment, building, table, surface, reflections");
 
           const res = await fetch("https://api.ideogram.ai/v1/ideogram-v3/generate", {
             method: "POST",
