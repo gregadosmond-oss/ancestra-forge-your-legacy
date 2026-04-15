@@ -8,7 +8,7 @@ serve(async (req) => {
   }
 
   try {
-    const { priceId, quantity, customerEmail, userId, returnUrl, environment } = await req.json();
+    const { priceId, quantity, customerEmail, userId, returnUrl, environment, isGift, recipientEmail, surname } = await req.json();
     if (!priceId || typeof priceId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {
       return new Response(JSON.stringify({ error: "Invalid priceId" }), {
         status: 400,
@@ -28,13 +28,19 @@ serve(async (req) => {
     }
     const stripePrice = prices.data[0];
 
+    const metadata: Record<string, string> = {};
+    if (userId) metadata.userId = userId;
+    if (isGift) metadata.isGift = 'true';
+    if (recipientEmail) metadata.recipientEmail = recipientEmail;
+    if (surname) metadata.surname = surname;
+
     const session = await stripe.checkout.sessions.create({
       line_items: [{ price: stripePrice.id, quantity: quantity || 1 }],
       mode: "payment",
       ui_mode: "embedded",
       return_url: returnUrl || `${req.headers.get("origin")}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
       ...(customerEmail && { customer_email: customerEmail }),
-      ...(userId && { metadata: { userId } }),
+      ...(Object.keys(metadata).length > 0 && { metadata }),
     });
 
     return new Response(JSON.stringify({ clientSecret: session.client_secret }), {

@@ -1,16 +1,20 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import PaymentTestModeBanner from "@/components/PaymentTestModeBanner";
 import StripeEmbeddedCheckout from "@/components/StripeEmbeddedCheckout";
 import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
 
+type GiftState = { isGift?: boolean; recipientEmail?: string };
+
 const CheckoutPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { surname } = useJourney();
   const { user, hasPurchased, loading } = usePurchase();
+  const giftState = (location.state as GiftState | null) ?? {};
 
   // If already purchased, redirect to my-legacy
   useEffect(() => {
@@ -35,7 +39,7 @@ const CheckoutPage = () => {
       <PaymentTestModeBanner />
 
       <div className="w-full max-w-2xl px-6 py-16">
-        <SectionLabel>UNLOCK YOUR LEGACY</SectionLabel>
+        <SectionLabel>{giftState.isGift ? "GIFT A LEGACY" : "UNLOCK YOUR LEGACY"}</SectionLabel>
 
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
@@ -52,7 +56,9 @@ const CheckoutPage = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="mt-4 text-center font-serif italic text-text-body"
         >
-          Full story, high-res crest, family tree, and legacy certificate — yours forever.
+          {giftState.isGift && giftState.recipientEmail
+            ? `A gift for ${giftState.recipientEmail} — delivered instantly after payment.`
+            : "Full story, high-res crest, family tree, and legacy certificate — yours forever."}
         </motion.p>
 
         <motion.div
@@ -66,6 +72,9 @@ const CheckoutPage = () => {
             customerEmail={user.email ?? undefined}
             userId={user.id}
             returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
+            isGift={giftState.isGift}
+            recipientEmail={giftState.recipientEmail}
+            surname={surname ?? undefined}
           />
         </motion.div>
 
