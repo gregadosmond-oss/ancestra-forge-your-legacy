@@ -109,10 +109,10 @@ const Stop5Story = () => {
             >
               <div className="mb-6 rounded-[18px] border border-amber-dim/25 bg-amber-dim/10 px-6 py-5">
                 <p className="font-serif text-sm italic text-amber-light">
-                  Your full Legacy Pack is on its way.
+                  Your full Legacy Pack is being prepared.
                 </p>
                 <p className="mt-2 font-sans text-xs text-text-dim">
-                  All 9 chapters of your family story, your high-res crest, family tree, and legacy certificate have been sent to your email.
+                  All 9 chapters of your family story, your high-res crest, family tree, and legacy certificate will be sent to your email after payment is confirmed.
                 </p>
               </div>
 
