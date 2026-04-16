@@ -4,6 +4,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import AppLayout from "./components/AppLayout";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import JourneyLayout from "./pages/journey/JourneyLayout.tsx";
@@ -31,27 +32,29 @@ const App = () => (
       <BrowserRouter>
         <ScrollToTop />
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/tools/surname" element={<SurnameLookup />} />
-          <Route path="/tools/motto" element={<MottoGenerator />} />
-          <Route path="/tools/quiz" element={<BloodlineQuiz />} />
-          <Route path="/journey" element={<JourneyLayout />}>
-            <Route index element={<Navigate to="/journey/1" replace />} />
-            <Route path="1" element={<Stop1EnterName />} />
-            <Route path="2" element={<Stop2NameMeaning />} />
-            <Route path="3" element={<Stop3Bloodline />} />
-            <Route path="4" element={<Stop4CrestForge />} />
-            <Route path="5" element={<Stop5Story />} />
-            <Route path="6" element={<Stop6PassItOn />} />
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<Index />} />
+            <Route path="/tools/surname" element={<SurnameLookup />} />
+            <Route path="/tools/motto" element={<MottoGenerator />} />
+            <Route path="/tools/quiz" element={<BloodlineQuiz />} />
+            <Route path="/journey" element={<JourneyLayout />}>
+              <Route index element={<Navigate to="/journey/1" replace />} />
+              <Route path="1" element={<Stop1EnterName />} />
+              <Route path="2" element={<Stop2NameMeaning />} />
+              <Route path="3" element={<Stop3Bloodline />} />
+              <Route path="4" element={<Stop4CrestForge />} />
+              <Route path="5" element={<Stop5Story />} />
+              <Route path="6" element={<Stop6PassItOn />} />
+            </Route>
+            <Route path="/checkout" element={<JourneyLayout />}>
+              <Route index element={<CheckoutPage />} />
+              <Route path="return" element={<CheckoutReturn />} />
+            </Route>
+            <Route path="/my-legacy" element={<MyLegacy />} />
+            <Route path="/gift/:giftId" element={<GiftPage />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
           </Route>
-          <Route path="/checkout" element={<JourneyLayout />}>
-            <Route index element={<CheckoutPage />} />
-            <Route path="return" element={<CheckoutReturn />} />
-          </Route>
-          <Route path="/my-legacy" element={<MyLegacy />} />
-          <Route path="/gift/:giftId" element={<GiftPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
