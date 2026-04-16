@@ -46,9 +46,9 @@ describe("AppLayout — back button", () => {
     expect(screen.queryByLabelText("Go back")).not.toBeInTheDocument();
   });
 
-  it("hides back button on /journey/1", () => {
+  it("shows back button on /journey/1", () => {
     renderAt("/journey/1");
-    expect(screen.queryByLabelText("Go back")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Go back")).toBeInTheDocument();
   });
 
   it("shows back button on /tools/surname", () => {

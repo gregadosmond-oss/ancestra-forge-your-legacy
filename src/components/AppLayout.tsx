@@ -13,7 +13,7 @@ const AppLayout = () => {
   const stepNumber = journeyMatch ? journeyMatch[1] : null;
   const isJourneyStep1 = location.pathname === "/journey/1";
 
-  const showBack = !isLanding && !isJourneyStep1;
+  const showBack = !isLanding;
   const showStepCounter = !!stepNumber;
 
   return (
