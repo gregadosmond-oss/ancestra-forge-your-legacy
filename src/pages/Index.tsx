@@ -22,21 +22,19 @@ const Index = () => {
         <rect width="100%" height="100%" filter="url(#grain)" />
       </svg>
 
-      {/* ── HERO PHOTO BANNER ── */}
+      {/* ── HERO VIDEO BANNER ── */}
       <div className="relative w-full" style={{ height: "42vh" }}>
-        {/* Castle photo */}
-        <img
-          src="/hero.jpg"
-          alt="Ancient castle at golden hour"
+        {/* 3D hero video */}
+        <video
+          src="/hero.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
           className="h-full w-full object-cover"
           style={{
             objectPosition: "center 40%",
-            filter: "brightness(0.75) saturate(0.85)",
-          }}
-          onError={(e) => {
-            // Fallback to Unsplash if local image not yet available
-            (e.currentTarget as HTMLImageElement).src =
-              "https://images.unsplash.com/photo-1533107862482-0e6974b06ec4?w=1400&q=85";
+            filter: "brightness(0.85) saturate(0.9)",
           }}
         />
 
