@@ -4,10 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import SectionLabel from "@/components/journey/SectionLabel";
 import WarmDivider from "@/components/journey/WarmDivider";
-import ProductCard from "@/components/journey/ProductCard";
 import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
 import AuthGate from "@/components/AuthGate";
-import { MOCK_PRODUCTS } from "@/test/fixtures/legacy";
 import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
 import { supabase } from "@/integrations/supabase/client";
@@ -139,15 +137,64 @@ const Stop6PassItOn = () => {
           <WarmDivider />
         </motion.div>
 
-        {/* Action 3: Physical keepsake */}
+        {/* Action 3: Three destination cards */}
         <motion.div variants={staggerItem}>
           <p className="mb-6 text-center font-serif text-sm italic text-amber-dim">
-            Or gift a physical keepsake
+            Want to go deeper?
           </p>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-            {MOCK_PRODUCTS.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
+
+            {/* Legacy Pack */}
+            <div className="flex flex-col rounded-[22px] p-6 text-center" style={{ background: "#1e1810", border: "1px solid rgba(232,148,58,0.35)" }}>
+              <div className="mb-3 text-3xl">🛡</div>
+              <h3 className="font-display text-base text-cream-warm">Legacy Pack</h3>
+              <p className="mt-2 text-sm leading-relaxed" style={{ color: "#8a7e6e" }}>
+                Your full 9-chapter story, high-res crest, family tree &amp; legacy certificate.
+              </p>
+              <div className="mt-3 font-display text-2xl" style={{ color: "#e8b85c" }}>$29</div>
+              <button
+                onClick={() => navigate("/checkout")}
+                className="mt-5 rounded-pill py-3 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
+              >
+                Unlock Now
+              </button>
+            </div>
+
+            {/* Heirloom Shop */}
+            <div className="flex flex-col rounded-[22px] border bg-card p-6 text-center" style={{ borderColor: "rgba(232,148,58,0.12)" }}>
+              <div className="mb-3 text-3xl">🎁</div>
+              <h3 className="font-display text-base text-cream-warm">Heirloom Shop</h3>
+              <p className="mt-2 text-sm leading-relaxed" style={{ color: "#8a7e6e" }}>
+                Framed crests, mugs, books &amp; more. Every heirloom includes the Legacy Pack.
+              </p>
+              <div className="mt-3 font-display text-2xl" style={{ color: "#e8b85c" }}>$49+</div>
+              <button
+                onClick={() => navigate("/shop")}
+                className="mt-5 rounded-pill py-3 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:opacity-80"
+                style={{ background: "rgba(232,148,58,0.08)", border: "1px solid rgba(232,148,58,0.2)", color: "#d4a04a" }}
+              >
+                Browse Shop
+              </button>
+            </div>
+
+            {/* Pricing */}
+            <div className="flex flex-col rounded-[22px] border bg-card p-6 text-center" style={{ borderColor: "rgba(232,148,58,0.12)" }}>
+              <div className="mb-3 text-3xl">📜</div>
+              <h3 className="font-display text-base text-cream-warm">See All Pricing</h3>
+              <p className="mt-2 text-sm leading-relaxed" style={{ color: "#8a7e6e" }}>
+                Compare everything we offer and find the right pack for your family.
+              </p>
+              <div className="mt-3 font-display text-2xl" style={{ color: "#e8b85c" }}>Free+</div>
+              <button
+                onClick={() => navigate("/pricing")}
+                className="mt-5 rounded-pill py-3 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:opacity-80"
+                style={{ background: "rgba(232,148,58,0.08)", border: "1px solid rgba(232,148,58,0.2)", color: "#d4a04a" }}
+              >
+                View Pricing
+              </button>
+            </div>
+
           </div>
         </motion.div>
 
