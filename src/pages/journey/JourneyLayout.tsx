@@ -8,6 +8,23 @@ const JourneyLayout = () => {
   return (
     <JourneyProvider>
       <div className="relative min-h-screen overflow-hidden bg-background">
+        {/* Castle video background — fixed so it stays as user scrolls */}
+        <video
+          src="/hero.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="pointer-events-none fixed inset-0 h-full w-full object-cover"
+          style={{ objectPosition: "center 30%", opacity: 0.18, filter: "saturate(0.7)" }}
+        />
+
+        {/* Dark overlay to keep content readable */}
+        <div
+          className="pointer-events-none fixed inset-0"
+          style={{ background: "rgba(13,10,7,0.72)" }}
+        />
+
         {/* SVG grain overlay */}
         <svg className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-[0.018]">
           <filter id="journey-grain">
