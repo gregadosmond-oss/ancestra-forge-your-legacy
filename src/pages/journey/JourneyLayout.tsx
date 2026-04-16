@@ -4,10 +4,6 @@ import { JourneyProvider } from "@/contexts/JourneyContext";
 
 const JourneyLayout = () => {
   const location = useLocation();
-  // Child routes are declared with literal paths (path="1"…"6"), so useParams
-  // has no :stop key. Derive the number from the URL instead.
-  const match = location.pathname.match(/\/journey\/(\d+)/);
-  const stopNumber = match ? match[1] : "1";
 
   return (
     <JourneyProvider>
@@ -35,11 +31,6 @@ const JourneyLayout = () => {
               "radial-gradient(ellipse at center, hsla(30, 80%, 40%, 0.07) 0%, transparent 70%)",
           }}
         />
-
-        {/* Step counter */}
-        <div className="fixed right-8 top-8 z-40 font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
-          {String(stopNumber).padStart(2, "0")} / 06
-        </div>
 
         {/* Animated page content */}
         <AnimatePresence mode="wait">
