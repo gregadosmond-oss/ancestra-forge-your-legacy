@@ -46,20 +46,23 @@ const Index = () => {
               "linear-gradient(to bottom, rgba(13,10,7,0.3) 0%, rgba(13,10,7,0.05) 50%, rgba(13,10,7,0.9) 100%)",
           }}
         />
-      </div>
 
-      {/* ── CREST TRANSITION ELEMENT ── */}
-      <div className="relative z-10 flex flex-col items-center px-6 pb-16 text-center">
+        {/* Crest overlaid on video — centered, lower third */}
         <img
           src="/crest.png"
           alt="Ancestra family crest"
+          className="absolute left-1/2 z-10 -translate-x-1/2"
           style={{
-            width: "180px",
+            bottom: "18%",
+            width: "200px",
             height: "auto",
-            marginTop: "-50px",
-            filter: "drop-shadow(0 0 28px rgba(212,160,74,0.35))",
+            filter: "drop-shadow(0 0 36px rgba(212,160,74,0.5))",
           }}
         />
+      </div>
+
+      {/* ── HEADLINE + CTA below the video ── */}
+      <div className="relative z-10 flex flex-col items-center px-6 pb-16 text-center">
 
         <h1 className="mt-6 font-display text-3xl leading-tight tracking-tight text-cream-warm sm:text-4xl md:text-5xl lg:text-6xl">
           Every family has a story
