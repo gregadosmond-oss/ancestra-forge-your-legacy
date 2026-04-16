@@ -126,7 +126,21 @@ export default function BloodlineQuiz() {
   const questionIndex = step - 1;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
+      {/* Castle video background */}
+      <video
+        src="/hero.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="pointer-events-none fixed inset-0 h-full w-full object-cover"
+        style={{ objectPosition: "center 30%", opacity: 0.15, filter: "saturate(0.6)" }}
+      />
+      <div className="pointer-events-none fixed inset-0" style={{ background: "rgba(13,10,7,0.75)" }} />
+      {/* Content */}
+      <div className="relative z-10">
+
       {/* Intro */}
       {step === 0 && (
         <section className="flex min-h-[80vh] flex-col items-center justify-center px-4 text-center">
@@ -379,6 +393,7 @@ export default function BloodlineQuiz() {
           </AnimatePresence>
         </section>
       )}
+      </div>
     </div>
   );
 }
