@@ -26,35 +26,6 @@ const AppLayout = () => {
           borderBottom: "1px solid #3d3020",
         }}
       >
-        {/* Back button — top-left */}
-        {showBack && (
-          <button
-            aria-label="Go back"
-            onClick={() => navigate(-1)}
-            className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center justify-center transition-all duration-300"
-            style={{
-              width: "34px",
-              height: "34px",
-              borderRadius: "50%",
-              border: "1px solid rgba(212,160,74,0.2)",
-              background: "rgba(212,160,74,0.04)",
-            }}
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#d4a04a"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M19 12H5M5 12l7-7M5 12l7 7" />
-            </svg>
-          </button>
-        )}
-
         {/* Step counter — top-right (journey only) */}
         {showStepCounter && (
           <div
@@ -120,6 +91,37 @@ const AppLayout = () => {
           </Link>
         </div>
       </nav>
+
+      {/* ── BACK BUTTON — below navbar ── */}
+      {showBack && (
+        <div className="px-5 pt-4">
+          <button
+            aria-label="Go back"
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center transition-all duration-300"
+            style={{
+              width: "34px",
+              height: "34px",
+              borderRadius: "50%",
+              border: "1px solid rgba(212,160,74,0.2)",
+              background: "rgba(212,160,74,0.04)",
+            }}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#d4a04a"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M5 12l7-7M5 12l7 7" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {/* ── PAGE CONTENT ── */}
       <div className="flex-1">
