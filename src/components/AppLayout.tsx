@@ -69,11 +69,11 @@ const AppLayout = () => {
             Shop
           </NavLink>
           <NavLink
-            to="/gifts"
+            to="/pricing"
             className="text-text-dim transition-colors duration-200 hover:text-amber"
             activeClassName="text-amber"
           >
-            Gifts
+            Pricing
           </NavLink>
           <NavLink
             to="/about"

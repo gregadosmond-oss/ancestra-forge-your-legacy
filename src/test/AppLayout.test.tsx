@@ -24,7 +24,7 @@ describe("AppLayout — navbar", () => {
     renderAt("/home");
     expect(screen.getByRole("link", { name: /free tools/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /shop/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /gifts/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /pricing/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /about/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /begin journey/i })).toBeInTheDocument();
   });
