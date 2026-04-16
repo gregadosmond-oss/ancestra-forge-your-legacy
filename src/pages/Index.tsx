@@ -54,7 +54,7 @@ const Index = () => {
           className="absolute left-1/2 z-10 -translate-x-1/2"
           style={{
             bottom: "18%",
-            width: "200px",
+            width: "260px",
             height: "auto",
             filter: "drop-shadow(0 0 36px rgba(212,160,74,0.5))",
           }}
