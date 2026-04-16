@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import AppLayout from "@/components/AppLayout";
 
 const renderAt = (path: string) =>
@@ -15,15 +15,13 @@ const renderAt = (path: string) =>
   );
 
 describe("AppLayout — navbar", () => {
-  beforeEach(() => sessionStorage.setItem("ancestra_entered", "1"));
-
   it("renders the Ancestra logo", () => {
-    renderAt("/");
+    renderAt("/home");
     expect(screen.getByText("Ancestra")).toBeInTheDocument();
   });
 
   it("renders all nav links", () => {
-    renderAt("/");
+    renderAt("/home");
     expect(screen.getByRole("link", { name: /free tools/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /shop/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /gifts/i })).toBeInTheDocument();
@@ -32,21 +30,19 @@ describe("AppLayout — navbar", () => {
   });
 
   it("Free Tools link points to /tools", () => {
-    renderAt("/");
+    renderAt("/home");
     expect(screen.getByRole("link", { name: /free tools/i })).toHaveAttribute("href", "/tools");
   });
 
   it("renders page content via Outlet", () => {
-    renderAt("/");
+    renderAt("/home");
     expect(screen.getByText("page content")).toBeInTheDocument();
   });
 });
 
 describe("AppLayout — back button", () => {
-  beforeEach(() => sessionStorage.setItem("ancestra_entered", "1"));
-
-  it("hides back button on landing page /", () => {
-    renderAt("/");
+  it("hides back button on landing page /home", () => {
+    renderAt("/home");
     expect(screen.queryByLabelText("Go back")).not.toBeInTheDocument();
   });
 
@@ -72,8 +68,6 @@ describe("AppLayout — back button", () => {
 });
 
 describe("AppLayout — step counter", () => {
-  beforeEach(() => sessionStorage.setItem("ancestra_entered", "1"));
-
   it("hides step counter on non-journey pages", () => {
     renderAt("/tools/surname");
     expect(screen.queryByText(/\/ 06/)).not.toBeInTheDocument();
@@ -87,34 +81,5 @@ describe("AppLayout — step counter", () => {
   it("shows step counter on /journey/1", () => {
     renderAt("/journey/1");
     expect(screen.getByText("01 / 06")).toBeInTheDocument();
-  });
-});
-
-describe("AppLayout — entry portal", () => {
-  beforeEach(() => sessionStorage.clear());
-
-  it("shows portal when sessionStorage key is not set", () => {
-    renderAt("/");
-    expect(screen.getByText("Welcome to Ancestra")).toBeInTheDocument();
-  });
-
-  it("hides portal when sessionStorage key is already set", () => {
-    sessionStorage.setItem("ancestra_entered", "1");
-    renderAt("/");
-    expect(screen.queryByText("Welcome to Ancestra")).not.toBeInTheDocument();
-  });
-});
-
-describe("AppLayout — sound toggle", () => {
-  it("shows sound toggle after portal is dismissed", () => {
-    sessionStorage.setItem("ancestra_entered", "1");
-    renderAt("/");
-    expect(screen.getByLabelText("Toggle sound")).toBeInTheDocument();
-  });
-
-  it("hides sound toggle when portal is showing", () => {
-    sessionStorage.clear();
-    renderAt("/");
-    expect(screen.queryByLabelText("Toggle sound")).not.toBeInTheDocument();
   });
 });
