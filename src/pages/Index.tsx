@@ -31,7 +31,7 @@ const Index = () => {
         <rect width="100%" height="100%" filter="url(#grain)" />
       </svg>
 
-      {/* ── HERO VIDEO BANNER ── */}
+      {/* ── HERO VIDEO BANNER with overlaid content ── */}
       <div className="relative w-full" style={{ height: "100vh" }}>
         {/* 3D hero video */}
         <video
@@ -47,17 +47,65 @@ const Index = () => {
           }}
         />
 
-        {/* Bottom fade into page background */}
+        {/* Gradient overlay — darkens top and bottom */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "linear-gradient(to bottom, rgba(13,10,7,0.3) 0%, rgba(13,10,7,0.05) 50%, rgba(13,10,7,0.9) 100%)",
+              "linear-gradient(to bottom, rgba(13,10,7,0.5) 0%, rgba(13,10,7,0.1) 35%, rgba(13,10,7,0.1) 55%, rgba(13,10,7,0.85) 100%)",
           }}
         />
 
+        {/* ── CREST + HEADLINE + CTA — centered over video ── */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+          <img
+            src="/crest.png"
+            alt="Ancestra family crest"
+            style={{
+              width: "220px",
+              height: "auto",
+              filter: "drop-shadow(0 0 48px rgba(212,160,74,0.6))",
+            }}
+          />
+
+          <h1 className="mt-6 font-display text-3xl leading-tight tracking-tight text-cream-warm sm:text-4xl md:text-5xl lg:text-6xl" style={{ textShadow: "0 2px 24px rgba(13,10,7,0.8)" }}>
+            Every family has a story
+            <br />
+            worth telling.
+          </h1>
+
+          <p className="mt-5 max-w-lg font-serif text-lg italic text-cream-soft sm:text-xl" style={{ textShadow: "0 2px 12px rgba(13,10,7,0.8)" }}>
+            Discover your name. Forge your crest. Pass it on.
+          </p>
+
+          <Link
+            to="/journey"
+            className="mt-10 inline-block rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-400"
+            style={{
+              background: "linear-gradient(135deg, #e8943a, #c47828)",
+              transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.background =
+                "linear-gradient(135deg, #f0a848, #e8943a)";
+              (e.currentTarget as HTMLAnchorElement).style.transform =
+                "translateY(-2px)";
+              (e.currentTarget as HTMLAnchorElement).style.boxShadow =
+                "0 12px 40px rgba(232,148,58,0.2)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.background =
+                "linear-gradient(135deg, #e8943a, #c47828)";
+              (e.currentTarget as HTMLAnchorElement).style.transform = "";
+              (e.currentTarget as HTMLAnchorElement).style.boxShadow = "";
+            }}
+          >
+            Begin Your Journey
+          </Link>
+        </div>
+
         {/* Scroll indicator */}
-        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1" style={{ animation: "scrollBounce 2s ease-in-out infinite" }}>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1" style={{ animation: "scrollBounce 2s ease-in-out infinite" }}>
           <span className="font-sans text-[9px] uppercase tracking-[3px]" style={{ color: "rgba(212,160,74,0.5)" }}>Scroll</span>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(212,160,74,0.5)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 9l6 6 6-6" />
@@ -89,55 +137,6 @@ const Index = () => {
           </button>
         </div>
       )}
-
-      {/* ── CREST + HEADLINE + CTA below the video ── */}
-      <div className="relative z-10 flex flex-col items-center px-6 pb-16 text-center">
-        <img
-          src="/crest.png"
-          alt="Ancestra family crest"
-          style={{
-            width: "260px",
-            height: "auto",
-            marginTop: "48px",
-            filter: "drop-shadow(0 0 36px rgba(212,160,74,0.5))",
-          }}
-        />
-
-        <h1 className="mt-6 font-display text-3xl leading-tight tracking-tight text-cream-warm sm:text-4xl md:text-5xl lg:text-6xl">
-          Every family has a story
-          <br />
-          worth telling.
-        </h1>
-
-        <p className="mt-5 max-w-lg font-serif text-lg italic text-cream-soft sm:text-xl">
-          Discover your name. Forge your crest. Pass it on.
-        </p>
-
-        <Link
-          to="/journey"
-          className="mt-10 inline-block rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-400"
-          style={{
-            background: "linear-gradient(135deg, #e8943a, #c47828)",
-            transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.background =
-              "linear-gradient(135deg, #f0a848, #e8943a)";
-            (e.currentTarget as HTMLAnchorElement).style.transform =
-              "translateY(-2px)";
-            (e.currentTarget as HTMLAnchorElement).style.boxShadow =
-              "0 12px 40px rgba(232,148,58,0.2)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.background =
-              "linear-gradient(135deg, #e8943a, #c47828)";
-            (e.currentTarget as HTMLAnchorElement).style.transform = "";
-            (e.currentTarget as HTMLAnchorElement).style.boxShadow = "";
-          }}
-        >
-          Begin Your Journey
-        </Link>
-      </div>
 
       {/* ── LANDING SECTIONS ── */}
       <div className="relative z-10 w-full max-w-4xl px-6 pb-24">
