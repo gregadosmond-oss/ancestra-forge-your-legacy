@@ -66,6 +66,6 @@ describe("PacksSection", () => {
 
   it("renders heirloom items list", () => {
     renderComponent();
-    expect(screen.getByText("Legacy Pack included with every item")).toBeInTheDocument();
+    expect(screen.getByText("Framed crest print, mugs & glassware")).toBeInTheDocument();
   });
 });

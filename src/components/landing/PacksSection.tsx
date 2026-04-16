@@ -27,7 +27,6 @@ const LEGACY_ITEMS = [
 ];
 
 const HEIRLOOM_ITEMS = [
-  "Legacy Pack included with every item",
   "Framed crest print, mugs & glassware",
   "Hardcover legacy book",
   "Christmas ornaments & coasters",
