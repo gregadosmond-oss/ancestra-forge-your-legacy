@@ -77,9 +77,9 @@ const Index = () => {
           src="/crest.png"
           alt="Ancestra family crest"
           style={{
-            width: "110px",
+            width: "180px",
             height: "auto",
-            marginTop: "-32px",
+            marginTop: "-50px",
             filter: "drop-shadow(0 0 28px rgba(212,160,74,0.35))",
           }}
         />
