@@ -47,10 +47,11 @@ const FreeToolsSection = () => (
           key={tool.heading}
           {...reveal}
           transition={{ ...reveal.transition, delay: i * 0.08 }}
+          className="h-full"
         >
           <Link
             to={tool.href}
-            className="block rounded-lg border border-gold-line bg-card p-6 text-left transition-all duration-[400ms] hover:-translate-y-0.5"
+            className="flex h-full flex-col rounded-lg border border-gold-line bg-card p-6 text-left transition-all duration-[400ms] hover:-translate-y-0.5"
             style={{ borderColor: "rgba(232,148,58,0.08)" }}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(232,148,58,0.20)";
