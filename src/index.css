@@ -69,10 +69,16 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Libre Caslon Text', serif;
   }
 
-  h1, h2, h3 {
+  h1, h2, h3, h4 {
     font-family: 'Libre Caslon Display', serif;
+  }
+
+  /* Keep UI elements in DM Sans */
+  button, input, select, textarea, nav, label,
+  .font-sans {
+    font-family: 'DM Sans', sans-serif;
   }
 }
