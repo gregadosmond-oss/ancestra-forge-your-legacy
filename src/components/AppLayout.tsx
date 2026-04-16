@@ -33,11 +33,13 @@ const AppLayout = () => {
   }, [isMuted]);
 
   const handleEnter = () => {
+    // Scroll to top so hero is visible when portal fades out
+    window.scrollTo({ top: 0, behavior: "instant" });
     // Create and start audio on user gesture (satisfies browser autoplay policy)
     if (!audioRef.current) {
       const audio = new Audio("/starfields-within.mp3");
       audio.loop = true;
-      audio.volume = 0.3;
+      audio.volume = 0.5;
       audio.muted = isMuted;
       audio.play().catch(() => {/* autoplay blocked — silent fail */});
       audioRef.current = audio;
