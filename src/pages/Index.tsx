@@ -47,6 +47,20 @@ const Index = () => {
           }}
         />
 
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1" style={{ animation: "scrollBounce 2s ease-in-out infinite" }}>
+          <span className="font-sans text-[9px] uppercase tracking-[3px]" style={{ color: "rgba(212,160,74,0.5)" }}>Scroll</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(212,160,74,0.5)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </div>
+
+        <style>{`
+          @keyframes scrollBounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.7; }
+            50% { transform: translateX(-50%) translateY(6px); opacity: 1; }
+          }
+        `}</style>
       </div>
 
       {/* ── CREST + HEADLINE + CTA below the video ── */}
