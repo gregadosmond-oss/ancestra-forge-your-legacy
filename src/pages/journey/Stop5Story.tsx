@@ -107,22 +107,29 @@ const Stop5Story = () => {
               transition={{ duration: 1.2, delay: 2 }}
               className="mt-14 w-full max-w-xl text-center"
             >
-              <div className="mb-8 rounded-pill border border-amber-dim/25 bg-amber-dim/10 px-6 py-3">
+              <div className="mb-6 rounded-[18px] border border-amber-dim/25 bg-amber-dim/10 px-6 py-5">
                 <p className="font-serif text-sm italic text-amber-light">
-                  Your story is unlocked
+                  Your full Legacy Pack is on its way.
+                </p>
+                <p className="mt-2 font-sans text-xs text-text-dim">
+                  All 9 chapters of your family story, your high-res crest, family tree, and legacy certificate have been sent to your email.
                 </p>
               </div>
 
+              <p className="mb-4 font-sans text-[10px] uppercase tracking-[3px] text-amber-dim">
+                Your 9 chapters
+              </p>
               <ul className="space-y-3 text-left">
-                {story.data.teaserChapters.map((title, i) => (
+                {["Chapter I — " + story.data.chapterOneTitle, ...story.data.teaserChapters].map((title, i) => (
                   <motion.li
                     key={`${title}-${i}`}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: 2.2 + i * 0.1 }}
-                    className="flex items-center gap-3 font-serif text-sm text-text-body"
+                    className="flex items-center gap-3 font-serif text-sm"
+                    style={{ color: i === 0 ? "#e8b85c" : "#8a7e6e" }}
                   >
-                    <span className="h-2 w-2 shrink-0 rounded-full bg-amber-dim" />
+                    <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: i === 0 ? "#e8b85c" : "#3d3020" }} />
                     {title}
                   </motion.li>
                 ))}
