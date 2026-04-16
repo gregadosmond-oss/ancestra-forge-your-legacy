@@ -120,7 +120,7 @@ const Stop5Story = () => {
                 Your 9 chapters
               </p>
               <ul className="space-y-3 text-left">
-                {["Chapter I — " + story.data.chapterOneTitle, ...story.data.teaserChapters].map((title, i) => (
+                {[story.data.chapterOneTitle, ...story.data.teaserChapters].map((title, i) => (
                   <motion.li
                     key={`${title}-${i}`}
                     initial={{ opacity: 0, x: -10 }}
@@ -151,28 +151,44 @@ const Stop5Story = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1.2, delay: 2 }}
-              className="mt-14 w-full max-w-xl rounded-[22px] border border-amber-dim/25 bg-card/60 p-8 text-center"
+              className="mt-14 w-full max-w-xl rounded-[22px] border text-center"
+              style={{ background: "rgba(26,18,8,0.85)", borderColor: "rgba(232,148,58,0.3)" }}
             >
-              <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
-                EIGHT CHAPTERS REMAIN
-              </p>
-              <ul className="mt-5 space-y-2 font-serif text-sm italic text-text-dim">
-                {story.data.teaserChapters.map((t, i) => (
-                  <li key={`${t}-${i}`}>{t}</li>
-                ))}
-              </ul>
+              {/* Fade out teaser */}
+              <div className="relative overflow-hidden rounded-t-[22px] px-8 pt-8">
+                <ul className="space-y-2 font-serif text-sm italic text-text-dim">
+                  {story.data.teaserChapters.slice(0, 4).map((t, i) => (
+                    <li key={`${t}-${i}`} style={{ opacity: 1 - i * 0.2 }}>{t}</li>
+                  ))}
+                </ul>
+                {/* Fade mask */}
+                <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16"
+                  style={{ background: "linear-gradient(to bottom, transparent, rgba(26,18,8,0.95))" }} />
+              </div>
 
-              <button
-                onClick={handleUnlock}
-                className="mt-8 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
-                style={{
-                  background: "linear-gradient(135deg, #e8943a, #c47828)",
-                  transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-                  color: "#1a1208",
-                }}
-              >
-                Unlock Your Legacy Pack — $29.99
-              </button>
+              {/* CTA */}
+              <div className="px-8 pb-8 pt-4">
+                <p className="font-display text-xl text-cream-warm">
+                  8 more chapters await.
+                </p>
+                <p className="mt-2 font-serif text-sm italic text-text-dim">
+                  Your full crest, family story, bloodline tree &amp; legacy certificate — delivered to your inbox.
+                </p>
+
+                <button
+                  onClick={handleUnlock}
+                  className="mt-6 w-full rounded-pill py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                  style={{
+                    background: "linear-gradient(135deg, #e8943a, #c47828)",
+                    color: "#1a1208",
+                  }}
+                >
+                  Unlock My Full Legacy — $29
+                </button>
+                <p className="mt-3 font-sans text-[10px] text-text-dim">
+                  One-time payment · Instant delivery · No subscription
+                </p>
+              </div>
             </motion.div>
           )}
         </>
