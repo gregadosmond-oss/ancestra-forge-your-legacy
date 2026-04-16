@@ -57,7 +57,7 @@ const Index = () => {
           style={{
             width: "260px",
             height: "auto",
-            marginTop: "-30px",
+            marginTop: "48px",
             filter: "drop-shadow(0 0 36px rgba(212,160,74,0.5))",
           }}
         />
