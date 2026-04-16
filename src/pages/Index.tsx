@@ -23,7 +23,7 @@ const Index = () => {
       </svg>
 
       {/* ── HERO VIDEO BANNER ── */}
-      <div className="relative w-full" style={{ height: "60vh" }}>
+      <div className="relative w-full" style={{ height: "100vh" }}>
         {/* 3D hero video */}
         <video
           src="/hero.mp4"
