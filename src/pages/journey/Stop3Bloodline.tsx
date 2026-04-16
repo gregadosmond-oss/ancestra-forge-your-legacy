@@ -69,11 +69,13 @@ const Stop3Bloodline = () => {
         className="mt-12"
       >
         <Link
-          to="/journey/4"
-          className="inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
+          to={facts.status === "ready" ? "/journey/4" : "#"}
+          onClick={facts.status !== "ready" ? (e) => e.preventDefault() : undefined}
+          className="inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300"
           style={{
             background: "linear-gradient(135deg, #e8943a, #c47828)",
-            transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+            opacity: facts.status === "ready" ? 1 : 0.4,
+            cursor: facts.status === "ready" ? "pointer" : "not-allowed",
           }}
         >
           Forge Your Crest

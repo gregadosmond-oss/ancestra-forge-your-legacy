@@ -142,11 +142,13 @@ const Stop4CrestForge = () => {
             className="mt-12"
           >
             <Link
-              to="/journey/5"
-              className="inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
+              to={crest.status === "ready" ? "/journey/5" : "#"}
+              onClick={crest.status !== "ready" ? (e) => e.preventDefault() : undefined}
+              className="inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300"
               style={{
                 background: "linear-gradient(135deg, #e8943a, #c47828)",
-                transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                opacity: crest.status === "ready" ? 1 : 0.4,
+                cursor: crest.status === "ready" ? "pointer" : "not-allowed",
               }}
             >
               Read Your Story
