@@ -8,7 +8,7 @@ const AppLayout = () => {
   const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(true);
 
-  const isLanding = location.pathname === "/home";
+  const isLanding = location.pathname === "/";
   const journeyMatch = location.pathname.match(/^\/journey\/(\d+)$/);
   const stepNumber = journeyMatch ? journeyMatch[1] : null;
   const isJourneyStep1 = location.pathname === "/journey/1";
@@ -38,7 +38,7 @@ const AppLayout = () => {
 
         {/* Logo */}
         <Link
-          to="/home"
+          to="/"
           className="inline-block pt-3 font-display text-xl uppercase"
           style={{ color: "#e8b85c", letterSpacing: "3px" }}
         >

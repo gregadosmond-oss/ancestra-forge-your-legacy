@@ -5,7 +5,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import AppLayout from "./components/AppLayout";
-import EntryPortalPage from "./pages/EntryPortalPage.tsx";
 import Pricing from "./pages/Pricing.tsx";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -34,10 +33,9 @@ const App = () => (
       <BrowserRouter>
         <ScrollToTop />
         <Routes>
-          {/* Entry portal — standalone, no navbar */}
-          <Route path="/" element={<EntryPortalPage />} />
           <Route element={<AppLayout />}>
-            <Route path="/home" element={<Index />} />
+            <Route path="/" element={<Index />} />
+            <Route path="/home" element={<Navigate to="/" replace />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/tools/surname" element={<SurnameLookup />} />
             <Route path="/tools/motto" element={<MottoGenerator />} />

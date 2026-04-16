@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { startAmbientAudio } from "@/lib/ambientAudio";
 import WarmDivider from "@/components/journey/WarmDivider";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import PacksSection from "@/components/landing/PacksSection";
@@ -7,6 +9,13 @@ import OccasionsSection from "@/components/landing/OccasionsSection";
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
 
 const Index = () => {
+  const [musicStarted, setMusicStarted] = useState(false);
+
+  const handleStartMusic = () => {
+    startAmbientAudio();
+    setMusicStarted(true);
+  };
+
   return (
     <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-background">
       {/* SVG grain texture overlay */}
@@ -62,6 +71,24 @@ const Index = () => {
           }
         `}</style>
       </div>
+
+      {/* ── MUSIC INVITE ── */}
+      {!musicStarted && (
+        <div className="relative z-10 flex w-full items-center justify-center gap-3 py-3" style={{ background: "rgba(26,18,8,0.8)", borderBottom: "1px solid rgba(212,160,74,0.08)" }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a07830" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+          </svg>
+          <span className="font-sans text-[11px]" style={{ color: "#8a7e6e" }}>Want the full experience?</span>
+          <button
+            onClick={handleStartMusic}
+            className="font-sans text-[11px] font-semibold transition-opacity hover:opacity-70"
+            style={{ color: "#d4a04a", textDecoration: "underline", textUnderlineOffset: "3px" }}
+          >
+            Enable music
+          </button>
+        </div>
+      )}
 
       {/* ── CREST + HEADLINE + CTA below the video ── */}
       <div className="relative z-10 flex flex-col items-center px-6 pb-16 text-center">

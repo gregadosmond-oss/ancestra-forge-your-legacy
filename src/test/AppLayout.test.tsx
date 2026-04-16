@@ -16,12 +16,12 @@ const renderAt = (path: string) =>
 
 describe("AppLayout — navbar", () => {
   it("renders the Ancestra logo", () => {
-    renderAt("/home");
+    renderAt("/");
     expect(screen.getByText("Ancestra")).toBeInTheDocument();
   });
 
   it("renders all nav links", () => {
-    renderAt("/home");
+    renderAt("/");
     expect(screen.getByRole("link", { name: /free tools/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /shop/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /pricing/i })).toBeInTheDocument();
@@ -30,19 +30,19 @@ describe("AppLayout — navbar", () => {
   });
 
   it("Free Tools link points to /tools", () => {
-    renderAt("/home");
+    renderAt("/");
     expect(screen.getByRole("link", { name: /free tools/i })).toHaveAttribute("href", "/tools");
   });
 
   it("renders page content via Outlet", () => {
-    renderAt("/home");
+    renderAt("/");
     expect(screen.getByText("page content")).toBeInTheDocument();
   });
 });
 
 describe("AppLayout — back button", () => {
-  it("hides back button on landing page /home", () => {
-    renderAt("/home");
+  it("hides back button on landing page /", () => {
+    renderAt("/");
     expect(screen.queryByLabelText("Go back")).not.toBeInTheDocument();
   });
 
