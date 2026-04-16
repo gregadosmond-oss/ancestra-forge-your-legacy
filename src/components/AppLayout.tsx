@@ -1,5 +1,10 @@
+import { useRef, useState, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { NavLink } from "@/components/NavLink";
+import EntryPortal from "@/components/EntryPortal";
+
+const SESSION_KEY = "ancestra_entered";
 
 const AppLayout = () => {
   const location = useLocation();
@@ -13,8 +18,43 @@ const AppLayout = () => {
   const showBack = !isLanding && !isJourneyStep1;
   const showStepCounter = !!stepNumber;
 
+  // ── Portal + audio state ──
+  const [hasEntered, setHasEntered] = useState<boolean>(
+    () => sessionStorage.getItem(SESSION_KEY) === "1"
+  );
+  const [isMuted, setIsMuted] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Sync mute state to audio element
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
+  const handleEnter = () => {
+    // Create and start audio on user gesture (satisfies browser autoplay policy)
+    if (!audioRef.current) {
+      const audio = new Audio("/starfields-within.mp3");
+      audio.loop = true;
+      audio.volume = 0.3;
+      audio.muted = isMuted;
+      audio.play().catch(() => {/* autoplay blocked — silent fail */});
+      audioRef.current = audio;
+    }
+    sessionStorage.setItem(SESSION_KEY, "1");
+    setHasEntered(true);
+  };
+
+  const toggleMute = () => setIsMuted((m) => !m);
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      {/* ── ENTRY PORTAL (fullscreen overlay) ── */}
+      <AnimatePresence>
+        {!hasEntered && <EntryPortal onEnter={handleEnter} />}
+      </AnimatePresence>
+
       {/* ── GLOBAL NAVBAR ── */}
       <nav
         className="relative w-full text-center"
@@ -122,6 +162,35 @@ const AppLayout = () => {
       <div className="flex-1">
         <Outlet />
       </div>
+
+      {/* ── SOUND TOGGLE (fixed bottom-right, only after portal dismissed) ── */}
+      {hasEntered && (
+        <button
+          aria-label="Toggle sound"
+          onClick={toggleMute}
+          className="fixed bottom-5 right-5 z-40 flex items-center justify-center transition-opacity duration-200 hover:opacity-70"
+          style={{
+            width: "32px",
+            height: "32px",
+          }}
+        >
+          {isMuted ? (
+            // Speaker muted icon
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <line x1="23" y1="9" x2="17" y2="15" />
+              <line x1="17" y1="9" x2="23" y2="15" />
+            </svg>
+          ) : (
+            // Speaker on icon
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            </svg>
+          )}
+        </button>
+      )}
     </div>
   );
 };
