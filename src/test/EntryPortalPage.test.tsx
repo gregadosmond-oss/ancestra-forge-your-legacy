@@ -39,12 +39,12 @@ describe("EntryPortalPage", () => {
 
   it("renders the Begin Your Journey button", () => {
     renderPage();
-    expect(screen.getByRole("button", { name: /begin your journey/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /begin your experience/i })).toBeInTheDocument();
   });
 
   it("navigates to /home on button click", () => {
     renderPage();
-    fireEvent.click(screen.getByRole("button", { name: /begin your journey/i }));
+    fireEvent.click(screen.getByRole("button", { name: /begin your experience/i }));
     expect(mockNavigate).toHaveBeenCalledWith("/home");
   });
 

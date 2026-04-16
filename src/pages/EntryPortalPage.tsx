@@ -72,7 +72,7 @@ const EntryPortalPage = () => {
             animation: "portalPulse 2.5s ease-in-out infinite",
           }}
         >
-          Begin Your Journey
+          Begin Your Experience
         </button>
       </div>
 
