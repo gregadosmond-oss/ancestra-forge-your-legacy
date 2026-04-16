@@ -26,13 +26,13 @@ const LEGACY_ITEMS = [
   "Shareable legacy page",
 ];
 
-const PHYSICAL_ITEMS = [
-  "Framed crest print",
+const HEIRLOOM_ITEMS = [
+  "Legacy Pack included with every item",
+  "Framed crest print, mugs & glassware",
   "Hardcover legacy book",
-  "Beer mug / whiskey glass",
-  "Christmas ornament",
-  "Metal wall sign",
-  "Coasters, phone case & more",
+  "Christmas ornaments & coasters",
+  "Metal wall sign & more",
+  "Ships worldwide — perfect to gift",
 ];
 
 const PacksSection = () => (
@@ -124,18 +124,21 @@ const PacksSection = () => (
         </Link>
       </motion.div>
 
-      {/* ── Heirlooms / Physical ── */}
+      {/* ── Heirloom Shop ── */}
       <motion.div
         {...reveal}
         transition={{ ...reveal.transition, delay: 0.16 }}
         className="flex flex-col items-center rounded-[22px] border border-gold-line bg-card p-7 text-center"
       >
-        <div className="mb-3 text-3xl">🖼</div>
-        <h3 className="font-display text-lg text-cream-warm">Heirlooms</h3>
-        <div className="mt-3 font-display text-3xl text-amber-light">$29+</div>
-        <p className="mt-1 text-[11px] text-text-dim">Ships worldwide</p>
-        <ul className="mt-5 w-full space-y-1 text-left text-sm text-foreground">
-          {PHYSICAL_ITEMS.map((item) => (
+        <div className="mb-3 text-3xl">🎁</div>
+        <h3 className="font-display text-lg text-cream-warm">Heirloom Shop</h3>
+        <div className="mt-3 font-display text-3xl text-amber-light">$49+</div>
+        <p className="mt-1 text-[11px] text-text-dim">Legacy Pack included · Ships worldwide</p>
+        <p className="mt-3 font-serif text-xs italic text-text-dim">
+          The perfect gift for family. Every heirloom comes with a full Legacy Pack — their crest, story, and tree.
+        </p>
+        <ul className="mt-4 w-full space-y-1 text-left text-sm text-foreground">
+          {HEIRLOOM_ITEMS.map((item) => (
             <li key={item} className="flex items-start gap-2">
               <span className="mt-1 text-[8px] text-amber-dim">✦</span>
               {item}
@@ -150,7 +153,7 @@ const PacksSection = () => (
             border: "1px solid rgba(232,148,58,0.18)",
           }}
         >
-          Browse Shop
+          Browse Heirloom Shop
         </Link>
       </motion.div>
 

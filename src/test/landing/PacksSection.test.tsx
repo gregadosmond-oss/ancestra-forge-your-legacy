@@ -27,7 +27,7 @@ describe("PacksSection", () => {
     renderComponent();
     expect(screen.getByText("Explorer")).toBeInTheDocument();
     expect(screen.getByText("Legacy Pack")).toBeInTheDocument();
-    expect(screen.getByText("Heirlooms")).toBeInTheDocument();
+    expect(screen.getByText("Heirloom Shop")).toBeInTheDocument();
   });
 
   it("renders the Legacy Pack price", () => {
@@ -48,7 +48,7 @@ describe("PacksSection", () => {
     const unlockLink = screen.getByRole("link", { name: /unlock my legacy/i });
     expect(unlockLink).toHaveAttribute("href", "/journey");
 
-    const shopLink = screen.getByRole("link", { name: /browse shop/i });
+    const shopLink = screen.getByRole("link", { name: /browse heirloom shop/i });
     expect(shopLink).toHaveAttribute("href", "/shop");
   });
 
@@ -64,8 +64,8 @@ describe("PacksSection", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders physical items list", () => {
+  it("renders heirloom items list", () => {
     renderComponent();
-    expect(screen.getByText("Framed crest print")).toBeInTheDocument();
+    expect(screen.getByText("Legacy Pack included with every item")).toBeInTheDocument();
   });
 });
