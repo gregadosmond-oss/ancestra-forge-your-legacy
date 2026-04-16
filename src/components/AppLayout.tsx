@@ -48,7 +48,20 @@ const AppLayout = () => {
     setHasEntered(true);
   };
 
-  const toggleMute = () => setIsMuted((m) => !m);
+  const toggleMute = () => {
+    // If audio hasn't started yet (return visitor who skipped portal), start it now
+    if (!audioRef.current) {
+      const audio = new Audio("/starfields-within.mp3");
+      audio.loop = true;
+      audio.volume = 0.5;
+      audio.muted = false;
+      audio.play().catch(() => {});
+      audioRef.current = audio;
+      setIsMuted(false);
+      return;
+    }
+    setIsMuted((m) => !m);
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
