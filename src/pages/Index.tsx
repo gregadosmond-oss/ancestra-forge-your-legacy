@@ -47,22 +47,20 @@ const Index = () => {
           }}
         />
 
-        {/* Crest overlaid on video — centered, lower third */}
+      </div>
+
+      {/* ── CREST + HEADLINE + CTA below the video ── */}
+      <div className="relative z-10 flex flex-col items-center px-6 pb-16 text-center">
         <img
           src="/crest.png"
           alt="Ancestra family crest"
-          className="absolute left-1/2 z-10 -translate-x-1/2"
           style={{
-            bottom: "18%",
             width: "260px",
             height: "auto",
+            marginTop: "-30px",
             filter: "drop-shadow(0 0 36px rgba(212,160,74,0.5))",
           }}
         />
-      </div>
-
-      {/* ── HEADLINE + CTA below the video ── */}
-      <div className="relative z-10 flex flex-col items-center px-6 pb-16 text-center">
 
         <h1 className="mt-6 font-display text-3xl leading-tight tracking-tight text-cream-warm sm:text-4xl md:text-5xl lg:text-6xl">
           Every family has a story
