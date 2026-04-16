@@ -25,8 +25,9 @@ const Stop4CrestForge = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
-      <SectionLabel>THE FORGE</SectionLabel>
-
+      {(crest.status === "idle" || crest.status === "loading") && (
+        <SectionLabel>THE FORGE</SectionLabel>
+      )}
       {(crest.status === "idle" || crest.status === "loading") && (
         <ForgeLoader messages={FORGE_MESSAGES} loop />
       )}
@@ -52,7 +53,7 @@ const Stop4CrestForge = () => {
             className="mb-6 text-center"
           >
             <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
-              House
+              The House of
             </p>
             <h1 className="font-display text-4xl text-cream-warm sm:text-5xl">
               {facts.data?.displaySurname ?? surname}
@@ -74,6 +75,7 @@ const Stop4CrestForge = () => {
           <div
             className="relative z-10 w-full max-w-2xl rounded-[22px]"
             style={{
+              minHeight: "400px",
               boxShadow: "0 0 80px rgba(212,160,74,0.25), 0 0 0 1px rgba(212,160,74,0.15), 0 32px 80px rgba(0,0,0,0.6)",
             }}
           >
@@ -82,6 +84,11 @@ const Stop4CrestForge = () => {
               alt={`${facts.data?.displaySurname ?? surname} family crest`}
               className="w-full rounded-[22px]"
               style={{ maxHeight: "70vh", objectFit: "contain", display: "block" }}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = "/crest.png";
+                (e.currentTarget as HTMLImageElement).style.padding = "40px";
+                (e.currentTarget as HTMLImageElement).style.filter = "drop-shadow(0 0 40px rgba(212,160,74,0.5))";
+              }}
             />
             {facts.status === "ready" && facts.data && (
               <div
