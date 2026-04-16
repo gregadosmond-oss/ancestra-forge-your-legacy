@@ -24,27 +24,6 @@ const Index = () => {
 
       {/* ── HERO PHOTO BANNER ── */}
       <div className="relative w-full" style={{ height: "42vh" }}>
-        {/* Nav sits absolutely on top of photo */}
-        <nav
-          className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between px-8 py-5"
-          style={{
-            background: "linear-gradient(to bottom, rgba(13,10,7,0.65), transparent)",
-          }}
-        >
-          <span
-            className="font-display text-xl uppercase tracking-[2px]"
-            style={{ color: "#e8b85c" }}
-          >
-            Ancestra
-          </span>
-          <div className="hidden gap-8 text-[11px] font-semibold uppercase tracking-[1.5px] text-cream-soft sm:flex">
-            <Link to="/tools" className="opacity-80 transition-opacity hover:opacity-100">Free Tools</Link>
-            <Link to="/shop" className="opacity-80 transition-opacity hover:opacity-100">Shop</Link>
-            <Link to="/gifts" className="opacity-80 transition-opacity hover:opacity-100">Gifts</Link>
-            <Link to="/about" className="opacity-80 transition-opacity hover:opacity-100">About</Link>
-          </div>
-        </nav>
-
         {/* Castle photo */}
         <img
           src="/hero.jpg"
