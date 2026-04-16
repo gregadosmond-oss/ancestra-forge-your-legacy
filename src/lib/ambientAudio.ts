@@ -9,8 +9,22 @@ export const startAmbientAudio = (): void => {
   audio.play().catch(() => {/* autoplay blocked — silent fail */});
 };
 
-export const toggleAmbientMute = (): void => {
-  if (audio) audio.muted = !audio.muted;
+export const toggleAmbientPlayback = (): boolean => {
+  if (!audio) {
+    // First click — start audio and return playing state
+    audio = new Audio("/starfields-within.mp3");
+    audio.loop = true;
+    audio.volume = 0.5;
+    audio.play().catch(() => {});
+    return true; // now playing
+  }
+  if (audio.paused) {
+    audio.play().catch(() => {});
+    return true; // now playing
+  } else {
+    audio.pause();
+    return false; // now paused
+  }
 };
 
-export const isAmbientPlaying = (): boolean => !!audio;
+export const isAmbientStarted = (): boolean => !!audio;
