@@ -26,9 +26,9 @@ export default function LandingCrest() {
           top: "46%",
           left: "50%",
           transform: "translateX(-50%)",
-          width: "16%",
+          width: "13%",
           height: "auto",
-          borderRadius: 3,
+          borderRadius: 2,
           mixBlendMode: "multiply" as const,
         }}
       />
