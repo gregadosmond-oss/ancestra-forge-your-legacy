@@ -39,7 +39,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
 
     const load = async () => {
       try {
-        // Step 1: get surname from profile
+        // Step 1: get surname — profile first, then sessionStorage fallback
         const { data: profile, error: profileErr } = await supabase
           .from("profiles")
           .select("surname")
@@ -48,10 +48,18 @@ function useLegacyData(userId: string | undefined): LegacyData {
 
         if (profileErr) throw new Error(profileErr.message);
 
-        const surname = profile?.surname ?? null;
+        const surname = profile?.surname
+          ?? sessionStorage.getItem("ancestra_journey_surname")
+          ?? null;
+
         if (!surname) {
           setData({ facts: null, story: null, crestUrl: null, surname: null, loading: false, error: null });
           return;
+        }
+
+        // Save to profile for next time if it was missing
+        if (!profile?.surname) {
+          await supabase.from("profiles").upsert({ id: userId, surname }, { onConflict: "id" });
         }
 
         // Step 2: load facts + story + crest in parallel
