@@ -58,7 +58,7 @@ export function buildPrompt(facts: LegacyFacts): string {
     `A photorealistic heraldic coat of arms in the same style as the reference image.`,
     `Two golden lion supporters standing on either side of a quartered heraldic shield.`,
     `The shield features ${symbols}.`,
-    `A knight helmet or crown crest on top with ornate gold scrollwork and mantling.`,
+    `A royal gold crown on top, centered above the shield.`,
     `A silver ribbon banner at the base with the text "${surname}" engraved clearly.`,
     `White transparent background. Perfectly symmetrical.`,
     `Style: luxury 3D CGI render, polished gold metalwork, rich crimson and navy shield,`,
