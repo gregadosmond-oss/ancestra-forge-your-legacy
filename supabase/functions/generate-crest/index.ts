@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
-import { generateCrest, REFERENCE_CREST_URL } from "./crest.ts";
+import { generateCrest } from "./crest.ts";
 import type { LegacyFacts } from "../generate-legacy/types.ts";
 
 const CORS_HEADERS = {
@@ -65,10 +65,8 @@ Deno.serve(async (req: Request) => {
           formData.append("prompt", prompt);
           formData.append("aspect_ratio", "1x1");
           formData.append("rendering_speed", "TURBO");
-          formData.append("style_type", "DESIGN");
-          formData.append("image_url", REFERENCE_CREST_URL);
-          formData.append("image_weight", "40");
-          formData.append("negative_prompt", "ANCESTORSQR text, wrong surname, incorrect banner text, any text other than the specified surname, 3D render, photorealistic, gradient, shadow, depth, metallic sheen, background scene, room, interior, furniture, walls, floor, environment, building, table, surface, reflections");
+          formData.append("style_type", "REALISTIC");
+          formData.append("negative_prompt", "flat, 2D, monogram, letter, initials, cartoon, sketch, watermark, text overlap, blurry, low quality, dark background, plain background");
 
           const res = await fetch("https://api.ideogram.ai/v1/ideogram-v3/generate", {
             method: "POST",
