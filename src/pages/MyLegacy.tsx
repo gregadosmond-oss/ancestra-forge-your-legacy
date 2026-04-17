@@ -341,7 +341,7 @@ const MyLegacy = () => {
                 src={crestUrl}
                 alt={`${displaySurname} coat of arms`}
                 className="relative z-10 mx-auto"
-                style={{ width: "260px", maxWidth: "100%" }}
+                style={{ width: "260px", maxWidth: "100%", mixBlendMode: "multiply" }}
               />
             </div>
           </motion.div>

@@ -146,7 +146,7 @@ const FamilySharePage = () => {
                 src={crestUrl}
                 alt={`${displaySurname} coat of arms`}
                 className="relative z-10 mx-auto"
-                style={{ width: "220px", maxWidth: "100%" }}
+                style={{ width: "220px", maxWidth: "100%", mixBlendMode: "multiply" }}
               />
             </div>
           </motion.div>

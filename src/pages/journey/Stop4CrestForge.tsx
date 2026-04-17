@@ -96,7 +96,7 @@ const Stop4CrestForge = () => {
               src={crest.data.imageUrl}
               alt={`${facts.data?.displaySurname ?? surname} family crest`}
               className="w-full rounded-[22px]"
-              style={{ maxHeight: "70vh", objectFit: "contain", display: "block" }}
+              style={{ maxHeight: "70vh", objectFit: "contain", display: "block", mixBlendMode: "multiply" }}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src = "/crest.png";
                 (e.currentTarget as HTMLImageElement).style.padding = "40px";
