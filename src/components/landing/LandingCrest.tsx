@@ -29,7 +29,7 @@ export default function LandingCrest() {
           width: "16%",
           height: "auto",
           borderRadius: 3,
-          opacity: 0.92,
+          mixBlendMode: "multiply",
         }}
       />
     </div>
