@@ -35,10 +35,12 @@ export async function writeFacts(
   modelVersion: string,
   payload: LegacyFacts,
 ): Promise<void> {
+  // Also clear story_payload so it regenerates with the new model version.
   const { error } = await client.from("surname_facts").upsert({
     surname,
     payload,
     model_version: modelVersion,
+    story_payload: null,
   });
   if (error) {
     // Write failures are non-fatal — we already have the data to return.
@@ -63,7 +65,10 @@ export async function readStory(
   }
   if (!data?.story_payload) return null;
   if (data.model_version !== modelVersion) return null; // stale, regenerate
-  return data.story_payload as LegacyStory;
+  const story = data.story_payload as LegacyStory;
+  // Validate expected shape — old cache rows won't have chapterBodies
+  if (!story.chapterBodies || story.chapterBodies.length === 0) return null;
+  return story;
 }
 
 export async function writeStory(
