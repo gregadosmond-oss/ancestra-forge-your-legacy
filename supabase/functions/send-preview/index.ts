@@ -46,7 +46,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Ancestra <legacy@ancestra.com>",
+        from: "Ancestra <legacy@ancestorsqr.com>",
         to: [recipientEmail],
         subject: `The ${surname} Family Legacy`,
         html,
@@ -131,10 +131,10 @@ function buildPreviewEmail({
     <div style="padding:40px;text-align:center;">
       <p style="margin:0 0 8px;font-size:16px;color:#d0c4b4;">Every family has a story worth telling.</p>
       <p style="margin:0 0 28px;font-size:14px;font-style:italic;color:#8a7e6e;">Discover yours in five minutes.</p>
-      <a href="https://ancestra.com/journey" style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg,#e8943a,#c47828);color:#1a1208;text-decoration:none;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:60px;">
+      <a href="https://ancestorsqr.com/journey" style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg,#e8943a,#c47828);color:#1a1208;text-decoration:none;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:60px;">
         Discover My Legacy
       </a>
-      <p style="margin:28px 0 0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;">Forged by Ancestra &nbsp;·&nbsp; ancestra.com</p>
+      <p style="margin:28px 0 0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;">Forged by Ancestra &nbsp;·&nbsp; ancestorsqr.com</p>
     </div>
 
   </div>

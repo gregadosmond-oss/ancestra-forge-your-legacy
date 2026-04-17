@@ -105,7 +105,7 @@ export default function BloodlineQuiz() {
 
   const handleShare = async () => {
     if (!result) return;
-    const text = `My bloodline archetype is The ${result.archetype}.\n\n"${result.motto}"\n\nDiscover yours → ancestra.com/tools/quiz`;
+    const text = `My bloodline archetype is The ${result.archetype}.\n\n"${result.motto}"\n\nDiscover yours → ancestorsqr.com/tools/quiz`;
     if (navigator.share) {
       try {
         await navigator.share({ text });

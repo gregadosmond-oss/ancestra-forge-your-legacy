@@ -7,7 +7,7 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
-// TODO: switch to "Ancestra <legacy@ancestra.com>" once ancestra.com is
+// TODO: switch to "Ancestra <legacy@ancestorsqr.com>" once ancestorsqr.com is
 // verified in Resend (Settings → Domains). Until then emails send from
 // the shared Resend domain so deliverability is limited.
 const FROM_ADDRESS = "Ancestra <onboarding@resend.dev>";
@@ -142,7 +142,7 @@ async function sendBuyerConfirmationEmail({
   const displaySurname = facts?.displaySurname ?? surname ?? "Your Family";
   const mottoLatin = facts?.mottoLatin ?? null;
   const mottoEnglish = facts?.mottoEnglish ?? null;
-  const journeyUrl = "https://ancestra.com/journey/5";
+  const journeyUrl = "https://ancestorsqr.com/journey/5";
 
   const crestSection = crestUrl
     ? `<div style="text-align:center;padding:32px 40px;border-bottom:1px solid #3d3020;">
@@ -188,7 +188,7 @@ async function sendBuyerConfirmationEmail({
         View Your Legacy
       </a>
       <p style="margin:32px 0 0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;line-height:1.8;">
-        Forged by Ancestra &nbsp;·&nbsp; ancestra.com<br>
+        Forged by Ancestra &nbsp;·&nbsp; ancestorsqr.com<br>
         Questions? Reply to this email.
       </p>
     </div>
@@ -237,8 +237,8 @@ async function sendGiftEmail({
 
   const surnameLabel = surname ? `the ${surname} ` : "";
   const claimUrl = giftId
-    ? `https://ancestra.com/gift/${giftId}`
-    : "https://ancestra.com/journey";
+    ? `https://ancestorsqr.com/gift/${giftId}`
+    : "https://ancestorsqr.com/journey";
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=d4a04a&bgcolor=13100b&data=${encodeURIComponent(claimUrl)}`;
 
   const html = `<!DOCTYPE html>
@@ -270,7 +270,7 @@ async function sendGiftEmail({
         <p style="margin:0 0 14px;font-size:11px;letter-spacing:3px;color:#a07830;text-transform:uppercase;font-family:Arial,sans-serif;">Or scan to open on your phone</p>
         <img src="${qrUrl}" alt="Scan to claim your legacy" width="160" height="160" style="display:inline-block;border:2px solid #3d3020;border-radius:8px;" />
       </div>
-      <p style="margin:28px 0 0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;">Forged by Ancestra &nbsp;·&nbsp; ancestra.com</p>
+      <p style="margin:28px 0 0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;">Forged by Ancestra &nbsp;·&nbsp; ancestorsqr.com</p>
     </div>
   </div>
 </body>
