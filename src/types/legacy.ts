@@ -37,7 +37,8 @@ export type LegacyFacts = {
 export type LegacyStory = {
   chapterOneTitle: string;
   chapterOneBody: string;
-  teaserChapters: string[]; // exactly 8
+  teaserChapters: string[];  // exactly 8 titles (chapters 2-9)
+  chapterBodies: string[];   // exactly 8 bodies (chapters 2-9), matches teaserChapters by index
 };
 
 export type GenerationError = {

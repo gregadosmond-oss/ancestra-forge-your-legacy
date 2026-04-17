@@ -255,9 +255,6 @@ const MyLegacy = () => {
   }
 
   const displaySurname = facts?.displaySurname ?? (surname ? surname.replace(/\b\w/g, (c) => c.toUpperCase()) : "");
-  const allChapters = story
-    ? [story.chapterOneTitle, ...story.teaserChapters]
-    : [];
 
   return (
     <div className="relative min-h-screen px-6 pb-32 pt-16">
@@ -350,8 +347,8 @@ const MyLegacy = () => {
           </motion.section>
         )}
 
-        {/* ── All 9 Chapters ── */}
-        {allChapters.length > 0 && (
+        {/* ── Chapters 2–9 ── */}
+        {story?.teaserChapters && story.teaserChapters.length > 0 && (
           <motion.section
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -359,27 +356,41 @@ const MyLegacy = () => {
             className="mt-14"
           >
             <OrnamentDivider />
-            <p className="mb-5 font-sans text-[10px] uppercase tracking-[3px] text-amber-dim text-center">
-              Your 9 Chapters
+            <p className="mb-8 font-sans text-[10px] uppercase tracking-[3px] text-amber-dim text-center">
+              The Full Story — All 9 Chapters
             </p>
-            <ul className="space-y-3">
-              {allChapters.map((title, i) => (
-                <motion.li
-                  key={`${title}-${i}`}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.9 + i * 0.06 }}
-                  className="flex items-center gap-3 font-serif text-sm"
-                  style={{ color: i === 0 ? "#e8b85c" : "#8a7e6e" }}
-                >
-                  <span
-                    className="h-2 w-2 shrink-0 rounded-full"
-                    style={{ background: i === 0 ? "#e8b85c" : "#3d3020" }}
-                  />
-                  {stripMarkdown(title)}
-                </motion.li>
-              ))}
-            </ul>
+            <div className="space-y-8">
+              {story.teaserChapters.map((title, i) => {
+                const body = story.chapterBodies?.[i] ?? null;
+                const chapterNum = i + 2; // chapters 2–9
+                const cleanTitle = stripMarkdown(title).replace(/^Chapter\s+[IVX]+\s*[—–-]\s*/i, "");
+                return (
+                  <motion.div
+                    key={`ch${chapterNum}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.9 + i * 0.07 }}
+                  >
+                    <p className="mb-1 font-sans text-[9px] uppercase tracking-[2px] text-amber-dim">
+                      Chapter {["II","III","IV","V","VI","VII","VIII","IX"][i]}
+                    </p>
+                    <h3 className="font-display text-lg text-cream-warm">{cleanTitle}</h3>
+                    {body ? (
+                      <p
+                        className="mt-3 font-serif leading-[1.9] text-text-body"
+                        style={{ fontSize: "0.9375rem", textAlign: "justify" }}
+                      >
+                        {stripMarkdown(body)}
+                      </p>
+                    ) : (
+                      <p className="mt-2 font-serif text-sm italic text-text-dim">
+                        Chapter text coming soon…
+                      </p>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
           </motion.section>
         )}
 
