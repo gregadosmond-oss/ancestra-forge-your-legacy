@@ -83,9 +83,8 @@ function useLegacyData(userId: string | undefined): LegacyData {
         let story = (factsRes.data as any)?.story_payload as LegacyStory ?? null;
         let crestUrl = crestRes.data?.image_url ?? null;
 
-        // Step 3: generate if no facts, OR if story is missing chapterBodies (old cached format)
-        const storyNeedsRegen = story && (!story.chapterBodies || story.chapterBodies.length === 0);
-        if (!facts || storyNeedsRegen) {
+        // Step 3: generate if no facts at all (e.g. user skipped the journey)
+        if (!facts) {
           setData((d) => ({ ...d, surname, loading: false, generating: true }));
           try {
             const resp = await fetchLegacy(surname);
@@ -136,6 +135,41 @@ function useLegacyData(userId: string | undefined): LegacyData {
   }, [userId]);
 
   return data;
+}
+
+// ─── Lazy chapter expander ────────────────────────────────────────────────────
+
+function useExpandChapters(surname: string | null, story: LegacyStory | null) {
+  const [chapterBodies, setChapterBodies] = useState<string[] | null>(
+    story?.chapterBodies ?? null
+  );
+  const [expanding, setExpanding] = useState(false);
+
+  useEffect(() => {
+    // Already have bodies, or nothing to expand
+    if (!surname || !story?.teaserChapters?.length) return;
+    if (story.chapterBodies && story.chapterBodies.length > 0) {
+      setChapterBodies(story.chapterBodies);
+      return;
+    }
+    // Trigger expansion
+    let cancelled = false;
+    setExpanding(true);
+    supabase.functions
+      .invoke<{ code: string; chapterBodies: string[] }>("expand-chapters", {
+        body: { surname },
+      })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (!error && data?.chapterBodies) {
+          setChapterBodies(data.chapterBodies);
+        }
+        setExpanding(false);
+      });
+    return () => { cancelled = true; };
+  }, [surname, story]);
+
+  return { chapterBodies, expanding };
 }
 
 // ─── Ornamental divider ────────────────────────────────────────────────────────
@@ -256,6 +290,7 @@ const MyLegacy = () => {
   }
 
   const displaySurname = facts?.displaySurname ?? (surname ? surname.replace(/\b\w/g, (c) => c.toUpperCase()) : "");
+  const { chapterBodies, expanding: expandingChapters } = useExpandChapters(surname, story);
 
   return (
     <div className="relative min-h-screen px-6 pb-32 pt-16">
@@ -360,14 +395,26 @@ const MyLegacy = () => {
             <p className="mb-8 font-sans text-[10px] uppercase tracking-[3px] text-amber-dim text-center">
               The Full Story — All 9 Chapters
             </p>
+
+            {expandingChapters && !chapterBodies && (
+              <motion.div
+                animate={{ opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="py-8 text-center"
+              >
+                <p className="font-serif text-sm italic text-text-dim">
+                  Writing your full story…
+                </p>
+              </motion.div>
+            )}
+
             <div className="space-y-8">
               {story.teaserChapters.map((title, i) => {
-                const body = story.chapterBodies?.[i] ?? null;
-                const chapterNum = i + 2; // chapters 2–9
+                const body = chapterBodies?.[i] ?? null;
                 const cleanTitle = stripMarkdown(title).replace(/^Chapter\s+[IVX]+\s*[—–-]\s*/i, "");
                 return (
                   <motion.div
-                    key={`ch${chapterNum}`}
+                    key={`ch${i + 2}`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.9 + i * 0.07 }}
@@ -383,11 +430,9 @@ const MyLegacy = () => {
                       >
                         {stripMarkdown(body)}
                       </p>
-                    ) : (
-                      <p className="mt-2 font-serif text-sm italic text-text-dim">
-                        Chapter text coming soon…
-                      </p>
-                    )}
+                    ) : expandingChapters ? (
+                      <div className="mt-2 h-3 w-3/4 rounded-full bg-amber-dim/20 animate-pulse" />
+                    ) : null}
                   </motion.div>
                 );
               })}

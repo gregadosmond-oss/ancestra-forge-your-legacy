@@ -65,10 +65,7 @@ export async function readStory(
   }
   if (!data?.story_payload) return null;
   if (data.model_version !== modelVersion) return null; // stale, regenerate
-  const story = data.story_payload as LegacyStory;
-  // Validate expected shape — old cache rows won't have chapterBodies
-  if (!story.chapterBodies || story.chapterBodies.length === 0) return null;
-  return story;
+  return data.story_payload as LegacyStory;
 }
 
 export async function writeStory(
