@@ -56,29 +56,33 @@ const AppLayout = () => {
         >
           <NavLink
             to="/tools"
-            className="text-text-dim transition-colors duration-200 hover:text-amber"
+            className="transition-colors duration-200 hover:text-amber"
             activeClassName="text-amber"
+            style={{ color: "#c4b8a6" }}
           >
             Free Tools
           </NavLink>
           <NavLink
             to="/shop"
-            className="text-text-dim transition-colors duration-200 hover:text-amber"
+            className="transition-colors duration-200 hover:text-amber"
             activeClassName="text-amber"
+            style={{ color: "#c4b8a6" }}
           >
             Shop
           </NavLink>
           <NavLink
             to="/pricing"
-            className="text-text-dim transition-colors duration-200 hover:text-amber"
+            className="transition-colors duration-200 hover:text-amber"
             activeClassName="text-amber"
+            style={{ color: "#c4b8a6" }}
           >
             Pricing
           </NavLink>
           <NavLink
             to="/about"
-            className="text-text-dim transition-colors duration-200 hover:text-amber"
+            className="transition-colors duration-200 hover:text-amber"
             activeClassName="text-amber"
+            style={{ color: "#c4b8a6" }}
           >
             About
           </NavLink>
@@ -103,8 +107,8 @@ const AppLayout = () => {
               width: "34px",
               height: "34px",
               borderRadius: "50%",
-              border: "1px solid rgba(212,160,74,0.2)",
-              background: "rgba(212,160,74,0.04)",
+              border: "1px solid rgba(212,160,74,0.5)",
+              background: "rgba(212,160,74,0.1)",
             }}
           >
             <svg
