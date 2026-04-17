@@ -33,12 +33,12 @@ const FamilySharePage = () => {
 
     const load = async () => {
       const [factsRes, crestRes] = await Promise.all([
-        supabase.from("surname_facts").select("payload, story_payload").eq("surname", surname).maybeSingle(),
+        supabase.from("surname_facts").select("payload").eq("surname", surname).maybeSingle(),
         supabase.from("surname_crests").select("image_url").eq("surname", surname).maybeSingle(),
       ]);
 
       const f = factsRes.data?.payload as LegacyFacts | null;
-      const s = (factsRes.data as any)?.story_payload as LegacyStory | null;
+      const s = ((factsRes.data?.payload as any)?.story as LegacyStory) ?? null;
       const c = crestRes.data?.image_url ?? null;
 
       if (!f) { setNotFound(true); setLoading(false); return; }
