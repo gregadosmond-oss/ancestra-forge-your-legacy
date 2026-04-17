@@ -20,7 +20,7 @@ export function buildPrompt(facts: LegacyFacts): string {
 }
 
 // Public URL of the AncestorsQR reference crest — used as Ideogram style image
-export const REFERENCE_CREST_URL = "https://legacy-forge-stories.lovable.app/AncestorsQR-crest-reference.jpg";
+export const REFERENCE_CREST_URL = "https://legacy-forge-stories.lovable.app/ancestra-crest-reference.jpg";
 
 export async function readCrest(
   client: DbClient,
