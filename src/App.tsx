@@ -22,6 +22,7 @@ import GiftPage from "./pages/GiftPage.tsx";
 import SurnameLookup from "./pages/tools/SurnameLookup.tsx";
 import MottoGenerator from "./pages/tools/MottoGenerator.tsx";
 import BloodlineQuiz from "./pages/tools/BloodlineQuiz.tsx";
+import ToolsHub from "./pages/tools/ToolsHub.tsx";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/home" element={<Navigate to="/" replace />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/tools" element={<ToolsHub />} />
             <Route path="/tools/surname" element={<SurnameLookup />} />
             <Route path="/tools/motto" element={<MottoGenerator />} />
             <Route path="/tools/quiz" element={<BloodlineQuiz />} />

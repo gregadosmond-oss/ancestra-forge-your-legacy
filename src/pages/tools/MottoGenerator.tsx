@@ -81,9 +81,20 @@ export default function MottoGenerator() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
+      {/* Castle video background */}
+      <video
+        src="/hero.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="pointer-events-none fixed inset-0 h-full w-full object-cover"
+        style={{ objectPosition: "center 30%", opacity: 0.12, filter: "saturate(0.6)" }}
+      />
+      <div className="pointer-events-none fixed inset-0" style={{ background: "rgba(13,10,7,0.78)" }} />
       {/* Hero */}
-      <section className="flex flex-col items-center justify-center px-4 pt-24 pb-16 text-center">
+      <section className="relative z-10 flex flex-col items-center justify-center px-4 pt-24 pb-16 text-center">
         <motion.p
           {...reveal}
           className="mb-3 text-[10px] uppercase tracking-[4px] text-amber-dim font-sans"
@@ -153,6 +164,7 @@ export default function MottoGenerator() {
       </section>
 
       {/* Results */}
+      <div className="relative z-10">
       <AnimatePresence>
         {result && (
           <motion.section
@@ -244,9 +256,10 @@ export default function MottoGenerator() {
           </motion.section>
         )}
       </AnimatePresence>
+      </div>
 
       {/* Journey CTA */}
-      <section className="py-20 text-center">
+      <section className="relative z-10 py-20 text-center">
         <motion.p
           {...reveal}
           className="mb-4 text-text-body font-sans text-base"
