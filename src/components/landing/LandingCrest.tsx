@@ -23,10 +23,10 @@ export default function LandingCrest() {
         alt="Scan to visit AncestorsQR"
         style={{
           position: "absolute",
-          top: "48%",
-          left: "50%",
+          top: "53%",
+          left: "50.3%",
           transform: "translate(-50%, -50%)",
-          width: "13%",
+          width: "14%",
           height: "auto",
           borderRadius: 2,
           mixBlendMode: "multiply" as const,
