@@ -5,6 +5,7 @@ import SectionLabel from "@/components/journey/SectionLabel";
 import { usePurchase } from "@/hooks/usePurchase";
 import { supabase } from "@/integrations/supabase/client";
 import { stripMarkdown } from "@/lib/utils";
+import ShareQRCode from "@/components/ShareQRCode";
 import type { LegacyFacts, LegacyStory } from "@/types/legacy";
 
 // ─── Data hook ────────────────────────────────────────────────────────────────
@@ -442,6 +443,22 @@ const MyLegacy = () => {
           transition={{ duration: 0.8, delay: 1.5 }}
           className="mt-16"
         >
+          <OrnamentDivider />
+
+          {/* QR Code */}
+          <div className="flex flex-col items-center">
+            <p className="mb-5 font-sans text-[10px] uppercase tracking-[3px] text-amber-dim">
+              Your shareable legacy link
+            </p>
+            <ShareQRCode
+              url={`${window.location.origin}/f/${surname}`}
+              surname={displaySurname}
+            />
+            <p className="mt-4 max-w-xs text-center font-serif text-xs italic text-text-dim">
+              Share this QR with family and friends — or print it on any of our heirloom products.
+            </p>
+          </div>
+
           <OrnamentDivider />
 
           <div className="text-center">

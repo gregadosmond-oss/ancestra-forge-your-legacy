@@ -31,6 +31,7 @@ import Confirmation from "./pages/Confirmation.tsx";
 import MeetYourAncestor from "./pages/tools/MeetYourAncestor.tsx";
 import The1700sYou from "./pages/tools/The1700sYou.tsx";
 import AncestorChat from "./pages/tools/AncestorChat.tsx";
+import FamilySharePage from "./pages/FamilySharePage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,7 @@ const App = () => (
             <Route path="/confirmation" element={<Confirmation />} />
             <Route path="/about" element={<About />} />
             <Route path="/my-legacy" element={<MyLegacy />} />
+            <Route path="/f/:surname" element={<FamilySharePage />} />
             <Route path="/gift/:giftId" element={<GiftPage />} />
             <Route path="/gifts/:occasion" element={<GiftOccasionPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

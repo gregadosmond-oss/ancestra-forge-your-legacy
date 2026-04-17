@@ -6,6 +6,7 @@ import SectionLabel from "@/components/journey/SectionLabel";
 import WarmDivider from "@/components/journey/WarmDivider";
 import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
 import AuthGate from "@/components/AuthGate";
+import ShareQRCode from "@/components/ShareQRCode";
 import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
 import { supabase } from "@/integrations/supabase/client";
@@ -82,8 +83,28 @@ const Stop6PassItOn = () => {
           </h1>
         </motion.div>
 
+        {/* QR Code share */}
+        {surname && (
+          <motion.div variants={staggerItem} className="mt-10 flex flex-col items-center">
+            <p className="mb-5 font-sans text-[9px] uppercase tracking-[3px]" style={{ color: "#a07830" }}>
+              Your shareable legacy link
+            </p>
+            <ShareQRCode
+              url={`${window.location.origin}/f/${surname.toLowerCase()}`}
+              surname={surname}
+            />
+            <p className="mt-4 max-w-xs text-center font-serif text-xs italic" style={{ color: "#8a7e6e" }}>
+              Anyone who scans this sees your family crest, motto &amp; story preview — and can discover their own.
+            </p>
+          </motion.div>
+        )}
+
+        <motion.div variants={staggerItem}>
+          <WarmDivider />
+        </motion.div>
+
         {/* Action 1: Send free preview */}
-        <motion.div variants={staggerItem} className="mt-16">
+        <motion.div variants={staggerItem} className="mt-4">
           <p className="mb-4 text-center font-serif text-sm italic text-amber-dim">
             Send a free preview
           </p>
