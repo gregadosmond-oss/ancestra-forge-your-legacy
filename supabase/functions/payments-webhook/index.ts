@@ -7,10 +7,7 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
-// TODO: switch to "Ancestra <legacy@ancestorsqr.com>" once ancestorsqr.com is
-// verified in Resend (Settings → Domains). Until then emails send from
-// the shared Resend domain so deliverability is limited.
-const FROM_ADDRESS = "Ancestra <onboarding@resend.dev>";
+const FROM_ADDRESS = "Ancestra <legacy@ancestorsqr.com>";
 
 serve(async (req) => {
   if (req.method !== "POST") {
