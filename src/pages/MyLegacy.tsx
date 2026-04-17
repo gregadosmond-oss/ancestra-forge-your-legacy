@@ -291,7 +291,6 @@ const MyLegacy = () => {
   }
 
   const displaySurname = facts?.displaySurname ?? (surname ? surname.replace(/\b\w/g, (c) => c.toUpperCase()) : "");
-  const { chapterBodies, expanding: expandingChapters } = useExpandChapters(surname, story);
 
   return (
     <div className="relative min-h-screen px-6 pb-32 pt-16">
