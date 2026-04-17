@@ -6,6 +6,7 @@ import RetryInline from "@/components/journey/RetryInline";
 import AuthGate from "@/components/AuthGate";
 import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
+import { stripMarkdown } from "@/lib/utils";
 
 const Stop5Story = () => {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ const Stop5Story = () => {
             transition={{ duration: 0.8 }}
             className="mt-6 max-w-3xl text-center font-display text-3xl text-cream-warm sm:text-4xl"
           >
-            {story.data.chapterOneTitle}
+            {stripMarkdown(story.data.chapterOneTitle)}
           </motion.h1>
 
           <motion.div
@@ -87,9 +88,9 @@ const Stop5Story = () => {
                 className="float-left mr-2 font-display leading-none text-amber-light"
                 style={{ fontSize: "4.2rem", lineHeight: "0.82", marginTop: "6px" }}
               >
-                {story.data.chapterOneBody.charAt(0)}
+                {stripMarkdown(story.data.chapterOneBody).charAt(0)}
               </span>
-              {story.data.chapterOneBody.slice(1)}
+              {stripMarkdown(story.data.chapterOneBody).slice(1)}
             </p>
 
             {/* Closing ornament */}
@@ -130,7 +131,7 @@ const Stop5Story = () => {
                     style={{ color: i === 0 ? "#e8b85c" : "#8a7e6e" }}
                   >
                     <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: i === 0 ? "#e8b85c" : "#3d3020" }} />
-                    {title}
+                    {stripMarkdown(title)}
                   </motion.li>
                 ))}
               </ul>
@@ -158,7 +159,7 @@ const Stop5Story = () => {
               <div className="relative overflow-hidden rounded-t-[22px] px-8 pt-8">
                 <ul className="space-y-2 font-serif text-sm italic text-text-dim">
                   {story.data.teaserChapters.slice(0, 4).map((t, i) => (
-                    <li key={`${t}-${i}`} style={{ opacity: 1 - i * 0.2 }}>{t}</li>
+                    <li key={`${t}-${i}`} style={{ opacity: 1 - i * 0.2 }}>{stripMarkdown(t)}</li>
                   ))}
                 </ul>
                 {/* Fade mask */}

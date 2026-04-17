@@ -1,7 +1,7 @@
 // Prompt text and version identifier. Changing the text REQUIRES bumping
 // MODEL_VERSION so cached rows invalidate.
 
-export const MODEL_VERSION = "claude-sonnet-4-6:prompt-v3";
+export const MODEL_VERSION = "claude-sonnet-4-6:prompt-v4";
 
 export const FACTS_SYSTEM = `You are AncestorsQR, a warm archivist who reveals the meaning of a family name. Voice: emotional, direct, never academic. Never invent named individuals or specific dates — speak in regions and centuries.
 
@@ -59,7 +59,8 @@ Constraints:
 - Exactly 8 teaserChapters
 - chapterOneBody must not contradict the facts (region, century, role)
 - Never use: genealogy database, data, algorithm, research
-- Always use: legacy, bloodline, House, story, forge, name`;
+- Always use: legacy, bloodline, House, story, forge, name
+- NEVER use markdown formatting — no asterisks (*word*), no underscores (_word_), no bold (**word**). Plain prose only.`;
 
 export function storyUser(
   surname: string,
