@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
@@ -16,10 +16,20 @@ const Stop4CrestForge = () => {
   const navigate = useNavigate();
   const { unknownSurname, surname, facts, crest } = useJourney();
 
+  const [timedOut, setTimedOut] = useState(false);
+
   useEffect(() => {
     if (unknownSurname) navigate("/journey/1", { replace: true });
     else if (!surname) navigate("/journey/1", { replace: true });
   }, [unknownSurname, surname, navigate]);
+
+  // Show retry if still loading after 90 seconds
+  useEffect(() => {
+    if (crest.status !== "loading" && crest.status !== "idle") return;
+    setTimedOut(false);
+    const t = setTimeout(() => setTimedOut(true), 90_000);
+    return () => clearTimeout(t);
+  }, [crest.status]);
 
   if (!surname) return null;
 
@@ -32,9 +42,12 @@ const Stop4CrestForge = () => {
         <ForgeLoader messages={FORGE_MESSAGES} loop />
       )}
 
-      {crest.status === "error" && (
-        <div className="mt-10">
-          <RetryInline onRetry={crest.retry} />
+      {(crest.status === "error" || timedOut) && (
+        <div className="mt-10 text-center">
+          <p className="mb-4 font-serif text-sm italic text-text-dim">
+            {timedOut ? "Taking longer than expected…" : "Something went wrong forging your crest."}
+          </p>
+          <RetryInline onRetry={() => { setTimedOut(false); crest.retry(); }} />
         </div>
       )}
 
