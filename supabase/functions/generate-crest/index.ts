@@ -94,24 +94,30 @@ Deno.serve(async (req: Request) => {
         const imgBuffer = await imgRes.arrayBuffer();
         const imgBlob = new Blob([imgBuffer], { type: "image/png" });
 
-        // 2. Send binary to remove.bg
-        const rbgForm = new FormData();
-        rbgForm.append("image_file", imgBlob, "crest.png");
-        rbgForm.append("size", "auto");
+        // 2. Try remove.bg — fall back to original if it fails (e.g. insufficient credits)
+        let buffer: ArrayBuffer = imgBuffer;
+        try {
+          const rbgForm = new FormData();
+          rbgForm.append("image_file", imgBlob, "crest.png");
+          rbgForm.append("size", "auto");
 
-        const rbgRes = await fetch("https://api.remove.bg/v1.0/removebg", {
-          method: "POST",
-          headers: {
-            "X-Api-Key": removeBgKey,
-            "Accept": "image/png",
-          },
-          body: rbgForm,
-        });
-        if (!rbgRes.ok) {
-          const errText = await rbgRes.text();
-          throw new Error(`remove.bg error ${rbgRes.status}: ${errText}`);
+          const rbgRes = await fetch("https://api.remove.bg/v1.0/removebg", {
+            method: "POST",
+            headers: {
+              "X-Api-Key": removeBgKey,
+              "Accept": "image/png",
+            },
+            body: rbgForm,
+          });
+          if (rbgRes.ok) {
+            buffer = await rbgRes.arrayBuffer();
+          } else {
+            const errText = await rbgRes.text();
+            console.warn(`remove.bg failed (${rbgRes.status}), using original: ${errText}`);
+          }
+        } catch (e) {
+          console.warn("remove.bg threw, using original:", (e as Error).message);
         }
-        const buffer = await rbgRes.arrayBuffer();
 
         const filePath = `${normalized}.png`;
         const { error: uploadError } = await client.storage
