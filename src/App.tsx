@@ -23,6 +23,7 @@ import SurnameLookup from "./pages/tools/SurnameLookup.tsx";
 import MottoGenerator from "./pages/tools/MottoGenerator.tsx";
 import BloodlineQuiz from "./pages/tools/BloodlineQuiz.tsx";
 import ToolsHub from "./pages/tools/ToolsHub.tsx";
+import About from "./pages/About.tsx";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => (
               <Route index element={<CheckoutPage />} />
               <Route path="return" element={<CheckoutReturn />} />
             </Route>
+            <Route path="/about" element={<About />} />
             <Route path="/my-legacy" element={<MyLegacy />} />
             <Route path="/gift/:giftId" element={<GiftPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
