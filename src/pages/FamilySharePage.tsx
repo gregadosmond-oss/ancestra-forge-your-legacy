@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { stripMarkdown } from "@/lib/utils";
 import ShareQRCode from "@/components/ShareQRCode";
+import SocialShare from "@/components/SocialShare";
 import type { LegacyFacts, LegacyStory } from "@/types/legacy";
 
 function OrnamentDivider() {
@@ -237,6 +238,10 @@ const FamilySharePage = () => {
             Share this legacy
           </p>
           <ShareQRCode url={shareUrl} surname={displaySurname} />
+
+          <div className="mt-6 w-full">
+            <SocialShare url={shareUrl} surname={displaySurname} />
+          </div>
         </motion.div>
 
         <OrnamentDivider />

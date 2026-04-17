@@ -6,6 +6,7 @@ import { usePurchase } from "@/hooks/usePurchase";
 import { supabase } from "@/integrations/supabase/client";
 import { stripMarkdown } from "@/lib/utils";
 import ShareQRCode from "@/components/ShareQRCode";
+import SocialShare from "@/components/SocialShare";
 import type { LegacyFacts, LegacyStory } from "@/types/legacy";
 
 // ─── Data hook ────────────────────────────────────────────────────────────────
@@ -457,6 +458,12 @@ const MyLegacy = () => {
             <p className="mt-4 max-w-xs text-center font-serif text-xs italic text-text-dim">
               Share this QR with family and friends — or print it on any of our heirloom products.
             </p>
+            <div className="mt-6 w-full">
+              <SocialShare
+                url={`${window.location.origin}/f/${surname}`}
+                surname={displaySurname}
+              />
+            </div>
           </div>
 
           <OrnamentDivider />

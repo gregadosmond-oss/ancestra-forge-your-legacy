@@ -7,6 +7,7 @@ import WarmDivider from "@/components/journey/WarmDivider";
 import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
 import AuthGate from "@/components/AuthGate";
 import ShareQRCode from "@/components/ShareQRCode";
+import SocialShare from "@/components/SocialShare";
 import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
 import { supabase } from "@/integrations/supabase/client";
@@ -96,6 +97,12 @@ const Stop6PassItOn = () => {
             <p className="mt-4 max-w-xs text-center font-serif text-xs italic" style={{ color: "#8a7e6e" }}>
               Anyone who scans this sees your family crest, motto &amp; story preview — and can discover their own.
             </p>
+            <div className="mt-6 w-full">
+              <SocialShare
+                url={`${window.location.origin}/f/${surname?.toLowerCase()}`}
+                surname={surname ?? ""}
+              />
+            </div>
           </motion.div>
         )}
 
