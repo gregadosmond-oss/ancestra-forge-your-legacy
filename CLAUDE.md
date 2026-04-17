@@ -361,12 +361,12 @@ IMPORTANT RULES
 8. The journey is LINEAR — no complex navigation, no dashboards at launch
 9. Free tools exist to drive virality — they must be shareable
 10. Every experience ends with a gift CTA — "Who needs to see this?"
-11. The domain target is ancestra.com — if unavailable, alternatives: ancestra.co, ancestra.io, getancestra.com
+11. The domain target is ancestorsqr.com — if unavailable, alternatives: ancestra.co, ancestra.io, getancestorsqr.com
 12. Physical products are fulfilled by Printful (most items) and Gelato (books)
 13. Do not modify any existing pages or components unless explicitly asked
 14. One change at a time — never bundle multiple features
 BRAND NAME — ANCESTRA
-Name: Ancestra Pronunciation: an-SESS-truh Domain target: ancestra.com (alternatives: ancestra.co, ancestra.io, getancestra.com)
+Name: Ancestra Pronunciation: an-SESS-truh Domain target: ancestorsqr.com (alternatives: ancestra.co, ancestra.io, getancestorsqr.com)
 Why Ancestra:
 
 * Sounds like "ancestry" but isn't — unique, ownable
