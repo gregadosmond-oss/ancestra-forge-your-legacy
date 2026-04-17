@@ -37,6 +37,39 @@ const tools = [
     ),
   },
   {
+    to: "/tools/ancestor",
+    label: "Meet Your Ancestor",
+    tag: "FREE",
+    description: "A historically plausible ancestor from your bloodline — their life, their world, their words.",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    ),
+  },
+  {
+    to: "/tools/1700s",
+    label: "The 1700s You",
+    tag: "FREE",
+    description: "What would your life look like 300 years ago? Step back into history.",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+      </svg>
+    ),
+  },
+  {
+    to: "/tools/chat",
+    label: "Ancestor Chat",
+    tag: "FREE",
+    description: "Chat live with an AI character based on your family history. Ask them anything.",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
+  },
+  {
     to: "/journey",
     label: "Full Legacy Journey",
     tag: "BEGIN",
@@ -114,7 +147,7 @@ export default function ToolsHub() {
           variants={stagger}
           initial="hidden"
           animate="show"
-          className="mt-10 grid w-full max-w-3xl grid-cols-1 gap-5 sm:grid-cols-2"
+          className="mt-10 grid w-full max-w-4xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
         >
           {tools.map((tool) => (
             <motion.div key={tool.to} variants={item}>

@@ -26,6 +26,11 @@ import ToolsHub from "./pages/tools/ToolsHub.tsx";
 import About from "./pages/About.tsx";
 import GiftOccasionPage from "./pages/gifts/GiftOccasionPage.tsx";
 import Shop from "./pages/Shop.tsx";
+import Cart from "./pages/Cart.tsx";
+import Confirmation from "./pages/Confirmation.tsx";
+import MeetYourAncestor from "./pages/tools/MeetYourAncestor.tsx";
+import The1700sYou from "./pages/tools/The1700sYou.tsx";
+import AncestorChat from "./pages/tools/AncestorChat.tsx";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +50,9 @@ const App = () => (
             <Route path="/tools/surname" element={<SurnameLookup />} />
             <Route path="/tools/motto" element={<MottoGenerator />} />
             <Route path="/tools/quiz" element={<BloodlineQuiz />} />
+            <Route path="/tools/ancestor" element={<MeetYourAncestor />} />
+            <Route path="/tools/1700s" element={<The1700sYou />} />
+            <Route path="/tools/chat" element={<AncestorChat />} />
             <Route path="/journey" element={<JourneyLayout />}>
               <Route index element={<Navigate to="/journey/1" replace />} />
               <Route path="1" element={<Stop1EnterName />} />
@@ -59,6 +67,8 @@ const App = () => (
               <Route path="return" element={<CheckoutReturn />} />
             </Route>
             <Route path="/shop" element={<Shop />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/confirmation" element={<Confirmation />} />
             <Route path="/about" element={<About />} />
             <Route path="/my-legacy" element={<MyLegacy />} />
             <Route path="/gift/:giftId" element={<GiftPage />} />
