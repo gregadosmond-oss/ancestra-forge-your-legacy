@@ -128,8 +128,8 @@ const AppLayout = () => {
         <Outlet />
       </div>
 
-      {/* ── MUSIC PAUSE/PLAY (fixed bottom-right) ── */}
-      <button
+      {/* ── MUSIC PAUSE/PLAY (fixed bottom-right, hidden on landing where Index has its own) ── */}
+      {!isLanding && <button
         aria-label={isPlaying ? "Pause music" : "Play music"}
         onClick={() => setIsPlaying(toggleAmbientPlayback())}
         className="fixed bottom-5 right-5 z-40 flex items-center justify-center transition-opacity duration-200 hover:opacity-70"
@@ -153,7 +153,7 @@ const AppLayout = () => {
             <polygon points="5 3 19 12 5 21 5 3" />
           </svg>
         )}
-      </button>
+      </button>}
     </div>
   );
 };
