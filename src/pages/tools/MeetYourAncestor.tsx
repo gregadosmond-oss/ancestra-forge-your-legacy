@@ -69,15 +69,7 @@ export default function MeetYourAncestor() {
   return (
     <div className="relative min-h-screen bg-background">
       {/* Video background */}
-      <video
-        src="/hero.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="pointer-events-none fixed inset-0 h-full w-full object-cover"
-        style={{ objectPosition: "center 30%", opacity: 0.12, filter: "saturate(0.6)" }}
-      />
+            <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.13, filter: "saturate(0.5) brightness(0.7)" }} />
       <div
         className="pointer-events-none fixed inset-0"
         style={{ background: "rgba(13,10,7,0.78)" }}

@@ -73,6 +73,21 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     console.log("Purchase recorded for user:", userId);
   }
 
+  // Save surname to profile so MyLegacy page can load it later
+  if (surname && userId) {
+    const normalized = surname.trim().toLowerCase();
+    const displaySurname = surname.trim().replace(/\b\w/g, (c: string) => c.toUpperCase());
+    const { error: profileError } = await supabase.from("profiles").upsert(
+      { id: userId, surname: normalized },
+      { onConflict: "id" }
+    );
+    if (profileError) {
+      console.error("Failed to save surname to profile:", profileError);
+    } else {
+      console.log("Surname saved to profile:", displaySurname);
+    }
+  }
+
   if (isGift && recipientEmail) {
     // Gift purchase — notify the recipient
     const { data: gift, error: giftError } = await supabase
