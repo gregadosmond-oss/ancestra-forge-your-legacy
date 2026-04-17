@@ -7,6 +7,7 @@ import PacksSection from "@/components/landing/PacksSection";
 import FreeToolsSection from "@/components/landing/FreeToolsSection";
 import OccasionsSection from "@/components/landing/OccasionsSection";
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
+import LandingCrest from "@/components/landing/LandingCrest";
 
 const Index = () => {
   const [musicStarted, setMusicStarted] = useState(false);
@@ -58,15 +59,7 @@ const Index = () => {
 
         {/* ── CREST + HEADLINE + CTA — centered over video ── */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-          <img
-            src="/crest.png"
-            alt="AncestorsQR family crest"
-            style={{
-              width: "220px",
-              height: "auto",
-              filter: "drop-shadow(0 0 48px rgba(212,160,74,0.6))",
-            }}
-          />
+          <LandingCrest />
 
           <h1 className="mt-6 font-display text-3xl leading-tight tracking-tight text-cream-warm sm:text-4xl md:text-5xl lg:text-6xl" style={{ textShadow: "0 2px 24px rgba(13,10,7,0.8)" }}>
             Every family has a story
