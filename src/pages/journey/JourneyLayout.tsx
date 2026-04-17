@@ -14,7 +14,7 @@ const JourneyLayout = () => {
         {/* Dark overlay to keep content readable */}
         <div
           className="pointer-events-none fixed inset-0"
-          style={{ background: "rgba(13,10,7,0.72)" }}
+          style={{ background: "rgba(13,10,7,0.45)" }}
         />
 
         {/* SVG grain overlay */}
