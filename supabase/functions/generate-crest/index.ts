@@ -25,7 +25,7 @@ Deno.serve(async (req: Request) => {
   }
 
   const ideogramKey = Deno.env.get("IDEOGRAM_API_KEY");
-  const clipdropKey = Deno.env.get("CLIPDROP_API_KEY"); // optional — skips bg removal if missing
+  const removeBgKey = Deno.env.get("REMOVE_BG_API_KEY"); // optional — skips bg removal if missing
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!ideogramKey || !supabaseUrl || !supabaseKey) {
@@ -93,30 +93,34 @@ Deno.serve(async (req: Request) => {
         if (!imgRes.ok) throw new Error(`failed to download image: ${imgRes.status}`);
         const imgBuffer = await imgRes.arrayBuffer();
 
-        // 2. Remove background via ClipDrop — fall back to original if key missing or call fails
+        // 2. Remove background via remove.bg — fall back to original if key missing or call fails
         let buffer: ArrayBuffer = imgBuffer;
-        if (clipdropKey) {
+        if (removeBgKey) {
           try {
-            const cdForm = new FormData();
-            cdForm.append("image_file", new Blob([imgBuffer], { type: "image/png" }), "crest.png");
+            const rbgForm = new FormData();
+            rbgForm.append("image_file", new Blob([imgBuffer], { type: "image/png" }), "crest.png");
+            rbgForm.append("size", "auto");
 
-            const cdRes = await fetch("https://clipdrop-api.co/remove-background/v1", {
+            const rbgRes = await fetch("https://api.remove.bg/v1.0/removebg", {
               method: "POST",
-              headers: { "x-api-key": clipdropKey },
-              body: cdForm,
+              headers: {
+                "X-Api-Key": removeBgKey,
+                "Accept": "image/png",
+              },
+              body: rbgForm,
             });
-            if (cdRes.ok) {
-              buffer = await cdRes.arrayBuffer();
-              console.log("ClipDrop bg removal succeeded");
+            if (rbgRes.ok) {
+              buffer = await rbgRes.arrayBuffer();
+              console.log("remove.bg succeeded");
             } else {
-              const errText = await cdRes.text();
-              console.warn(`ClipDrop failed (${cdRes.status}), using original: ${errText}`);
+              const errText = await rbgRes.text();
+              console.warn(`remove.bg failed (${rbgRes.status}), using original: ${errText}`);
             }
           } catch (e) {
-            console.warn("ClipDrop threw, using original:", (e as Error).message);
+            console.warn("remove.bg threw, using original:", (e as Error).message);
           }
         } else {
-          console.log("CLIPDROP_API_KEY not set — skipping background removal");
+          console.log("REMOVE_BG_API_KEY not set — skipping background removal");
         }
 
         const filePath = `${normalized}.png`;
