@@ -13,7 +13,7 @@ export function buildPrompt(facts: LegacyFacts): string {
     `Black background. Gold flat line art — no 3D, no gradients, no photorealism.`,
     `A heraldic shield in the center with a large ornate letter "${initial}" inside.`,
     `A decorative royal crown above the shield.`,
-    `A ribbon scroll banner at the bottom with the word "${surname}" engraved in bold capital letters.`,
+    `A ribbon scroll banner at the bottom. The banner must say exactly "${surname}" — no other word, no other name.`,
     `Decorative border frame around the shield. Perfectly symmetrical.`,
     `Style: classic gold heraldic engraving on black, flat vector illustration look, premium brand quality.`,
   ].join(" ");
