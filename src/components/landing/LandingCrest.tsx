@@ -2,8 +2,7 @@
  * LandingCrest — the showcase crest on the homepage.
  * Crest image with a small QR code stamp in the bottom-right corner.
  */
-const QR_URL =
-  "https://api.qrserver.com/v1/create-qr-code/?size=120x120&color=d4a04a&bgcolor=13100b&qzone=1&data=https%3A%2F%2Fwww.ancestorsqr.com";
+const QR_URL = "/qr-code.png";
 
 export default function LandingCrest() {
   return (
