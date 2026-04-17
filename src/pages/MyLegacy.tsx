@@ -8,6 +8,7 @@ import { stripMarkdown } from "@/lib/utils";
 import ShareQRCode from "@/components/ShareQRCode";
 import SocialShare from "@/components/SocialShare";
 import { generateCertificate } from "@/lib/generateCertificate";
+import { fetchLegacy, fetchCrest } from "@/lib/legacyClient";
 import type { LegacyFacts, LegacyStory } from "@/types/legacy";
 
 // ─── Data hook ────────────────────────────────────────────────────────────────
@@ -18,6 +19,7 @@ type LegacyData = {
   crestUrl: string | null;
   surname: string | null;
   loading: boolean;
+  generating: boolean;
   error: string | null;
 };
 
@@ -28,6 +30,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
     crestUrl: null,
     surname: null,
     loading: true,
+    generating: false,
     error: null,
   });
 
@@ -53,7 +56,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
           ?? null;
 
         if (!surname) {
-          setData({ facts: null, story: null, crestUrl: null, surname: null, loading: false, error: null });
+          setData({ facts: null, story: null, crestUrl: null, surname: null, loading: false, generating: false, error: null });
           return;
         }
 
@@ -76,13 +79,55 @@ function useLegacyData(userId: string | undefined): LegacyData {
             .maybeSingle(),
         ]);
 
-        const facts = (factsRes.data?.payload as LegacyFacts) ?? null;
-        const story = (factsRes.data as any)?.story_payload as LegacyStory ?? null;
-        const crestUrl = crestRes.data?.image_url ?? null;
+        let facts = (factsRes.data?.payload as LegacyFacts) ?? null;
+        let story = (factsRes.data as any)?.story_payload as LegacyStory ?? null;
+        let crestUrl = crestRes.data?.image_url ?? null;
 
-        setData({ facts, story, crestUrl, surname, loading: false, error: null });
+        // Step 3: if no facts in cache, generate them now (e.g. user skipped the journey)
+        if (!facts) {
+          setData((d) => ({ ...d, surname, loading: false, generating: true }));
+          try {
+            const resp = await fetchLegacy(surname);
+            if (resp.code !== "UNKNOWN_SURNAME" && resp.facts) {
+              facts = resp.facts;
+              story = resp.story ?? null;
+              // Re-read from DB to pick up the freshly cached row
+              const [factsRes2, crestRes2] = await Promise.all([
+                supabase
+                  .from("surname_facts")
+                  .select("payload, story_payload")
+                  .eq("surname", surname)
+                  .maybeSingle(),
+                supabase
+                  .from("surname_crests")
+                  .select("image_url")
+                  .eq("surname", surname)
+                  .maybeSingle(),
+              ]);
+              facts = (factsRes2.data?.payload as LegacyFacts) ?? facts;
+              story = ((factsRes2.data as any)?.story_payload as LegacyStory) ?? story;
+              crestUrl = crestRes2.data?.image_url ?? null;
+
+              // If crest still missing, generate it too
+              if (!crestUrl && facts) {
+                try {
+                  const crest = await fetchCrest(surname, facts);
+                  crestUrl = crest.imageUrl;
+                } catch {
+                  // crest generation failure is non-fatal
+                }
+              }
+            }
+          } catch {
+            // generation failure is non-fatal — show what we have
+          }
+          setData({ facts, story, crestUrl, surname, loading: false, generating: false, error: null });
+          return;
+        }
+
+        setData({ facts, story, crestUrl, surname, loading: false, generating: false, error: null });
       } catch (err) {
-        setData((d) => ({ ...d, loading: false, error: (err as Error).message }));
+        setData((d) => ({ ...d, loading: false, generating: false, error: (err as Error).message }));
       }
     };
 
@@ -109,7 +154,7 @@ function OrnamentDivider() {
 const MyLegacy = () => {
   const navigate = useNavigate();
   const { user, hasPurchased, loading: purchaseLoading } = usePurchase();
-  const { facts, story, crestUrl, surname, loading, error } = useLegacyData(
+  const { facts, story, crestUrl, surname, loading, generating, error } = useLegacyData(
     !purchaseLoading && hasPurchased ? user?.id : undefined
   );
 
@@ -121,6 +166,24 @@ const MyLegacy = () => {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <p className="font-serif text-sm italic text-amber-dim">Loading your legacy…</p>
+      </div>
+    );
+  }
+
+  if (hasPurchased && generating) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-6">
+        <motion.div
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          className="text-5xl"
+        >
+          🛡
+        </motion.div>
+        <p className="font-display text-2xl text-cream-warm">Forging your legacy…</p>
+        <p className="font-serif text-sm italic text-text-dim">
+          This takes about 30 seconds. Discovering your family's history.
+        </p>
       </div>
     );
   }
