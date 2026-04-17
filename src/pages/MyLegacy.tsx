@@ -192,6 +192,7 @@ const MyLegacy = () => {
   const { facts, story, crestUrl, surname, loading, generating, error } = useLegacyData(
     !purchaseLoading && hasPurchased ? user?.id : undefined
   );
+  const { chapterBodies, expanding: expandingChapters } = useExpandChapters(surname, story);
 
   useEffect(() => {
     if (!purchaseLoading && !user) navigate("/journey/1", { replace: true });
