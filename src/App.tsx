@@ -25,6 +25,7 @@ import BloodlineQuiz from "./pages/tools/BloodlineQuiz.tsx";
 import ToolsHub from "./pages/tools/ToolsHub.tsx";
 import About from "./pages/About.tsx";
 import GiftOccasionPage from "./pages/gifts/GiftOccasionPage.tsx";
+import Shop from "./pages/Shop.tsx";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => (
               <Route index element={<CheckoutPage />} />
               <Route path="return" element={<CheckoutReturn />} />
             </Route>
+            <Route path="/shop" element={<Shop />} />
             <Route path="/about" element={<About />} />
             <Route path="/my-legacy" element={<MyLegacy />} />
             <Route path="/gift/:giftId" element={<GiftPage />} />
