@@ -83,8 +83,9 @@ function useLegacyData(userId: string | undefined): LegacyData {
         let story = (factsRes.data as any)?.story_payload as LegacyStory ?? null;
         let crestUrl = crestRes.data?.image_url ?? null;
 
-        // Step 3: if no facts in cache, generate them now (e.g. user skipped the journey)
-        if (!facts) {
+        // Step 3: generate if no facts, OR if story is missing chapterBodies (old cached format)
+        const storyNeedsRegen = story && (!story.chapterBodies || story.chapterBodies.length === 0);
+        if (!facts || storyNeedsRegen) {
           setData((d) => ({ ...d, surname, loading: false, generating: true }));
           try {
             const resp = await fetchLegacy(surname);
