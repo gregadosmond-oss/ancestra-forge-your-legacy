@@ -24,6 +24,7 @@ import MottoGenerator from "./pages/tools/MottoGenerator.tsx";
 import BloodlineQuiz from "./pages/tools/BloodlineQuiz.tsx";
 import ToolsHub from "./pages/tools/ToolsHub.tsx";
 import About from "./pages/About.tsx";
+import GiftOccasionPage from "./pages/gifts/GiftOccasionPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/my-legacy" element={<MyLegacy />} />
             <Route path="/gift/:giftId" element={<GiftPage />} />
+            <Route path="/gifts/:occasion" element={<GiftOccasionPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Route>
