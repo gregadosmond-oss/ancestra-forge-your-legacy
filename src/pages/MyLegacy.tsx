@@ -95,7 +95,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
               const [factsRes2, crestRes2] = await Promise.all([
                 supabase
                   .from("surname_facts")
-                  .select("payload, story_payload")
+                  .select("payload")
                   .eq("surname", surname)
                   .maybeSingle(),
                 supabase
@@ -105,7 +105,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
                   .maybeSingle(),
               ]);
               facts = (factsRes2.data?.payload as LegacyFacts) ?? facts;
-              story = ((factsRes2.data as any)?.story_payload as LegacyStory) ?? story;
+              story = (((factsRes2.data?.payload as any)?.story) as LegacyStory) ?? story;
               crestUrl = crestRes2.data?.image_url ?? null;
 
               // If crest still missing, generate it too
