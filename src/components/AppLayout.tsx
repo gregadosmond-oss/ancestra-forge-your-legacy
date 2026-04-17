@@ -20,10 +20,12 @@ const AppLayout = () => {
     <div className="flex min-h-screen flex-col bg-background">
       {/* ── GLOBAL NAVBAR ── */}
       <nav
-        className="relative w-full text-center"
+        className="sticky top-0 z-50 w-full text-center"
         style={{
-          background: "#13100b",
+          background: "rgba(19,16,11,0.97)",
           borderBottom: "1px solid #3d3020",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
         }}
       >
         {/* Step counter — top-right (journey only) */}
@@ -98,7 +100,7 @@ const AppLayout = () => {
 
       {/* ── BACK BUTTON — below navbar ── */}
       {showBack && (
-        <div className="px-5 pt-4">
+        <div className="relative z-40 px-5 pt-4">
           <button
             aria-label="Go back"
             onClick={() => navigate(-1)}
