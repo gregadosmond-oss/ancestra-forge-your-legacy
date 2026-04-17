@@ -135,7 +135,12 @@ const Pricing = () => (
       </div>
 
       {/* Heirloom Shop */}
-      <div className="flex flex-col rounded-[22px] border bg-card p-8" style={{ borderColor: "rgba(232,148,58,0.1)" }}>
+      <div className="relative flex flex-col rounded-[22px] border bg-card p-8" style={{ borderColor: "rgba(232,148,58,0.1)" }}>
+        {/* Coming Soon badge */}
+        <div className="absolute right-4 top-4 rounded-pill px-3 py-1 font-sans text-[9px] font-semibold uppercase tracking-[2px]"
+          style={{ background: "rgba(160,120,48,0.15)", border: "1px solid rgba(160,120,48,0.35)", color: "#a07830" }}>
+          Coming Soon
+        </div>
         <div className="mb-2 text-3xl">🎁</div>
         <h2 className="font-display text-xl text-cream-warm">Heirloom Shop</h2>
         <div className="mt-3 font-display text-4xl" style={{ color: "#e8b85c" }}>$49+</div>
