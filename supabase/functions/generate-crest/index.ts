@@ -25,7 +25,8 @@ Deno.serve(async (req: Request) => {
   }
 
   const ideogramKey = Deno.env.get("IDEOGRAM_API_KEY");
-  const removeBgKey = Deno.env.get("REMOVE_BG_API_KEY"); // optional — skips bg removal if missing
+  const removeBgKey = Deno.env.get("REMOVE_BG_API_KEY");       // optional — remove.bg
+  const photoroomKey = Deno.env.get("PHOTOROOM_API_KEY");     // optional — PhotoRoom (preferred)
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!ideogramKey || !supabaseUrl || !supabaseKey) {
@@ -93,34 +94,70 @@ Deno.serve(async (req: Request) => {
         if (!imgRes.ok) throw new Error(`failed to download image: ${imgRes.status}`);
         const imgBuffer = await imgRes.arrayBuffer();
 
-        // 2. Remove background via remove.bg — fall back to original if key missing or call fails
+        // 2. Remove background — try PhotoRoom first, fall back to remove.bg, then original
         let buffer: ArrayBuffer = imgBuffer;
-        if (removeBgKey) {
+        if (photoroomKey) {
+          try {
+            const prForm = new FormData();
+            prForm.append("image_file", new Blob([imgBuffer], { type: "image/png" }), "crest.png");
+
+            const prRes = await fetch("https://sdk.photoroom.com/v1/segment", {
+              method: "POST",
+              headers: { "x-api-key": photoroomKey },
+              body: prForm,
+            });
+            if (prRes.ok) {
+              buffer = await prRes.arrayBuffer();
+              console.log("PhotoRoom bg removal succeeded");
+            } else {
+              const errText = await prRes.text();
+              console.warn(`PhotoRoom failed (${prRes.status}), trying remove.bg: ${errText}`);
+              throw new Error("photoroom-failed");
+            }
+          } catch {
+            // Fall through to remove.bg
+            if (removeBgKey) {
+              try {
+                const rbgForm = new FormData();
+                rbgForm.append("image_file", new Blob([imgBuffer], { type: "image/png" }), "crest.png");
+                rbgForm.append("size", "auto");
+                const rbgRes = await fetch("https://api.remove.bg/v1.0/removebg", {
+                  method: "POST",
+                  headers: { "X-Api-Key": removeBgKey, "Accept": "image/png" },
+                  body: rbgForm,
+                });
+                if (rbgRes.ok) {
+                  buffer = await rbgRes.arrayBuffer();
+                  console.log("remove.bg fallback succeeded");
+                } else {
+                  console.warn(`remove.bg fallback failed (${rbgRes.status}), using original`);
+                }
+              } catch (e) {
+                console.warn("remove.bg threw, using original:", (e as Error).message);
+              }
+            }
+          }
+        } else if (removeBgKey) {
           try {
             const rbgForm = new FormData();
             rbgForm.append("image_file", new Blob([imgBuffer], { type: "image/png" }), "crest.png");
             rbgForm.append("size", "auto");
-
             const rbgRes = await fetch("https://api.remove.bg/v1.0/removebg", {
               method: "POST",
-              headers: {
-                "X-Api-Key": removeBgKey,
-                "Accept": "image/png",
-              },
+              headers: { "X-Api-Key": removeBgKey, "Accept": "image/png" },
               body: rbgForm,
             });
             if (rbgRes.ok) {
               buffer = await rbgRes.arrayBuffer();
               console.log("remove.bg succeeded");
             } else {
-              const errText = await rbgRes.text();
-              console.warn(`remove.bg failed (${rbgRes.status}), using original: ${errText}`);
+              console.warn(`remove.bg failed (${rbgRes.status}), using original`);
             }
           } catch (e) {
             console.warn("remove.bg threw, using original:", (e as Error).message);
           }
         } else {
-          console.log("REMOVE_BG_API_KEY not set — skipping background removal");
+          console.log("No bg removal key set — skipping");
         }
 
         const filePath = `${normalized}.png`;
