@@ -1,18 +1,36 @@
 /**
- * LandingCrest — the showcase crest on the homepage.
- * Uses the custom AncestorsQR crest with QR code built into the shield
- * and ANCESTOR banner at the bottom.
+ * LandingCrest — AncestorsQR branded crest with a real scannable QR code
+ * overlaid on the shield area.
  */
 export default function LandingCrest() {
   return (
-    <img
-      src="/crest.png"
-      alt="AncestorsQR crest"
-      style={{
-        width: "220px",
-        height: "auto",
-        filter: "drop-shadow(0 0 48px rgba(212,160,74,0.6))",
-      }}
-    />
+    <div className="relative select-none" style={{ width: 220, height: "auto" }}>
+      {/* Crest image */}
+      <img
+        src="/crest.png"
+        alt="AncestorsQR crest"
+        style={{
+          width: "100%",
+          height: "auto",
+          display: "block",
+          filter: "drop-shadow(0 0 48px rgba(212,160,74,0.6))",
+        }}
+      />
+
+      {/* Real scannable QR code — overlaid on the shield */}
+      <img
+        src="/qr-code.png"
+        alt="Scan to visit AncestorsQR"
+        style={{
+          position: "absolute",
+          top: "38%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "36%",
+          height: "auto",
+          borderRadius: 4,
+        }}
+      />
+    </div>
   );
 }
