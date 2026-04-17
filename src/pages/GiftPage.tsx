@@ -87,7 +87,7 @@ const GiftPage = () => {
 
         <img
           src="/crest.png"
-          alt="Ancestra crest"
+          alt="AncestorsQR crest"
           className="w-20 h-20 object-contain opacity-40"
           draggable={false}
         />
@@ -126,7 +126,7 @@ const GiftPage = () => {
           className="absolute bottom-6 font-sans text-center uppercase tracking-[3px]"
           style={{ color: "hsl(var(--text-dim))", fontSize: "10px" }}
         >
-          Forged by Ancestra
+          Forged by AncestorsQR
         </p>
       </div>
     );
@@ -218,7 +218,7 @@ const GiftPage = () => {
         className="absolute bottom-6 font-sans text-center uppercase tracking-[3px]"
         style={{ color: "hsl(var(--text-dim))", fontSize: "10px" }}
       >
-        Forged by Ancestra
+        Forged by AncestorsQR
       </p>
     </div>
   );

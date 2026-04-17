@@ -67,7 +67,7 @@ export default function MottoGenerator() {
 
   const handleShare = async () => {
     if (!result) return;
-    const text = `My family motto, forged by Ancestra:\n\n"${result.mottoLatin}"\n${result.mottoEnglish}\n\nDiscover yours → ancestorsqr.com/tools/motto`;
+    const text = `My family motto, forged by AncestorsQR:\n\n"${result.mottoLatin}"\n${result.mottoEnglish}\n\nDiscover yours → ancestorsqr.com/tools/motto`;
     if (navigator.share) {
       try {
         await navigator.share({ text });

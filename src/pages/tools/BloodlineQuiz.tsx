@@ -333,7 +333,7 @@ export default function BloodlineQuiz() {
                   className="mt-8"
                 >
                   <p className="mb-2 text-[10px] uppercase tracking-[3px] text-amber-dim font-sans">
-                    Your Ancestral Motto
+                    Your ancestral Motto
                   </p>
                   <p className="font-display text-cream-warm text-[clamp(20px,4vw,28px)] leading-snug">
                     "{result.motto}"

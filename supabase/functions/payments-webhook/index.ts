@@ -7,7 +7,7 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
-const FROM_ADDRESS = "Ancestra <legacy@ancestorsqr.com>";
+const FROM_ADDRESS = "AncestorsQR <legacy@ancestorsqr.com>";
 
 serve(async (req) => {
   if (req.method !== "POST") {
@@ -185,7 +185,7 @@ async function sendBuyerConfirmationEmail({
         View Your Legacy
       </a>
       <p style="margin:32px 0 0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;line-height:1.8;">
-        Forged by Ancestra &nbsp;·&nbsp; ancestorsqr.com<br>
+        Forged by AncestorsQR &nbsp;·&nbsp; ancestorsqr.com<br>
         Questions? Reply to this email.
       </p>
     </div>
@@ -267,7 +267,7 @@ async function sendGiftEmail({
         <p style="margin:0 0 14px;font-size:11px;letter-spacing:3px;color:#a07830;text-transform:uppercase;font-family:Arial,sans-serif;">Or scan to open on your phone</p>
         <img src="${qrUrl}" alt="Scan to claim your legacy" width="160" height="160" style="display:inline-block;border:2px solid #3d3020;border-radius:8px;" />
       </div>
-      <p style="margin:28px 0 0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;">Forged by Ancestra &nbsp;·&nbsp; ancestorsqr.com</p>
+      <p style="margin:28px 0 0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;">Forged by AncestorsQR &nbsp;·&nbsp; ancestorsqr.com</p>
     </div>
   </div>
 </body>

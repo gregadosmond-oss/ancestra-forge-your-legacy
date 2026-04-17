@@ -1,6 +1,6 @@
 # Lovable Workspace Knowledge — Greg Osmond
 
-Universal rules for every Lovable project in this workspace (RelocateIQ, Life By Design, Ancestra, and future projects).
+Universal rules for every Lovable project in this workspace (RelocateIQ, Life By Design, AncestorsQR, and future projects).
 
 ---
 
@@ -86,5 +86,5 @@ Then build exactly that, nothing more.
 
 ## DOMAIN DETAILS
 
-- My domains use non-standard TLDs. Example: RelocateIQ is `relocateiq.io`, not `.com`. Ancestra targets `ancestorsqr.com`. Don't assume `.com` for any of my brands — check the project knowledge.
+- My domains use non-standard TLDs. Example: RelocateIQ is `relocateiq.io`, not `.com`. AncestorsQR targets `ancestorsqr.com`. Don't assume `.com` for any of my brands — check the project knowledge.
 - I live in Playa del Carmen, Mexico — but my target audience is mostly US/Canada/UK

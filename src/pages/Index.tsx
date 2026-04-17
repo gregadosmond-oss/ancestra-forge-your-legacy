@@ -60,7 +60,7 @@ const Index = () => {
         <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
           <img
             src="/crest.png"
-            alt="Ancestra family crest"
+            alt="AncestorsQR family crest"
             style={{
               width: "220px",
               height: "auto",

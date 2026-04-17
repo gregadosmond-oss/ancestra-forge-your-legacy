@@ -29,12 +29,12 @@ describe("EntryPortalPage", () => {
 
   it("renders the crest image", () => {
     renderPage();
-    expect(screen.getByAltText("Ancestra crest")).toBeInTheDocument();
+    expect(screen.getByAltText("AncestorsQR crest")).toBeInTheDocument();
   });
 
   it("renders the welcome headline", () => {
     renderPage();
-    expect(screen.getByText("Welcome to Ancestra")).toBeInTheDocument();
+    expect(screen.getByText("Welcome to AncestorsQR")).toBeInTheDocument();
   });
 
   it("renders the Begin Your Journey button", () => {

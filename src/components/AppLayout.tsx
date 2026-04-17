@@ -42,7 +42,7 @@ const AppLayout = () => {
           className="inline-block pt-3 font-display text-xl uppercase"
           style={{ color: "#e8b85c", letterSpacing: "3px" }}
         >
-          Ancestra
+          AncestorsQR
         </Link>
 
         {/* Links row */}

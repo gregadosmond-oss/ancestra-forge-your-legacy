@@ -17,7 +17,7 @@ const EntryPortal = ({ onEnter }: EntryPortalProps) => (
     {/* Crest */}
     <img
       src="/crest.png"
-      alt="Ancestra crest"
+      alt="AncestorsQR crest"
       style={{
         width: "180px",
         height: "auto",
@@ -30,7 +30,7 @@ const EntryPortal = ({ onEnter }: EntryPortalProps) => (
       className="mt-8 font-serif text-2xl italic"
       style={{ color: "#e8b85c" }}
     >
-      Welcome to Ancestra
+      Welcome to AncestorsQR
     </p>
 
     {/* CTA button with pulse */}

@@ -5,12 +5,12 @@ import EntryPortal from "@/components/EntryPortal";
 describe("EntryPortal", () => {
   it("renders the crest image", () => {
     render(<EntryPortal onEnter={() => {}} />);
-    expect(screen.getByAltText("Ancestra crest")).toBeInTheDocument();
+    expect(screen.getByAltText("AncestorsQR crest")).toBeInTheDocument();
   });
 
   it("renders the welcome headline", () => {
     render(<EntryPortal onEnter={() => {}} />);
-    expect(screen.getByText("Welcome to Ancestra")).toBeInTheDocument();
+    expect(screen.getByText("Welcome to AncestorsQR")).toBeInTheDocument();
   });
 
   it("renders the Begin Your Journey button", () => {

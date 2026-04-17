@@ -15,9 +15,9 @@ const renderAt = (path: string) =>
   );
 
 describe("AppLayout — navbar", () => {
-  it("renders the Ancestra logo", () => {
+  it("renders the AncestorsQR logo", () => {
     renderAt("/");
-    expect(screen.getByText("Ancestra")).toBeInTheDocument();
+    expect(screen.getByText("AncestorsQR")).toBeInTheDocument();
   });
 
   it("renders all nav links", () => {

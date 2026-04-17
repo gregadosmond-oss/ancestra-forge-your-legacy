@@ -8,7 +8,7 @@ const CrestHero = ({ heightVh = 52 }: CrestHeroProps = {}) => {
     <div
       className="relative flex w-full select-none items-center justify-center"
       style={{ height: `${heightVh}vh` }}
-      aria-label="Ancestra family crest"
+      aria-label="AncestorsQR family crest"
     >
       {/* Soft amber glow behind crest */}
       <div
@@ -21,7 +21,7 @@ const CrestHero = ({ heightVh = 52 }: CrestHeroProps = {}) => {
       {/* Crest — fully static */}
       <img
         src="/crest.png"
-        alt="Ancestra family crest"
+        alt="AncestorsQR family crest"
         draggable={false}
         style={{
           height: '88%',

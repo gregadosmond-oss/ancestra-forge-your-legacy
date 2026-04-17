@@ -77,7 +77,7 @@ export default function About() {
             Gregory Angus Dean Osmond
           </h2>
           <p className="mt-5 font-sans text-base leading-relaxed text-text-body">
-            Ancestra didn't start as a business idea. It started as an obsession.
+            AncestorsQR didn't start as a business idea. It started as an obsession.
           </p>
           <p className="mt-4 font-sans text-base leading-relaxed text-text-body">
             Greg spent years chasing his family through historical documents — wills from the 1700s,
@@ -134,7 +134,7 @@ export default function About() {
             — <em>os</em> (god) and <em>mund</em> (protector). A name carrying that weight for over a thousand years.
           </p>
           <p className="mt-4 font-sans text-base leading-relaxed text-text-body">
-            Ancestra exists so everyone can have that same experience — in five minutes instead of five years.
+            AncestorsQR exists so everyone can have that same experience — in five minutes instead of five years.
           </p>
         </motion.div>
 
@@ -180,7 +180,7 @@ export default function About() {
             Every family has a story worth telling.
           </h2>
           <p className="mx-auto mt-5 max-w-xl font-sans text-base leading-relaxed text-text-body">
-            Ancestry.com gives you data. Ancestra gives you identity. We're not competing with
+            Ancestry.com gives you data. AncestorsQR gives you identity. We're not competing with
             genealogy tools — we're helping people feel the weight and pride of where they come from,
             and pass it on to the people they love.
           </p>

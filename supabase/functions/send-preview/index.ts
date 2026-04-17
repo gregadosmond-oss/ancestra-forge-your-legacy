@@ -46,7 +46,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Ancestra <legacy@ancestorsqr.com>",
+        from: "AncestorsQR <legacy@ancestorsqr.com>",
         to: [recipientEmail],
         subject: `The ${surname} Family Legacy`,
         html,
@@ -96,7 +96,7 @@ function buildPreviewEmail({
 
     <!-- Header -->
     <div style="padding:48px 40px 32px;text-align:center;border-bottom:1px solid #3d3020;">
-      <p style="margin:0 0 16px;font-size:11px;letter-spacing:4px;color:#a07830;text-transform:uppercase;font-family:Arial,sans-serif;">AN ANCESTRA ORIGINAL</p>
+      <p style="margin:0 0 16px;font-size:11px;letter-spacing:4px;color:#a07830;text-transform:uppercase;font-family:Arial,sans-serif;">AN ANCESTORSQR ORIGINAL</p>
       <h1 style="margin:0 0 12px;font-size:38px;color:#f0e8da;font-weight:400;line-height:1.2;">The ${surname} Legacy</h1>
       <p style="margin:0;font-size:16px;font-style:italic;color:#c4b8a6;">Someone thought you should see this.</p>
     </div>
@@ -134,7 +134,7 @@ function buildPreviewEmail({
       <a href="https://ancestorsqr.com/journey" style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg,#e8943a,#c47828);color:#1a1208;text-decoration:none;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:60px;">
         Discover My Legacy
       </a>
-      <p style="margin:28px 0 0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;">Forged by Ancestra &nbsp;·&nbsp; ancestorsqr.com</p>
+      <p style="margin:28px 0 0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;">Forged by AncestorsQR &nbsp;·&nbsp; ancestorsqr.com</p>
     </div>
 
   </div>

@@ -202,7 +202,7 @@ const Stop6PassItOn = () => {
           variants={staggerItem}
           className="mt-20 text-center font-serif text-sm italic text-amber-dim"
         >
-          An Ancestra Original.
+          An AncestorsQR Original.
         </motion.p>
       </StaggerGroup>
 
