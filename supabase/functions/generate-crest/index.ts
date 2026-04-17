@@ -25,6 +25,7 @@ Deno.serve(async (req: Request) => {
   }
 
   const ideogramKey = Deno.env.get("IDEOGRAM_API_KEY");
+  const clipdropKey = Deno.env.get("CLIPDROP_API_KEY"); // optional — skips bg removal if missing
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!ideogramKey || !supabaseUrl || !supabaseKey) {
@@ -87,10 +88,36 @@ Deno.serve(async (req: Request) => {
         return url;
       },
       downloadAndUpload: async (normalized: string, tempUrl: string) => {
-        // Download from Ideogram — reference PNG has transparent bg so no remove.bg needed
+        // 1. Download from Ideogram
         const imgRes = await fetch(tempUrl);
         if (!imgRes.ok) throw new Error(`failed to download image: ${imgRes.status}`);
-        const buffer = await imgRes.arrayBuffer();
+        const imgBuffer = await imgRes.arrayBuffer();
+
+        // 2. Remove background via ClipDrop — fall back to original if key missing or call fails
+        let buffer: ArrayBuffer = imgBuffer;
+        if (clipdropKey) {
+          try {
+            const cdForm = new FormData();
+            cdForm.append("image_file", new Blob([imgBuffer], { type: "image/png" }), "crest.png");
+
+            const cdRes = await fetch("https://clipdrop-api.co/remove-background/v1", {
+              method: "POST",
+              headers: { "x-api-key": clipdropKey },
+              body: cdForm,
+            });
+            if (cdRes.ok) {
+              buffer = await cdRes.arrayBuffer();
+              console.log("ClipDrop bg removal succeeded");
+            } else {
+              const errText = await cdRes.text();
+              console.warn(`ClipDrop failed (${cdRes.status}), using original: ${errText}`);
+            }
+          } catch (e) {
+            console.warn("ClipDrop threw, using original:", (e as Error).message);
+          }
+        } else {
+          console.log("CLIPDROP_API_KEY not set — skipping background removal");
+        }
 
         const filePath = `${normalized}.png`;
         const { error: uploadError } = await client.storage
