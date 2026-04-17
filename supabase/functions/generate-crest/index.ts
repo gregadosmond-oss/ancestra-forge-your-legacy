@@ -25,7 +25,6 @@ Deno.serve(async (req: Request) => {
   }
 
   const ideogramKey = Deno.env.get("IDEOGRAM_API_KEY");
-  const removeBgKey = Deno.env.get("REMOVE_BG_API_KEY"); // optional — skipped if missing/out of credits
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!ideogramKey || !supabaseUrl || !supabaseKey) {
@@ -88,36 +87,10 @@ Deno.serve(async (req: Request) => {
         return url;
       },
       downloadAndUpload: async (normalized: string, tempUrl: string) => {
-        // 1. Download from Ideogram
+        // Download from Ideogram — reference PNG has transparent bg so no remove.bg needed
         const imgRes = await fetch(tempUrl);
         if (!imgRes.ok) throw new Error(`failed to download image: ${imgRes.status}`);
-        const imgBuffer = await imgRes.arrayBuffer();
-        const imgBlob = new Blob([imgBuffer], { type: "image/png" });
-
-        // 2. Try remove.bg — fall back to original if it fails (e.g. insufficient credits)
-        let buffer: ArrayBuffer = imgBuffer;
-        try {
-          const rbgForm = new FormData();
-          rbgForm.append("image_file", imgBlob, "crest.png");
-          rbgForm.append("size", "auto");
-
-          const rbgRes = await fetch("https://api.remove.bg/v1.0/removebg", {
-            method: "POST",
-            headers: {
-              "X-Api-Key": removeBgKey,
-              "Accept": "image/png",
-            },
-            body: rbgForm,
-          });
-          if (rbgRes.ok) {
-            buffer = await rbgRes.arrayBuffer();
-          } else {
-            const errText = await rbgRes.text();
-            console.warn(`remove.bg failed (${rbgRes.status}), using original: ${errText}`);
-          }
-        } catch (e) {
-          console.warn("remove.bg threw, using original:", (e as Error).message);
-        }
+        const buffer = await imgRes.arrayBuffer();
 
         const filePath = `${normalized}.png`;
         const { error: uploadError } = await client.storage
