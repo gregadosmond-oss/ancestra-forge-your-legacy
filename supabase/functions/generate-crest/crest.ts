@@ -51,37 +51,23 @@ function getEarliestYear(facts: LegacyFacts): string {
 }
 
 export function buildPrompt(facts: LegacyFacts): string {
+  const symbols = facts.symbolism.map((s) => s.element).join(", ");
   const surname = facts.displaySurname.toUpperCase();
-  const initial = facts.displaySurname.charAt(0).toUpperCase();
-  const crestAnimal = getCrestAnimal(facts);
-  const crestObject = getCrestObject(facts);
-  const supporterAnimal = "lion";
-  const tradeSymbol = getTradeSymbol(facts);
-  const sinceYear = getEarliestYear(facts);
 
-  return `Generate a photorealistic 3D heraldic coat of arms for the ${surname} family.
-
-CREST (TOP): A gold rampant ${crestAnimal} holding ${crestObject}
-Below the crest: A royal crown with a medieval knight's helmet facing forward
-
-SUPPORTERS: Two gold rampant ${supporterAnimal}s flanking the shield, standing on their hind legs
-
-CENTRAL SHIELD (quartered):
-- Top-left: Gold fleur-de-lis on royal blue
-- Top-right: Ornate gold "${initial}" monogram on crimson red
-- Bottom-left: ${tradeSymbol} on crimson red
-- Bottom-right: Gold fleur-de-lis on royal blue
-
-BANNER (bottom): Silver scrolled ribbon with "${surname}" in bold gold serif capital letters
-BELOW BANNER: Small elegant gold text: "SINCE ${sinceYear}"
-
-STYLE: Hyper-realistic 3D rendering, polished antique gold with deep shadows and bright specular highlights, dramatic cinematic lighting, rich dimensional depth, ornate baroque heraldic design, museum-quality luxury feel. Textured charcoal gray background. No QR codes. No watermarks.
-
-Square 1:1 aspect ratio. Centered composition.`;
+  return [
+    `A photorealistic heraldic coat of arms in the same style as the reference image.`,
+    `Two golden lion supporters standing on either side of a quartered heraldic shield.`,
+    `The shield features ${symbols}.`,
+    `A knight helmet or crown crest on top with ornate gold scrollwork and mantling.`,
+    `A silver ribbon banner at the base with the text "${surname}" engraved clearly.`,
+    `White transparent background. Perfectly symmetrical.`,
+    `Style: luxury 3D CGI render, polished gold metalwork, rich crimson and navy shield,`,
+    `warm studio lighting, photorealistic detail, premium brand quality, 8K.`,
+  ].join(" ");
 }
 
 // Reference image URL — the 3D photorealistic style reference
-export const REFERENCE_CREST_URL = "https://legacy-forge-stories.lovable.app/ancestra-crest-3d.png";
+export const REFERENCE_CREST_URL = "https://legacy-forge-stories.lovable.app/crest.png";
 
 export async function readCrest(
   client: DbClient,
