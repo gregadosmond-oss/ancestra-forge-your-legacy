@@ -81,9 +81,9 @@ export default function About() {
           </p>
           <p className="mt-4 font-sans text-base leading-relaxed text-text-body">
             Greg spent years chasing his family through historical documents — wills from the 1700s,
-            church records in Piddletrenthide, Domesday Book entries from 1066. His ancestors were
-            Haywards. Land managers and protectors in Dorset, England. They weren't born wealthy.
-            They earned everything through work, resilience, and grit.
+            church records in Piddletrenthide, Domesday Book entries from 1066. The Osmonds of Dorset,
+            England were land managers and protectors — Haywards — stewards of the land entrusted to
+            guard it. They weren't born wealthy. They earned everything through work, resilience, and grit.
           </p>
           <p className="mt-4 font-sans text-base leading-relaxed text-text-body">
             They later migrated to Newfoundland, Canada. Joseph Osmond built a fishing operation from
