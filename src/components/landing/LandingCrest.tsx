@@ -30,7 +30,6 @@ export default function LandingCrest() {
           height: "auto",
           borderRadius: 2,
           mixBlendMode: "multiply" as const,
-          filter: "sepia(1) saturate(8) hue-rotate(5deg) brightness(0.75)",
         }}
       />
     </div>
