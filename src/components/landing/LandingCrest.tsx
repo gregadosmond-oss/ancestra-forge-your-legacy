@@ -4,7 +4,7 @@
  */
 export default function LandingCrest() {
   return (
-    <div className="relative select-none" style={{ width: 280, height: "auto" }}>
+    <div className="relative select-none" style={{ width: 420, height: "auto" }}>
       {/* Crest image */}
       <img
         src="/crest.png"
@@ -23,10 +23,10 @@ export default function LandingCrest() {
         alt="Scan to visit AncestorsQR"
         style={{
           position: "absolute",
-          top: "44%",
+          top: "42%",
           left: "50%",
           transform: "translateX(-50%)",
-          width: "28%",
+          width: "19%",
           height: "auto",
           borderRadius: 3,
           opacity: 0.92,
