@@ -35,7 +35,8 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center">
+    <div className="relative flex min-h-screen flex-col items-center">
+      <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       <PaymentTestModeBanner />
 
       <div className="w-full max-w-2xl px-6 py-16">

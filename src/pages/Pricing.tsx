@@ -63,7 +63,9 @@ const FAQ = [
 ];
 
 const Pricing = () => (
-  <div className="mx-auto max-w-5xl px-6 py-20">
+  <div className="relative min-h-screen bg-background">
+    <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
+  <div className="relative z-10 mx-auto max-w-5xl px-6 py-20">
     {/* Header */}
     <motion.div {...reveal} className="text-center">
       <p className="mb-3 font-sans text-[10px] uppercase tracking-[4px]" style={{ color: "#a07830" }}>
@@ -196,6 +198,7 @@ const Pricing = () => (
         Begin Your Journey
       </Link>
     </motion.div>
+  </div>
   </div>
 );
 

@@ -8,7 +8,8 @@ const CheckoutReturn = () => {
   const sessionId = searchParams.get("session_id");
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
+    <div className="relative flex min-h-screen flex-col items-center justify-center px-6 py-24">
+      <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       <SectionLabel>LEGACY UNLOCKED</SectionLabel>
 
       <motion.div

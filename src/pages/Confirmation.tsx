@@ -45,6 +45,7 @@ export default function Confirmation() {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-background">
+      <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       {/* Grain */}
       <svg className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-[0.018]">
         <filter id="grain-conf">

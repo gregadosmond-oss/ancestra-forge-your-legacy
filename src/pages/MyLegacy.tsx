@@ -186,8 +186,9 @@ const MyLegacy = () => {
     : [];
 
   return (
-    <div className="min-h-screen px-6 pb-32 pt-16">
-      <div className="mx-auto max-w-2xl">
+    <div className="relative min-h-screen px-6 pb-32 pt-16">
+      <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
+      <div className="relative z-10 mx-auto max-w-2xl">
 
         {/* ── Header ── */}
         <motion.div
