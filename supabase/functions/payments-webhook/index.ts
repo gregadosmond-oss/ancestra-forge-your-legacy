@@ -95,7 +95,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
       .insert({
         user_id: userId,
         recipient_email: recipientEmail,
-        surname: surname || null,
+        surname: surname ?? "",
         status: "delivered",
       })
       .select("id")
@@ -143,18 +143,18 @@ async function sendBuyerConfirmationEmail({
     normalized
       ? supabase
           .from("surname_facts")
-          .select("facts_payload")
+          .select("payload")
           .eq("surname", normalized)
           .maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
 
   const crestUrl = (crestRow as any).data?.image_url ?? null;
-  const facts = (factsRow as any).data?.facts_payload ?? null;
+  const facts = (factsRow as any).data?.payload ?? null;
   const displaySurname = facts?.displaySurname ?? surname ?? "Your Family";
   const mottoLatin = facts?.mottoLatin ?? null;
   const mottoEnglish = facts?.mottoEnglish ?? null;
-  const journeyUrl = "https://ancestorsqr.com/journey/5";
+  const journeyUrl = "https://ancestorsqr.com/my-legacy";
 
   const crestSection = crestUrl
     ? `<div style="text-align:center;padding:32px 40px;border-bottom:1px solid #3d3020;">

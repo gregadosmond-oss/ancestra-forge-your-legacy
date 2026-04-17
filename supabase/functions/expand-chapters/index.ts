@@ -100,6 +100,7 @@ Write ~150 words of cinematic prose for each of these 8 chapters.`;
       apiKey,
       system: EXPAND_SYSTEM,
       user: userPrompt,
+      maxTokens: 6000,
     });
     chapterBodies = result.chapterBodies;
   } catch (err) {

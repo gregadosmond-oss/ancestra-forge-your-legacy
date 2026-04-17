@@ -31,6 +31,7 @@ const Stop1EnterName = () => {
     // on Stops 2-5 absorb the latency.
     void startJourney(surname.trim());
     navigate("/journey/2");
+    setSubmitting(false);
   };
 
   return (
