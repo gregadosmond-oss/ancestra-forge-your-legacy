@@ -69,7 +69,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
         const [factsRes, crestRes] = await Promise.all([
           supabase
             .from("surname_facts")
-            .select("payload, story_payload")
+            .select("payload")
             .eq("surname", surname)
             .maybeSingle(),
           supabase
@@ -80,7 +80,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
         ]);
 
         let facts = (factsRes.data?.payload as LegacyFacts) ?? null;
-        let story = (factsRes.data as any)?.story_payload as LegacyStory ?? null;
+        let story = ((factsRes.data?.payload as any)?.story as LegacyStory) ?? null;
         let crestUrl = crestRes.data?.image_url ?? null;
 
         // Step 3: generate if no facts at all (e.g. user skipped the journey)
@@ -95,7 +95,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
               const [factsRes2, crestRes2] = await Promise.all([
                 supabase
                   .from("surname_facts")
-                  .select("payload, story_payload")
+                  .select("payload")
                   .eq("surname", surname)
                   .maybeSingle(),
                 supabase
@@ -105,7 +105,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
                   .maybeSingle(),
               ]);
               facts = (factsRes2.data?.payload as LegacyFacts) ?? facts;
-              story = ((factsRes2.data as any)?.story_payload as LegacyStory) ?? story;
+              story = (((factsRes2.data?.payload as any)?.story) as LegacyStory) ?? story;
               crestUrl = crestRes2.data?.image_url ?? null;
 
               // If crest still missing, generate it too
@@ -192,6 +192,7 @@ const MyLegacy = () => {
   const { facts, story, crestUrl, surname, loading, generating, error } = useLegacyData(
     !purchaseLoading && hasPurchased ? user?.id : undefined
   );
+  const { chapterBodies, expanding: expandingChapters } = useExpandChapters(surname, story);
 
   useEffect(() => {
     if (!purchaseLoading && !user) navigate("/journey/1", { replace: true });
@@ -290,7 +291,6 @@ const MyLegacy = () => {
   }
 
   const displaySurname = facts?.displaySurname ?? (surname ? surname.replace(/\b\w/g, (c) => c.toUpperCase()) : "");
-  const { chapterBodies, expanding: expandingChapters } = useExpandChapters(surname, story);
 
   return (
     <div className="relative min-h-screen px-6 pb-32 pt-16">
