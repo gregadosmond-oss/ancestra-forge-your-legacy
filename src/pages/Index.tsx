@@ -182,6 +182,66 @@ const Index = () => {
         <WarmDivider />
         <FinalCtaSection />
       </div>
+
+      {/* ── FLOATING MUSIC BUTTON — fixed bottom-right ── */}
+      <button
+        onClick={handleToggleMusic}
+        title={isPlaying ? "Pause Music" : "Play Music"}
+        style={{
+          position: "fixed",
+          bottom: 28,
+          right: 28,
+          zIndex: 100,
+          display: "flex",
+          alignItems: "center",
+          gap: "7px",
+          padding: "9px 16px",
+          borderRadius: 60,
+          border: isPlaying
+            ? "1px solid rgba(232,148,58,0.5)"
+            : "1px solid rgba(212,160,74,0.22)",
+          background: isPlaying
+            ? "rgba(232,148,58,0.14)"
+            : "rgba(13,10,7,0.75)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
+          color: isPlaying ? "#f0a848" : "#a07830",
+          fontFamily: "var(--font-sans, DM Sans, sans-serif)",
+          fontSize: "10px",
+          fontWeight: 600,
+          letterSpacing: "1.4px",
+          textTransform: "uppercase",
+          cursor: "pointer",
+          animation: isPlaying
+            ? "musicPulse 2s ease-in-out infinite"
+            : "musicPulseIdle 3s ease-in-out infinite",
+          transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
+        }}
+        onMouseEnter={(e) => {
+          const el = e.currentTarget as HTMLButtonElement;
+          el.style.color = isPlaying ? "#f0a848" : "#d4a04a";
+          el.style.borderColor = isPlaying ? "rgba(232,148,58,0.7)" : "rgba(212,160,74,0.45)";
+          el.style.transform = "translateY(-2px)";
+        }}
+        onMouseLeave={(e) => {
+          const el = e.currentTarget as HTMLButtonElement;
+          el.style.color = isPlaying ? "#f0a848" : "#a07830";
+          el.style.borderColor = isPlaying ? "rgba(232,148,58,0.5)" : "rgba(212,160,74,0.22)";
+          el.style.transform = "";
+        }}
+      >
+        {isPlaying ? (
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16" rx="1" />
+            <rect x="14" y="4" width="4" height="16" rx="1" />
+          </svg>
+        ) : (
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+        )}
+        {isPlaying ? "Pause" : "Play Music"}
+      </button>
     </div>
   );
 };
