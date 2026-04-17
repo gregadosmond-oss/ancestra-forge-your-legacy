@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { startAmbientAudio } from "@/lib/ambientAudio";
+import { toggleAmbientPlayback } from "@/lib/ambientAudio";
 import WarmDivider from "@/components/journey/WarmDivider";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import PacksSection from "@/components/landing/PacksSection";
@@ -10,11 +10,11 @@ import FinalCtaSection from "@/components/landing/FinalCtaSection";
 import LandingCrest from "@/components/landing/LandingCrest";
 
 const Index = () => {
-  const [musicStarted, setMusicStarted] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  const handleStartMusic = () => {
-    startAmbientAudio();
-    setMusicStarted(true);
+  const handleToggleMusic = () => {
+    const playing = toggleAmbientPlayback();
+    setIsPlaying(playing);
   };
 
   return (
@@ -110,26 +110,64 @@ const Index = () => {
             0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.7; }
             50% { transform: translateX(-50%) translateY(6px); opacity: 1; }
           }
+          @keyframes musicPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(232,148,58,0.5), 0 0 18px rgba(232,148,58,0.25); }
+            50% { box-shadow: 0 0 0 7px rgba(232,148,58,0), 0 0 30px rgba(232,148,58,0.4); }
+          }
+          @keyframes musicPulseIdle {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(212,160,74,0.3), 0 0 12px rgba(212,160,74,0.1); }
+            50% { box-shadow: 0 0 0 5px rgba(212,160,74,0), 0 0 20px rgba(212,160,74,0.2); }
+          }
         `}</style>
       </div>
 
-      {/* ── MUSIC INVITE ── */}
-      {!musicStarted && (
-        <div className="relative z-10 flex w-full items-center justify-center gap-3 py-3" style={{ background: "rgba(26,18,8,0.8)", borderBottom: "1px solid rgba(212,160,74,0.08)" }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a07830" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-          </svg>
-          <span className="font-sans text-[11px]" style={{ color: "#8a7e6e" }}>Want the full experience?</span>
-          <button
-            onClick={handleStartMusic}
-            className="font-sans text-[11px] font-semibold transition-opacity hover:opacity-70"
-            style={{ color: "#d4a04a", textDecoration: "underline", textUnderlineOffset: "3px" }}
-          >
-            Enable music
-          </button>
-        </div>
-      )}
+      {/* ── MUSIC BUTTON ── */}
+      <div className="relative z-10 flex w-full items-center justify-center py-4" style={{ background: "rgba(20,14,8,0.85)", borderBottom: "1px solid rgba(212,160,74,0.08)" }}>
+        <button
+          onClick={handleToggleMusic}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "9px",
+            padding: "10px 22px",
+            borderRadius: 60,
+            border: isPlaying
+              ? "1px solid rgba(232,148,58,0.55)"
+              : "1px solid rgba(212,160,74,0.3)",
+            background: isPlaying
+              ? "linear-gradient(135deg, rgba(232,148,58,0.18), rgba(196,120,40,0.12))"
+              : "rgba(212,160,74,0.06)",
+            color: isPlaying ? "#f0a848" : "#d4a04a",
+            fontFamily: "var(--font-sans, DM Sans, sans-serif)",
+            fontSize: "12px",
+            fontWeight: 600,
+            letterSpacing: "1.5px",
+            textTransform: "uppercase",
+            cursor: "pointer",
+            animation: isPlaying ? "musicPulse 2s ease-in-out infinite" : "musicPulseIdle 3s ease-in-out infinite",
+            transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px) scale(1.04)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.transform = "";
+          }}
+        >
+          {/* Icon */}
+          {isPlaying ? (
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" rx="1" />
+              <rect x="14" y="4" width="4" height="16" rx="1" />
+            </svg>
+          ) : (
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+          )}
+          {isPlaying ? "Pause Music" : "Play Music"}
+        </button>
+      </div>
 
       {/* ── LANDING SECTIONS ── */}
       <div className="relative z-10 w-full max-w-4xl px-6 pb-24">
