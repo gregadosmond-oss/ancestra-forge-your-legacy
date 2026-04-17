@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -44,6 +45,8 @@ type InternalState = {
   crest: { data: LegacyCrest | null; status: PieceStatus; reason: string | null };
 };
 
+const SESSION_KEY = "ancestra_journey_surname";
+
 const INITIAL: InternalState = {
   surname: null,
   unknownSurname: false,
@@ -53,7 +56,11 @@ const INITIAL: InternalState = {
 };
 
 export function JourneyProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<InternalState>(INITIAL);
+  const [state, setState] = useState<InternalState>(() => {
+    // Rehydrate surname from sessionStorage so it survives auth redirects
+    const saved = sessionStorage.getItem(SESSION_KEY);
+    return saved ? { ...INITIAL, surname: saved } : INITIAL;
+  });
   // Pinned current surname used by retry callbacks so stale closures don't fire.
   const surnameRef = useRef<string | null>(null);
   const factsRef = useRef<LegacyFacts | null>(null);
@@ -101,6 +108,7 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
   }, [runCrestFetch]);
 
   const runFetch = useCallback(async (surname: string) => {
+    sessionStorage.setItem(SESSION_KEY, surname);
     setState((s) => ({
       ...s,
       surname,
@@ -142,7 +150,17 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
     await runFetch(surname);
   }, [runFetch]);
 
+  // On mount: if surname was rehydrated from sessionStorage but data is missing, re-fetch
+  useEffect(() => {
+    const saved = sessionStorage.getItem(SESSION_KEY);
+    if (saved && state.facts.status === "idle") {
+      void runFetch(saved);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const reset = useCallback(() => {
+    sessionStorage.removeItem(SESSION_KEY);
     surnameRef.current = null;
     factsRef.current = null;
     setState(INITIAL);
