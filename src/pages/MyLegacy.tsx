@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { stripMarkdown } from "@/lib/utils";
 import ShareQRCode from "@/components/ShareQRCode";
 import SocialShare from "@/components/SocialShare";
+import { generateCertificate } from "@/lib/generateCertificate";
 import type { LegacyFacts, LegacyStory } from "@/types/legacy";
 
 // ─── Data hook ────────────────────────────────────────────────────────────────
@@ -469,6 +470,33 @@ const MyLegacy = () => {
           <OrnamentDivider />
 
           <div className="text-center">
+            {/* Certificate download — hero CTA */}
+            {facts && (
+              <div
+                className="mb-8 rounded-[18px] border p-6"
+                style={{ background: "rgba(201,168,76,0.06)", borderColor: "rgba(201,168,76,0.25)" }}
+              >
+                <p className="font-sans text-[9px] uppercase tracking-[3px] text-amber-dim">Included in your Legacy Pack</p>
+                <h3 className="mt-2 font-display text-xl text-cream-warm">Your Legacy Certificate</h3>
+                <p className="mt-1 font-serif text-sm italic text-text-dim">
+                  A formal, frameable certificate documenting your family lineage, crest, motto &amp; bloodline journey.
+                </p>
+                <button
+                  onClick={() => generateCertificate({ facts, story, crestUrl })}
+                  className="mt-5 inline-flex items-center gap-2 rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                  style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  Download Certificate
+                </button>
+                <p className="mt-2 font-sans text-[9px] text-text-dim">Opens as PDF · Print or frame it</p>
+              </div>
+            )}
+
             <p className="font-sans text-[10px] uppercase tracking-[3px] text-amber-dim">
               What would you like to do next?
             </p>
