@@ -88,16 +88,16 @@ async function buildDesign(crestUrl: string, qrUrl: string, surname: string): Pr
   return resvg.render().asPng();
 }
 
-async function getBlack11ozVariant(apiKey: string): Promise<number> {
+async function getWhite11ozVariant(apiKey: string): Promise<number> {
   const res = await fetch(
     `${PRINTIFY_BASE}/catalog/blueprints/${BLUEPRINT_ID}/print_providers/${PROVIDER_ID}/variants.json`,
     { headers: { Authorization: `Bearer ${apiKey}` } }
   );
   const { variants } = await res.json();
-  const black11 = variants?.find((v: any) =>
-    v.title?.toLowerCase().includes("11") && v.title?.toLowerCase().includes("black")
+  const white11 = variants?.find((v: any) =>
+    v.title?.toLowerCase().includes("11") && v.title?.toLowerCase().includes("white")
   );
-  return black11?.id ?? variants?.[0]?.id;
+  return white11?.id ?? variants?.[0]?.id;
 }
 
 serve(async (req) => {
@@ -137,7 +137,7 @@ serve(async (req) => {
 
     const { data: { publicUrl: designUrl } } = supabase.storage.from("crests").getPublicUrl(fileName);
 
-    const variantId = await getBlack11ozVariant(apiKey);
+    const variantId = await getWhite11ozVariant(apiKey);
 
     const orderPayload = {
       external_id: `aqr-${surname.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`,
