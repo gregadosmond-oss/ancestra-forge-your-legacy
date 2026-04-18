@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { Mic, MicOff, Volume2, VolumeX, Pause, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type Message = {
@@ -64,6 +64,7 @@ export default function AncestorChat() {
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [listening, setListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [paused, setPaused] = useState(false);
   const recognitionRef = useRef<InstanceType<typeof SpeechRecognition> | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -73,14 +74,26 @@ export default function AncestorChat() {
   const speakAncestor = useCallback((text: string) => {
     if (!voiceEnabled) return;
     setSpeaking(true);
-    speakText(text, () => setSpeaking(false));
+    setPaused(false);
+    speakText(text, () => { setSpeaking(false); setPaused(false); });
   }, [voiceEnabled]);
+
+  const togglePause = () => {
+    if (paused) {
+      window.speechSynthesis.resume();
+      setPaused(false);
+    } else {
+      window.speechSynthesis.pause();
+      setPaused(true);
+    }
+  };
 
   // Stop speech when voice is toggled off
   useEffect(() => {
     if (!voiceEnabled) {
       window.speechSynthesis.cancel();
       setSpeaking(false);
+      setPaused(false);
     }
   }, [voiceEnabled]);
 
@@ -285,6 +298,22 @@ export default function AncestorChat() {
               <p className="font-display text-lg text-cream-warm">{ancestorName}</p>
             </div>
             <div className="flex items-center gap-2">
+              {/* Pause/resume button — only while speaking */}
+              {speaking && (
+                <button
+                  onClick={togglePause}
+                  title={paused ? "Resume" : "Pause"}
+                  className="flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200"
+                  style={{
+                    border: "1px solid rgba(232,148,58,0.4)",
+                    background: "rgba(232,148,58,0.1)",
+                    color: "#d4a04a",
+                    cursor: "pointer",
+                  }}
+                >
+                  {paused ? <Play size={14} /> : <Pause size={14} />}
+                </button>
+              )}
               {/* Voice toggle */}
               <button
                 onClick={() => setVoiceEnabled((v) => !v)}
