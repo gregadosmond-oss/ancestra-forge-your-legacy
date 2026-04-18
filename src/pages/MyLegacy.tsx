@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
@@ -214,6 +214,101 @@ function OrnamentDivider() {
   );
 }
 
+// ─── TTS hook ─────────────────────────────────────────────────────────────────
+
+function useChapterTTS() {
+  const [speaking, setSpeaking] = useState<string | null>(null); // chapter key e.g. "ch1", "ch2"
+  const [paused, setPaused] = useState(false);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
+
+  const stop = useCallback(() => {
+    try { sourceRef.current?.stop(); } catch {}
+    sourceRef.current = null;
+    setSpeaking(null);
+    setPaused(false);
+  }, []);
+
+  useEffect(() => () => { stop(); }, [stop]);
+
+  const speak = useCallback(async (chapterKey: string, text: string) => {
+    if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
+    stop();
+    setSpeaking(chapterKey);
+    setPaused(false);
+    try {
+      const { data, error: fnErr } = await supabase.functions.invoke("ancestor-tts", { body: { text } });
+      if (fnErr) throw new Error(fnErr.message);
+      if (!data?.audio) throw new Error("No audio data");
+      const binary = atob(data.audio);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const ctx = audioCtxRef.current!;
+      if (ctx.state === "suspended") await ctx.resume();
+      const audioBuffer = await ctx.decodeAudioData(bytes.buffer);
+      const source = ctx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(ctx.destination);
+      sourceRef.current = source;
+      source.onended = () => { setSpeaking(null); setPaused(false); sourceRef.current = null; };
+      source.start(0);
+    } catch { setSpeaking(null); }
+  }, [stop]);
+
+  const togglePause = useCallback(() => {
+    const ctx = audioCtxRef.current;
+    if (!ctx) return;
+    if (ctx.state === "running") { ctx.suspend(); setPaused(true); }
+    else { ctx.resume(); setPaused(false); }
+  }, []);
+
+  return { speaking, paused, speak, stop, togglePause };
+}
+
+// ─── Listen button ─────────────────────────────────────────────────────────────
+
+function ListenButton({ chapterKey, text, tts }: {
+  chapterKey: string;
+  text: string;
+  tts: ReturnType<typeof useChapterTTS>;
+}) {
+  const active = tts.speaking === chapterKey;
+  if (!active) {
+    return (
+      <button
+        onClick={() => tts.speak(chapterKey, text)}
+        className="mt-3 flex items-center gap-2 rounded-full border px-4 py-1.5 font-sans text-[10px] font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
+        style={{ borderColor: "rgba(212,160,74,0.3)", color: "#a07830", background: "rgba(212,160,74,0.05)" }}
+      >
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        Listen
+      </button>
+    );
+  }
+  return (
+    <div className="mt-3 flex items-center gap-2">
+      <button
+        onClick={tts.togglePause}
+        className="flex items-center gap-2 rounded-full border px-4 py-1.5 font-sans text-[10px] font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
+        style={{ borderColor: "rgba(212,160,74,0.3)", color: "#a07830", background: "rgba(212,160,74,0.05)" }}
+      >
+        {tts.paused
+          ? <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          : <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>}
+        {tts.paused ? "Resume" : "Pause"}
+      </button>
+      <button
+        onClick={tts.stop}
+        className="flex items-center gap-2 rounded-full border px-3 py-1.5 font-sans text-[10px] font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
+        style={{ borderColor: "rgba(138,126,110,0.25)", color: "#8a7e6e", background: "transparent" }}
+      >
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
+        Stop
+      </button>
+    </div>
+  );
+}
+
 // ─── Main component ────────────────────────────────────────────────────────────
 
 const MyLegacy = () => {
@@ -224,6 +319,7 @@ const MyLegacy = () => {
   );
   const crestUrl = useCrestPoller(surname, initialCrestUrl);
   const { chapterBodies, expanding: expandingChapters } = useExpandChapters(surname, story);
+  const tts = useChapterTTS();
 
   useEffect(() => {
     if (!purchaseLoading && !user) navigate("/journey/1", { replace: true });
@@ -412,18 +508,25 @@ const MyLegacy = () => {
             </h2>
 
             {story.chapterOneBody && (
-              <p
-                className="mt-6 font-serif leading-[1.95] text-text-body"
-                style={{ fontSize: "1.0625rem", textAlign: "justify" }}
-              >
-                <span
-                  className="float-left mr-2 font-display leading-none text-amber-light"
-                  style={{ fontSize: "4.2rem", lineHeight: "0.82", marginTop: "6px" }}
+              <>
+                <ListenButton
+                  chapterKey="ch1"
+                  text={`${stripMarkdown(story.chapterOneTitle)}. ${stripMarkdown(story.chapterOneBody)}`}
+                  tts={tts}
+                />
+                <p
+                  className="mt-6 font-serif leading-[1.95] text-text-body"
+                  style={{ fontSize: "1.0625rem", textAlign: "justify" }}
                 >
-                  {stripMarkdown(story.chapterOneBody).charAt(0)}
-                </span>
-                {stripMarkdown(story.chapterOneBody).slice(1)}
-              </p>
+                  <span
+                    className="float-left mr-2 font-display leading-none text-amber-light"
+                    style={{ fontSize: "4.2rem", lineHeight: "0.82", marginTop: "6px" }}
+                  >
+                    {stripMarkdown(story.chapterOneBody).charAt(0)}
+                  </span>
+                  {stripMarkdown(story.chapterOneBody).slice(1)}
+                </p>
+              </>
             )}
           </motion.section>
         )}
@@ -469,12 +572,19 @@ const MyLegacy = () => {
                     </p>
                     <h3 className="font-display text-lg text-cream-warm">{cleanTitle}</h3>
                     {body ? (
-                      <p
-                        className="mt-3 font-serif leading-[1.9] text-text-body"
-                        style={{ fontSize: "0.9375rem", textAlign: "justify" }}
-                      >
-                        {stripMarkdown(body)}
-                      </p>
+                      <>
+                        <ListenButton
+                          chapterKey={`ch${i + 2}`}
+                          text={`${cleanTitle}. ${stripMarkdown(body)}`}
+                          tts={tts}
+                        />
+                        <p
+                          className="mt-3 font-serif leading-[1.9] text-text-body"
+                          style={{ fontSize: "0.9375rem", textAlign: "justify" }}
+                        >
+                          {stripMarkdown(body)}
+                        </p>
+                      </>
                     ) : expandingChapters ? (
                       <div className="mt-2 h-3 w-3/4 rounded-full bg-amber-dim/20 animate-pulse" />
                     ) : null}
