@@ -6,7 +6,7 @@ const CORS_HEADERS = {
 };
 
 // Clyde — full, diplomatic, warm. Perfect ancestor voice.
-const VOICE_ID = "wyWA56cQNU2KqUW4eCsI";
+const VOICE_ID = "yvKg3CwzCYDTwyHnWQLg";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: CORS_HEADERS });
