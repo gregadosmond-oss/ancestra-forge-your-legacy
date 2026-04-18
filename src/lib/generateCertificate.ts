@@ -113,7 +113,7 @@ export function generateCertificate({ facts, story, crestUrl, surname }: Certifi
     /* ── Layout ── */
     .content {
       position: absolute;
-      inset: 13mm 12mm 12mm 12mm;
+      inset: 13mm 12mm 32mm 12mm;
       display: flex;
       gap: 8mm;
     }
@@ -326,7 +326,7 @@ export function generateCertificate({ facts, story, crestUrl, surname }: Certifi
     /* Footer */
     .footer {
       position: absolute;
-      bottom: 10mm;
+      bottom: 7mm;
       left: 0;
       right: 0;
       padding: 0 13mm;
@@ -406,10 +406,6 @@ export function generateCertificate({ facts, story, crestUrl, surname }: Certifi
         <div style="margin-top:1mm;color:#c9a84c;">Ancestral Role</div>
         <div style="margin-top:0.5mm;font-style:italic;font-family:'Libre Caslon Text',Georgia,serif;font-size:6.5pt;color:#6b5030;text-transform:none;letter-spacing:0;">${facts.meaning.role}</div>
       </div>
-      <div class="qr-wrap">
-        <p class="qr-label">View Online</p>
-        <img src="${qrSrc}" alt="Legacy QR" style="width:60px;height:60px;" />
-      </div>
     </div>
 
     <!-- RIGHT -->
@@ -465,6 +461,8 @@ export function generateCertificate({ facts, story, crestUrl, surname }: Certifi
   <!-- Footer -->
   <div class="footer">
     <div>
+      <img src="${qrSrc}" alt="Legacy QR" style="width:52px;height:52px;display:block;margin-bottom:2mm;" />
+      <p class="qr-label" style="margin-bottom:2mm;">VIEW ONLINE</p>
       <div class="sig-line"></div>
       <p class="sig-name">Gregory Osmond</p>
       <p class="sig-title">Founder, AncestorsQR</p>
