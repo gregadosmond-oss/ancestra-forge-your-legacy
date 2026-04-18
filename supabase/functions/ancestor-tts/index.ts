@@ -5,8 +5,37 @@ const CORS_HEADERS = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-// Clyde — full, diplomatic, warm. Perfect ancestor voice.
-const VOICE_ID = "wyWA56cQNU2KqUW4eCsI";
+const DEFAULT_VOICE = "wyWA56cQNU2KqUW4eCsI";
+
+// Country keyword → ElevenLabs voice ID
+// Update any entry with a voice ID you pick from elevenlabs.io/voice-library
+const VOICE_MAP: Record<string, string> = {
+  england:   "wyWA56cQNU2KqUW4eCsI",
+  britain:   "wyWA56cQNU2KqUW4eCsI",
+  uk:        "wyWA56cQNU2KqUW4eCsI",
+  scotland:  "wyWA56cQNU2KqUW4eCsI",
+  ireland:   "wyWA56cQNU2KqUW4eCsI",
+  wales:     "wyWA56cQNU2KqUW4eCsI",
+  // Add more once you pick voices from ElevenLabs:
+  // germany: "VOICE_ID",
+  // france:  "VOICE_ID",
+  // russia:  "VOICE_ID",
+  // italy:   "VOICE_ID",
+  // spain:   "VOICE_ID",
+  // poland:  "VOICE_ID",
+  // sweden:  "VOICE_ID",
+  // norway:  "VOICE_ID",
+  // greece:  "VOICE_ID",
+};
+
+function voiceForCountry(country?: string): string {
+  if (!country) return DEFAULT_VOICE;
+  const key = country.toLowerCase();
+  for (const [pattern, id] of Object.entries(VOICE_MAP)) {
+    if (key.includes(pattern)) return id;
+  }
+  return DEFAULT_VOICE;
+}
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: CORS_HEADERS });
@@ -14,10 +43,11 @@ Deno.serve(async (req: Request) => {
   const apiKey = Deno.env.get("ELEVENLABS_API_KEY");
   if (!apiKey) return new Response("Missing API key", { status: 500 });
 
-  const { text } = await req.json();
+  const { text, country } = await req.json();
   if (!text) return new Response("Missing text", { status: 400 });
 
-  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
+  const voiceId = voiceForCountry(country);
+  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
     method: "POST",
     headers: {
       "xi-api-key": apiKey,
