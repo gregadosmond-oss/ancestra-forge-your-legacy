@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { Image } from "https://deno.land/x/imagescript@1.2.15/mod.ts";
+import { Resvg, initWasm } from "npm:@resvg/resvg-wasm";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,43 +8,81 @@ const corsHeaders = {
 };
 
 const PRINTIFY_BASE = "https://api.printify.com/v1";
-const BLUEPRINT_ID = 478;  // Ceramic Mug 11oz/15oz
-const PROVIDER_ID = 99;    // Printify Choice
+const BLUEPRINT_ID = 478;
+const PROVIDER_ID = 99;
 const PRINT_W = 2475;
 const PRINT_H = 1155;
 
-async function fetchBytes(url: string): Promise<Uint8Array> {
-  const res = await fetch(url);
-  return new Uint8Array(await res.arrayBuffer());
+let wasmReady = false;
+async function ensureWasm() {
+  if (!wasmReady) {
+    const res = await fetch("https://unpkg.com/@resvg/resvg-wasm/index_bg.wasm");
+    await initWasm(res);
+    wasmReady = true;
+  }
 }
 
-// Build a 2475x1155 mug design image
-async function buildDesign(crestUrl: string, qrUrl: string): Promise<Uint8Array> {
-  const canvas = new Image(PRINT_W, PRINT_H);
+async function toBase64(url: string): Promise<{ b64: string; mime: string }> {
+  const res = await fetch(url);
+  const mime = res.headers.get("content-type") ?? "image/png";
+  const buf = await res.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return { b64: btoa(binary), mime };
+}
 
-  // Dark background #1a1510
-  canvas.fill(0x1a1510ff);
+async function buildDesign(crestUrl: string, qrUrl: string, surname: string): Promise<Uint8Array> {
+  await ensureWasm();
 
-  // Gold border strip at top and bottom
-  for (let x = 0; x < PRINT_W; x++) {
-    for (let y = 0; y < 18; y++) canvas.setPixelAt(x + 1, y + 1, 0xc9a84cff);
-    for (let y = PRINT_H - 18; y < PRINT_H; y++) canvas.setPixelAt(x + 1, y + 1, 0xc9a84cff);
-  }
+  const [crest, qr] = await Promise.all([toBase64(crestUrl), toBase64(qrUrl)]);
+  const crestDataUri = `data:${crest.mime};base64,${crest.b64}`;
+  const qrDataUri = `data:${qr.mime};base64,${qr.b64}`;
+  const displayName = `House of ${surname}`;
 
-  // Crest image — left-center
-  const crestBytes = await fetchBytes(crestUrl);
-  const crest = await Image.decode(crestBytes);
-  const crestSize = Math.min(900, PRINT_H - 80);
-  crest.resize(crestSize, Image.RESIZE_AUTO);
-  canvas.composite(crest, 40, Math.floor((PRINT_H - crest.height) / 2));
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="${PRINT_W}" height="${PRINT_H}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 
-  // QR code — bottom right
-  const qrBytes = await fetchBytes(qrUrl);
-  const qr = await Image.decode(qrBytes);
-  qr.resize(220, Image.RESIZE_AUTO);
-  canvas.composite(qr, PRINT_W - 260, PRINT_H - 280);
+  <!-- Background -->
+  <rect width="${PRINT_W}" height="${PRINT_H}" fill="#1a1510"/>
 
-  return await canvas.encode(1); // PNG
+  <!-- Gold border strips -->
+  <rect x="0" y="0" width="${PRINT_W}" height="20" fill="#c9a84c"/>
+  <rect x="0" y="${PRINT_H - 20}" width="${PRINT_W}" height="20" fill="#c9a84c"/>
+
+  <!-- Inner border lines -->
+  <rect x="30" y="30" width="${PRINT_W - 60}" height="${PRINT_H - 60}" fill="none" stroke="#c9a84c" stroke-width="2" opacity="0.5"/>
+
+  <!-- Vertical divider -->
+  <line x1="1050" y1="60" x2="1050" y2="${PRINT_H - 60}" stroke="#c9a84c" stroke-width="1.5" opacity="0.3"/>
+
+  <!-- Crest -->
+  <image href="${crestDataUri}" x="60" y="60" width="940" height="${PRINT_H - 120}" preserveAspectRatio="xMidYMid meet"/>
+
+  <!-- House of name -->
+  <text x="1100" y="260" font-family="Georgia, 'Times New Roman', serif" font-size="110" fill="#e8b85c" letter-spacing="3">${displayName}</text>
+
+  <!-- Decorative rule under name -->
+  <line x1="1100" y1="310" x2="2380" y2="310" stroke="#c9a84c" stroke-width="2" opacity="0.5"/>
+
+  <!-- Subtitle -->
+  <text x="1100" y="390" font-family="Arial, sans-serif" font-size="44" fill="#a07830" letter-spacing="8">AN ANCESTORSQR ORIGINAL</text>
+
+  <!-- QR label -->
+  <text x="2150" y="820" font-family="Arial, sans-serif" font-size="28" fill="#a07830" letter-spacing="4" text-anchor="middle">SCAN YOUR LEGACY</text>
+
+  <!-- QR code -->
+  <image href="${qrDataUri}" x="2030" y="840" width="240" height="240" preserveAspectRatio="xMidYMid meet"/>
+
+  <!-- ANCESTORSQR wordmark -->
+  <text x="${PRINT_W / 2}" y="${PRINT_H - 40}" font-family="Georgia, serif" font-size="38" fill="#c9a84c" opacity="0.25" text-anchor="middle" letter-spacing="12">ANCESTORSQR</text>
+
+</svg>`;
+
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "width", value: PRINT_W },
+  });
+  return resvg.render().asPng();
 }
 
 async function getFirstWhiteVariant(apiKey: string): Promise<number> {
@@ -53,7 +91,6 @@ async function getFirstWhiteVariant(apiKey: string): Promise<number> {
     { headers: { Authorization: `Bearer ${apiKey}` } }
   );
   const { variants } = await res.json();
-  // Find 11oz white variant
   const white11 = variants?.find((v: any) =>
     v.title?.toLowerCase().includes("11") && v.title?.toLowerCase().includes("white")
   );
@@ -83,13 +120,10 @@ serve(async (req) => {
   }
 
   try {
-    // 1. Generate QR code URL
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=c9a84c&bgcolor=1a1510&qzone=2&data=${encodeURIComponent(legacyUrl)}`;
 
-    // 2. Build design image
-    const pngBytes = await buildDesign(crestUrl, qrUrl);
+    const pngBytes = await buildDesign(crestUrl, qrUrl, surname);
 
-    // 3. Upload to Supabase Storage
     const supabase = createClient(supabaseUrl, serviceKey);
     const fileName = `heirloom/${surname.toLowerCase().replace(/\s+/g, "-")}-mug-${Date.now()}.png`;
     const { error: uploadErr } = await supabase.storage
@@ -100,10 +134,8 @@ serve(async (req) => {
 
     const { data: { publicUrl: designUrl } } = supabase.storage.from("crests").getPublicUrl(fileName);
 
-    // 4. Get variant ID
     const variantId = await getFirstWhiteVariant(apiKey);
 
-    // 5. Create Printify order
     const orderPayload = {
       external_id: `aqr-${surname.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`,
       line_items: [{
@@ -127,7 +159,6 @@ serve(async (req) => {
     const order = await orderRes.json();
     if (!orderRes.ok) throw new Error(`Printify order failed: ${JSON.stringify(order)}`);
 
-    // 6. Send to production
     await fetch(`${PRINTIFY_BASE}/shops/${shopId}/orders/${order.id}/send_to_production.json`, {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}` },
