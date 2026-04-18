@@ -8,7 +8,8 @@ import { stripMarkdown } from "@/lib/utils";
 import ShareQRCode from "@/components/ShareQRCode";
 import SocialShare from "@/components/SocialShare";
 import { generateCertificate } from "@/lib/generateCertificate";
-import { fetchLegacy, fetchCrest } from "@/lib/legacyClient";
+import { fetchLegacy } from "@/lib/legacyClient";
+import FreeCrest from "@/components/FreeCrest";
 import type { LegacyFacts, LegacyStory } from "@/types/legacy";
 
 // ─── Data hook ────────────────────────────────────────────────────────────────
@@ -108,15 +109,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
               story = (factsRes2.data as any)?.story_payload as LegacyStory ?? story;
               crestUrl = crestRes2.data?.image_url ?? null;
 
-              // If crest still missing, generate it too
-              if (!crestUrl && facts) {
-                try {
-                  const crest = await fetchCrest(surname, facts);
-                  crestUrl = crest.imageUrl;
-                } catch {
-                  // crest generation failure is non-fatal
-                }
-              }
+              // Real crest is generated server-side after payment (payments-webhook → generate-crest).
             }
           } catch {
             // generation failure is non-fatal — show what we have
@@ -135,6 +128,44 @@ function useLegacyData(userId: string | undefined): LegacyData {
   }, [userId]);
 
   return data;
+}
+
+// ─── Crest poller ─────────────────────────────────────────────────────────────
+// Polls surname_crests every 5s for up to 60s when user has paid but crest isn't ready.
+
+const POLL_INTERVAL_MS = 5_000;
+const POLL_TIMEOUT_MS = 60_000;
+
+function useCrestPoller(surname: string | null, initialCrestUrl: string | null) {
+  const [polledUrl, setPolledUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    // If we already have a crest, nothing to poll
+    if (!surname || initialCrestUrl) return;
+
+    let stopped = false;
+    const deadline = Date.now() + POLL_TIMEOUT_MS;
+
+    const tick = async () => {
+      if (stopped || Date.now() > deadline) return;
+      const { data } = await supabase
+        .from("surname_crests")
+        .select("image_url")
+        .eq("surname", surname)
+        .maybeSingle();
+      if (stopped) return;
+      if (data?.image_url) {
+        setPolledUrl(data.image_url);
+      } else if (Date.now() < deadline) {
+        setTimeout(tick, POLL_INTERVAL_MS);
+      }
+    };
+
+    setTimeout(tick, POLL_INTERVAL_MS);
+    return () => { stopped = true; };
+  }, [surname, initialCrestUrl]);
+
+  return polledUrl ?? initialCrestUrl;
 }
 
 // ─── Lazy chapter expander ────────────────────────────────────────────────────
@@ -189,9 +220,10 @@ function OrnamentDivider() {
 const MyLegacy = () => {
   const navigate = useNavigate();
   const { user, hasPurchased, loading: purchaseLoading } = usePurchase();
-  const { facts, story, crestUrl, surname, loading, generating, error } = useLegacyData(
+  const { facts, story, crestUrl: initialCrestUrl, surname, loading, generating, error } = useLegacyData(
     !purchaseLoading && hasPurchased ? user?.id : undefined
   );
+  const crestUrl = useCrestPoller(surname, initialCrestUrl);
   const { chapterBodies, expanding: expandingChapters } = useExpandChapters(surname, story);
 
   useEffect(() => {
@@ -324,15 +356,14 @@ const MyLegacy = () => {
         </motion.div>
 
         {/* ── Crest ── */}
-        {crestUrl && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.94 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, delay: 0.3 }}
-            className="mt-12 flex justify-center"
-          >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, delay: 0.3 }}
+          className="mt-12 flex flex-col items-center"
+        >
+          {crestUrl ? (
             <div className="relative">
-              {/* Glow */}
               <div
                 className="pointer-events-none absolute inset-0 rounded-full blur-3xl"
                 style={{ background: "radial-gradient(ellipse, rgba(232,184,92,0.18) 0%, transparent 70%)" }}
@@ -341,11 +372,26 @@ const MyLegacy = () => {
                 src={crestUrl}
                 alt={`${displaySurname} coat of arms`}
                 className="relative z-10 mx-auto"
-                style={{ width: "260px", maxWidth: "100%", mixBlendMode: "multiply" }}
+                style={{ width: "260px", maxWidth: "100%" }}
               />
             </div>
-          </motion.div>
-        )}
+          ) : (
+            <>
+              <div style={{ filter: "drop-shadow(0 0 40px rgba(212,160,74,0.25))" }}>
+                <FreeCrest
+                  surname={surname ?? ""}
+                  legacyUrl={`${window.location.origin}/f/${(surname ?? "").toLowerCase()}`}
+                />
+              </div>
+              <p
+                className="mt-4 font-serif text-sm italic"
+                style={{ color: "#a07830" }}
+              >
+                Your personalised crest is being forged…
+              </p>
+            </>
+          )}
+        </motion.div>
 
         <OrnamentDivider />
 

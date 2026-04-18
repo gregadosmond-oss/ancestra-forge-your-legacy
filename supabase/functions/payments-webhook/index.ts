@@ -88,6 +88,11 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     }
   }
 
+  // Trigger real crest generation server-side — non-fatal if it fails
+  if (surname && userId) {
+    void triggerCrestGeneration(surname);
+  }
+
   if (isGift && recipientEmail) {
     // Gift purchase — notify the recipient
     const { data: gift, error: giftError } = await supabase
@@ -110,6 +115,51 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
   } else if (buyerEmail) {
     // Regular purchase — send confirmation to buyer
     await sendBuyerConfirmationEmail({ buyerEmail, surname, userId });
+  }
+}
+
+// ─── Crest generation trigger ────────────────────────────────────────────────
+
+async function triggerCrestGeneration(surname: string) {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !serviceKey) {
+    console.warn("triggerCrestGeneration: missing env, skipping");
+    return;
+  }
+
+  const normalized = surname.trim().toLowerCase();
+
+  // Fetch facts — needed by generate-crest for the prompt
+  const { data: factsRow, error: factsError } = await supabase
+    .from("surname_facts")
+    .select("payload")
+    .eq("surname", normalized)
+    .maybeSingle();
+
+  if (factsError || !factsRow?.payload) {
+    console.warn("triggerCrestGeneration: no facts found for", normalized, factsError?.message);
+    return;
+  }
+
+  try {
+    const res = await fetch(`${supabaseUrl}/functions/v1/generate-crest`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${serviceKey}`,
+      },
+      body: JSON.stringify({ surname: normalized, facts: factsRow.payload }),
+    });
+
+    const body = await res.json();
+    if (body.code === "OK") {
+      console.log("Crest generated for", normalized, body.imageUrl);
+    } else {
+      console.warn("Crest generation failed for", normalized, body.reason);
+    }
+  } catch (err) {
+    console.warn("triggerCrestGeneration threw:", (err as Error).message);
   }
 }
 
