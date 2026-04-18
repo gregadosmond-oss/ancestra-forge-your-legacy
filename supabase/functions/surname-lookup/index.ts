@@ -82,6 +82,11 @@ Deno.serve(async (req: Request) => {
     if (!text) return json({ error: "empty AI response" }, 502);
 
     text = text.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
+    const firstBrace = text.indexOf("{");
+    const lastBrace = text.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace !== -1) {
+      text = text.slice(firstBrace, lastBrace + 1);
+    }
 
     const parsed = JSON.parse(text);
     return json({ code: "OK", surname: body.surname.trim(), ...parsed });

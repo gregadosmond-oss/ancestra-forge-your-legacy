@@ -96,6 +96,11 @@ Deno.serve(async (req: Request) => {
 
     // Strip markdown code fences if present
     text = text.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
+    const firstBrace = text.indexOf("{");
+    const lastBrace = text.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace !== -1) {
+      text = text.slice(firstBrace, lastBrace + 1);
+    }
 
     const parsed = JSON.parse(text);
     return json({ code: "OK", ...parsed });
