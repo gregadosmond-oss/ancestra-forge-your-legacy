@@ -18,7 +18,7 @@ export default function FreeCrest({ surname, legacyUrl }: FreeCrestProps) {
       <div
         style={{
           position: "absolute",
-          top: "55%",
+          top: "61%",
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: "11%",
