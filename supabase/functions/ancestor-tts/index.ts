@@ -39,7 +39,10 @@ Deno.serve(async (req: Request) => {
   if (!res.ok) {
     const err = await res.text();
     console.error("ElevenLabs error:", err);
-    return new Response("TTS error", { status: 502 });
+    return new Response(
+      JSON.stringify({ error: "TTS error", detail: err, status: res.status }),
+      { status: 502, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } },
+    );
   }
 
   const buffer = await res.arrayBuffer();
