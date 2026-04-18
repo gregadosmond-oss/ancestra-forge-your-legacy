@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, Volume2, VolumeX, Pause, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { pauseAmbient, resumeAmbient } from "@/lib/ambientAudio";
 
 type Message = {
   role: "user" | "ancestor";
@@ -42,6 +43,7 @@ export default function AncestorChat() {
   const [listening, setListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
   const recognitionRef = useRef<InstanceType<typeof SpeechRecognition> | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
@@ -99,7 +101,9 @@ export default function AncestorChat() {
       source.onended = () => { setSpeaking(false); setPaused(false); sourceRef.current = null; };
       source.start(0);
     } catch (e) {
-      console.error("speakAncestor error:", e);
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("speakAncestor error:", msg);
+      setAudioError(msg);
       setSpeaking(false);
     }
   }, [voiceEnabled, stopAudio]);
@@ -115,6 +119,12 @@ export default function AncestorChat() {
       setPaused(true);
     }
   };
+
+  // Pause ambient music while on this page, resume when leaving
+  useEffect(() => {
+    pauseAmbient();
+    return () => resumeAmbient();
+  }, []);
 
   // Stop audio when voice is toggled off
   useEffect(() => {
@@ -319,6 +329,9 @@ export default function AncestorChat() {
                 Speaking with
               </p>
               <p className="font-display text-lg text-cream-warm">{ancestorName}</p>
+              {audioError && (
+                <p className="font-sans text-[10px] text-rose mt-1">Voice error: {audioError}</p>
+              )}
             </div>
             <div className="flex items-center gap-2">
               {/* Persistent mute/unmute — always visible */}
