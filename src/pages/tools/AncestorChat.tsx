@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, Volume2, VolumeX, Pause, Play } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from "@/integrations/supabase/client";
 import { pauseAmbient, resumeAmbient } from "@/lib/ambientAudio";
 
 type Message = {
@@ -76,17 +76,14 @@ export default function AncestorChat() {
     setPaused(false);
 
     try {
-      // Use supabase client to get the session token, then fetch binary directly
       const { data: { session } } = await supabase.auth.getSession();
-      const supabaseUrl = (supabase as any).supabaseUrl as string;
-      const supabaseKey = (supabase as any).supabaseKey as string;
-      const token = session?.access_token ?? supabaseKey;
+      const token = session?.access_token ?? SUPABASE_ANON_KEY;
 
-      const res = await fetch(`${supabaseUrl}/functions/v1/ancestor-tts`, {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/ancestor-tts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "apikey": supabaseKey,
+          "apikey": SUPABASE_ANON_KEY,
           "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({ text }),
