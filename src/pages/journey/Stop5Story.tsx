@@ -275,6 +275,15 @@ const Stop5Story = () => {
                   Your full crest, family story, bloodline tree &amp; legacy certificate — delivered to your inbox.
                 </p>
 
+                <ul className="mt-4 space-y-1.5">
+                  {["Custom high-res coat of arms (PNG & SVG)", "AI-written family story — all 9 chapters", "Visual bloodline tree", "Legacy certificate (frameable PDF)", "Ancestor chat — full access"].map(item => (
+                    <li key={item} className="flex items-center gap-2 font-sans text-[12px]" style={{ color: "#c4b8a6" }}>
+                      <span style={{ color: "#d4a04a", fontSize: 8 }}>✦</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
                 <button
                   onClick={handleUnlock}
                   className="mt-6 w-full rounded-pill py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
@@ -283,7 +292,7 @@ const Stop5Story = () => {
                     color: "#1a1208",
                   }}
                 >
-                  Unlock My Full Legacy — $29
+                  Unlock My Full Legacy — $29.99
                 </button>
                 <p className="mt-3 font-sans text-[10px] text-text-dim">
                   One-time payment · Instant delivery · No subscription
