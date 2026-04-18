@@ -4,9 +4,10 @@ interface CertificateData {
   facts: LegacyFacts;
   story: LegacyStory | null;
   crestUrl: string | null;
+  surname?: string | null;
 }
 
-export function generateCertificate({ facts, story, crestUrl }: CertificateData): void {
+export function generateCertificate({ facts, story, crestUrl, surname }: CertificateData): void {
   const displaySurname = facts.displaySurname;
   const certNumber = `ANCESTRA-${Date.now().toString(36).toUpperCase().slice(-8)}`;
   const issuedDate = new Date().toLocaleDateString("en-US", {
@@ -21,9 +22,18 @@ export function generateCertificate({ facts, story, crestUrl }: CertificateData)
         .join("")
     : "";
 
-  const crestSection = crestUrl
-    ? `<img src="${crestUrl}" alt="${displaySurname} Crest" style="width:180px;height:auto;display:block;margin:0 auto;" />`
-    : `<div style="width:180px;height:180px;margin:0 auto;border:2px solid #c9a84c;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:48px;">🛡</div>`;
+  const templateCrestUrl = typeof window !== "undefined" ? `${window.location.origin}/crest.png` : "/crest.png";
+  const activeCrestUrl = crestUrl ?? templateCrestUrl;
+  const isTemplate = !crestUrl;
+  const legacySlug = (surname ?? facts.displaySurname ?? "").trim().toLowerCase().replace(/\s+/g, "-");
+  const legacyUrl = typeof window !== "undefined" ? `${window.location.origin}/f/${legacySlug}` : `/f/${legacySlug}`;
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&color=1a1510&bgcolor=ffffff&qzone=1&data=${encodeURIComponent(legacyUrl)}`;
+
+  const crestSection = `
+    <div style="position:relative;display:inline-block;width:180px;">
+      <img src="${activeCrestUrl}" alt="${displaySurname} Crest" style="display:block;width:180px;height:auto;" />
+      ${isTemplate ? `<img src="${qrSrc}" alt="QR" style="position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);width:11%;height:auto;mix-blend-mode:multiply;pointer-events:none;" />` : ""}
+    </div>`;
 
   const html = `<!DOCTYPE html>
 <html lang="en">
