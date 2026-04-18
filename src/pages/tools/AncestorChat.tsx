@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type Message = {
@@ -21,6 +22,37 @@ const SUGGESTED_QUESTIONS = [
   "What do you want me to remember?",
 ];
 
+// Browser speech API types
+declare global {
+  interface Window {
+    SpeechRecognition: typeof SpeechRecognition;
+    webkitSpeechRecognition: typeof SpeechRecognition;
+  }
+}
+
+function pickAncestorVoice(): SpeechSynthesisVoice | null {
+  const voices = window.speechSynthesis.getVoices();
+  // Prefer deep English male voices
+  const preferred = ["Daniel", "Arthur", "Thomas", "Google UK English Male", "Microsoft David"];
+  for (const name of preferred) {
+    const v = voices.find((v) => v.name.includes(name));
+    if (v) return v;
+  }
+  return voices.find((v) => v.lang.startsWith("en")) ?? null;
+}
+
+function speakText(text: string, onEnd?: () => void) {
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.rate = 0.88;
+  utter.pitch = 0.85;
+  utter.volume = 1;
+  const voice = pickAncestorVoice();
+  if (voice) utter.voice = voice;
+  if (onEnd) utter.onend = onEnd;
+  window.speechSynthesis.speak(utter);
+}
+
 export default function AncestorChat() {
   const [surname, setSurname] = useState("");
   const [started, setStarted] = useState(false);
@@ -29,7 +61,28 @@ export default function AncestorChat() {
   const [loading, setLoading] = useState(false);
   const [ancestorName, setAncestorName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [listening, setListening] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const recognitionRef = useRef<InstanceType<typeof SpeechRecognition> | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const hasSpeechRecognition = typeof window !== "undefined" &&
+    ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
+
+  const speakAncestor = useCallback((text: string) => {
+    if (!voiceEnabled) return;
+    setSpeaking(true);
+    speakText(text, () => setSpeaking(false));
+  }, [voiceEnabled]);
+
+  // Stop speech when voice is toggled off
+  useEffect(() => {
+    if (!voiceEnabled) {
+      window.speechSynthesis.cancel();
+      setSpeaking(false);
+    }
+  }, [voiceEnabled]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -55,11 +108,37 @@ export default function AncestorChat() {
       setAncestorName(data.ancestorName || `Ancestor ${surname}`);
       setMessages([{ role: "ancestor", text: data.reply }]);
       setStarted(true);
+      speakAncestor(data.reply);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleMic = () => {
+    if (listening) {
+      recognitionRef.current?.stop();
+      setListening(false);
+      return;
+    }
+    const SR = window.SpeechRecognition ?? window.webkitSpeechRecognition;
+    const rec = new SR();
+    rec.lang = "en-US";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = (e: SpeechRecognitionEvent) => {
+      const transcript = e.results[0][0].transcript;
+      setInput(transcript);
+      setListening(false);
+    };
+    rec.onerror = () => setListening(false);
+    rec.onend = () => setListening(false);
+    recognitionRef.current = rec;
+    rec.start();
+    setListening(true);
+    window.speechSynthesis.cancel();
+    setSpeaking(false);
   };
 
   const handleSend = async (text?: string) => {
@@ -82,10 +161,9 @@ export default function AncestorChat() {
         },
       );
       if (fnError) throw new Error(fnError.message);
-      setMessages((prev) => [
-        ...prev,
-        { role: "ancestor", text: data.reply || "…" },
-      ]);
+      const reply = data.reply || "…";
+      setMessages((prev) => [...prev, { role: "ancestor", text: reply }]);
+      speakAncestor(reply);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -206,18 +284,34 @@ export default function AncestorChat() {
               </p>
               <p className="font-display text-lg text-cream-warm">{ancestorName}</p>
             </div>
-            <button
-              onClick={() => { setStarted(false); setMessages([]); }}
-              className="rounded-pill px-4 py-2 font-sans text-[10px] uppercase tracking-[1.5px] transition-all duration-200"
-              style={{
-                border: "1px solid rgba(61,48,32,1)",
-                background: "transparent",
-                color: "#8a7e6e",
-                cursor: "pointer",
-              }}
-            >
-              New Ancestor
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Voice toggle */}
+              <button
+                onClick={() => setVoiceEnabled((v) => !v)}
+                title={voiceEnabled ? "Mute ancestor" : "Unmute ancestor"}
+                className="flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200"
+                style={{
+                  border: "1px solid rgba(61,48,32,1)",
+                  background: voiceEnabled ? "rgba(232,148,58,0.1)" : "transparent",
+                  color: voiceEnabled ? "#d4a04a" : "#8a7e6e",
+                  cursor: "pointer",
+                }}
+              >
+                {voiceEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
+              </button>
+              <button
+                onClick={() => { window.speechSynthesis.cancel(); setSpeaking(false); setStarted(false); setMessages([]); }}
+                className="rounded-pill px-4 py-2 font-sans text-[10px] uppercase tracking-[1.5px] transition-all duration-200"
+                style={{
+                  border: "1px solid rgba(61,48,32,1)",
+                  background: "transparent",
+                  color: "#8a7e6e",
+                  cursor: "pointer",
+                }}
+              >
+                New Ancestor
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
@@ -347,11 +441,27 @@ export default function AncestorChat() {
               onSubmit={(e) => { e.preventDefault(); handleSend(); }}
               className="mx-auto flex max-w-2xl gap-3"
             >
+              {hasSpeechRecognition && (
+                <button
+                  type="button"
+                  onClick={toggleMic}
+                  title={listening ? "Stop listening" : "Speak your question"}
+                  className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full transition-all duration-200"
+                  style={{
+                    border: listening ? "1px solid rgba(232,148,58,0.5)" : "1px solid rgba(61,48,32,1)",
+                    background: listening ? "rgba(232,148,58,0.15)" : "rgba(26,21,14,0.8)",
+                    color: listening ? "#e8943a" : "#8a7e6e",
+                    animation: listening ? "micPulse 1.2s ease-in-out infinite" : "none",
+                  }}
+                >
+                  {listening ? <MicOff size={16} /> : <Mic size={16} />}
+                </button>
+              )}
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask your ancestor something…"
+                placeholder={listening ? "Listening…" : "Ask your ancestor something…"}
                 className="flex-1 rounded-pill border border-gold-line bg-input px-5 py-3 font-sans text-sm text-foreground placeholder:text-text-dim focus:outline-none focus:ring-2 focus:ring-ring"
               />
               <button
@@ -365,10 +475,35 @@ export default function AncestorChat() {
             </form>
           </div>
 
+          {/* Speaking indicator */}
+          {speaking && (
+            <div
+              className="fixed bottom-24 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-pill px-4 py-2"
+              style={{
+                background: "rgba(26,21,14,0.95)",
+                border: "1px solid rgba(232,148,58,0.2)",
+                pointerEvents: "none",
+                zIndex: 50,
+              }}
+            >
+              <Volume2 size={12} style={{ color: "#d4a04a" }} />
+              <span style={{ fontSize: "10px", letterSpacing: "2px", color: "#a07830", textTransform: "uppercase", fontFamily: "DM Sans, sans-serif" }}>
+                Speaking…
+              </span>
+              {[0, 1, 2, 3].map((i) => (
+                <span key={i} style={{ width: 3, height: 3, borderRadius: "50%", background: "#a07830", animation: `dotPulse 1.2s ease-in-out ${i * 0.15}s infinite`, display: "inline-block" }} />
+              ))}
+            </div>
+          )}
+
           <style>{`
             @keyframes dotPulse {
               0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
               30% { opacity: 1; transform: scale(1.2); }
+            }
+            @keyframes micPulse {
+              0%, 100% { box-shadow: 0 0 0 0 rgba(232,148,58,0.3); }
+              50% { box-shadow: 0 0 0 6px rgba(232,148,58,0); }
             }
           `}</style>
         </div>
