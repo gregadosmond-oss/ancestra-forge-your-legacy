@@ -385,7 +385,6 @@ export default function AncestorChat() {
                 width: 180, height: 180,
                 borderRadius: "50%",
                 border: `2px solid ${speaking && !paused ? "rgba(232,148,58,0.7)" : "rgba(212,160,74,0.25)"}`,
-                background: "radial-gradient(ellipse at 42% 32%, #3d2510 0%, #1a1008 45%, #0d0a07 100%)",
                 overflow: "hidden",
                 position: "relative",
                 transition: "border-color 0.4s ease, box-shadow 0.4s ease",
@@ -393,52 +392,15 @@ export default function AncestorChat() {
                   ? "0 0 60px rgba(232,148,58,0.35), 0 0 20px rgba(232,148,58,0.2) inset"
                   : "0 0 20px rgba(0,0,0,0.5)",
               }}>
-                <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%", position: "absolute", inset: 0 }}>
-                  <defs>
-                    <radialGradient id="candle" cx="48%" cy="75%" r="65%">
-                      <stop offset="0%" stopColor="#5a3218" stopOpacity="0.9"/>
-                      <stop offset="60%" stopColor="#2a1608" stopOpacity="0.5"/>
-                      <stop offset="100%" stopColor="#0d0a07" stopOpacity="0"/>
-                    </radialGradient>
-                    <radialGradient id="skinLight" cx="45%" cy="38%" r="40%">
-                      <stop offset="0%" stopColor="#4a2e18" stopOpacity="0.7"/>
-                      <stop offset="100%" stopColor="#1a1008" stopOpacity="0"/>
-                    </radialGradient>
-                  </defs>
-                  {/* Candlelight background wash */}
-                  <ellipse cx="90" cy="140" rx="85" ry="70" fill="url(#candle)" />
-                  {/* Coat/torso */}
-                  <ellipse cx="90" cy="185" rx="58" ry="55" fill="#1a1008"/>
-                  {/* Coat detail — lapels */}
-                  <path d="M62 148 Q90 136 118 148 L112 170 Q90 158 68 170 Z" fill="#261a0c"/>
-                  {/* Cravat/collar */}
-                  <path d="M82 130 Q90 126 98 130 L96 143 Q90 138 84 143 Z" fill="#d4a04a" opacity="0.15"/>
-                  {/* Neck */}
-                  <rect x="83" y="118" width="14" height="18" rx="4" fill="#1a1008"/>
-                  {/* Head */}
-                  <ellipse cx="90" cy="98" rx="32" ry="36" fill="#1a1008"/>
-                  {/* Skin highlight — candlelit side of face */}
-                  <ellipse cx="80" cy="92" rx="18" ry="22" fill="url(#skinLight)"/>
-                  {/* Eye sockets — slight shadow */}
-                  <ellipse cx="80" cy="88" rx="5" ry="4" fill="#130e07" opacity="0.6"/>
-                  <ellipse cx="100" cy="88" rx="5" ry="4" fill="#130e07" opacity="0.4"/>
-                  {/* Nose bridge shadow */}
-                  <path d="M88 88 Q90 96 88 102" stroke="#130e07" strokeWidth="1.5" fill="none" opacity="0.4"/>
-                  {/* Mouth shadow */}
-                  <path d="M83 106 Q90 110 97 106" stroke="#130e07" strokeWidth="1.5" fill="none" opacity="0.35"/>
-                  {/* Period wig/hair */}
-                  <ellipse cx="90" cy="68" rx="35" ry="14" fill="#130e08"/>
-                  <path d="M58 68 Q58 90 64 110" stroke="#130e08" strokeWidth="8" fill="none" strokeLinecap="round"/>
-                  <path d="M122 68 Q122 90 116 110" stroke="#130e08" strokeWidth="8" fill="none" strokeLinecap="round"/>
-                  {/* Hat brim */}
-                  <rect x="58" y="57" width="64" height="8" rx="2" fill="#0e0b07"/>
-                  <ellipse cx="90" cy="57" rx="30" ry="6" fill="#130e08"/>
-                  <rect x="68" y="36" width="44" height="24" rx="3" fill="#0e0b07"/>
-                </svg>
+                <img
+                  src="/ancestor-portrait.jpg"
+                  alt="Ancestor"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
+                />
                 {/* Candlelight flicker overlay */}
                 <div style={{
                   position: "absolute", inset: 0,
-                  background: "radial-gradient(ellipse at 45% 70%, rgba(232,148,58,0.08) 0%, transparent 65%)",
+                  background: "radial-gradient(ellipse at 45% 70%, rgba(232,148,58,0.1) 0%, transparent 65%)",
                   animation: speaking && !paused ? "flicker 0.8s ease-in-out infinite alternate" : "breathe 4s ease-in-out infinite",
                 }} />
               </div>
