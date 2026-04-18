@@ -70,17 +70,25 @@ export default function AncestorChat() {
     setPaused(false);
 
     try {
-      const { data, error } = await supabase.functions.invoke("ancestor-tts", {
-        body: { text },
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const res = await fetch(`${supabaseUrl}/functions/v1/ancestor-tts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${supabaseKey}`,
+        },
+        body: JSON.stringify({ text }),
       });
-      if (error || !data) throw new Error("TTS failed");
+      if (!res.ok) throw new Error("TTS failed");
 
-      // data is an ArrayBuffer from the edge function
-      const blob = new Blob([data], { type: "audio/mpeg" });
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       audioBlobRef.current = url;
 
-      const audio = new Audio(url);
+      const audio = new Audio();
+      audio.src = url;
       audioRef.current = audio;
       audio.onended = () => { setSpeaking(false); setPaused(false); URL.revokeObjectURL(url); audioBlobRef.current = null; };
       audio.onerror = () => { setSpeaking(false); setPaused(false); };
