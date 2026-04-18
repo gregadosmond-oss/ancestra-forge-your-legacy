@@ -26,7 +26,7 @@ Return valid JSON ONLY:
 }
 
 Constraints:
-- Exactly 8 chapterBodies, one per title provided
+- Return one chapterBody per title provided in the user prompt, in the same order
 - Each body is a standalone scene from a different moment in the family's history
 - Never use: genealogy database, data, algorithm, research
 - Always use: legacy, bloodline, House, story, forge, name
