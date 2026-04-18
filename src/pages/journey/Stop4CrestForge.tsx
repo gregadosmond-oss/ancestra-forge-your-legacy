@@ -72,10 +72,10 @@ const Stop4CrestForge = () => {
         {/* Legacy Pack upsell */}
         <motion.p
           initial={{ opacity: 0 }}
-          animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.03, 1], color: ["#a07830", "#e8b85c", "#a07830"] }}
-          transition={{ duration: 1.8, delay: 0.5, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
           className="mt-4 font-serif text-sm italic text-center"
-          style={{ color: "#a07830" }}
+          style={{ color: "#d4a04a" }}
         >
           ✦ Your personalised coat of arms is forged when you unlock the Legacy Pack — $29.99
         </motion.p>
