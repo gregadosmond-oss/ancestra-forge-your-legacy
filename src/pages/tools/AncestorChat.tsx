@@ -22,35 +22,12 @@ const SUGGESTED_QUESTIONS = [
   "What do you want me to remember?",
 ];
 
-// Browser speech API types
+// Browser speech recognition API types
 declare global {
   interface Window {
     SpeechRecognition: typeof SpeechRecognition;
     webkitSpeechRecognition: typeof SpeechRecognition;
   }
-}
-
-function pickAncestorVoice(): SpeechSynthesisVoice | null {
-  const voices = window.speechSynthesis.getVoices();
-  // Prefer deep English male voices
-  const preferred = ["Daniel", "Arthur", "Thomas", "Google UK English Male", "Microsoft David"];
-  for (const name of preferred) {
-    const v = voices.find((v) => v.name.includes(name));
-    if (v) return v;
-  }
-  return voices.find((v) => v.lang.startsWith("en")) ?? null;
-}
-
-function speakText(text: string, onEnd?: () => void) {
-  window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.rate = 0.88;
-  utter.pitch = 0.85;
-  utter.volume = 1;
-  const voice = pickAncestorVoice();
-  if (voice) utter.voice = voice;
-  if (onEnd) utter.onend = onEnd;
-  window.speechSynthesis.speak(utter);
 }
 
 export default function AncestorChat() {
@@ -66,36 +43,68 @@ export default function AncestorChat() {
   const [speaking, setSpeaking] = useState(false);
   const [paused, setPaused] = useState(false);
   const recognitionRef = useRef<InstanceType<typeof SpeechRecognition> | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioBlobRef = useRef<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const hasSpeechRecognition = typeof window !== "undefined" &&
     ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
 
-  const speakAncestor = useCallback((text: string) => {
+  const stopAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    if (audioBlobRef.current) {
+      URL.revokeObjectURL(audioBlobRef.current);
+      audioBlobRef.current = null;
+    }
+    setSpeaking(false);
+    setPaused(false);
+  }, []);
+
+  const speakAncestor = useCallback(async (text: string) => {
     if (!voiceEnabled) return;
+    stopAudio();
     setSpeaking(true);
     setPaused(false);
-    speakText(text, () => { setSpeaking(false); setPaused(false); });
-  }, [voiceEnabled]);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("ancestor-tts", {
+        body: { text },
+      });
+      if (error || !data) throw new Error("TTS failed");
+
+      // data is an ArrayBuffer from the edge function
+      const blob = new Blob([data], { type: "audio/mpeg" });
+      const url = URL.createObjectURL(blob);
+      audioBlobRef.current = url;
+
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => { setSpeaking(false); setPaused(false); URL.revokeObjectURL(url); audioBlobRef.current = null; };
+      audio.onerror = () => { setSpeaking(false); setPaused(false); };
+      audio.play();
+    } catch {
+      setSpeaking(false);
+    }
+  }, [voiceEnabled, stopAudio]);
 
   const togglePause = () => {
+    if (!audioRef.current) return;
     if (paused) {
-      window.speechSynthesis.resume();
+      audioRef.current.play();
       setPaused(false);
     } else {
-      window.speechSynthesis.pause();
+      audioRef.current.pause();
       setPaused(true);
     }
   };
 
-  // Stop speech when voice is toggled off
+  // Stop audio when voice is toggled off
   useEffect(() => {
-    if (!voiceEnabled) {
-      window.speechSynthesis.cancel();
-      setSpeaking(false);
-      setPaused(false);
-    }
-  }, [voiceEnabled]);
+    if (!voiceEnabled) stopAudio();
+  }, [voiceEnabled, stopAudio]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -313,7 +322,7 @@ export default function AncestorChat() {
                 {voiceEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
               </button>
               <button
-                onClick={() => { window.speechSynthesis.cancel(); setSpeaking(false); setStarted(false); setMessages([]); }}
+                onClick={() => { stopAudio(); setStarted(false); setMessages([]); }}
                 className="rounded-pill px-4 py-2 font-sans text-[10px] uppercase tracking-[1.5px] transition-all duration-200"
                 style={{
                   border: "1px solid rgba(61,48,32,1)",
