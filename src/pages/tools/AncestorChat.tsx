@@ -361,54 +361,85 @@ export default function AncestorChat() {
 
           {/* Ancestor silhouette portrait */}
           <div className="flex justify-center pt-6 pb-2">
-            <div style={{ position: "relative", width: 110, height: 110 }}>
-              {/* Glow ring — pulses when speaking */}
+            <div style={{ position: "relative", width: 180, height: 180 }}>
+              {/* Outer glow burst — strong when speaking */}
               <div style={{
-                position: "absolute", inset: -8,
+                position: "absolute", inset: -24,
                 borderRadius: "50%",
-                background: speaking ? "radial-gradient(circle, rgba(232,148,58,0.18) 0%, transparent 70%)" : "transparent",
-                transition: "background 0.6s ease",
-                animation: speaking && !paused ? "portraitGlow 2s ease-in-out infinite" : "none",
+                background: speaking && !paused
+                  ? "radial-gradient(circle, rgba(232,148,58,0.28) 0%, rgba(196,120,40,0.12) 40%, transparent 70%)"
+                  : "transparent",
+                transition: "background 0.5s ease",
+                animation: speaking && !paused ? "portraitGlow 1.6s ease-in-out infinite" : "none",
+              }} />
+              {/* Second glow ring */}
+              <div style={{
+                position: "absolute", inset: -10,
+                borderRadius: "50%",
+                border: speaking && !paused ? "2px solid rgba(232,148,58,0.35)" : "2px solid transparent",
+                transition: "border-color 0.4s ease",
+                animation: speaking && !paused ? "ringPulse 1.6s ease-in-out infinite" : "none",
               }} />
               {/* Portrait frame */}
               <div style={{
-                width: 110, height: 110,
+                width: 180, height: 180,
                 borderRadius: "50%",
-                border: `2px solid ${speaking ? "rgba(232,148,58,0.45)" : "rgba(212,160,74,0.18)"}`,
-                background: "radial-gradient(ellipse at 40% 35%, #2a1e10 0%, #0d0a07 100%)",
+                border: `2px solid ${speaking && !paused ? "rgba(232,148,58,0.7)" : "rgba(212,160,74,0.25)"}`,
+                background: "radial-gradient(ellipse at 42% 32%, #3d2510 0%, #1a1008 45%, #0d0a07 100%)",
                 overflow: "hidden",
                 position: "relative",
-                transition: "border-color 0.6s ease",
-                boxShadow: speaking ? "0 0 32px rgba(232,148,58,0.15)" : "none",
+                transition: "border-color 0.4s ease, box-shadow 0.4s ease",
+                boxShadow: speaking && !paused
+                  ? "0 0 60px rgba(232,148,58,0.35), 0 0 20px rgba(232,148,58,0.2) inset"
+                  : "0 0 20px rgba(0,0,0,0.5)",
               }}>
-                {/* Silhouette SVG */}
-                <svg viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%" }}>
-                  {/* Candlelight warm background glow */}
-                  <radialGradient id="candlelight" cx="50%" cy="80%" r="60%">
-                    <stop offset="0%" stopColor="#3d2510" stopOpacity="0.8"/>
-                    <stop offset="100%" stopColor="#0d0a07" stopOpacity="0"/>
-                  </radialGradient>
-                  <ellipse cx="55" cy="88" rx="50" ry="40" fill="url(#candlelight)" />
-                  {/* Coat/body */}
-                  <ellipse cx="55" cy="115" rx="36" ry="38" fill="#1a120a"/>
-                  {/* Lapels */}
-                  <path d="M38 92 Q55 84 72 92 L68 108 Q55 100 42 108 Z" fill="#241810"/>
+                <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%", position: "absolute", inset: 0 }}>
+                  <defs>
+                    <radialGradient id="candle" cx="48%" cy="75%" r="65%">
+                      <stop offset="0%" stopColor="#5a3218" stopOpacity="0.9"/>
+                      <stop offset="60%" stopColor="#2a1608" stopOpacity="0.5"/>
+                      <stop offset="100%" stopColor="#0d0a07" stopOpacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="skinLight" cx="45%" cy="38%" r="40%">
+                      <stop offset="0%" stopColor="#4a2e18" stopOpacity="0.7"/>
+                      <stop offset="100%" stopColor="#1a1008" stopOpacity="0"/>
+                    </radialGradient>
+                  </defs>
+                  {/* Candlelight background wash */}
+                  <ellipse cx="90" cy="140" rx="85" ry="70" fill="url(#candle)" />
+                  {/* Coat/torso */}
+                  <ellipse cx="90" cy="185" rx="58" ry="55" fill="#1a1008"/>
+                  {/* Coat detail — lapels */}
+                  <path d="M62 148 Q90 136 118 148 L112 170 Q90 158 68 170 Z" fill="#261a0c"/>
+                  {/* Cravat/collar */}
+                  <path d="M82 130 Q90 126 98 130 L96 143 Q90 138 84 143 Z" fill="#d4a04a" opacity="0.15"/>
                   {/* Neck */}
-                  <rect x="50" y="78" width="10" height="16" rx="3" fill="#1a120a"/>
+                  <rect x="83" y="118" width="14" height="18" rx="4" fill="#1a1008"/>
                   {/* Head */}
-                  <ellipse cx="55" cy="62" rx="20" ry="23" fill="#1a120a"/>
-                  {/* Period hat/hair */}
-                  <ellipse cx="55" cy="42" rx="22" ry="10" fill="#130e08"/>
-                  <rect x="38" y="36" width="34" height="10" rx="3" fill="#130e08"/>
-                  {/* Subtle face highlight */}
-                  <ellipse cx="51" cy="57" rx="4" ry="5" fill="#241810" opacity="0.5"/>
+                  <ellipse cx="90" cy="98" rx="32" ry="36" fill="#1a1008"/>
+                  {/* Skin highlight — candlelit side of face */}
+                  <ellipse cx="80" cy="92" rx="18" ry="22" fill="url(#skinLight)"/>
+                  {/* Eye sockets — slight shadow */}
+                  <ellipse cx="80" cy="88" rx="5" ry="4" fill="#130e07" opacity="0.6"/>
+                  <ellipse cx="100" cy="88" rx="5" ry="4" fill="#130e07" opacity="0.4"/>
+                  {/* Nose bridge shadow */}
+                  <path d="M88 88 Q90 96 88 102" stroke="#130e07" strokeWidth="1.5" fill="none" opacity="0.4"/>
+                  {/* Mouth shadow */}
+                  <path d="M83 106 Q90 110 97 106" stroke="#130e07" strokeWidth="1.5" fill="none" opacity="0.35"/>
+                  {/* Period wig/hair */}
+                  <ellipse cx="90" cy="68" rx="35" ry="14" fill="#130e08"/>
+                  <path d="M58 68 Q58 90 64 110" stroke="#130e08" strokeWidth="8" fill="none" strokeLinecap="round"/>
+                  <path d="M122 68 Q122 90 116 110" stroke="#130e08" strokeWidth="8" fill="none" strokeLinecap="round"/>
+                  {/* Hat brim */}
+                  <rect x="58" y="57" width="64" height="8" rx="2" fill="#0e0b07"/>
+                  <ellipse cx="90" cy="57" rx="30" ry="6" fill="#130e08"/>
+                  <rect x="68" y="36" width="44" height="24" rx="3" fill="#0e0b07"/>
                 </svg>
-
-                {/* Breathing overlay */}
+                {/* Candlelight flicker overlay */}
                 <div style={{
                   position: "absolute", inset: 0,
-                  background: "radial-gradient(ellipse at 50% 100%, rgba(232,148,58,0.06) 0%, transparent 60%)",
-                  animation: "breathe 4s ease-in-out infinite",
+                  background: "radial-gradient(ellipse at 45% 70%, rgba(232,148,58,0.08) 0%, transparent 65%)",
+                  animation: speaking && !paused ? "flicker 0.8s ease-in-out infinite alternate" : "breathe 4s ease-in-out infinite",
                 }} />
               </div>
             </div>
@@ -622,12 +653,20 @@ export default function AncestorChat() {
               50% { box-shadow: 0 0 0 6px rgba(232,148,58,0); }
             }
             @keyframes portraitGlow {
-              0%, 100% { opacity: 0.6; transform: scale(1); }
-              50% { opacity: 1; transform: scale(1.08); }
+              0%, 100% { opacity: 0.5; transform: scale(1); }
+              50% { opacity: 1; transform: scale(1.12); }
+            }
+            @keyframes ringPulse {
+              0%, 100% { transform: scale(1); opacity: 0.4; }
+              50% { transform: scale(1.06); opacity: 1; }
+            }
+            @keyframes flicker {
+              0% { opacity: 0.5; }
+              100% { opacity: 1; }
             }
             @keyframes breathe {
-              0%, 100% { opacity: 0.4; }
-              50% { opacity: 0.8; }
+              0%, 100% { opacity: 0.3; }
+              50% { opacity: 0.7; }
             }
           `}</style>
         </div>
