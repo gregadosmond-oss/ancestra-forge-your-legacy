@@ -144,16 +144,16 @@ const PacksSection = () => (
             </li>
           ))}
         </ul>
-        <Link
-          to="/shop"
-          className="mt-6 w-full rounded-pill py-3 text-[12px] font-semibold uppercase tracking-[1.5px] text-amber transition-all duration-400"
+        <div
+          className="mt-6 w-full rounded-pill py-3 text-center text-[12px] font-semibold uppercase tracking-[1.5px]"
           style={{
-            background: "rgba(232,148,58,0.06)",
-            border: "1px solid rgba(232,148,58,0.18)",
+            background: "rgba(138,126,110,0.08)",
+            border: "1px solid rgba(138,126,110,0.2)",
+            color: "#8a7e6e",
           }}
         >
-          Browse Heirloom Shop
-        </Link>
+          Coming Soon
+        </div>
       </motion.div>
 
     </div>
