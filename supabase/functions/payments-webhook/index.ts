@@ -46,7 +46,14 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
   const isGift = session.metadata?.isGift === 'true';
   const recipientEmail = session.metadata?.recipientEmail;
   const surname = session.metadata?.surname;
+  const productType = session.metadata?.productType;
+  const shippingAddressRaw = session.metadata?.shippingAddress;
   const buyerEmail = session.customer_details?.email ?? session.customer_email;
+
+  // Heirloom physical order — trigger Printify fulfillment
+  if (productType === 'heirloom' && surname && shippingAddressRaw) {
+    await triggerHeirloomOrder({ surname, shippingAddress: JSON.parse(shippingAddressRaw), buyerEmail });
+  }
 
   if (!userId) {
     console.log("No userId in session metadata — anonymous purchase");
@@ -115,6 +122,51 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
   } else if (buyerEmail) {
     // Regular purchase — send confirmation to buyer
     await sendBuyerConfirmationEmail({ buyerEmail, surname, userId });
+  }
+}
+
+// ─── Heirloom order trigger ──────────────────────────────────────────────────
+
+async function triggerHeirloomOrder({ surname, shippingAddress, buyerEmail }: {
+  surname: string;
+  shippingAddress: Record<string, string>;
+  buyerEmail?: string;
+}) {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !serviceKey) return;
+
+  const normalized = surname.trim().toLowerCase();
+  const legacySlug = normalized.replace(/\s+/g, "-");
+  const legacyUrl = `https://ancestorsqr.com/f/${legacySlug}`;
+
+  // Get crest URL from DB
+  const { data: crestRow } = await supabase
+    .from("surname_crests")
+    .select("image_url")
+    .eq("surname", normalized)
+    .maybeSingle();
+
+  const crestUrl = crestRow?.image_url ?? null;
+  if (!crestUrl) {
+    console.warn("triggerHeirloomOrder: no crest found for", normalized);
+    return;
+  }
+
+  try {
+    const res = await fetch(`${supabaseUrl}/functions/v1/create-heirloom-order`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
+      body: JSON.stringify({ surname, crestUrl, legacyUrl, shippingAddress, customerEmail: buyerEmail }),
+    });
+    const body = await res.json();
+    if (body.success) {
+      console.log("Heirloom order created:", body.orderId);
+    } else {
+      console.error("Heirloom order failed:", body.error);
+    }
+  } catch (err) {
+    console.error("triggerHeirloomOrder threw:", (err as Error).message);
   }
 }
 
