@@ -42,12 +42,9 @@ Deno.serve(async (req: Request) => {
     return new Response("TTS error", { status: 502 });
   }
 
-  const audio = await res.arrayBuffer();
-  return new Response(audio, {
-    headers: {
-      ...CORS_HEADERS,
-      "Content-Type": "audio/mpeg",
-      "Cache-Control": "no-cache",
-    },
+  const buffer = await res.arrayBuffer();
+  const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+  return new Response(JSON.stringify({ audio: base64 }), {
+    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
   });
 });

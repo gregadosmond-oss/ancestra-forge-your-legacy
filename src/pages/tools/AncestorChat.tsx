@@ -78,13 +78,14 @@ export default function AncestorChat() {
     try {
       const { data, error: fnErr } = await supabase.functions.invoke("ancestor-tts", {
         body: { text },
-        // @ts-ignore — responseType supported in supabase-js v2.39+
-        responseType: "arraybuffer",
       });
       if (fnErr) throw new Error(fnErr.message);
-      if (!data) throw new Error("No audio data");
+      if (!data?.audio) throw new Error("No audio data");
 
-      const arrayBuffer = data as ArrayBuffer;
+      const binary = atob(data.audio);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const arrayBuffer = bytes.buffer;
       const ctx = audioCtxRef.current!;
       if (ctx.state === "suspended") await ctx.resume();
       const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
