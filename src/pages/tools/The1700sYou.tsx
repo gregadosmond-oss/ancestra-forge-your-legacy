@@ -49,7 +49,7 @@ export default function The1700sYou() {
 
     try {
       const { data, error: fnError } = await supabase.functions.invoke(
-        "1700s-you",
+        "the-1700s-you",
         { body: { surname: surname.trim(), country: country.trim() } },
       );
       if (fnError) throw new Error(fnError.message);
