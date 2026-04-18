@@ -69,6 +69,17 @@ const Stop4CrestForge = () => {
           <FreeCrest surname={surname} legacyUrl={legacyUrl} />
         </motion.div>
 
+        {/* Legacy Pack upsell */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="mt-4 font-serif text-sm italic text-center"
+          style={{ color: "#a07830" }}
+        >
+          ✦ Your personalised coat of arms is forged when you unlock the Legacy Pack
+        </motion.p>
+
         {/* Motto */}
         {facts.status === "ready" && facts.data && (
           <motion.div
