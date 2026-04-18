@@ -78,7 +78,7 @@ Deno.serve(async (req: Request) => {
   };
 
   // Already expanded — return cached
-  if (story.chapterBodies && story.chapterBodies.length === 8) {
+  if (story.chapterBodies && story.chapterBodies.length > 0) {
     return json({ code: "OK", chapterBodies: story.chapterBodies });
   }
 
