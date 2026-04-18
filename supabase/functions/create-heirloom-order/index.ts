@@ -38,44 +38,47 @@ async function buildDesign(crestUrl: string, qrUrl: string, surname: string): Pr
   const [crest, qr] = await Promise.all([toBase64(crestUrl), toBase64(qrUrl)]);
   const crestDataUri = `data:${crest.mime};base64,${crest.b64}`;
   const qrDataUri = `data:${qr.mime};base64,${qr.b64}`;
-  const displayName = `House of ${surname}`;
+  const SAFE_T = 80;
+  const SAFE_B = 80;
+  const crestY = SAFE_T + 30;
+  const crestH = PRINT_H - SAFE_T - SAFE_B - 60;
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${PRINT_W}" height="${PRINT_H}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 
   <!-- Background -->
-  <rect width="${PRINT_W}" height="${PRINT_H}" fill="#1a1510"/>
+  <rect width="${PRINT_W}" height="${PRINT_H}" fill="#0d0a07"/>
 
-  <!-- Gold border strips -->
-  <rect x="0" y="0" width="${PRINT_W}" height="20" fill="#c9a84c"/>
-  <rect x="0" y="${PRINT_H - 20}" width="${PRINT_W}" height="20" fill="#c9a84c"/>
+  <!-- Gold border strips — inside safe zone -->
+  <rect x="0" y="${SAFE_T}" width="${PRINT_W}" height="18" fill="#c9a84c"/>
+  <rect x="0" y="${PRINT_H - SAFE_B - 18}" width="${PRINT_W}" height="18" fill="#c9a84c"/>
 
-  <!-- Inner border lines -->
-  <rect x="30" y="30" width="${PRINT_W - 60}" height="${PRINT_H - 60}" fill="none" stroke="#c9a84c" stroke-width="2" opacity="0.5"/>
+  <!-- Inner frame -->
+  <rect x="20" y="${SAFE_T + 26}" width="${PRINT_W - 40}" height="${PRINT_H - SAFE_T - SAFE_B - 52}" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.4"/>
 
-  <!-- Vertical divider -->
-  <line x1="1050" y1="60" x2="1050" y2="${PRINT_H - 60}" stroke="#c9a84c" stroke-width="1.5" opacity="0.3"/>
-
-  <!-- Crest -->
-  <image href="${crestDataUri}" x="60" y="60" width="940" height="${PRINT_H - 120}" preserveAspectRatio="xMidYMid meet"/>
-
-  <!-- House of name -->
-  <text x="1100" y="260" font-family="Georgia, 'Times New Roman', serif" font-size="110" fill="#e8b85c" letter-spacing="3">${displayName}</text>
-
-  <!-- Decorative rule under name -->
-  <line x1="1100" y1="310" x2="2380" y2="310" stroke="#c9a84c" stroke-width="2" opacity="0.5"/>
-
-  <!-- Subtitle -->
-  <text x="1100" y="390" font-family="Arial, sans-serif" font-size="44" fill="#a07830" letter-spacing="8">AN ANCESTORSQR ORIGINAL</text>
-
-  <!-- QR label -->
-  <text x="2150" y="820" font-family="Arial, sans-serif" font-size="28" fill="#a07830" letter-spacing="4" text-anchor="middle">SCAN YOUR LEGACY</text>
+  <!-- QR label — left side (back of mug) -->
+  <text x="330" y="720" font-family="Arial, sans-serif" font-size="28" fill="#a07830" letter-spacing="4" text-anchor="middle">SCAN YOUR LEGACY</text>
 
   <!-- QR code -->
-  <image href="${qrDataUri}" x="2030" y="840" width="240" height="240" preserveAspectRatio="xMidYMid meet"/>
+  <image href="${qrDataUri}" x="205" y="740" width="250" height="250" preserveAspectRatio="xMidYMid meet"/>
+
+  <!-- HOUSE OF label -->
+  <text x="350" y="260" font-family="Georgia, 'Times New Roman', serif" font-size="52" fill="#a07830" letter-spacing="6">HOUSE  OF</text>
+
+  <!-- Surname — large -->
+  <text x="350" y="430" font-family="Georgia, 'Times New Roman', serif" font-size="148" font-weight="bold" fill="#e8b85c">${surname.toUpperCase()}</text>
+
+  <!-- Gold rule under surname -->
+  <line x1="350" y1="458" x2="1600" y2="458" stroke="#c9a84c" stroke-width="2" opacity="0.6"/>
+
+  <!-- Vertical divider -->
+  <line x1="1640" y1="${SAFE_T + 28}" x2="1640" y2="${PRINT_H - SAFE_B - 28}" stroke="#c9a84c" stroke-width="1.5" opacity="0.25"/>
+
+  <!-- Crest — right side, flush -->
+  <image href="${crestDataUri}" x="1600" y="${crestY}" width="700" height="${crestH}" preserveAspectRatio="xMidYMid meet"/>
 
   <!-- ANCESTORSQR wordmark -->
-  <text x="${PRINT_W / 2}" y="${PRINT_H - 40}" font-family="Georgia, serif" font-size="38" fill="#c9a84c" opacity="0.25" text-anchor="middle" letter-spacing="12">ANCESTORSQR</text>
+  <text x="950" y="${PRINT_H - SAFE_B - 28}" font-family="Georgia, serif" font-size="34" fill="#c9a84c" opacity="0.18" text-anchor="middle" letter-spacing="10">A N C E S T O R S Q R</text>
 
 </svg>`;
 
@@ -85,16 +88,16 @@ async function buildDesign(crestUrl: string, qrUrl: string, surname: string): Pr
   return resvg.render().asPng();
 }
 
-async function getFirstWhiteVariant(apiKey: string): Promise<number> {
+async function getBlack11ozVariant(apiKey: string): Promise<number> {
   const res = await fetch(
     `${PRINTIFY_BASE}/catalog/blueprints/${BLUEPRINT_ID}/print_providers/${PROVIDER_ID}/variants.json`,
     { headers: { Authorization: `Bearer ${apiKey}` } }
   );
   const { variants } = await res.json();
-  const white11 = variants?.find((v: any) =>
-    v.title?.toLowerCase().includes("11") && v.title?.toLowerCase().includes("white")
+  const black11 = variants?.find((v: any) =>
+    v.title?.toLowerCase().includes("11") && v.title?.toLowerCase().includes("black")
   );
-  return white11?.id ?? variants?.[0]?.id;
+  return black11?.id ?? variants?.[0]?.id;
 }
 
 serve(async (req) => {
@@ -134,7 +137,7 @@ serve(async (req) => {
 
     const { data: { publicUrl: designUrl } } = supabase.storage.from("crests").getPublicUrl(fileName);
 
-    const variantId = await getFirstWhiteVariant(apiKey);
+    const variantId = await getBlack11ozVariant(apiKey);
 
     const orderPayload = {
       external_id: `aqr-${surname.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`,
