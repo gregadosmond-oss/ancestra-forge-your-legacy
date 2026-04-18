@@ -797,17 +797,16 @@ const MyLegacy = () => {
                 Pass It On
               </button>
 
-              <button
-                onClick={() => navigate("/shop")}
-                className="w-full rounded-pill border px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5 sm:w-auto"
+              <div
+                className="w-full rounded-pill border px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] sm:w-auto text-center"
                 style={{
-                  borderColor: "rgba(232,148,58,0.3)",
-                  background: "rgba(232,148,58,0.06)",
-                  color: "#d4a04a",
+                  borderColor: "rgba(138,126,110,0.2)",
+                  background: "rgba(138,126,110,0.06)",
+                  color: "#8a7e6e",
                 }}
               >
-                Browse Products
-              </button>
+                Heirloom Shop — Coming Soon
+              </div>
             </div>
 
             {crestUrl && (
