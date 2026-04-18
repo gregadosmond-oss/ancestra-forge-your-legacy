@@ -231,18 +231,21 @@ export type Database = {
           created_at: string
           model_version: string
           payload: Json
+          story_payload: Json | null
           surname: string
         }
         Insert: {
           created_at?: string
           model_version: string
           payload: Json
+          story_payload?: Json | null
           surname: string
         }
         Update: {
           created_at?: string
           model_version?: string
           payload?: Json
+          story_payload?: Json | null
           surname?: string
         }
         Relationships: []
