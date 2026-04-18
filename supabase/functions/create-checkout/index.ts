@@ -8,7 +8,7 @@ serve(async (req) => {
   }
 
   try {
-    const { priceId, quantity, customerEmail, userId, returnUrl, environment, isGift, recipientEmail, surname } = await req.json();
+    const { priceId, quantity, customerEmail, userId, returnUrl, environment, isGift, recipientEmail, surname, shippingAddress, productType } = await req.json();
     if (!priceId || typeof priceId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {
       return new Response(JSON.stringify({ error: "Invalid priceId" }), {
         status: 400,
@@ -33,6 +33,8 @@ serve(async (req) => {
     if (isGift) metadata.isGift = 'true';
     if (recipientEmail) metadata.recipientEmail = recipientEmail;
     if (surname) metadata.surname = surname;
+    if (productType) metadata.productType = productType;
+    if (shippingAddress) metadata.shippingAddress = shippingAddress;
 
     const session = await stripe.checkout.sessions.create({
       line_items: [{ price: stripePrice.id, quantity: quantity || 1 }],
