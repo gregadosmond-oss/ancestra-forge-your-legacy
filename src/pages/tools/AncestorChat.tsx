@@ -76,21 +76,15 @@ export default function AncestorChat() {
     setPaused(false);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token ?? SUPABASE_ANON_KEY;
-
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/ancestor-tts`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": SUPABASE_ANON_KEY,
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({ text }),
+      const { data, error: fnErr } = await supabase.functions.invoke("ancestor-tts", {
+        body: { text },
+        // @ts-ignore — responseType supported in supabase-js v2.39+
+        responseType: "arraybuffer",
       });
-      if (!res.ok) throw new Error(`TTS ${res.status}: ${await res.text()}`);
+      if (fnErr) throw new Error(fnErr.message);
+      if (!data) throw new Error("No audio data");
 
-      const arrayBuffer = await res.arrayBuffer();
+      const arrayBuffer = data as ArrayBuffer;
       const ctx = audioCtxRef.current!;
       if (ctx.state === "suspended") await ctx.resume();
       const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
