@@ -147,24 +147,23 @@ export default function ToolsHub() {
                 to={tool.to}
                 className="group flex h-full flex-col items-start rounded-[22px] p-7 text-left transition-all duration-[400ms]"
                 style={{
-                  background: "rgba(232,148,58,0.06)",
+                  background: "#1a1510",
                   border: tool.cta
-                    ? "1px solid rgba(232,148,58,0.25)"
-                    : "1px solid rgba(232,148,58,0.12)",
-                  backdropFilter: "blur(8px)",
+                    ? "1px solid rgba(232,148,58,0.32)"
+                    : "1px solid rgba(232,148,58,0.18)",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(232,148,58,0.12)";
+                  e.currentTarget.style.background = "#221c14";
                   e.currentTarget.style.borderColor = tool.cta
-                    ? "rgba(232,148,58,0.4)"
-                    : "rgba(232,148,58,0.28)";
+                    ? "rgba(232,148,58,0.5)"
+                    : "rgba(232,148,58,0.38)";
                   e.currentTarget.style.transform = "translateY(-3px)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(232,148,58,0.06)";
+                  e.currentTarget.style.background = "#1a1510";
                   e.currentTarget.style.borderColor = tool.cta
-                    ? "rgba(232,148,58,0.25)"
-                    : "rgba(232,148,58,0.12)";
+                    ? "rgba(232,148,58,0.32)"
+                    : "rgba(232,148,58,0.18)";
                   e.currentTarget.style.transform = "";
                 }}
               >
