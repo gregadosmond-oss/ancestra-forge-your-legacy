@@ -156,13 +156,12 @@ const Pricing = () => (
             </li>
           ))}
         </ul>
-        <Link
-          to="/shop"
-          className="mt-8 block rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:opacity-80"
-          style={{ background: "rgba(232,148,58,0.08)", border: "1px solid rgba(232,148,58,0.2)", color: "#d4a04a" }}
+        <div
+          className="mt-8 rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
+          style={{ background: "rgba(138,126,110,0.08)", border: "1px solid rgba(138,126,110,0.2)", color: "#8a7e6e" }}
         >
-          Browse Heirloom Shop
-        </Link>
+          Coming Soon
+        </div>
       </div>
 
     </motion.div>
