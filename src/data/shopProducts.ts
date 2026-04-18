@@ -55,8 +55,8 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     price: "$79",
     priceNote: "24–48hr delivery",
     description:
-      "Both families' crests merged into one — a digital heirloom for a new life together. Unique to Ancestra.",
-    tag: "Unique to Ancestra",
+      "Both families' crests merged into one — a digital heirloom for a new life together. Unique to AncestorsQR.",
+    tag: "Unique to AncestorsQR",
     category: "digital",
   },
 

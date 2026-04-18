@@ -172,7 +172,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
         price: "$79",
         description:
           "Both family crests merged into one — a digital heirloom for their new life together.",
-        tag: "Unique to Ancestra",
+        tag: "Unique to AncestorsQR",
       },
       {
         name: "Framed Crest Print",
