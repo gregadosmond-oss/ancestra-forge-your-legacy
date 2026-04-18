@@ -142,10 +142,10 @@ export default function ToolsHub() {
           className="mt-10 grid w-full max-w-4xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
         >
           {tools.map((tool) => (
-            <motion.div key={tool.to} variants={item}>
+            <motion.div key={tool.to} variants={item} className="h-full">
               <Link
                 to={tool.to}
-                className="group flex flex-col items-start rounded-[22px] p-7 text-left transition-all duration-[400ms]"
+                className="group flex h-full flex-col items-start rounded-[22px] p-7 text-left transition-all duration-[400ms]"
                 style={{
                   background: "rgba(232,148,58,0.06)",
                   border: tool.cta
@@ -197,7 +197,7 @@ export default function ToolsHub() {
                 </p>
 
                 <div
-                  className="mt-5 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-opacity duration-200 group-hover:opacity-100"
+                  className="mt-auto pt-5 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-opacity duration-200 group-hover:opacity-100"
                   style={{
                     color: tool.cta ? "#e8943a" : "#a07830",
                     opacity: 0.7,
