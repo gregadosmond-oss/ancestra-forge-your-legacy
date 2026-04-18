@@ -20,6 +20,24 @@ const TOOLS = [
     body: "Enter 3 values → get a Latin motto with English translation.",
     href: "/tools/motto",
   },
+  {
+    icon: "👤",
+    heading: "Meet Your Ancestor",
+    body: "AI generates a historically plausible ancestor — name, era, occupation, personality, and a quote.",
+    href: "/tools/ancestor",
+  },
+  {
+    icon: "🕯️",
+    heading: "The 1700s You",
+    body: "What would your life look like 300 years ago based on your surname?",
+    href: "/tools/1700s",
+  },
+  {
+    icon: "💬",
+    heading: "Chat With Your Ancestor",
+    body: "A live conversation with an AI character drawn from your family's real history.",
+    href: "/tools/chat",
+  },
 ] as const;
 
 const reveal = {
@@ -41,7 +59,7 @@ const FreeToolsSection = () => (
       Free tools to explore your heritage. No account needed.
     </p>
 
-    <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
+    <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {TOOLS.map((tool, i) => (
         <motion.div
           key={tool.heading}
