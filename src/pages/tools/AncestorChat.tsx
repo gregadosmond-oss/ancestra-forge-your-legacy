@@ -359,6 +359,61 @@ export default function AncestorChat() {
             </div>
           </div>
 
+          {/* Ancestor silhouette portrait */}
+          <div className="flex justify-center pt-6 pb-2">
+            <div style={{ position: "relative", width: 110, height: 110 }}>
+              {/* Glow ring — pulses when speaking */}
+              <div style={{
+                position: "absolute", inset: -8,
+                borderRadius: "50%",
+                background: speaking ? "radial-gradient(circle, rgba(232,148,58,0.18) 0%, transparent 70%)" : "transparent",
+                transition: "background 0.6s ease",
+                animation: speaking && !paused ? "portraitGlow 2s ease-in-out infinite" : "none",
+              }} />
+              {/* Portrait frame */}
+              <div style={{
+                width: 110, height: 110,
+                borderRadius: "50%",
+                border: `2px solid ${speaking ? "rgba(232,148,58,0.45)" : "rgba(212,160,74,0.18)"}`,
+                background: "radial-gradient(ellipse at 40% 35%, #2a1e10 0%, #0d0a07 100%)",
+                overflow: "hidden",
+                position: "relative",
+                transition: "border-color 0.6s ease",
+                boxShadow: speaking ? "0 0 32px rgba(232,148,58,0.15)" : "none",
+              }}>
+                {/* Silhouette SVG */}
+                <svg viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%" }}>
+                  {/* Candlelight warm background glow */}
+                  <radialGradient id="candlelight" cx="50%" cy="80%" r="60%">
+                    <stop offset="0%" stopColor="#3d2510" stopOpacity="0.8"/>
+                    <stop offset="100%" stopColor="#0d0a07" stopOpacity="0"/>
+                  </radialGradient>
+                  <ellipse cx="55" cy="88" rx="50" ry="40" fill="url(#candlelight)" />
+                  {/* Coat/body */}
+                  <ellipse cx="55" cy="115" rx="36" ry="38" fill="#1a120a"/>
+                  {/* Lapels */}
+                  <path d="M38 92 Q55 84 72 92 L68 108 Q55 100 42 108 Z" fill="#241810"/>
+                  {/* Neck */}
+                  <rect x="50" y="78" width="10" height="16" rx="3" fill="#1a120a"/>
+                  {/* Head */}
+                  <ellipse cx="55" cy="62" rx="20" ry="23" fill="#1a120a"/>
+                  {/* Period hat/hair */}
+                  <ellipse cx="55" cy="42" rx="22" ry="10" fill="#130e08"/>
+                  <rect x="38" y="36" width="34" height="10" rx="3" fill="#130e08"/>
+                  {/* Subtle face highlight */}
+                  <ellipse cx="51" cy="57" rx="4" ry="5" fill="#241810" opacity="0.5"/>
+                </svg>
+
+                {/* Breathing overlay */}
+                <div style={{
+                  position: "absolute", inset: 0,
+                  background: "radial-gradient(ellipse at 50% 100%, rgba(232,148,58,0.06) 0%, transparent 60%)",
+                  animation: "breathe 4s ease-in-out infinite",
+                }} />
+              </div>
+            </div>
+          </div>
+
           {/* Messages */}
           <div
             className="flex-1 overflow-y-auto px-4 py-6"
@@ -565,6 +620,14 @@ export default function AncestorChat() {
             @keyframes micPulse {
               0%, 100% { box-shadow: 0 0 0 0 rgba(232,148,58,0.3); }
               50% { box-shadow: 0 0 0 6px rgba(232,148,58,0); }
+            }
+            @keyframes portraitGlow {
+              0%, 100% { opacity: 0.6; transform: scale(1); }
+              50% { opacity: 1; transform: scale(1.08); }
+            }
+            @keyframes breathe {
+              0%, 100% { opacity: 0.4; }
+              50% { opacity: 0.8; }
             }
           `}</style>
         </div>
