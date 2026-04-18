@@ -1,0 +1,1 @@
+ALTER TABLE public.surname_facts ADD COLUMN IF NOT EXISTS story_payload jsonb;
