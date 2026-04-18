@@ -72,8 +72,8 @@ const Stop4CrestForge = () => {
         {/* Legacy Pack upsell */}
         <motion.p
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2.4, delay: 0.5, repeat: Infinity, ease: "easeInOut" }}
           className="mt-4 font-serif text-sm italic text-center"
           style={{ color: "#a07830" }}
         >
