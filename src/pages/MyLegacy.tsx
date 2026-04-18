@@ -69,7 +69,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
         const [factsRes, crestRes] = await Promise.all([
           supabase
             .from("surname_facts")
-            .select("payload")
+            .select("payload, story_payload")
             .eq("surname", surname)
             .maybeSingle(),
           supabase
@@ -80,7 +80,9 @@ function useLegacyData(userId: string | undefined): LegacyData {
         ]);
 
         let facts = ((factsRes.data?.payload as any)?.facts as LegacyFacts) ?? (factsRes.data?.payload as LegacyFacts) ?? null;
-        let story = ((factsRes.data?.payload as any)?.story as LegacyStory) ?? null;
+        let story = ((factsRes.data?.payload as any)?.story as LegacyStory)
+          ?? ((factsRes.data as any)?.story_payload as LegacyStory)
+          ?? null;
         let crestUrl = crestRes.data?.image_url ?? null;
 
         // Step 3: generate if no facts at all (e.g. user skipped the journey)
@@ -95,7 +97,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
               const [factsRes2, crestRes2] = await Promise.all([
                 supabase
                   .from("surname_facts")
-                  .select("payload")
+                  .select("payload, story_payload")
                   .eq("surname", surname)
                   .maybeSingle(),
                 supabase
@@ -105,7 +107,9 @@ function useLegacyData(userId: string | undefined): LegacyData {
                   .maybeSingle(),
               ]);
               facts = ((factsRes2.data?.payload as any)?.facts as LegacyFacts) ?? (factsRes2.data?.payload as LegacyFacts) ?? facts;
-              story = ((factsRes2.data?.payload as any)?.story as LegacyStory) ?? story;
+              story = ((factsRes2.data?.payload as any)?.story as LegacyStory)
+                ?? ((factsRes2.data as any)?.story_payload as LegacyStory)
+                ?? story;
               crestUrl = crestRes2.data?.image_url ?? null;
 
               // Real crest is generated server-side after payment (payments-webhook → generate-crest).
