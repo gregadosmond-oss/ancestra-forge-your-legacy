@@ -298,6 +298,20 @@ export default function AncestorChat() {
               <p className="font-display text-lg text-cream-warm">{ancestorName}</p>
             </div>
             <div className="flex items-center gap-2">
+              {/* Persistent mute/unmute — always visible */}
+              <button
+                onClick={() => setVoiceEnabled((v) => !v)}
+                title={voiceEnabled ? "Mute ancestor" : "Unmute ancestor"}
+                className="flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200"
+                style={{
+                  border: "1px solid rgba(61,48,32,1)",
+                  background: voiceEnabled ? "rgba(232,148,58,0.1)" : "transparent",
+                  color: voiceEnabled ? "#d4a04a" : "#8a7e6e",
+                  cursor: "pointer",
+                }}
+              >
+                {voiceEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
+              </button>
               <button
                 onClick={() => { window.speechSynthesis.cancel(); setSpeaking(false); setStarted(false); setMessages([]); }}
                 className="rounded-pill px-4 py-2 font-sans text-[10px] uppercase tracking-[1.5px] transition-all duration-200"
@@ -508,20 +522,6 @@ export default function AncestorChat() {
                 {paused ? "Paused" : "Speaking…"}
               </span>
 
-              {/* Mute toggle */}
-              <button
-                onClick={() => setVoiceEnabled((v) => !v)}
-                title="Mute"
-                className="flex h-7 w-7 items-center justify-center rounded-full transition-all duration-200"
-                style={{
-                  border: "1px solid rgba(61,48,32,1)",
-                  background: "transparent",
-                  color: "#8a7e6e",
-                  cursor: "pointer",
-                }}
-              >
-                <VolumeX size={12} />
-              </button>
             </div>
           )}
 
