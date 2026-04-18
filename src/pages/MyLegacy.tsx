@@ -52,17 +52,16 @@ function useLegacyData(userId: string | undefined): LegacyData {
 
         if (profileErr) throw new Error(profileErr.message);
 
-        const surname = profile?.surname
-          ?? sessionStorage.getItem("ancestra_journey_surname")
-          ?? null;
+        const sessionSurname = sessionStorage.getItem("ancestra_journey_surname");
+        const surname = sessionSurname ?? profile?.surname ?? null;
 
         if (!surname) {
           setData({ facts: null, story: null, crestUrl: null, surname: null, loading: false, generating: false, error: null });
           return;
         }
 
-        // Save to profile for next time if it was missing
-        if (!profile?.surname) {
+        // Always keep profile in sync with the journey surname
+        if (surname !== profile?.surname) {
           await supabase.from("profiles").upsert({ id: userId, surname }, { onConflict: "id" });
         }
 
