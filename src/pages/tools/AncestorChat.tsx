@@ -43,22 +43,26 @@ export default function AncestorChat() {
   const [speaking, setSpeaking] = useState(false);
   const [paused, setPaused] = useState(false);
   const recognitionRef = useRef<InstanceType<typeof SpeechRecognition> | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioBlobRef = useRef<string | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const hasSpeechRecognition = typeof window !== "undefined" &&
     ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
 
+  // Call this synchronously inside any button click to unlock AudioContext
+  const unlockAudio = () => {
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new AudioContext();
+    }
+    if (audioCtxRef.current.state === "suspended") {
+      audioCtxRef.current.resume();
+    }
+  };
+
   const stopAudio = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    if (audioBlobRef.current) {
-      URL.revokeObjectURL(audioBlobRef.current);
-      audioBlobRef.current = null;
-    }
+    try { sourceRef.current?.stop(); } catch { /* already stopped */ }
+    sourceRef.current = null;
     setSpeaking(false);
     setPaused(false);
   }, []);
@@ -81,18 +85,19 @@ export default function AncestorChat() {
         },
         body: JSON.stringify({ text }),
       });
-      if (!res.ok) throw new Error("TTS failed");
+      if (!res.ok) throw new Error(`TTS ${res.status}`);
 
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      audioBlobRef.current = url;
+      const arrayBuffer = await res.arrayBuffer();
+      const ctx = audioCtxRef.current!;
+      if (ctx.state === "suspended") await ctx.resume();
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
 
-      const audio = new Audio();
-      audio.src = url;
-      audioRef.current = audio;
-      audio.onended = () => { setSpeaking(false); setPaused(false); URL.revokeObjectURL(url); audioBlobRef.current = null; };
-      audio.onerror = (e) => { console.error("Audio playback error:", e); setSpeaking(false); setPaused(false); };
-      audio.play().catch((e) => { console.error("Autoplay blocked:", e); setSpeaking(false); });
+      const source = ctx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(ctx.destination);
+      sourceRef.current = source;
+      source.onended = () => { setSpeaking(false); setPaused(false); sourceRef.current = null; };
+      source.start(0);
     } catch (e) {
       console.error("speakAncestor error:", e);
       setSpeaking(false);
@@ -100,12 +105,13 @@ export default function AncestorChat() {
   }, [voiceEnabled, stopAudio]);
 
   const togglePause = () => {
-    if (!audioRef.current) return;
+    const ctx = audioCtxRef.current;
+    if (!ctx) return;
     if (paused) {
-      audioRef.current.play();
+      ctx.resume();
       setPaused(false);
     } else {
-      audioRef.current.pause();
+      ctx.suspend();
       setPaused(true);
     }
   };
@@ -122,7 +128,7 @@ export default function AncestorChat() {
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!surname.trim() || loading) return;
-
+    unlockAudio();
     setLoading(true);
     setError(null);
 
@@ -168,14 +174,13 @@ export default function AncestorChat() {
     recognitionRef.current = rec;
     rec.start();
     setListening(true);
-    window.speechSynthesis.cancel();
-    setSpeaking(false);
+    stopAudio();
   };
 
   const handleSend = async (text?: string) => {
     const msg = (text ?? input).trim();
     if (!msg || loading) return;
-
+    unlockAudio();
     const newMessages: Message[] = [...messages, { role: "user", text: msg }];
     setMessages(newMessages);
     setInput("");
