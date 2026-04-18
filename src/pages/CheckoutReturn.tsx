@@ -26,16 +26,22 @@ const CheckoutReturn = () => {
             <p className="mt-4 font-serif italic text-text-body">
               Your full family story, crest, and tree are now unlocked.
             </p>
-            <button
-              onClick={() => navigate("/my-legacy")}
-              className="mt-10 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
-              style={{
-                background: "linear-gradient(135deg, #e8943a, #c47828)",
-                color: "#1a1208",
-              }}
-            >
-              View Your Legacy
-            </button>
+            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+              <button
+                onClick={() => navigate("/my-legacy")}
+                className="rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
+              >
+                View Your Legacy
+              </button>
+              <button
+                onClick={() => navigate("/journey/6")}
+                className="rounded-pill border px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                style={{ borderColor: "rgba(232,148,58,0.45)", color: "#e8b85c", background: "rgba(232,148,58,0.07)" }}
+              >
+                Pass It On
+              </button>
+            </div>
           </>
         ) : (
           <>
