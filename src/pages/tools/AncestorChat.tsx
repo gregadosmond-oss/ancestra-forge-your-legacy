@@ -298,36 +298,6 @@ export default function AncestorChat() {
               <p className="font-display text-lg text-cream-warm">{ancestorName}</p>
             </div>
             <div className="flex items-center gap-2">
-              {/* Pause/resume button — only while speaking */}
-              {speaking && (
-                <button
-                  onClick={togglePause}
-                  title={paused ? "Resume" : "Pause"}
-                  className="flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200"
-                  style={{
-                    border: "1px solid rgba(232,148,58,0.4)",
-                    background: "rgba(232,148,58,0.1)",
-                    color: "#d4a04a",
-                    cursor: "pointer",
-                  }}
-                >
-                  {paused ? <Play size={14} /> : <Pause size={14} />}
-                </button>
-              )}
-              {/* Voice toggle */}
-              <button
-                onClick={() => setVoiceEnabled((v) => !v)}
-                title={voiceEnabled ? "Mute ancestor" : "Unmute ancestor"}
-                className="flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200"
-                style={{
-                  border: "1px solid rgba(61,48,32,1)",
-                  background: voiceEnabled ? "rgba(232,148,58,0.1)" : "transparent",
-                  color: voiceEnabled ? "#d4a04a" : "#8a7e6e",
-                  cursor: "pointer",
-                }}
-              >
-                {voiceEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
-              </button>
               <button
                 onClick={() => { window.speechSynthesis.cancel(); setSpeaking(false); setStarted(false); setMessages([]); }}
                 className="rounded-pill px-4 py-2 font-sans text-[10px] uppercase tracking-[1.5px] transition-all duration-200"
@@ -504,24 +474,54 @@ export default function AncestorChat() {
             </form>
           </div>
 
-          {/* Speaking indicator */}
+          {/* Speaking indicator with controls */}
           {speaking && (
             <div
-              className="fixed bottom-24 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-pill px-4 py-2"
+              className="fixed bottom-24 left-1/2 -translate-x-1/2 flex items-center gap-3 rounded-pill px-5 py-3"
               style={{
-                background: "rgba(26,21,14,0.95)",
-                border: "1px solid rgba(232,148,58,0.2)",
-                pointerEvents: "none",
+                background: "rgba(26,21,14,0.97)",
+                border: "1px solid rgba(232,148,58,0.25)",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
                 zIndex: 50,
               }}
             >
-              <Volume2 size={12} style={{ color: "#d4a04a" }} />
-              <span style={{ fontSize: "10px", letterSpacing: "2px", color: "#a07830", textTransform: "uppercase", fontFamily: "DM Sans, sans-serif" }}>
-                Speaking…
-              </span>
-              {[0, 1, 2, 3].map((i) => (
+              {/* Pause/resume */}
+              <button
+                onClick={togglePause}
+                title={paused ? "Resume" : "Pause"}
+                className="flex h-7 w-7 items-center justify-center rounded-full transition-all duration-200"
+                style={{
+                  border: "1px solid rgba(232,148,58,0.35)",
+                  background: "rgba(232,148,58,0.1)",
+                  color: "#d4a04a",
+                  cursor: "pointer",
+                }}
+              >
+                {paused ? <Play size={12} /> : <Pause size={12} />}
+              </button>
+
+              {/* Waveform dots */}
+              {!paused && [0, 1, 2, 3].map((i) => (
                 <span key={i} style={{ width: 3, height: 3, borderRadius: "50%", background: "#a07830", animation: `dotPulse 1.2s ease-in-out ${i * 0.15}s infinite`, display: "inline-block" }} />
               ))}
+              <span style={{ fontSize: "10px", letterSpacing: "2px", color: "#a07830", textTransform: "uppercase", fontFamily: "DM Sans, sans-serif" }}>
+                {paused ? "Paused" : "Speaking…"}
+              </span>
+
+              {/* Mute toggle */}
+              <button
+                onClick={() => setVoiceEnabled((v) => !v)}
+                title="Mute"
+                className="flex h-7 w-7 items-center justify-center rounded-full transition-all duration-200"
+                style={{
+                  border: "1px solid rgba(61,48,32,1)",
+                  background: "transparent",
+                  color: "#8a7e6e",
+                  cursor: "pointer",
+                }}
+              >
+                <VolumeX size={12} />
+              </button>
             </div>
           )}
 
