@@ -91,9 +91,10 @@ export default function AncestorChat() {
       audio.src = url;
       audioRef.current = audio;
       audio.onended = () => { setSpeaking(false); setPaused(false); URL.revokeObjectURL(url); audioBlobRef.current = null; };
-      audio.onerror = () => { setSpeaking(false); setPaused(false); };
-      audio.play();
-    } catch {
+      audio.onerror = (e) => { console.error("Audio playback error:", e); setSpeaking(false); setPaused(false); };
+      audio.play().catch((e) => { console.error("Autoplay blocked:", e); setSpeaking(false); });
+    } catch (e) {
+      console.error("speakAncestor error:", e);
       setSpeaking(false);
     }
   }, [voiceEnabled, stopAudio]);

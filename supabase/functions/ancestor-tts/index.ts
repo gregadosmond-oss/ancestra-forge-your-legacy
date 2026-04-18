@@ -5,8 +5,8 @@ const CORS_HEADERS = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-// Daniel — deep, British, authoritative. Good aged ancestor voice.
-const VOICE_ID = "onwK4e9ZLuTAKqWW03F9";
+// Adam — deep, reliable, available on all ElevenLabs plans
+const VOICE_ID = "pNInz6obpgDQGcFmaJgB";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: CORS_HEADERS });
