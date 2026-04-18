@@ -174,21 +174,22 @@ export default function Shop() {
               {...stagger(i % 6)}
               className="relative flex flex-col rounded-[22px] p-6"
               style={{
-                background: "rgba(26,21,14,0.9)",
-                border: "1px solid rgba(212,160,74,0.08)",
+                background: "rgba(232,148,58,0.06)",
+                border: "1px solid rgba(232,148,58,0.12)",
+                backdropFilter: "blur(8px)",
                 transition: "border-color 0.3s ease, background 0.3s ease",
               }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLDivElement).style.borderColor =
-                  "rgba(212,160,74,0.2)";
+                  "rgba(232,148,58,0.28)";
                 (e.currentTarget as HTMLDivElement).style.background =
-                  "rgba(34,28,20,0.95)";
+                  "rgba(232,148,58,0.12)";
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLDivElement).style.borderColor =
-                  "rgba(212,160,74,0.08)";
+                  "rgba(232,148,58,0.12)";
                 (e.currentTarget as HTMLDivElement).style.background =
-                  "rgba(26,21,14,0.9)";
+                  "rgba(232,148,58,0.06)";
               }}
             >
               {product.tag && (
@@ -292,22 +293,22 @@ export default function Shop() {
               {...stagger(i % 3)}
               className="relative flex flex-col rounded-[28px] p-7"
               style={{
-                background: "rgba(26,21,14,0.95)",
+                background: "rgba(232,148,58,0.06)",
                 border: "1px solid rgba(232,148,58,0.2)",
-                boxShadow: "0 0 40px rgba(232,148,58,0.03)",
-                transition: "border-color 0.3s ease, box-shadow 0.3s ease",
+                backdropFilter: "blur(8px)",
+                transition: "border-color 0.3s ease, background 0.3s ease",
               }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLDivElement).style.borderColor =
                   "rgba(232,148,58,0.4)";
-                (e.currentTarget as HTMLDivElement).style.boxShadow =
-                  "0 0 50px rgba(232,148,58,0.08)";
+                (e.currentTarget as HTMLDivElement).style.background =
+                  "rgba(232,148,58,0.12)";
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLDivElement).style.borderColor =
                   "rgba(232,148,58,0.2)";
-                (e.currentTarget as HTMLDivElement).style.boxShadow =
-                  "0 0 40px rgba(232,148,58,0.03)";
+                (e.currentTarget as HTMLDivElement).style.background =
+                  "rgba(232,148,58,0.06)";
               }}
             >
               {bundle.tag && (
