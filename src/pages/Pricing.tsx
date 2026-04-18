@@ -115,7 +115,7 @@ const Pricing = () => (
         </div>
         <div className="mb-2 text-3xl">🛡</div>
         <h2 className="font-display text-xl text-cream-warm">Legacy Pack</h2>
-        <div className="mt-3 font-display text-4xl" style={{ color: "#e8b85c" }}>$29</div>
+        <div className="mt-3 font-display text-4xl" style={{ color: "#e8b85c" }}>$29.99</div>
         <p className="mt-1 font-sans text-[11px]" style={{ color: "#8a7e6e" }}>One-time · Instant delivery</p>
         <ul className="mt-6 flex-1 space-y-2">
           {LEGACY_ITEMS.map((item) => (
