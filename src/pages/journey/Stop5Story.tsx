@@ -235,25 +235,13 @@ const Stop5Story = () => {
                 ))}
               </ul>
 
-              <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-                <button
-                  onClick={() => navigate("/journey/6")}
-                  className="rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
-                  style={{
-                    background: "linear-gradient(135deg, #e8943a, #c47828)",
-                    color: "#1a1208",
-                  }}
-                >
-                  Pass It On
-                </button>
-                <button
-                  onClick={handleUnlock}
-                  className="rounded-pill border px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
-                  style={{ borderColor: "rgba(232,148,58,0.45)", color: "#e8b85c", background: "rgba(232,148,58,0.07)" }}
-                >
-                  Unlock Legacy Pack — $29.99
-                </button>
-              </div>
+              <button
+                onClick={handleUnlock}
+                className="mt-10 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
+              >
+                Unlock Legacy Pack — $29.99
+              </button>
             </motion.div>
           ) : (
             <motion.div
