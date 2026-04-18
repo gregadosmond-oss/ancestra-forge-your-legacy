@@ -76,18 +76,22 @@ export default function AncestorChat() {
     setPaused(false);
 
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      // Use supabase client to get the session token, then fetch binary directly
+      const { data: { session } } = await supabase.auth.getSession();
+      const supabaseUrl = (supabase as any).supabaseUrl as string;
+      const supabaseKey = (supabase as any).supabaseKey as string;
+      const token = session?.access_token ?? supabaseKey;
+
       const res = await fetch(`${supabaseUrl}/functions/v1/ancestor-tts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "apikey": supabaseKey,
-          "Authorization": `Bearer ${supabaseKey}`,
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({ text }),
       });
-      if (!res.ok) throw new Error(`TTS ${res.status}`);
+      if (!res.ok) throw new Error(`TTS ${res.status}: ${await res.text()}`);
 
       const arrayBuffer = await res.arrayBuffer();
       const ctx = audioCtxRef.current!;
