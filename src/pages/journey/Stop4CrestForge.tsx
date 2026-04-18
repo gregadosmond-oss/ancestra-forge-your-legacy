@@ -129,7 +129,7 @@ const Stop4CrestForge = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1.4 }}
-          className="mt-12"
+          className="mt-12 flex flex-col items-center text-center"
         >
           <Link
             to="/journey/5"
