@@ -197,13 +197,12 @@ const Stop6PassItOn = () => {
                 Framed crests, mugs, books &amp; more. Every heirloom includes the Legacy Pack.
               </p>
               <div className="mt-3 font-display text-2xl" style={{ color: "#e8b85c" }}>$49+</div>
-              <button
-                onClick={() => navigate("/shop")}
-                className="mt-5 rounded-pill py-3 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:opacity-80"
-                style={{ background: "rgba(232,148,58,0.08)", border: "1px solid rgba(232,148,58,0.2)", color: "#d4a04a" }}
+              <div
+                className="mt-5 rounded-pill py-3 font-sans text-[11px] font-semibold uppercase tracking-[1.5px]"
+                style={{ background: "rgba(138,126,110,0.08)", border: "1px solid rgba(138,126,110,0.2)", color: "#8a7e6e" }}
               >
-                Browse Shop
-              </button>
+                Coming Soon
+              </div>
             </div>
 
             {/* Pricing */}
