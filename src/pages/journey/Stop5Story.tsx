@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
@@ -7,12 +7,65 @@ import AuthGate from "@/components/AuthGate";
 import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
 import { stripMarkdown } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const Stop5Story = () => {
   const navigate = useNavigate();
   const { unknownSurname, surname, story } = useJourney();
   const { user, hasPurchased, loading: purchaseLoading } = usePurchase();
   const [showAuth, setShowAuth] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
+
+  const unlockAudio = () => {
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new AudioContext();
+    }
+  };
+
+  const stopAudio = useCallback(() => {
+    try { sourceRef.current?.stop(); } catch {}
+    sourceRef.current = null;
+    setSpeaking(false);
+    setPaused(false);
+  }, []);
+
+  const speakStory = useCallback(async (text: string) => {
+    unlockAudio();
+    stopAudio();
+    setSpeaking(true);
+    setPaused(false);
+    try {
+      const { data, error: fnErr } = await supabase.functions.invoke("ancestor-tts", { body: { text } });
+      if (fnErr) throw new Error(fnErr.message);
+      if (!data?.audio) throw new Error("No audio data");
+      const binary = atob(data.audio);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const ctx = audioCtxRef.current!;
+      if (ctx.state === "suspended") await ctx.resume();
+      const audioBuffer = await ctx.decodeAudioData(bytes.buffer);
+      const source = ctx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(ctx.destination);
+      sourceRef.current = source;
+      source.onended = () => { setSpeaking(false); setPaused(false); sourceRef.current = null; };
+      source.start(0);
+    } catch {
+      setSpeaking(false);
+    }
+  }, [stopAudio]);
+
+  const togglePause = useCallback(() => {
+    const ctx = audioCtxRef.current;
+    if (!ctx) return;
+    if (ctx.state === "running") { ctx.suspend(); setPaused(true); }
+    else { ctx.resume(); setPaused(false); }
+  }, []);
+
+  useEffect(() => () => { stopAudio(); }, [stopAudio]);
 
   useEffect(() => {
     if (unknownSurname) navigate("/journey/1", { replace: true });
@@ -60,6 +113,52 @@ const Stop5Story = () => {
           >
             {stripMarkdown(story.data.chapterOneTitle)}
           </motion.h1>
+
+          {/* Listen button */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="mt-5 flex items-center gap-3"
+          >
+            {!speaking ? (
+              <button
+                onClick={() => {
+                  const title = stripMarkdown(story.data!.chapterOneTitle);
+                  const body = stripMarkdown(story.data!.chapterOneBody);
+                  speakStory(`${title}. ${body}`);
+                }}
+                className="flex items-center gap-2 rounded-full border px-5 py-2 font-sans text-xs font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
+                style={{ borderColor: "rgba(212,160,74,0.35)", color: "#d4a04a", background: "rgba(212,160,74,0.06)" }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                Listen
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={togglePause}
+                  className="flex items-center gap-2 rounded-full border px-5 py-2 font-sans text-xs font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
+                  style={{ borderColor: "rgba(212,160,74,0.35)", color: "#d4a04a", background: "rgba(212,160,74,0.06)" }}
+                >
+                  {paused ? (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  ) : (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  )}
+                  {paused ? "Resume" : "Pause"}
+                </button>
+                <button
+                  onClick={stopAudio}
+                  className="flex items-center gap-2 rounded-full border px-4 py-2 font-sans text-xs font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
+                  style={{ borderColor: "rgba(138,126,110,0.3)", color: "#8a7e6e", background: "transparent" }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
+                  Stop
+                </button>
+              </>
+            )}
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0 }}
