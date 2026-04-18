@@ -22,6 +22,15 @@ const Stop6PassItOn = () => {
 
   const [giftEmail, setGiftEmail] = useState("");
   const [showGiftAuth, setShowGiftAuth] = useState(false);
+  const [showUnlockAuth, setShowUnlockAuth] = useState(false);
+
+  const handleUnlockClick = () => {
+    if (!user) {
+      setShowUnlockAuth(true);
+      return;
+    }
+    navigate("/checkout");
+  };
 
   const sendPreview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,7 +190,7 @@ const Stop6PassItOn = () => {
               </p>
               <div className="mt-3 font-display text-2xl" style={{ color: "#e8b85c" }}>$29.99</div>
               <button
-                onClick={() => navigate("/checkout")}
+                onClick={handleUnlockClick}
                 className="mt-5 rounded-pill py-3 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
                 style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
               >
@@ -237,6 +246,13 @@ const Stop6PassItOn = () => {
         <AuthGate
           onAuthenticated={handleGiftAuthenticated}
           onClose={() => setShowGiftAuth(false)}
+        />
+      )}
+
+      {showUnlockAuth && (
+        <AuthGate
+          onAuthenticated={() => { setShowUnlockAuth(false); navigate("/checkout"); }}
+          onClose={() => setShowUnlockAuth(false)}
         />
       )}
     </div>
