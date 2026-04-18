@@ -33,7 +33,6 @@ declare global {
 
 export default function AncestorChat() {
   const [surname, setSurname] = useState("");
-  const [country, setCountry] = useState("");
   const [started, setStarted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -78,7 +77,7 @@ export default function AncestorChat() {
 
     try {
       const { data, error: fnErr } = await supabase.functions.invoke("ancestor-tts", {
-        body: { text, country: country.trim() || undefined },
+        body: { text },
       });
       if (fnErr) throw new Error(fnErr.message);
       if (!data?.audio) throw new Error("No audio data");
@@ -263,14 +262,6 @@ export default function AncestorChat() {
               value={surname}
               onChange={(e) => setSurname(e.target.value)}
               placeholder="Enter your surname"
-              maxLength={60}
-              className="flex-1 rounded-pill border border-gold-line bg-input px-6 py-4 font-sans text-foreground placeholder:text-text-dim focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-            <input
-              type="text"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              placeholder="Country of origin (optional)"
               maxLength={60}
               className="flex-1 rounded-pill border border-gold-line bg-input px-6 py-4 font-sans text-foreground placeholder:text-text-dim focus:outline-none focus:ring-2 focus:ring-ring"
             />
