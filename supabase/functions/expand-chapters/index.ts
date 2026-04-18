@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
-import { callClaudeJson } from "../generate-legacy/claude.ts";
+import { callClaudeJson } from "./claude.ts";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
