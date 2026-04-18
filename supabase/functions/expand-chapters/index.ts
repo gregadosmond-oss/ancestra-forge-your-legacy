@@ -82,9 +82,11 @@ Deno.serve(async (req: Request) => {
     return json({ code: "OK", chapterBodies: story.chapterBodies });
   }
 
-  if (!story.teaserChapters || story.teaserChapters.length < 8) {
+  if (!story.teaserChapters || story.teaserChapters.length < 1) {
     return json({ error: "story teaserChapters missing" }, 422);
   }
+
+  const expectedCount = story.teaserChapters.length;
 
   // Generate chapter bodies
   const userPrompt = `Family surname: "${surname}"
@@ -92,7 +94,7 @@ Chapter 1 (already written): "${story.chapterOneTitle}"
 Chapters to write bodies for:
 ${story.teaserChapters.map((t, i) => `${i + 2}. ${t}`).join("\n")}
 
-Write ~150 words of cinematic prose for each of these 8 chapters.`;
+Write ~150 words of cinematic prose for each of these ${expectedCount} chapters. Return exactly ${expectedCount} entries in chapterBodies, one per chapter title above, in the same order.`;
 
   let chapterBodies: string[];
   try {
@@ -100,16 +102,24 @@ Write ~150 words of cinematic prose for each of these 8 chapters.`;
       apiKey,
       system: EXPAND_SYSTEM,
       user: userPrompt,
-      maxTokens: 6000,
+      maxTokens: 8000,
     });
     chapterBodies = result.chapterBodies;
   } catch (err) {
+    console.error("expand-chapters claude error", err);
     return json({ error: (err as Error).message }, 500);
   }
 
-  if (!chapterBodies || chapterBodies.length !== 8) {
+  if (!Array.isArray(chapterBodies) || chapterBodies.length === 0) {
+    console.error("expand-chapters bad shape", { received: chapterBodies?.length, expected: expectedCount });
     return json({ error: "unexpected response shape from Claude" }, 500);
   }
+
+  // If Claude returned fewer than expected, pad; if more, truncate
+  if (chapterBodies.length < expectedCount) {
+    console.warn(`expand-chapters got ${chapterBodies.length}, expected ${expectedCount}`);
+  }
+  chapterBodies = chapterBodies.slice(0, expectedCount);
 
   // Save back to story_payload
   const updatedStory = { ...story, chapterBodies };
