@@ -20,7 +20,7 @@ export default function FreeCrest({ surname, legacyUrl }: FreeCrestProps) {
         alt="Scan to view your legacy"
         style={{
           position: "absolute",
-          top: "55%",
+          top: "60%",
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: "11%",
