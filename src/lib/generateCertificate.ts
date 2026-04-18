@@ -9,7 +9,7 @@ interface CertificateData {
 
 export function generateCertificate({ facts, story, crestUrl, surname }: CertificateData): void {
   const displaySurname = facts.displaySurname;
-  const certNumber = `ANCESTRA-${Date.now().toString(36).toUpperCase().slice(-8)}`;
+  const certNumber = `ANCESTORSQR-${Date.now().toString(36).toUpperCase().slice(-8)}`;
   const issuedDate = new Date().toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -379,7 +379,7 @@ export function generateCertificate({ facts, story, crestUrl, surname }: Certifi
 <body>
 
   <!-- Watermark -->
-  <div class="watermark">ANCESTRA</div>
+  <div class="watermark">ANCESTORSQR</div>
 
   <!-- Borders -->
   <div class="border-outer">
@@ -417,7 +417,7 @@ export function generateCertificate({ facts, story, crestUrl, surname }: Certifi
 
       <!-- Header -->
       <div>
-        <p class="cert-label">Legacy Certificate &nbsp;·&nbsp; An Ancestra Original</p>
+        <p class="cert-label">Legacy Certificate &nbsp;·&nbsp; An AncestorsQR Original</p>
         <p class="house-name">House ${displaySurname}</p>
         <p class="house-sub">Est. ${facts.meaning.origin.replace(/[^0-9–—,\s]/g, "").trim() || facts.meaning.origin} &nbsp;✦&nbsp; ${facts.meaning.role}</p>
       </div>

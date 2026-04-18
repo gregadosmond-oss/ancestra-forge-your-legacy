@@ -116,7 +116,7 @@ export default function GiftOccasionPage() {
           className="mb-6 font-sans text-[10px] uppercase tracking-[4px]"
           style={{ color: "#a07830" }}
         >
-          Why Ancestra
+          Why AncestorsQR
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           {[
@@ -319,7 +319,7 @@ export default function GiftOccasionPage() {
           className="mb-3 font-sans text-[10px] uppercase tracking-[4px]"
           style={{ color: "#a07830" }}
         >
-          Forged by Ancestra
+          Forged by AncestorsQR
         </p>
         <h2
           className="mx-auto font-display leading-tight text-cream-warm"

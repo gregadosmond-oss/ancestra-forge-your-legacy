@@ -68,7 +68,7 @@ export default function Shop() {
           className="mb-4 font-sans text-[10px] uppercase tracking-[4px]"
           style={{ color: "#a07830" }}
         >
-          Forged by Ancestra
+          Forged by AncestorsQR
         </motion.p>
         <motion.h1
           {...stagger(1)}
@@ -443,7 +443,7 @@ export default function Shop() {
           className="mb-3 font-sans text-[10px] uppercase tracking-[4px]"
           style={{ color: "#a07830" }}
         >
-          Forged by Ancestra
+          Forged by AncestorsQR
         </p>
         <h2
           className="mx-auto font-display leading-tight text-cream-warm"
