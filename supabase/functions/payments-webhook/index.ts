@@ -126,7 +126,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     }
   } else if (buyerEmail) {
     // Regular purchase — send confirmation to buyer
-    await sendBuyerConfirmationEmail({ buyerEmail, surname, userId });
+    await sendBuyerConfirmationEmail({ buyerEmail, surname, userId, sessionId: session.id });
   }
 }
 
@@ -226,10 +226,12 @@ async function sendBuyerConfirmationEmail({
   buyerEmail,
   surname,
   userId,
+  sessionId,
 }: {
   buyerEmail: string;
   surname?: string;
   userId: string;
+  sessionId: string;
 }) {
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   if (!RESEND_API_KEY) {
@@ -237,82 +239,120 @@ async function sendBuyerConfirmationEmail({
     return;
   }
 
-  // Pull crest URL and motto from DB
+  // Idempotency — only send once per stripe session
+  const { data: existing } = await supabase
+    .from("purchases")
+    .select("id")
+    .eq("stripe_session_id", sessionId)
+    .maybeSingle();
+
+  if ((existing as any)?.email_sent === true) {
+    console.log("Email already sent for session:", sessionId);
+    return;
+  }
+
   const normalized = surname?.trim().toLowerCase() ?? "";
   const [crestRow, factsRow] = await Promise.all([
     normalized
-      ? supabase
-          .from("surname_crests")
-          .select("image_url")
-          .eq("surname", normalized)
-          .maybeSingle()
+      ? supabase.from("surname_crests").select("image_url").eq("surname", normalized).maybeSingle()
       : Promise.resolve({ data: null }),
     normalized
-      ? supabase
-          .from("surname_facts")
-          .select("payload")
-          .eq("surname", normalized)
-          .maybeSingle()
+      ? supabase.from("surname_facts").select("payload, story_payload").eq("surname", normalized).maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
 
   const crestUrl = (crestRow as any).data?.image_url ?? null;
   const facts = (factsRow as any).data?.payload ?? null;
-  const displaySurname = facts?.displaySurname ?? surname ?? "Your Family";
+  const story = (factsRow as any).data?.story_payload ?? null;
+
+  const displaySurname =
+    facts?.displaySurname ??
+    (surname ? surname.trim().replace(/\b\w/g, (c: string) => c.toUpperCase()) : "Your Family");
   const mottoLatin = facts?.mottoLatin ?? null;
   const mottoEnglish = facts?.mottoEnglish ?? null;
-  const journeyUrl = "https://ancestorsqr.com/my-legacy";
+
+  const teaserChapters: string[] = Array.isArray(story?.teaserChapters)
+    ? story.teaserChapters.slice(0, 4)
+    : Array.isArray(story?.chapters)
+      ? story.chapters.slice(1, 5).map((c: any) => c?.title ?? "")
+      : [];
+  const chapterOneTitle: string =
+    story?.chapterOneTitle ??
+    story?.chapters?.[0]?.title ??
+    "Chapter I — The Beginning";
+
+  const legacyUrl = "https://ancestorsqr.com/my-legacy";
 
   const crestSection = crestUrl
-    ? `<div style="text-align:center;padding:32px 40px;border-bottom:1px solid #3d3020;">
-        <img src="${crestUrl}" alt="${displaySurname} Crest" width="220" style="max-width:220px;display:inline-block;" />
-      </div>`
+    ? `<tr><td align="center" style="padding:32px 0;">
+        <img src="${crestUrl}" alt="${displaySurname} Family Crest" width="280" style="display:block;width:280px;max-width:280px;border-radius:8px;" />
+      </td></tr>`
     : "";
 
-  const mottoSection = mottoLatin
-    ? `<p style="margin:0 0 6px;font-size:20px;font-style:italic;color:#e8b85c;">${mottoLatin}</p>
-       <p style="margin:0;font-size:11px;letter-spacing:3px;color:#a07830;text-transform:uppercase;font-family:Arial,sans-serif;">${mottoEnglish}</p>`
+  const mottoBlock = mottoLatin
+    ? `<tr><td align="center" style="padding:0 40px 8px;">
+         <p style="margin:0;font-size:22px;font-style:italic;color:#e8b85c;font-family:Georgia,serif;">${mottoLatin}</p>
+       </td></tr>
+       <tr><td align="center" style="padding:0 40px 32px;">
+         <p style="margin:0;font-size:11px;letter-spacing:3px;color:#8a7e6e;text-transform:uppercase;font-family:Arial,sans-serif;">${mottoEnglish ?? ""}</p>
+       </td></tr>`
+    : "";
+
+  const teaserList = teaserChapters
+    .map(
+      (title, i) =>
+        `<li style="margin:0 0 8px;font-style:italic;color:#8a7e6e;font-size:14px;line-height:1.6;opacity:${(1 - i * 0.15).toFixed(2)};">${title}</li>`
+    )
+    .join("");
+
+  const remaining = Math.max(0, 9 - 1 - teaserChapters.length);
+  const remainingLine = remaining > 0
+    ? `<p style="margin:16px 0 0;font-size:13px;font-style:italic;color:#8a7e6e;">…and ${remaining} more chapters inside.</p>`
     : "";
 
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><title>Your Legacy is Ready</title></head>
 <body style="margin:0;padding:0;background:#0d0a07;font-family:Georgia,serif;">
-  <div style="max-width:600px;margin:0 auto;background:#13100b;border:1px solid #3d3020;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0d0a07;padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
 
-    <div style="padding:48px 40px 32px;text-align:center;border-bottom:1px solid #3d3020;">
-      <p style="margin:0 0 16px;font-size:11px;letter-spacing:4px;color:#a07830;text-transform:uppercase;font-family:Arial,sans-serif;">YOUR LEGACY IS READY</p>
-      <h1 style="margin:0 0 12px;font-size:38px;color:#f0e8da;font-weight:400;line-height:1.2;">House ${displaySurname}</h1>
-      ${mottoSection}
-    </div>
+        <tr><td align="center" style="padding:8px 0 24px;">
+          <p style="margin:0;font-size:14px;letter-spacing:6px;color:#d4a04a;font-family:Arial,sans-serif;font-weight:700;">ANCESTRA</p>
+        </td></tr>
+        <tr><td style="padding:0 0 32px;">
+          <div style="height:1px;background:linear-gradient(to right, transparent, #3d3020, transparent);"></div>
+        </td></tr>
 
-    ${crestSection}
+        <tr><td style="background:#1a1510;padding:40px;border-radius:12px;text-align:center;">
+          <h1 style="margin:0 0 16px;font-size:28px;color:#f0e8da;font-family:Georgia,serif;font-weight:400;line-height:1.3;">Your Legacy Has Been Forged.</h1>
+          <p style="margin:0;font-size:15px;font-style:italic;color:#c4b8a6;line-height:1.7;">Everything you discovered about the ${displaySurname} family is waiting for you.</p>
+        </td></tr>
 
-    <div style="padding:32px 40px;border-bottom:1px solid #3d3020;">
-      <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#d0c4b4;">Your Legacy Pack includes:</p>
-      <ul style="margin:0;padding:0 0 0 20px;color:#c4b8a6;font-size:14px;line-height:2.2;">
-        <li>Custom ${displaySurname} Coat of Arms (high-res PNG)</li>
-        <li>AI-written family story — 9 chapters</li>
-        <li>Full migration history &amp; ancestry</li>
-        <li>Family motto in Latin &amp; English</li>
-        <li>Heraldic symbolism breakdown</li>
-      </ul>
-    </div>
+        ${crestSection}
+        ${mottoBlock}
 
-    <div style="padding:40px;text-align:center;">
-      <p style="margin:0 0 28px;font-size:16px;font-style:italic;color:#c4b8a6;line-height:1.7;">
-        Every family has a story worth telling.<br>Yours has been forged.
-      </p>
-      <a href="${journeyUrl}" style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg,#e8943a,#c47828);color:#1a1208;text-decoration:none;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:60px;">
-        View Your Legacy
-      </a>
-      <p style="margin:32px 0 0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;line-height:1.8;">
-        Forged by AncestorsQR &nbsp;·&nbsp; ancestorsqr.com<br>
-        Questions? Reply to this email.
-      </p>
-    </div>
+        <tr><td style="padding:24px 40px;">
+          <p style="margin:0 0 12px;font-size:10px;letter-spacing:4px;color:#a07830;text-transform:uppercase;font-family:Arial,sans-serif;">YOUR FAMILY STORY</p>
+          <h2 style="margin:0 0 20px;font-size:20px;color:#e8b85c;font-family:Georgia,serif;font-weight:400;">${chapterOneTitle}</h2>
+          <ul style="margin:0;padding:0 0 0 18px;list-style:none;">${teaserList}</ul>
+          ${remainingLine}
+        </td></tr>
 
-  </div>
+        <tr><td align="center" style="padding:40px;">
+          <a href="${legacyUrl}" style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg,#e8943a,#c47828);color:#1a1208;text-decoration:none;font-family:Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:60px;">View Your Full Legacy</a>
+        </td></tr>
+
+        <tr><td align="center" style="padding:24px 40px 8px;">
+          <p style="margin:0 0 8px;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;letter-spacing:1px;">One-time purchase · Instant access · No subscription</p>
+          <p style="margin:0 0 8px;font-size:11px;color:#8a7e6e;font-family:Georgia,serif;font-style:italic;">© 2026 Ancestra — Every family has a story worth telling.</p>
+          <p style="margin:0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;">You're receiving this because you purchased a Legacy Pack.</p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
 </body>
 </html>`;
 
@@ -325,16 +365,23 @@ async function sendBuyerConfirmationEmail({
     body: JSON.stringify({
       from: FROM_ADDRESS,
       to: [buyerEmail],
-      subject: `Your ${displaySurname} Legacy Pack is ready`,
+      subject: `Your Legacy is Ready, ${displaySurname} Family`,
       html,
     }),
   });
 
   if (!res.ok) {
     console.error("Failed to send buyer confirmation email:", await res.text());
-  } else {
-    console.log("Buyer confirmation email sent to:", buyerEmail);
+    return;
   }
+
+  console.log("Buyer confirmation email sent to:", buyerEmail);
+
+  // Best-effort idempotency mark — non-fatal if column does not exist
+  await supabase
+    .from("purchases")
+    .update({ email_sent: true })
+    .eq("stripe_session_id", sessionId);
 }
 
 // ─── Gift notification email ─────────────────────────────────────────────────

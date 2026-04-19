@@ -171,6 +171,7 @@ export type Database = {
           amount_total: number | null
           created_at: string | null
           currency: string | null
+          email_sent: boolean
           environment: string
           id: string
           status: string
@@ -183,6 +184,7 @@ export type Database = {
           amount_total?: number | null
           created_at?: string | null
           currency?: string | null
+          email_sent?: boolean
           environment?: string
           id?: string
           status?: string
@@ -195,6 +197,7 @@ export type Database = {
           amount_total?: number | null
           created_at?: string | null
           currency?: string | null
+          email_sent?: boolean
           environment?: string
           id?: string
           status?: string
