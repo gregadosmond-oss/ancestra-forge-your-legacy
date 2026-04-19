@@ -8,8 +8,8 @@ interface MugMockupProps {
 export default function MugMockup({ surname }: MugMockupProps) {
   const [mockupUrl, setMockupUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [noCrest, setNoCrest] = useState(false);
   const debounceRef = useRef<number | null>(null);
+  const PLACEHOLDER_CREST = "https://fjtkjbnvpobawqqkzrst.supabase.co/storage/v1/object/public/crests/placeholder-crest.png";
 
   useEffect(() => {
     const trimmed = surname.trim();
