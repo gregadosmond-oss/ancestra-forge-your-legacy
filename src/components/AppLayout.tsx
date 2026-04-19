@@ -7,6 +7,13 @@ import AuthGate from "@/components/AuthGate";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+const AppLayout = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [showAuthGate, setShowAuthGate] = useState(false);
+  const { user, loading } = useAuth();
+
   const isLanding = location.pathname === "/";
   const journeyMatch = location.pathname.match(/^\/journey\/(\d+)$/);
   const stepNumber = journeyMatch ? journeyMatch[1] : null;
@@ -14,6 +21,16 @@ import { toast } from "sonner";
 
   const showBack = !isLanding;
   const showStepCounter = !!stepNumber;
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error("Sign out failed. Please try again.");
+    } else {
+      toast.success("Signed out successfully");
+      navigate("/");
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -79,6 +96,33 @@ import { toast } from "sonner";
           >
             Our Story
           </NavLink>
+          {loading ? null : user ? (
+            <>
+              <NavLink
+                to="/my-legacy"
+                className="transition-colors duration-200 hover:text-amber"
+                activeClassName="text-amber"
+                style={{ color: "#e8b85c" }}
+              >
+                My Legacy
+              </NavLink>
+              <button
+                onClick={handleSignOut}
+                className="transition-colors duration-200 hover:text-amber"
+                style={{ color: "#c4b8a6" }}
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => setShowAuthGate(true)}
+              className="transition-colors duration-200 hover:text-amber"
+              style={{ color: "#c4b8a6" }}
+            >
+              Sign In
+            </button>
+          )}
           <Link
             to="/journey"
             className="transition-colors duration-200 hover:opacity-80"
@@ -151,6 +195,14 @@ import { toast } from "sonner";
           </svg>
         )}
       </button>}
+
+      {/* AuthGate Modal */}
+      {showAuthGate && (
+        <AuthGate
+          onAuthenticated={() => setShowAuthGate(false)}
+          onClose={() => setShowAuthGate(false)}
+        />
+      )}
     </div>
   );
 };
