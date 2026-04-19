@@ -30,7 +30,7 @@ const LEGACY_ITEMS = [
 
 const HEIRLOOM_ITEMS = [
   "Custom crest mug — printed & shipped",
-  "Full Legacy Pack included ($29 value)",
+  "Full Legacy Pack included ($29.99 value)",
   "\"HOUSE OF [NAME]\" wrap-around design",
   "QR code linking to your legacy page",
   "Ships worldwide in 5–7 days",
