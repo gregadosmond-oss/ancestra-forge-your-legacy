@@ -59,17 +59,19 @@ async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl
       "X-PF-Store-Id": storeId,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      variant_ids: [variantId],
-      format: "jpg",
-      files: [
-        {
-          placement: "default",
-          image_url: designUrl,
-          position: { area_width: 2475, area_height: 1155, width: 2475, height: 1155, top: 0, left: 0 },
-        },
-      ],
-    }),
+      body: JSON.stringify({
+        variant_ids: [variantId],
+        format: "jpg",
+        files: [
+          {
+            placement: "default",
+            image_url: designUrl,
+            // Center crest as square within the wide mug print area (2475x1155).
+            // Square ~1100px tall, centered horizontally.
+            position: { area_width: 2475, area_height: 1155, width: 1100, height: 1100, top: 28, left: 688 },
+          },
+        ],
+      }),
   });
 
   if (!createRes.ok) throw new Error(`Printful create-task failed (${createRes.status}): ${await createRes.text()}`);
@@ -146,8 +148,22 @@ serve(async (req) => {
 
     // 2. Call Printful with the raw crest URL directly
     console.log("[generate-mug-mockup] Cache miss, calling Printful with crestUrl:", crestUrl);
-    const mockupUrl = await generatePrintfulMockup(printfulKey, printfulStoreId, crestUrl);
-    console.log("[generate-mug-mockup] Got mockupUrl:", mockupUrl);
+    let mockupUrl: string;
+    try {
+      mockupUrl = await generatePrintfulMockup(printfulKey, printfulStoreId, crestUrl);
+      console.log("[generate-mug-mockup] Got mockupUrl:", mockupUrl);
+    } catch (printfulErr) {
+      console.error("[generate-mug-mockup] Printful failed, returning fallback:", printfulErr);
+      return new Response(
+        JSON.stringify({
+          mockupUrl: crestUrl,
+          cached: false,
+          fallback: true,
+          error: (printfulErr as Error).message,
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // 3. Save cache reference (best-effort)
     const { error: cacheErr } = await supabase.storage
