@@ -78,7 +78,7 @@ const AppLayout = () => {
             activeClassName="text-amber"
             style={{ color: "#c4b8a6" }}
           >
-            About
+            Our Story
           </NavLink>
           <Link
             to="/journey"
