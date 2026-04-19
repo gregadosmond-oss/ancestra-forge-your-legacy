@@ -54,7 +54,7 @@ async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl
 
     const pollRes = await fetch(
       `${PRINTFUL_BASE}/mockup-generator/task?task_key=${encodeURIComponent(taskKey)}`,
-      { headers: { Authorization: `Bearer ${apiKey}` } }
+      { headers: { Authorization: `Bearer ${apiKey}`, "X-PF-Store-Id": storeId } }
     );
 
     if (!pollRes.ok) {
