@@ -21,7 +21,6 @@ export default function MugMockup({ surname }: MugMockupProps) {
 
     if (!trimmed) {
       setMockupUrl(null);
-      setNoCrest(false);
       setLoading(false);
       return;
     }
@@ -40,14 +39,7 @@ export default function MugMockup({ surname }: MugMockupProps) {
 
         if (cancelled) return;
 
-        if (!crest?.image_url) {
-          setNoCrest(true);
-          setMockupUrl(null);
-          setLoading(false);
-          return;
-        }
-
-        setNoCrest(false);
+        const crestUrl = crest?.image_url ?? PLACEHOLDER_CREST;
 
         console.log("[MugMockup] Invoking generate-mug-mockup:", { surname: trimmed, crestUrl: crest.image_url });
         const { data, error } = await supabase.functions.invoke("generate-mug-mockup", {
