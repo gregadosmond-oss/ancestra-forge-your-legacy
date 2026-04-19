@@ -148,8 +148,22 @@ serve(async (req) => {
 
     // 2. Call Printful with the raw crest URL directly
     console.log("[generate-mug-mockup] Cache miss, calling Printful with crestUrl:", crestUrl);
-    const mockupUrl = await generatePrintfulMockup(printfulKey, printfulStoreId, crestUrl);
-    console.log("[generate-mug-mockup] Got mockupUrl:", mockupUrl);
+    let mockupUrl: string;
+    try {
+      mockupUrl = await generatePrintfulMockup(printfulKey, printfulStoreId, crestUrl);
+      console.log("[generate-mug-mockup] Got mockupUrl:", mockupUrl);
+    } catch (printfulErr) {
+      console.error("[generate-mug-mockup] Printful failed, returning fallback:", printfulErr);
+      return new Response(
+        JSON.stringify({
+          mockupUrl: crestUrl,
+          cached: false,
+          fallback: true,
+          error: (printfulErr as Error).message,
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // 3. Save cache reference (best-effort)
     const { error: cacheErr } = await supabase.storage
