@@ -27,11 +27,11 @@ const LEGACY_ITEMS = [
 ];
 
 const HEIRLOOM_ITEMS = [
-  "Framed crest print, mugs & glassware",
-  "Hardcover legacy book",
-  "Christmas ornaments & coasters",
-  "Metal wall sign & more",
-  "Ships worldwide — perfect to gift",
+  "Custom crest mug — printed & shipped",
+  "Full Legacy Pack included ($29 value)",
+  "\"HOUSE OF [NAME]\" wrap-around design",
+  "QR code linking to your legacy page",
+  "Ships worldwide in 5–7 days",
 ];
 
 const PacksSection = () => (
@@ -131,10 +131,10 @@ const PacksSection = () => (
       >
         <div className="mb-3 text-3xl">🎁</div>
         <h3 className="font-display text-lg text-cream-warm">Heirloom Shop</h3>
-        <div className="mt-3 font-display text-3xl text-amber-light">$49+</div>
-        <p className="mt-1 text-[11px] text-text-dim">Legacy Pack included · Ships worldwide</p>
+        <div className="mt-3 font-display text-3xl text-amber-light">$49.99</div>
+        <p className="mt-1 text-[11px] text-text-dim">Mug · Legacy Pack included · Ships worldwide</p>
         <p className="mt-3 font-serif text-xs italic text-text-dim">
-          The perfect gift for family. Every heirloom comes with a full Legacy Pack — their crest, story, and tree.
+          Your family crest, name & QR code on a ceramic mug — plus the full digital Legacy Pack.
         </p>
         <ul className="mt-4 w-full space-y-1 text-left text-sm text-foreground">
           {HEIRLOOM_ITEMS.map((item) => (
@@ -144,16 +144,16 @@ const PacksSection = () => (
             </li>
           ))}
         </ul>
-        <div
-          className="mt-6 w-full rounded-pill py-3 text-center text-[12px] font-semibold uppercase tracking-[1.5px]"
+        <Link
+          to="/heirloom-order"
+          className="mt-6 w-full rounded-pill py-3 text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-400"
           style={{
-            background: "rgba(138,126,110,0.08)",
-            border: "1px solid rgba(138,126,110,0.2)",
-            color: "#8a7e6e",
+            background: "linear-gradient(135deg, #e8943a, #c47828)",
+            color: "#1a1208",
           }}
         >
-          Coming Soon
-        </div>
+          Order Now →
+        </Link>
       </motion.div>
 
     </div>

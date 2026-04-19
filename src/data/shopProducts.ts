@@ -6,6 +6,8 @@ export type ShopProduct = {
   description: string;
   tag?: string;
   category: "digital" | "print" | "drinkware" | "keepsake" | "book";
+  live?: boolean;
+  href?: string;
 };
 
 export type ShopBundle = {
@@ -97,6 +99,18 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   },
 
   // ── DRINKWARE ──
+  {
+    id: "heirloom-mug",
+    name: "Heirloom Crest Mug",
+    price: "$49.99",
+    priceNote: "Ships in 5–7 days",
+    description:
+      "Your family crest, name & QR code on a ceramic mug — printed and shipped worldwide. Includes the full digital Legacy Pack ($29 value).",
+    tag: "Now Available",
+    category: "drinkware",
+    live: true,
+    href: "/heirloom-order",
+  },
   {
     id: "beer-mug",
     name: "Beer Mug",
