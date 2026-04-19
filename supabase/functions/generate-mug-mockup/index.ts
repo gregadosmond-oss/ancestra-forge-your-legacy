@@ -77,13 +77,14 @@ async function findMugProductId(apiKey: string, storeId: string): Promise<number
   );
   console.log("[generate-mug-mockup] Mug products from Printful:", JSON.stringify(mugs, null, 2));
 
+  // Prefer a WHITE 11oz mug — exclude black/colored mugs
   const whiteMug =
-    mugs.find((p) => /white/i.test(p.title) && /11/.test(p.title)) ??
-    mugs.find((p) => /11\s*oz/i.test(p.title)) ??
+    mugs.find((p) => /white/i.test(p.title) && !/black|color/i.test(p.title)) ??
+    mugs.find((p) => /^(?!.*black).*mug/i.test(p.title)) ??
     mugs[0];
 
   if (!whiteMug) throw new Error(`No mug product found in Printful catalog (total: ${products.length})`);
-  console.log("[generate-mug-mockup] Selected mug product:", whiteMug);
+  console.log("[generate-mug-mockup] Selected mug product:", { id: whiteMug.id, title: whiteMug.title });
   return whiteMug.id;
 }
 
