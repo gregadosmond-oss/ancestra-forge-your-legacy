@@ -127,20 +127,46 @@ serve(async (req) => {
   }
 
   try {
-    const { surname, crestUrl, designUrl } = await req.json();
-    if (!surname || (!crestUrl && !designUrl)) {
-      return new Response(JSON.stringify({ error: "Missing surname or image url" }), {
+    const { surname, crestUrl, designUrl, designBase64 } = await req.json();
+    if (!surname || (!crestUrl && !designUrl && !designBase64)) {
+      return new Response(JSON.stringify({ error: "Missing surname or image source" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Prefer the pre-rendered design (full mug artwork) over the raw crest
-    const printImageUrl: string = designUrl ?? crestUrl;
-    const usingDesign = Boolean(designUrl);
-
     const supabase = createClient(supabaseUrl, serviceKey);
     const slug = surname.toLowerCase().replace(/\s+/g, "-");
+
+    // If client sent a base64 design, decode and upload it via service role first
+    let resolvedDesignUrl: string | undefined = designUrl;
+    if (designBase64 && !resolvedDesignUrl) {
+      try {
+        const cleaned = designBase64.includes(",")
+          ? designBase64.split(",")[1]
+          : designBase64;
+        const bytes = Uint8Array.from(atob(cleaned), (c) => c.charCodeAt(0));
+        const path = `heirloom-preview/${slug}-preview.png`;
+        const { error: upErr } = await supabase.storage
+          .from("crests")
+          .upload(path, bytes, { upsert: true, contentType: "image/png", cacheControl: "3600" });
+        if (upErr) throw upErr;
+        const { data: pub } = supabase.storage.from("crests").getPublicUrl(path);
+        resolvedDesignUrl = `${pub.publicUrl}?t=${Date.now()}`;
+        console.log("[generate-mug-mockup] Uploaded base64 design:", resolvedDesignUrl);
+      } catch (e) {
+        console.error("[generate-mug-mockup] Failed to upload base64 design:", e);
+        return new Response(
+          JSON.stringify({ error: `Design upload failed: ${(e as Error).message}` }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // Prefer the pre-rendered design (full mug artwork) over the raw crest
+    const printImageUrl: string = resolvedDesignUrl ?? crestUrl;
+    const usingDesign = Boolean(resolvedDesignUrl);
+
     // Separate cache namespace for design vs raw-crest mockups
     const cacheFile = `heirloom/mockup-${slug}-${usingDesign ? "design" : "crest"}.json`;
 
