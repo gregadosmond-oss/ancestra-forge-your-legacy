@@ -170,6 +170,8 @@ export default function Shop() {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((product, i) => {
             const isDigital = product.category === "digital";
+            const isLive = isDigital || product.live === true;
+            const linkHref = product.href ?? "/journey";
             return (
               <motion.div
                 key={product.id}
@@ -177,24 +179,24 @@ export default function Shop() {
                 className="relative flex flex-col rounded-[22px] p-6"
                 style={{
                   background: "#1a1510",
-                  border: `1px solid ${isDigital ? "rgba(232,148,58,0.18)" : "rgba(61,48,32,0.6)"}`,
-                  opacity: isDigital ? 1 : 0.7,
+                  border: `1px solid ${isLive ? "rgba(232,148,58,0.18)" : "rgba(61,48,32,0.6)"}`,
+                  opacity: isLive ? 1 : 0.7,
                   transition: "border-color 0.3s ease, background 0.3s ease",
-                  cursor: isDigital ? "default" : "default",
+                  cursor: "default",
                 }}
                 onMouseEnter={(e) => {
-                  if (!isDigital) return;
+                  if (!isLive) return;
                   (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(232,148,58,0.38)";
                   (e.currentTarget as HTMLDivElement).style.background = "#221c14";
                 }}
                 onMouseLeave={(e) => {
-                  if (!isDigital) return;
+                  if (!isLive) return;
                   (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(232,148,58,0.18)";
                   (e.currentTarget as HTMLDivElement).style.background = "#1a1510";
                 }}
               >
-                {/* Coming Soon badge for physical products */}
-                {!isDigital && (
+                {/* Coming Soon badge for non-live physical products */}
+                {!isLive && (
                   <span
                     className="mb-3 self-start rounded-pill font-sans text-[9px] uppercase tracking-[2px]"
                     style={{
@@ -208,7 +210,7 @@ export default function Shop() {
                   </span>
                 )}
 
-                {isDigital && product.tag && (
+                {isLive && product.tag && (
                   <span
                     className="mb-3 self-start rounded-pill font-sans text-[9px] uppercase tracking-[2px]"
                     style={{
@@ -232,14 +234,14 @@ export default function Shop() {
 
                 <h3
                   className="font-display text-xl"
-                  style={{ color: isDigital ? "#f0e8da" : "#8a7e6e" }}
+                  style={{ color: isLive ? "#f0e8da" : "#8a7e6e" }}
                 >
                   {product.name}
                 </h3>
 
                 <p
                   className="mt-1 font-display text-2xl"
-                  style={{ color: isDigital ? "#d4a04a" : "#5a4e3e" }}
+                  style={{ color: isLive ? "#d4a04a" : "#5a4e3e" }}
                 >
                   {product.price}
                   {product.priceNote && (
@@ -259,27 +261,41 @@ export default function Shop() {
                   {product.description}
                 </p>
 
-                {isDigital ? (
-                  <Link
-                    to="/journey"
-                    className="mt-5 self-start font-sans text-[11px] uppercase tracking-[1.5px]"
-                    style={{
-                      color: "#a07830",
-                      textDecoration: "none",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 5,
-                      transition: "color 0.2s",
-                    }}
-                    onMouseEnter={(e) =>
-                      ((e.currentTarget as HTMLAnchorElement).style.color = "#d4a04a")
-                    }
-                    onMouseLeave={(e) =>
-                      ((e.currentTarget as HTMLAnchorElement).style.color = "#a07830")
-                    }
-                  >
-                    Begin your journey →
-                  </Link>
+                {isLive ? (
+                  product.live ? (
+                    <Link
+                      to={linkHref}
+                      className="mt-5 self-start rounded-pill font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                      style={{
+                        padding: "10px 22px",
+                        background: "linear-gradient(135deg, #e8943a, #c47828)",
+                        color: "#1a1208",
+                      }}
+                    >
+                      Order Now →
+                    </Link>
+                  ) : (
+                    <Link
+                      to={linkHref}
+                      className="mt-5 self-start font-sans text-[11px] uppercase tracking-[1.5px]"
+                      style={{
+                        color: "#a07830",
+                        textDecoration: "none",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 5,
+                        transition: "color 0.2s",
+                      }}
+                      onMouseEnter={(e) =>
+                        ((e.currentTarget as HTMLAnchorElement).style.color = "#d4a04a")
+                      }
+                      onMouseLeave={(e) =>
+                        ((e.currentTarget as HTMLAnchorElement).style.color = "#a07830")
+                      }
+                    >
+                      Begin your journey →
+                    </Link>
+                  )
                 ) : (
                   <p
                     className="mt-5 font-sans text-[11px] uppercase tracking-[1.5px]"
