@@ -100,7 +100,8 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
   }
 
   // Trigger real crest generation server-side — non-fatal if it fails
-  if (surname && userId) {
+  // Skip for heirloom orders (already awaited above)
+  if (surname && userId && productType !== 'heirloom') {
     void triggerCrestGeneration(surname);
   }
 
