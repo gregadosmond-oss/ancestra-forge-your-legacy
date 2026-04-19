@@ -67,6 +67,12 @@ const CheckoutPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-10"
+          style={{
+            background: "#1a1510",
+            borderRadius: 18,
+            padding: "32px 24px",
+            border: "1px solid rgba(201,168,76,0.2)",
+          }}
         >
           <StripeEmbeddedCheckout
             priceId="legacy_pack_once"
