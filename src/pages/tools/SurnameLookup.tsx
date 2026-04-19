@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, MapPin, Calendar, Shield } from "lucide-react";
+import { Search, MapPin, Calendar, Shield, ScrollText, User, Compass, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type SurnameResult = {
@@ -10,6 +10,10 @@ type SurnameResult = {
   origin: string;
   dateFirstRecorded: string;
   ancestralRole: string;
+  motto?: string;
+  famousBearers?: string;
+  migration?: string;
+  coatOfArmsHint?: string;
 };
 
 const reveal = {
@@ -18,18 +22,39 @@ const reveal = {
   transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
 };
 
-const cards = [
+const baseCards = [
   { key: "meaning", label: "Meaning", icon: Search },
   { key: "origin", label: "Origin", icon: MapPin },
   { key: "dateFirstRecorded", label: "Date First Recorded", icon: Calendar },
   { key: "ancestralRole", label: "Ancestral Role", icon: Shield },
 ] as const;
 
+const extraCards = [
+  { key: "motto", label: "House Motto", icon: ScrollText },
+  { key: "famousBearers", label: "Famous Bearers", icon: User },
+  { key: "migration", label: "Migration", icon: Compass },
+  { key: "coatOfArmsHint", label: "Coat of Arms", icon: Crown },
+] as const;
+
+function MottoDisplay({ value }: { value: string }) {
+  const parts = value.split(/\s—\s|\s-\s/);
+  if (parts.length >= 2) {
+    return (
+      <>
+        <p className="font-serif italic text-amber-light text-lg leading-relaxed">{parts[0].trim()}</p>
+        <p className="text-text-dim font-sans text-sm mt-1">{parts.slice(1).join(" — ").trim()}</p>
+      </>
+    );
+  }
+  return <p className="font-serif italic text-amber-light leading-relaxed">{value}</p>;
+}
+
 export default function SurnameLookup() {
   const [surname, setSurname] = useState("");
   const [result, setResult] = useState<SurnameResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +79,18 @@ export default function SurnameLookup() {
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!result) return;
+    const text = `My surname ${result.surname} means ${result.meaning} first recorded ${result.dateFirstRecorded} in ${result.origin}. Ancestral role: ${result.ancestralRole} What's hiding in your name? ancestorsqr.com`;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setError("Couldn't copy to clipboard.");
     }
   };
 
@@ -142,7 +179,7 @@ export default function SurnameLookup() {
             </h2>
 
             <div className="mt-10 grid gap-6 sm:grid-cols-2">
-              {cards.map(({ key, label, icon: Icon }, i) => (
+              {baseCards.map(({ key, label, icon: Icon }, i) => (
                 <motion.div
                   key={key}
                   initial={{ opacity: 0, y: 24 }}
@@ -165,14 +202,67 @@ export default function SurnameLookup() {
                   </p>
                 </motion.div>
               ))}
+
+              {extraCards.map(({ key, label, icon: Icon }, i) => {
+                const value = result[key];
+                if (!value || value === "UNKNOWN") return null;
+                return (
+                  <motion.div
+                    key={key}
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.6,
+                      delay: 0.15 * (baseCards.length + i),
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    className="rounded-xl border border-gold-line bg-card p-6 transition-all duration-[400ms] hover:border-amber-dim/30"
+                  >
+                    <div className="mb-3 flex items-center gap-2">
+                      <Icon className="h-4 w-4 text-amber" />
+                      <span className="text-[10px] uppercase tracking-[3px] text-amber-dim font-sans">
+                        {label}
+                      </span>
+                    </div>
+                    {key === "motto" ? (
+                      <MottoDisplay value={value} />
+                    ) : (
+                      <p className="text-text-body font-sans leading-relaxed whitespace-pre-line">
+                        {value}
+                      </p>
+                    )}
+                  </motion.div>
+                );
+              })}
             </div>
+
+            {/* Share button */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-10 flex justify-center"
+            >
+              <button
+                type="button"
+                onClick={handleShare}
+                className="rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
+                style={{
+                  background: copied ? "rgba(74,158,106,0.12)" : "rgba(232,148,58,0.06)",
+                  border: `1px solid ${copied ? "rgba(74,158,106,0.4)" : "rgba(232,148,58,0.18)"}`,
+                  color: copied ? "#7fc99a" : "#d4a04a",
+                }}
+              >
+                {copied ? "Copied!" : "Share Your Results"}
+              </button>
+            </motion.div>
           </motion.section>
         )}
       </AnimatePresence>
       </div>
 
       {/* Journey CTA */}
-      <section className="relative z-10 py-20 text-center">
+      <section className="relative z-10 px-4 py-20 text-center">
         <motion.p
           {...reveal}
           className="mb-4 text-text-dim font-sans text-sm"
@@ -180,15 +270,14 @@ export default function SurnameLookup() {
           Want the full picture — crest, story, and bloodline?
         </motion.p>
         <Link
-          to="/journey"
-          className="inline-block rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
+          to="/journey/1"
+          className="block w-full max-w-2xl mx-auto rounded-pill px-10 py-5 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
           style={{
-            background: "rgba(232,148,58,0.06)",
-            border: "1px solid rgba(232,148,58,0.18)",
-            color: "#d4a04a",
+            background: "linear-gradient(135deg, #e8943a, #c47828)",
+            color: "#1a1208",
           }}
         >
-          Begin Your Journey
+          {result ? `Forge Your ${result.surname} Crest →` : "Begin Your Journey →"}
         </Link>
       </section>
     </div>

@@ -23,11 +23,15 @@ Return valid JSON ONLY matching this schema:
   "meaning": "string — what the name means, 1-2 sentences",
   "origin": "string — region and cultural origin, e.g. 'Anglo-Saxon England'",
   "dateFirstRecorded": "string — approximate century or year, e.g. '~900 AD' or '12th century'",
-  "ancestralRole": "string — what these people did, 1-2 sentences"
+  "ancestralRole": "string — what these people did, 1-2 sentences",
+  "motto": "string — a Latin motto for the House followed by an em dash and English translation, e.g. 'Fortitudine — By Fortitude'",
+  "famousBearers": "string — 2-3 notable historical people with this surname, one sentence each, separated by line breaks",
+  "migration": "string — one sentence describing where the family historically spread",
+  "coatOfArmsHint": "string — one sentence describing what heraldic symbols the family traditionally used"
 }
 
 If the surname is offensive, slang, or non-surname input, return:
-{"meaning":"UNKNOWN","origin":"UNKNOWN","dateFirstRecorded":"UNKNOWN","ancestralRole":"UNKNOWN"}`;
+{"meaning":"UNKNOWN","origin":"UNKNOWN","dateFirstRecorded":"UNKNOWN","ancestralRole":"UNKNOWN","motto":"UNKNOWN","famousBearers":"UNKNOWN","migration":"UNKNOWN","coatOfArmsHint":"UNKNOWN"}`;
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -63,7 +67,7 @@ Deno.serve(async (req: Request) => {
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 512,
+        max_tokens: 1024,
         system: SYSTEM,
         messages: [
           { role: "user", content: `What can you tell me about the surname "${body.surname.trim()}"?` },
