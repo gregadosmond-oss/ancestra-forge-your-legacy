@@ -191,16 +191,29 @@ export default function MugMockup({ surname }: MugMockupProps) {
         }}
       >
         {previewUrl ? (
-          <img
-            src={previewUrl}
-            alt={`${surname} family crest mug design`}
-            style={{
-              width: "100%",
-              borderRadius: 8,
-              boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-              display: "block",
-            }}
-          />
+          <div style={{ position: "relative", width: 400, margin: "0 auto" }}>
+            <img
+              src="https://images.printful.com/catalog/562/1_front_2.jpg"
+              alt="White ceramic mug"
+              style={{ width: "100%", display: "block" }}
+            />
+            <img
+              src={previewUrl}
+              alt={`${surname} family crest mug design`}
+              style={{
+                position: "absolute",
+                top: "18%",
+                left: "12%",
+                width: "62%",
+                height: "64%",
+                objectFit: "cover",
+                objectPosition: "left center",
+                transform: "perspective(600px) rotateY(-6deg)",
+                borderRadius: 4,
+                opacity: 0.92,
+              }}
+            />
+          </div>
         ) : loading ? (
           <div className="flex flex-col items-center gap-3">
             <div
@@ -226,7 +239,7 @@ export default function MugMockup({ surname }: MugMockupProps) {
           className="font-serif italic text-center mt-3"
           style={{ color: "#8a7e6e", fontSize: 13 }}
         >
-          This is the design that wraps around your mug
+          Your personalised mug — exactly as it will be printed
         </p>
       )}
     </div>
