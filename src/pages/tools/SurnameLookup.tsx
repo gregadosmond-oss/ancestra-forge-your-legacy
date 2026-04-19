@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, MapPin, Calendar, Shield, ScrollText, User, Compass, Crown } from "lucide-react";
+import { Search, MapPin, Calendar, Shield, ScrollText, User, Compass, Crown, Link2, Facebook, Twitter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type SurnameResult = {
