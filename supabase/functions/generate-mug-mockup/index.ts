@@ -63,7 +63,14 @@ async function buildDesign(crestUrl: string, qrUrl: string, surname: string): Pr
   <text x="950" y="${PRINT_H - SAFE_B - 28}" font-family="Georgia, serif" font-size="34" fill="#c9a84c" opacity="0.18" text-anchor="middle" letter-spacing="10">A N C E S T O R S Q R</text>
 </svg>`;
 
-  const resvg = new Resvg(svg, { fitTo: { mode: "width", value: PRINT_W } });
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "width", value: PRINT_W },
+    font: {
+      fontBuffers: fontBuffer ? [fontBuffer] : [],
+      defaultFontFamily: "Cormorant Garamond",
+      loadSystemFonts: false,
+    },
+  });
   return resvg.render().asPng();
 }
 
