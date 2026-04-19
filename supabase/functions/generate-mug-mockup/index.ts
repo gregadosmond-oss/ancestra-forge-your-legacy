@@ -40,7 +40,7 @@ async function findMugProductId(apiKey: string, storeId: string): Promise<number
 async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl: string): Promise<string> {
   const productId = await findMugProductId(apiKey, storeId);
   const createRes = await fetch(
-    `${PRINTFUL_BASE}/mockup-generator/create-task/${PRINTFUL_PRODUCT_ID}`,
+    `${PRINTFUL_BASE}/mockup-generator/create-task/${productId}`,
     {
       method: "POST",
       headers: {
