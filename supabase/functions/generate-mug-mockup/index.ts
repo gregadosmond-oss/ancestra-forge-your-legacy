@@ -59,17 +59,19 @@ async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl
       "X-PF-Store-Id": storeId,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      variant_ids: [variantId],
-      format: "jpg",
-      files: [
-        {
-          placement: "default",
-          image_url: designUrl,
-          position: { area_width: 2475, area_height: 1155, width: 2475, height: 1155, top: 0, left: 0 },
-        },
-      ],
-    }),
+      body: JSON.stringify({
+        variant_ids: [variantId],
+        format: "jpg",
+        files: [
+          {
+            placement: "default",
+            image_url: designUrl,
+            // Center crest as square within the wide mug print area (2475x1155).
+            // Square ~1100px tall, centered horizontally.
+            position: { area_width: 2475, area_height: 1155, width: 1100, height: 1100, top: 28, left: 688 },
+          },
+        ],
+      }),
   });
 
   if (!createRes.ok) throw new Error(`Printful create-task failed (${createRes.status}): ${await createRes.text()}`);
