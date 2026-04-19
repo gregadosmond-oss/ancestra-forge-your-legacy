@@ -8,8 +8,8 @@ interface MugMockupProps {
 export default function MugMockup({ surname }: MugMockupProps) {
   const [mockupUrl, setMockupUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [noCrest, setNoCrest] = useState(false);
   const debounceRef = useRef<number | null>(null);
+  const PLACEHOLDER_CREST = "https://fjtkjbnvpobawqqkzrst.supabase.co/storage/v1/object/public/crests/placeholder-crest.png";
 
   useEffect(() => {
     const trimmed = surname.trim();
@@ -21,7 +21,6 @@ export default function MugMockup({ surname }: MugMockupProps) {
 
     if (!trimmed) {
       setMockupUrl(null);
-      setNoCrest(false);
       setLoading(false);
       return;
     }
@@ -40,18 +39,11 @@ export default function MugMockup({ surname }: MugMockupProps) {
 
         if (cancelled) return;
 
-        if (!crest?.image_url) {
-          setNoCrest(true);
-          setMockupUrl(null);
-          setLoading(false);
-          return;
-        }
+        const crestUrl = crest?.image_url ?? PLACEHOLDER_CREST;
 
-        setNoCrest(false);
-
-        console.log("[MugMockup] Invoking generate-mug-mockup:", { surname: trimmed, crestUrl: crest.image_url });
+        console.log("[MugMockup] Invoking generate-mug-mockup:", { surname: trimmed, crestUrl });
         const { data, error } = await supabase.functions.invoke("generate-mug-mockup", {
-          body: { surname: trimmed, crestUrl: crest.image_url },
+          body: { surname: trimmed, crestUrl },
         });
         console.log("[MugMockup] Response:", { data, error });
 
@@ -103,13 +95,6 @@ export default function MugMockup({ surname }: MugMockupProps) {
           alt={`${surname} family crest mug preview`}
           className="h-full w-full object-contain"
         />
-      ) : noCrest ? (
-        <div className="flex flex-col items-center gap-2 px-6 text-center">
-          <div className="text-5xl">☕</div>
-          <p className="font-serif text-sm italic text-text-dim">
-            No crest yet for "{surname.trim()}" — your mug will be forged after checkout.
-          </p>
-        </div>
       ) : (
         <div className="flex flex-col items-center gap-2 px-6 text-center">
           <div className="text-5xl">☕</div>
