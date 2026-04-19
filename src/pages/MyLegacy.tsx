@@ -53,14 +53,17 @@ function useLegacyData(userId: string | undefined): LegacyData {
         if (profileErr) throw new Error(profileErr.message);
 
         const sessionSurname = sessionStorage.getItem("ancestra_journey_surname");
-        const surname = sessionSurname ?? profile?.surname ?? null;
+        const rawSurname = sessionSurname ?? profile?.surname ?? null;
 
-        if (!surname) {
+        if (!rawSurname) {
           setData({ facts: null, story: null, crestUrl: null, surname: null, loading: false, generating: false, error: null });
           return;
         }
 
-        // Always keep profile in sync with the journey surname
+        // Normalize for DB lookups — surname_crests/surname_facts are keyed on lowercase
+        const surname = rawSurname.trim().toLowerCase();
+
+        // Always keep profile in sync with the journey surname (store normalized)
         if (surname !== profile?.surname) {
           await supabase.from("profiles").upsert({ id: userId, surname }, { onConflict: "id" });
         }
