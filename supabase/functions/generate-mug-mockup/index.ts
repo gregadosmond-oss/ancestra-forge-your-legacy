@@ -9,13 +9,14 @@ const PRINTFUL_BASE = "https://api.printful.com";
 const PRINTFUL_PRODUCT_ID = 362; // White 11oz mug
 const PRINTFUL_VARIANT_ID = 4012; // White 11oz mug variant
 
-async function generatePrintfulMockup(apiKey: string, designUrl: string): Promise<string> {
+async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl: string): Promise<string> {
   const createRes = await fetch(
     `${PRINTFUL_BASE}/mockup-generator/create-task/${PRINTFUL_PRODUCT_ID}`,
     {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
+        "X-PF-Store-Id": storeId,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -53,7 +54,7 @@ async function generatePrintfulMockup(apiKey: string, designUrl: string): Promis
 
     const pollRes = await fetch(
       `${PRINTFUL_BASE}/mockup-generator/task?task_key=${encodeURIComponent(taskKey)}`,
-      { headers: { Authorization: `Bearer ${apiKey}` } }
+      { headers: { Authorization: `Bearer ${apiKey}`, "X-PF-Store-Id": storeId } }
     );
 
     if (!pollRes.ok) {
@@ -83,8 +84,15 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const printfulKey = Deno.env.get("PRINTFUL_API_KEY");
+  const printfulStoreId = Deno.env.get("PRINTFUL_STORE_ID");
   if (!printfulKey) {
     return new Response(JSON.stringify({ error: "Missing PRINTFUL_API_KEY" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  if (!printfulStoreId) {
+    return new Response(JSON.stringify({ error: "Missing PRINTFUL_STORE_ID" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -101,7 +109,7 @@ serve(async (req) => {
 
     // Use the crest URL directly as the design — Printful fetches it from the public URL.
     console.log("[generate-mug-mockup] Calling Printful with crestUrl:", crestUrl);
-    const mockupUrl = await generatePrintfulMockup(printfulKey, crestUrl);
+    const mockupUrl = await generatePrintfulMockup(printfulKey, printfulStoreId, crestUrl);
     console.log("[generate-mug-mockup] Got mockupUrl:", mockupUrl);
 
     return new Response(JSON.stringify({ mockupUrl, designUrl: crestUrl }), {
