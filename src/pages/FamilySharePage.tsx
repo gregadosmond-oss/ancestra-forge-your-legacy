@@ -115,7 +115,7 @@ const FamilySharePage = () => {
           className="text-center"
         >
           <h1 className="font-display text-4xl sm:text-5xl" style={{ color: "#f0e8da" }}>
-            House {displaySurname}
+            House of {displaySurname}
           </h1>
           {facts?.mottoLatin && (
             <p className="mt-3 font-serif italic text-lg" style={{ color: "#e8b85c" }}>
@@ -146,7 +146,7 @@ const FamilySharePage = () => {
                 src={crestUrl}
                 alt={`${displaySurname} coat of arms`}
                 className="relative z-10 mx-auto"
-                style={{ width: "220px", maxWidth: "100%", mixBlendMode: "multiply" }}
+                style={{ width: "220px", maxWidth: "100%" }}
               />
             </div>
           </motion.div>

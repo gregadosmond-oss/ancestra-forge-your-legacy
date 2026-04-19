@@ -59,7 +59,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
       },
       {
         name: "Legacy Pack",
-        price: "$29",
+        price: "$29.99",
         description:
           "Digital crest, full family story, bloodline tree, and legacy certificate — delivered instantly.",
       },
@@ -100,7 +100,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
       },
       {
         name: "Legacy Pack",
-        price: "$29",
+        price: "$29.99",
         description:
           "Digital crest, full family story, bloodline tree, and certificate — delivered to her inbox instantly.",
       },
@@ -129,7 +129,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
       },
       {
         name: "Christmas Ornament",
-        price: "$29",
+        price: "$29.99",
         description:
           "The family crest as a keepsake ornament. Goes on the tree every year, forever.",
       },
@@ -140,7 +140,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
       },
       {
         name: "Legacy Pack",
-        price: "$29",
+        price: "$29.99",
         description:
           "Digital crest, full story, bloodline tree — delivered instantly as a gift.",
       },
@@ -226,7 +226,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
       },
       {
         name: "Legacy Pack",
-        price: "$29",
+        price: "$29.99",
         description:
           "Digital crest, full family story, bloodline tree — delivered to their inbox instantly.",
       },
@@ -255,7 +255,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
       },
       {
         name: "Legacy Pack",
-        price: "$29",
+        price: "$29.99",
         description:
           "Digital crest, full family story, bloodline tree, and certificate — delivered instantly.",
       },
@@ -301,7 +301,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
       },
       {
         name: "Legacy Pack",
-        price: "$29",
+        price: "$29.99",
         description:
           "Digital crest, full family story, bloodline tree — delivered instantly.",
       },
@@ -335,7 +335,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
       },
       {
         name: "Legacy Pack",
-        price: "$29",
+        price: "$29.99",
         description:
           "Digital crest, full family story, bloodline tree — a digital legacy for a new life.",
       },
@@ -346,7 +346,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
       },
       {
         name: "Christmas Ornament",
-        price: "$29",
+        price: "$29.99",
         description:
           "A family crest ornament for baby's first Christmas — a tradition that starts now.",
       },
@@ -416,7 +416,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
       },
       {
         name: "Legacy Pack",
-        price: "$29",
+        price: "$29.99",
         description:
           "Digital crest, full family story, bloodline tree, and certificate — a complete digital legacy.",
       },
@@ -440,7 +440,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
       },
       {
         name: "Legacy Pack",
-        price: "$29",
+        price: "$29.99",
         description:
           "Digital crest, full family story, bloodline tree — delivered to their inbox like a love letter.",
       },
@@ -480,13 +480,13 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
       },
       {
         name: "Christmas Ornament",
-        price: "$29",
+        price: "$29.99",
         description:
           "A family crest ornament for every branch of the family tree to take home.",
       },
       {
         name: "Legacy Pack",
-        price: "$29",
+        price: "$29.99",
         description:
           "Digital crest, full family story, bloodline tree — share the link with every family member.",
       },

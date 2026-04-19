@@ -440,7 +440,7 @@ const MyLegacy = () => {
             className="mt-4 font-display text-4xl sm:text-5xl"
             style={{ color: "#f0e8da" }}
           >
-            House {displaySurname}
+            House of {displaySurname}
           </h1>
           {facts?.mottoLatin && (
             <p className="mt-3 font-serif italic text-amber-light text-lg">
