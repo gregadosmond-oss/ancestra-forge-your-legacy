@@ -109,6 +109,7 @@ async function findFirstVariantId(apiKey: string, storeId: string, productId: nu
 
 async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl: string): Promise<string> {
   const productId = await findMugProductId(apiKey, storeId);
+  const variantId = await findFirstVariantId(apiKey, storeId, productId);
 
   const createRes = await fetch(
     `${PRINTFUL_BASE}/mockup-generator/create-task/${productId}`,
@@ -120,6 +121,7 @@ async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        variant_ids: [variantId],
         format: "jpg",
         files: [
           {
