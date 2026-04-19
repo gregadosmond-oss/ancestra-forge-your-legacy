@@ -181,67 +181,68 @@ export default function MugMockup({ surname }: MugMockupProps) {
     <div className="w-full mx-auto" style={{ maxWidth: 500 }}>
       <div
         style={{
-          background: "#f5f5f5",
-          borderRadius: 16,
-          padding: 24,
-          display: "flex",
-          justifyContent: "center",
-          minHeight: 200,
-          alignItems: "center",
+          background: "linear-gradient(135deg, #1a1510, #0d0a07)",
+          border: "1px solid rgba(201,168,76,0.2)",
+          borderRadius: 20,
+          padding: "32px 24px 20px",
+          textAlign: "center",
+          minHeight: 240,
         }}
       >
+        <p
+          style={{
+            fontFamily: "sans-serif",
+            fontSize: 10,
+            letterSpacing: 4,
+            color: "#a07830",
+            textTransform: "uppercase",
+            marginBottom: 16,
+          }}
+        >
+          Your Mug Design Preview
+        </p>
+
         {previewUrl ? (
-          <div style={{ position: "relative", width: 400, margin: "0 auto" }}>
-            <img
-              src="https://images.printful.com/catalog/562/1_front_2.jpg"
-              alt="White ceramic mug"
-              style={{ width: "100%", display: "block" }}
-            />
+          <>
             <img
               src={previewUrl}
               alt={`${surname} family crest mug design`}
-              style={{
-                position: "absolute",
-                top: "18%",
-                left: "12%",
-                width: "62%",
-                height: "64%",
-                objectFit: "cover",
-                objectPosition: "left center",
-                transform: "perspective(600px) rotateY(-6deg)",
-                borderRadius: 4,
-                opacity: 0.92,
-              }}
+              style={{ width: "100%", borderRadius: 8, display: "block" }}
             />
-          </div>
+            <p
+              style={{
+                fontFamily: "Georgia, serif",
+                fontStyle: "italic",
+                fontSize: 13,
+                color: "#8a7e6e",
+                marginTop: 14,
+              }}
+            >
+              This design wraps around your ceramic mug · Printed &amp; shipped in 5–7 days
+            </p>
+          </>
         ) : loading ? (
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-col items-center gap-3 py-6">
             <div
               className="h-10 w-10 animate-spin rounded-full border-2"
-              style={{ borderColor: "rgba(160,120,48,0.2)", borderTopColor: "#c9a84c" }}
+              style={{ borderColor: "rgba(201,168,76,0.2)", borderTopColor: "#c9a84c" }}
             />
-            <p className="font-sans text-[11px] uppercase tracking-[2px]" style={{ color: "#a07830" }}>
+            <p
+              className="font-sans uppercase"
+              style={{ color: "#a07830", fontSize: 10, letterSpacing: 3 }}
+            >
               Forging your design…
             </p>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-2 px-6 text-center">
+          <div className="flex flex-col items-center gap-2 px-6 py-6 text-center">
             <div className="text-5xl">☕</div>
-            <p className="font-serif text-sm italic" style={{ color: "#8a7e6e" }}>
+            <p className="font-serif italic" style={{ color: "#8a7e6e", fontSize: 13 }}>
               Type your surname to preview your mug
             </p>
           </div>
         )}
       </div>
-
-      {previewUrl && (
-        <p
-          className="font-serif italic text-center mt-3"
-          style={{ color: "#8a7e6e", fontSize: 13 }}
-        >
-          Your personalised mug — exactly as it will be printed
-        </p>
-      )}
     </div>
   );
 }
