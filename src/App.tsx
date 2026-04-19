@@ -33,6 +33,8 @@ import MeetYourAncestor from "./pages/tools/MeetYourAncestor.tsx";
 import The1700sYou from "./pages/tools/The1700sYou.tsx";
 import AncestorChat from "./pages/tools/AncestorChat.tsx";
 import FamilySharePage from "./pages/FamilySharePage.tsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
+import Terms from "./pages/Terms.tsx";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +79,8 @@ const App = () => (
             <Route path="/f/:surname" element={<FamilySharePage />} />
             <Route path="/gift/:giftId" element={<GiftPage />} />
             <Route path="/gifts/:occasion" element={<GiftOccasionPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<Terms />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Route>
