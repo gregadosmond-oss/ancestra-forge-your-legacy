@@ -12,11 +12,17 @@ const PRINT_W = 2475;
 const PRINT_H = 1155;
 
 let wasmReady = false;
+let fontBuffer: Uint8Array | null = null;
 async function ensureWasm() {
   if (!wasmReady) {
     const res = await fetch("https://unpkg.com/@resvg/resvg-wasm/index_bg.wasm");
     await initWasm(res);
     wasmReady = true;
+  }
+  if (!fontBuffer) {
+    // Serif font for headlines (Cormorant Garamond — has Georgia-like feel)
+    const fontRes = await fetch("https://fonts.gstatic.com/s/cormorantgaramond/v16/co3YmX5slCNuHLi8bLeY9MK7whWMhyjornFLsS6V7w.ttf");
+    fontBuffer = new Uint8Array(await fontRes.arrayBuffer());
   }
 }
 
