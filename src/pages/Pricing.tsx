@@ -136,17 +136,12 @@ const Pricing = () => (
 
       {/* Heirloom Shop */}
       <div className="relative flex flex-col rounded-[22px] border bg-card p-8" style={{ borderColor: "rgba(232,148,58,0.1)" }}>
-        {/* Coming Soon badge */}
-        <div className="absolute right-4 top-4 rounded-pill px-3 py-1 font-sans text-[9px] font-semibold uppercase tracking-[2px]"
-          style={{ background: "rgba(160,120,48,0.15)", border: "1px solid rgba(160,120,48,0.35)", color: "#a07830" }}>
-          Coming Soon
-        </div>
         <div className="mb-2 text-3xl">🎁</div>
         <h2 className="font-display text-xl text-cream-warm">Heirloom Shop</h2>
-        <div className="mt-3 font-display text-4xl" style={{ color: "#e8b85c" }}>$49+</div>
-        <p className="mt-1 font-sans text-[11px]" style={{ color: "#8a7e6e" }}>Legacy Pack included · Ships worldwide</p>
+        <div className="mt-3 font-display text-4xl" style={{ color: "#e8b85c" }}>$49.99</div>
+        <p className="mt-1 font-sans text-[11px]" style={{ color: "#8a7e6e" }}>Mug · Legacy Pack included · Ships worldwide</p>
         <p className="mt-3 text-xs italic" style={{ color: "#8a7e6e" }}>
-          The perfect gift — every heirloom includes the full Legacy Pack.
+          Your family crest, name & QR code on a ceramic mug — plus the full digital Legacy Pack.
         </p>
         <ul className="mt-4 flex-1 space-y-2">
           {HEIRLOOM_ITEMS.map((item) => (
@@ -156,12 +151,13 @@ const Pricing = () => (
             </li>
           ))}
         </ul>
-        <div
-          className="mt-8 rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
-          style={{ background: "rgba(138,126,110,0.08)", border: "1px solid rgba(138,126,110,0.2)", color: "#8a7e6e" }}
+        <Link
+          to="/heirloom-order"
+          className="mt-8 block rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+          style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
         >
-          Coming Soon
-        </div>
+          Order Your Mug
+        </Link>
       </div>
 
     </motion.div>
