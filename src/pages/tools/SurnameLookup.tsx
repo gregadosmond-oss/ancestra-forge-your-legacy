@@ -265,78 +265,25 @@ export default function SurnameLookup() {
               })}
             </div>
 
-            {/* Share button + menu */}
+            {/* Share button */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="mt-10 flex justify-center"
             >
-              <div ref={shareRef} className="relative flex flex-col items-center">
-                <button
-                  type="button"
-                  onClick={() => setShareOpen((v) => !v)}
-                  className="rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
-                  style={{
-                    background: "rgba(232,148,58,0.06)",
-                    border: "1px solid rgba(232,148,58,0.18)",
-                    color: "#d4a04a",
-                  }}
-                >
-                  Share Your Results
-                </button>
-                <AnimatePresence>
-                  {shareOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full mt-3 flex flex-col items-center gap-2 z-20"
-                    >
-                      <button
-                        type="button"
-                        onClick={handleCopy}
-                        className="flex items-center gap-2 rounded-pill px-5 py-2.5 text-[12px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5 whitespace-nowrap"
-                        style={{
-                          background: copied ? "rgba(74,158,106,0.12)" : "rgba(232,148,58,0.06)",
-                          border: `1px solid ${copied ? "rgba(74,158,106,0.4)" : "rgba(232,148,58,0.18)"}`,
-                          color: copied ? "#7fc99a" : "#d4a04a",
-                        }}
-                      >
-                        <Link2 className="h-3.5 w-3.5" />
-                        {copied ? "Copied!" : "Copy Link"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={openFacebook}
-                        className="flex items-center gap-2 rounded-pill px-5 py-2.5 text-[12px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5 whitespace-nowrap"
-                        style={{
-                          background: "rgba(232,148,58,0.06)",
-                          border: "1px solid rgba(232,148,58,0.18)",
-                          color: "#d4a04a",
-                        }}
-                      >
-                        <Facebook className="h-3.5 w-3.5" />
-                        Facebook
-                      </button>
-                      <button
-                        type="button"
-                        onClick={openTwitter}
-                        className="flex items-center gap-2 rounded-pill px-5 py-2.5 text-[12px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5 whitespace-nowrap"
-                        style={{
-                          background: "rgba(232,148,58,0.06)",
-                          border: "1px solid rgba(232,148,58,0.18)",
-                          color: "#d4a04a",
-                        }}
-                      >
-                        <Twitter className="h-3.5 w-3.5" />
-                        X / Twitter
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
+                style={{
+                  background: copied ? "rgba(74,158,106,0.12)" : "rgba(232,148,58,0.06)",
+                  border: `1px solid ${copied ? "rgba(74,158,106,0.4)" : "rgba(232,148,58,0.18)"}`,
+                  color: copied ? "#7fc99a" : "#d4a04a",
+                }}
+              >
+                {copied ? "Copied!" : "Share Your Results"}
+              </button>
             </motion.div>
           </motion.section>
         )}
