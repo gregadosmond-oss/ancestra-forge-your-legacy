@@ -77,13 +77,14 @@ async function findMugProductId(apiKey: string, storeId: string): Promise<number
   );
   console.log("[generate-mug-mockup] Mug products from Printful:", JSON.stringify(mugs, null, 2));
 
+  // Prefer a WHITE 11oz mug — exclude black/colored mugs
   const whiteMug =
-    mugs.find((p) => /white/i.test(p.title) && /11/.test(p.title)) ??
-    mugs.find((p) => /11\s*oz/i.test(p.title)) ??
+    mugs.find((p) => /white/i.test(p.title) && !/black|color/i.test(p.title)) ??
+    mugs.find((p) => /^(?!.*black).*mug/i.test(p.title)) ??
     mugs[0];
 
   if (!whiteMug) throw new Error(`No mug product found in Printful catalog (total: ${products.length})`);
-  console.log("[generate-mug-mockup] Selected mug product:", whiteMug);
+  console.log("[generate-mug-mockup] Selected mug product:", { id: whiteMug.id, title: whiteMug.title });
   return whiteMug.id;
 }
 
@@ -96,13 +97,19 @@ async function findFirstVariantId(apiKey: string, storeId: string, productId: nu
     throw new Error(`Printful /products/${productId} failed (${res.status}): ${errText}`);
   }
   const json = await res.json();
-  const variants: Array<{ id: number; name: string; color?: string; size?: string }> = json?.result?.variants ?? [];
-  console.log(`[generate-mug-mockup] Product ${productId} has ${variants.length} variants. First 5:`,
-    JSON.stringify(variants.slice(0, 5), null, 2));
+  // Printful catalog returns { result: { product: {...}, variants: [...] } }
+  const variants: Array<{ id: number; name?: string; color?: string; size?: string }> =
+    json?.result?.variants ?? json?.result?.product?.variants ?? [];
+  console.log(`[generate-mug-mockup] Product ${productId} variants count: ${variants.length}. First 3:`,
+    JSON.stringify(variants.slice(0, 3), null, 2));
+
+  if (variants.length === 0) {
+    console.log("[generate-mug-mockup] Raw product detail response:", JSON.stringify(json).slice(0, 1000));
+    throw new Error(`No variants for product ${productId}`);
+  }
 
   const whiteVariant = variants.find((v) => /white/i.test(v.color ?? v.name ?? "")) ?? variants[0];
-  if (!whiteVariant) throw new Error(`No variants for product ${productId}`);
-  console.log("[generate-mug-mockup] Selected variant:", whiteVariant);
+  console.log("[generate-mug-mockup] Selected variant:", { id: whiteVariant.id, name: whiteVariant.name, color: whiteVariant.color });
   return whiteVariant.id;
 }
 
