@@ -203,15 +203,16 @@ const Stop6PassItOn = () => {
               <div className="mb-3 text-3xl">🎁</div>
               <h3 className="font-display text-base text-cream-warm">Heirloom Shop</h3>
               <p className="mt-2 text-sm leading-relaxed" style={{ color: "#8a7e6e" }}>
-                Framed crests, mugs, books &amp; more. Every heirloom includes the Legacy Pack.
+                Your family crest on a ceramic mug — every heirloom includes the Legacy Pack.
               </p>
-              <div className="mt-3 font-display text-2xl" style={{ color: "#e8b85c" }}>$49+</div>
-              <div
-                className="mt-5 rounded-pill py-3 font-sans text-[11px] font-semibold uppercase tracking-[1.5px]"
-                style={{ background: "rgba(138,126,110,0.08)", border: "1px solid rgba(138,126,110,0.2)", color: "#8a7e6e" }}
+              <div className="mt-3 font-display text-2xl" style={{ color: "#e8b85c" }}>$49.99</div>
+              <button
+                onClick={() => navigate("/heirloom-order")}
+                className="mt-5 rounded-pill py-3 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
               >
-                Coming Soon
-              </div>
+                Order Heirloom Mug
+              </button>
             </div>
 
             {/* Pricing */}
