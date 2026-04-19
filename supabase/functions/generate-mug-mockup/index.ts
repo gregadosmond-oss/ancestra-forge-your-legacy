@@ -9,9 +9,38 @@ const PRINTFUL_BASE = "https://api.printful.com";
 const PRINTFUL_PRODUCT_ID = 19; // White 11oz mug
 const PRINTFUL_VARIANT_ID = 1320; // White 11oz mug variant
 
+async function findMugProductId(apiKey: string, storeId: string): Promise<number> {
+  const res = await fetch(`${PRINTFUL_BASE}/products`, {
+    headers: { Authorization: `Bearer ${apiKey}`, "X-PF-Store-Id": storeId },
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Printful /products failed (${res.status}): ${errText}`);
+  }
+  const json = await res.json();
+  const products: Array<{ id: number; type: string; type_name: string; title: string; brand: string | null; model: string }> = json?.result ?? [];
+
+  // Log all mug-like products so we can see what's available
+  const mugs = products.filter((p) =>
+    [p.type, p.type_name, p.title, p.model].some((v) => (v ?? "").toLowerCase().includes("mug"))
+  );
+  console.log("[generate-mug-mockup] Mug products from Printful:", JSON.stringify(mugs, null, 2));
+
+  // Prefer white 11oz ceramic mug
+  const whiteMug =
+    mugs.find((p) => /white/i.test(p.title) && /11/.test(p.title)) ??
+    mugs.find((p) => /11\s*oz/i.test(p.title)) ??
+    mugs[0];
+
+  if (!whiteMug) throw new Error(`No mug product found in Printful catalog (total products: ${products.length})`);
+  console.log("[generate-mug-mockup] Selected mug product:", whiteMug);
+  return whiteMug.id;
+}
+
 async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl: string): Promise<string> {
+  const productId = await findMugProductId(apiKey, storeId);
   const createRes = await fetch(
-    `${PRINTFUL_BASE}/mockup-generator/create-task/${PRINTFUL_PRODUCT_ID}`,
+    `${PRINTFUL_BASE}/mockup-generator/create-task/${productId}`,
     {
       method: "POST",
       headers: {
