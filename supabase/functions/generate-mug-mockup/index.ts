@@ -87,6 +87,26 @@ async function findMugProductId(apiKey: string, storeId: string): Promise<number
   return whiteMug.id;
 }
 
+async function findFirstVariantId(apiKey: string, storeId: string, productId: number): Promise<number> {
+  const res = await fetch(`${PRINTFUL_BASE}/products/${productId}`, {
+    headers: { Authorization: `Bearer ${apiKey}`, "X-PF-Store-Id": storeId },
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Printful /products/${productId} failed (${res.status}): ${errText}`);
+  }
+  const json = await res.json();
+  const variants: Array<{ id: number; name: string; color?: string; size?: string }> = json?.result?.variants ?? [];
+  console.log(`[generate-mug-mockup] Product ${productId} has ${variants.length} variants. First 5:`,
+    JSON.stringify(variants.slice(0, 5), null, 2));
+
+  const whiteVariant = variants.find((v) => /white/i.test(v.color ?? v.name ?? "")) ?? variants[0];
+  if (!whiteVariant) throw new Error(`No variants for product ${productId}`);
+  console.log("[generate-mug-mockup] Selected variant:", whiteVariant);
+  return whiteVariant.id;
+}
+
+
 async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl: string): Promise<string> {
   const productId = await findMugProductId(apiKey, storeId);
 
