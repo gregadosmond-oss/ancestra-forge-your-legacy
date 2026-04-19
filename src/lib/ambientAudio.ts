@@ -3,7 +3,7 @@ let audio: HTMLAudioElement | null = null;
 
 export const startAmbientAudio = (): void => {
   if (audio) return;
-  audio = new Audio("/starfields-within.mp3");
+  audio = new Audio("/candlelit-manor-tide.mp3");
   audio.loop = true;
   audio.volume = 0.5;
   audio.play().catch(() => {/* autoplay blocked — silent fail */});
@@ -12,7 +12,7 @@ export const startAmbientAudio = (): void => {
 export const toggleAmbientPlayback = (): boolean => {
   if (!audio) {
     // First click — start audio and return playing state
-    audio = new Audio("/starfields-within.mp3");
+    audio = new Audio("/candlelit-manor-tide.mp3");
     audio.loop = true;
     audio.volume = 0.5;
     audio.play().catch(() => {});
