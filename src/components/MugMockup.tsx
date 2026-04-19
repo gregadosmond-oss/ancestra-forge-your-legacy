@@ -8,19 +8,17 @@ interface MugMockupProps {
 const PLACEHOLDER_CREST =
   "https://fjtkjbnvpobawqqkzrst.supabase.co/storage/v1/object/public/crests/wagman.png";
 
-// Original spec is 2475x1155. We render scaled at 800x374 (≈ /3.094) for a smaller payload.
+// Original spec is 2475x1155. Scaled to 800x374 for a crisp web preview.
 const SCALE = 800 / 2475;
 const W = Math.round(2475 * SCALE); // 800
 const H = Math.round(1155 * SCALE); // 374
-
 const s = (n: number) => n * SCALE;
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
-    img.onerror = (e) => reject(e);
+    img.onerror = reject;
     img.src = src;
   });
 }
@@ -106,26 +104,6 @@ async function renderMugDesign(surnameRaw: string, crestUrl: string): Promise<st
     ctx.lineTo(s(1600), s(458));
     ctx.stroke();
 
-    // QR label
-    ctx.fillStyle = "#a07830";
-    ctx.font = `${s(28)}px Arial, sans-serif`;
-    drawSpacedText(ctx, "SCAN YOUR LEGACY", s(330), s(720), s(4));
-
-    // QR placeholder (api.qrserver.com has no CORS — use a gold rectangle with "QR" text)
-    ctx.save();
-    ctx.globalAlpha = 0.3;
-    ctx.fillStyle = "#c9a84c";
-    ctx.fillRect(s(205), s(740), s(250), s(250));
-    ctx.restore();
-
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `bold ${s(50)}px Arial, sans-serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("QR", s(205 + 125), s(740 + 125));
-    ctx.textAlign = "left";
-    ctx.textBaseline = "alphabetic";
-
     // Watermark
     ctx.save();
     ctx.globalAlpha = 0.18;
@@ -145,9 +123,7 @@ async function renderMugDesign(surnameRaw: string, crestUrl: string): Promise<st
 
 export default function MugMockup({ surname }: MugMockupProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [mockupUrl, setMockupUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const debounceRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -160,16 +136,12 @@ export default function MugMockup({ surname }: MugMockupProps) {
 
     if (!trimmed) {
       setPreviewUrl(null);
-      setMockupUrl(null);
-      setErrorMsg(null);
       setLoading(false);
       return;
     }
 
     let cancelled = false;
     setLoading(true);
-    setErrorMsg(null);
-    setMockupUrl(null);
 
     debounceRef.current = window.setTimeout(async () => {
       try {
@@ -183,36 +155,13 @@ export default function MugMockup({ surname }: MugMockupProps) {
         if (cancelled) return;
 
         const crestUrl = crest?.image_url ?? PLACEHOLDER_CREST;
-
-        // 1. Render canvas → base64 data URL
-        console.log("[MugMockup] Rendering canvas design for:", trimmed);
         const dataUrl = await renderMugDesign(trimmed, crestUrl);
         if (cancelled) return;
-
-        // Show the flat canvas immediately as the preview
         setPreviewUrl(dataUrl);
-
-        // 2. Send base64 to edge function (it will upload via service role + call Printful)
-        console.log("[MugMockup] Sending design to edge function…");
-        const { data, error } = await supabase.functions.invoke("generate-mug-mockup", {
-          body: { surname: trimmed, designBase64: dataUrl, crestUrl },
-        });
-        console.log("[MugMockup] Response:", { data, error });
-
-        if (cancelled) return;
-
-        if (error) {
-          console.error("[MugMockup] Edge function error:", error);
-          setErrorMsg(error.message ?? "Failed to generate 3D mockup");
-        } else if (data?.mockupUrl) {
-          setMockupUrl(data.mockupUrl);
-        } else {
-          setErrorMsg("No mockup returned");
-        }
       } catch (e) {
         if (!cancelled) {
           console.error("[MugMockup] Error:", e);
-          setErrorMsg((e as Error).message ?? "Mockup failed");
+          setPreviewUrl(null);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -228,55 +177,57 @@ export default function MugMockup({ surname }: MugMockupProps) {
     };
   }, [surname]);
 
-  // Display priority: 3D Printful mockup > flat canvas preview > spinner > empty state
-  const displayUrl = mockupUrl ?? previewUrl;
-
   return (
-    <div
-      className="w-full mx-auto flex items-center justify-center overflow-hidden rounded-[18px] relative"
-      style={{ maxWidth: 500, aspectRatio: "1 / 1", background: "#1a1510" }}
-    >
-      {displayUrl ? (
-        <>
+    <div className="w-full mx-auto" style={{ maxWidth: 500 }}>
+      <div
+        style={{
+          background: "#f5f5f5",
+          borderRadius: 16,
+          padding: 24,
+          display: "flex",
+          justifyContent: "center",
+          minHeight: 200,
+          alignItems: "center",
+        }}
+      >
+        {previewUrl ? (
           <img
-            src={displayUrl}
-            alt={`${surname} family crest mug preview`}
-            className="h-full w-full object-contain"
+            src={previewUrl}
+            alt={`${surname} family crest mug design`}
+            style={{
+              width: "100%",
+              borderRadius: 8,
+              boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+              display: "block",
+            }}
           />
-          {loading && !mockupUrl && (
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm">
-              <div
-                className="h-3 w-3 animate-spin rounded-full border-2 border-amber-dim/30"
-                style={{ borderTopColor: "#e8b85c" }}
-              />
-              <span className="font-sans text-[10px] uppercase tracking-[2px] text-amber-dim">
-                Forging 3D mug…
-              </span>
-            </div>
-          )}
-        </>
-      ) : loading ? (
-        <div className="flex flex-col items-center gap-3">
-          <div
-            className="h-10 w-10 animate-spin rounded-full border-2 border-amber-dim/30"
-            style={{ borderTopColor: "#e8b85c" }}
-          />
-          <p className="font-sans text-[11px] uppercase tracking-[2px] text-amber-dim">
-            Forging your mug…
-          </p>
-        </div>
-      ) : errorMsg ? (
-        <div className="flex flex-col items-center gap-2 px-6 text-center">
-          <div className="text-3xl">⚠️</div>
-          <p className="font-serif text-xs italic text-text-dim">{errorMsg}</p>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center gap-2 px-6 text-center">
-          <div className="text-5xl">☕</div>
-          <p className="font-serif text-sm italic text-text-dim">
-            Type your surname to preview your mug
-          </p>
-        </div>
+        ) : loading ? (
+          <div className="flex flex-col items-center gap-3">
+            <div
+              className="h-10 w-10 animate-spin rounded-full border-2"
+              style={{ borderColor: "rgba(160,120,48,0.2)", borderTopColor: "#c9a84c" }}
+            />
+            <p className="font-sans text-[11px] uppercase tracking-[2px]" style={{ color: "#a07830" }}>
+              Forging your design…
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2 px-6 text-center">
+            <div className="text-5xl">☕</div>
+            <p className="font-serif text-sm italic" style={{ color: "#8a7e6e" }}>
+              Type your surname to preview your mug
+            </p>
+          </div>
+        )}
+      </div>
+
+      {previewUrl && (
+        <p
+          className="font-serif italic text-center mt-3"
+          style={{ color: "#8a7e6e", fontSize: 13 }}
+        >
+          This is the design that wraps around your mug
+        </p>
       )}
     </div>
   );
