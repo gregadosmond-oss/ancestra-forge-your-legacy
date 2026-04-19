@@ -1,5 +1,5 @@
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
-import { getStripe, getStripeEnvironment } from "@/lib/stripe";
+import { getStripe, getStripeEnvironment, isStripeConfigured } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
 
 interface StripeEmbeddedCheckoutProps {
@@ -27,6 +27,19 @@ const StripeEmbeddedCheckout = ({
   shippingAddress,
   productType,
 }: StripeEmbeddedCheckoutProps) => {
+  if (!isStripeConfigured()) {
+    return (
+      <div className="rounded-[14px] border border-amber-dim/30 bg-bg-card p-6 text-center">
+        <p className="font-serif italic text-amber-light">
+          Payments aren't configured for this environment yet.
+        </p>
+        <p className="mt-2 font-sans text-xs text-text-dim">
+          Please check back shortly — we're getting things ready.
+        </p>
+      </div>
+    );
+  }
+
   const fetchClientSecret = async (): Promise<string> => {
     const { data, error } = await supabase.functions.invoke("create-checkout", {
       body: { priceId, quantity, customerEmail, userId, returnUrl, environment: getStripeEnvironment(), isGift, recipientEmail, surname, shippingAddress: shippingAddress ? JSON.stringify(shippingAddress) : undefined, productType },
