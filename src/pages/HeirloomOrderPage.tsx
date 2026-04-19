@@ -17,6 +17,7 @@ const COUNTRY_LABELS: Record<string, string> = {
 };
 
 interface ShippingAddress {
+  [key: string]: string;
   first_name: string;
   last_name: string;
   address1: string;
