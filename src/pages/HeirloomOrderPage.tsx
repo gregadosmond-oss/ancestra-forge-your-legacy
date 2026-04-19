@@ -65,9 +65,9 @@ export default function HeirloomOrderPage() {
       <div className="relative z-10 w-full max-w-xl px-6 py-20">
         <SectionLabel>HEIRLOOM ORDER</SectionLabel>
 
-        {/* Live mug mockup */}
+        {/* Live mug mockup — placeholder surname so preview is never empty */}
         <div className="mt-8 flex justify-center">
-          <MugMockup surname={inputSurname} />
+          <MugMockup surname={inputSurname.trim() || "Your Family"} />
         </div>
 
         {/* Product card */}
