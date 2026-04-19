@@ -50,8 +50,12 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
   const shippingAddressRaw = session.metadata?.shippingAddress;
   const buyerEmail = session.customer_details?.email ?? session.customer_email;
 
-  // Heirloom physical order — trigger Printify fulfillment
+  console.log("Metadata — productType:", productType, "surname:", surname, "shippingAddress present:", !!shippingAddressRaw, "userId:", userId);
+
+  // Heirloom physical order — ensure crest exists, then trigger Printify fulfillment
   if (productType === 'heirloom' && surname && shippingAddressRaw) {
+    console.log("Heirloom order detected — ensuring crest exists for:", surname);
+    await triggerCrestGeneration(surname);
     await triggerHeirloomOrder({ surname, shippingAddress: JSON.parse(shippingAddressRaw), buyerEmail });
   }
 
