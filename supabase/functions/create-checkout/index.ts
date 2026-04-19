@@ -30,6 +30,8 @@ serve(async (req) => {
 
     const metadata: Record<string, string> = {};
     if (userId) metadata.userId = userId;
+    if (userId) metadata.user_id = userId;
+    if (customerEmail) metadata.email = customerEmail;
     if (isGift) metadata.isGift = 'true';
     if (recipientEmail) metadata.recipientEmail = recipientEmail;
     if (surname) metadata.surname = surname;
