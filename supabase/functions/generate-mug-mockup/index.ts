@@ -48,9 +48,20 @@ async function findFirstVariantId(apiKey: string, storeId: string, productId: nu
   return whiteVariant.id;
 }
 
-async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl: string): Promise<string> {
+async function generatePrintfulMockup(
+  apiKey: string,
+  storeId: string,
+  imageUrl: string,
+  fullWrap: boolean
+): Promise<string> {
   const productId = await findMugProductId(apiKey, storeId);
   const variantId = await findFirstVariantId(apiKey, storeId, productId);
+
+  // Full pre-rendered design fills the entire 2475x1155 print area.
+  // Raw crest gets centered as a square.
+  const position = fullWrap
+    ? { area_width: 2475, area_height: 1155, width: 2475, height: 1155, top: 0, left: 0 }
+    : { area_width: 2475, area_height: 1155, width: 1100, height: 1100, top: 28, left: 688 };
 
   const createRes = await fetch(`${PRINTFUL_BASE}/mockup-generator/create-task/${productId}`, {
     method: "POST",
@@ -59,19 +70,17 @@ async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl
       "X-PF-Store-Id": storeId,
       "Content-Type": "application/json",
     },
-      body: JSON.stringify({
-        variant_ids: [variantId],
-        format: "jpg",
-        files: [
-          {
-            placement: "default",
-            image_url: designUrl,
-            // Center crest as square within the wide mug print area (2475x1155).
-            // Square ~1100px tall, centered horizontally.
-            position: { area_width: 2475, area_height: 1155, width: 1100, height: 1100, top: 28, left: 688 },
-          },
-        ],
-      }),
+    body: JSON.stringify({
+      variant_ids: [variantId],
+      format: "jpg",
+      files: [
+        {
+          placement: "default",
+          image_url: imageUrl,
+          position,
+        },
+      ],
+    }),
   });
 
   if (!createRes.ok) throw new Error(`Printful create-task failed (${createRes.status}): ${await createRes.text()}`);
@@ -118,17 +127,22 @@ serve(async (req) => {
   }
 
   try {
-    const { surname, crestUrl } = await req.json();
-    if (!surname || !crestUrl) {
-      return new Response(JSON.stringify({ error: "Missing surname or crestUrl" }), {
+    const { surname, crestUrl, designUrl } = await req.json();
+    if (!surname || (!crestUrl && !designUrl)) {
+      return new Response(JSON.stringify({ error: "Missing surname or image url" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    // Prefer the pre-rendered design (full mug artwork) over the raw crest
+    const printImageUrl: string = designUrl ?? crestUrl;
+    const usingDesign = Boolean(designUrl);
+
     const supabase = createClient(supabaseUrl, serviceKey);
     const slug = surname.toLowerCase().replace(/\s+/g, "-");
-    const cacheFile = `heirloom/mockup-${slug}.json`;
+    // Separate cache namespace for design vs raw-crest mockups
+    const cacheFile = `heirloom/mockup-${slug}-${usingDesign ? "design" : "crest"}.json`;
 
     // 1. Check cache
     const { data: cached } = await supabase.storage.from("crests").download(cacheFile);
@@ -146,17 +160,17 @@ serve(async (req) => {
       }
     }
 
-    // 2. Call Printful with the raw crest URL directly
-    console.log("[generate-mug-mockup] Cache miss, calling Printful with crestUrl:", crestUrl);
+    // 2. Call Printful with the print image (pre-rendered design or raw crest)
+    console.log("[generate-mug-mockup] Cache miss, calling Printful:", { usingDesign, printImageUrl });
     let mockupUrl: string;
     try {
-      mockupUrl = await generatePrintfulMockup(printfulKey, printfulStoreId, crestUrl);
+      mockupUrl = await generatePrintfulMockup(printfulKey, printfulStoreId, printImageUrl, usingDesign);
       console.log("[generate-mug-mockup] Got mockupUrl:", mockupUrl);
     } catch (printfulErr) {
       console.error("[generate-mug-mockup] Printful failed, returning fallback:", printfulErr);
       // Cache fallback briefly so we don't hammer Printful while it's rate-limited (429 → 30s cooldown)
       const fallbackPayload = {
-        mockupUrl: crestUrl,
+        mockupUrl: printImageUrl,
         fallback: true,
         createdAt: new Date().toISOString(),
       };
@@ -167,7 +181,7 @@ serve(async (req) => {
 
       return new Response(
         JSON.stringify({
-          mockupUrl: crestUrl,
+          mockupUrl: printImageUrl,
           cached: false,
           fallback: true,
           error: (printfulErr as Error).message,
@@ -179,7 +193,7 @@ serve(async (req) => {
     // 3. Save cache reference (best-effort)
     const { error: cacheErr } = await supabase.storage
       .from("crests")
-      .upload(cacheFile, new Blob([JSON.stringify({ mockupUrl, surname, crestUrl, createdAt: new Date().toISOString() })], { type: "application/json" }), { upsert: true, contentType: "application/json" });
+      .upload(cacheFile, new Blob([JSON.stringify({ mockupUrl, surname, printImageUrl, usingDesign, createdAt: new Date().toISOString() })], { type: "application/json" }), { upsert: true, contentType: "application/json" });
     if (cacheErr) console.warn("[generate-mug-mockup] Cache write failed:", cacheErr.message);
 
     return new Response(JSON.stringify({ mockupUrl, cached: false }), {
