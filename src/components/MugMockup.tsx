@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 
 interface MugMockupProps {
