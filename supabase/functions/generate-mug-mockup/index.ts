@@ -53,21 +53,21 @@ async function buildDesign(crestUrl: string, qrUrl: string, surname: string): Pr
   <rect x="0" y="${SAFE_T}" width="${PRINT_W}" height="18" fill="#c9a84c"/>
   <rect x="0" y="${PRINT_H - SAFE_B - 18}" width="${PRINT_W}" height="18" fill="#c9a84c"/>
   <rect x="20" y="${SAFE_T + 26}" width="${PRINT_W - 40}" height="${PRINT_H - SAFE_T - SAFE_B - 52}" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.4"/>
-  <text x="330" y="720" font-family="Arial, sans-serif" font-size="28" fill="#a07830" letter-spacing="4" text-anchor="middle">SCAN YOUR LEGACY</text>
+  <text x="330" y="720" font-family="monospace" font-size="28" fill="#a07830" letter-spacing="4" text-anchor="middle">SCAN YOUR LEGACY</text>
   <image href="${qrDataUri}" x="205" y="740" width="250" height="250" preserveAspectRatio="xMidYMid meet"/>
-  <text x="350" y="260" font-family="Georgia, 'Times New Roman', serif" font-size="52" fill="#a07830" letter-spacing="6">HOUSE  OF</text>
-  <text x="350" y="430" font-family="Georgia, 'Times New Roman', serif" font-size="148" font-weight="bold" fill="#e8b85c">${surname.toUpperCase()}</text>
+  <text x="350" y="260" font-family="monospace" font-size="52" fill="#a07830" letter-spacing="6">HOUSE  OF</text>
+  <text x="350" y="430" font-family="monospace" font-size="148" font-weight="bold" fill="#e8b85c">${surname.toUpperCase()}</text>
   <line x1="350" y1="458" x2="1600" y2="458" stroke="#c9a84c" stroke-width="2" opacity="0.6"/>
   <line x1="1640" y1="${SAFE_T + 28}" x2="1640" y2="${PRINT_H - SAFE_B - 28}" stroke="#c9a84c" stroke-width="1.5" opacity="0.25"/>
   <image href="${crestDataUri}" x="1600" y="${crestY}" width="700" height="${crestH}" preserveAspectRatio="xMidYMid meet"/>
-  <text x="950" y="${PRINT_H - SAFE_B - 28}" font-family="Georgia, serif" font-size="34" fill="#c9a84c" opacity="0.18" text-anchor="middle" letter-spacing="10">A N C E S T O R S Q R</text>
+  <text x="950" y="${PRINT_H - SAFE_B - 28}" font-family="monospace" font-size="34" fill="#c9a84c" opacity="0.18" text-anchor="middle" letter-spacing="10">A N C E S T O R S Q R</text>
 </svg>`;
 
   const resvg = new Resvg(svg, {
     fitTo: { mode: "width", value: PRINT_W },
     font: {
       fontBuffers: fontBuffer ? [fontBuffer] : [],
-      defaultFontFamily: "Cormorant Garamond",
+      defaultFontFamily: "monospace",
       loadSystemFonts: false,
     },
   });
