@@ -112,37 +112,10 @@ serve(async (req) => {
 
     const { data: { publicUrl: designUrl } } = supabase.storage.from("crests").getPublicUrl(fileName);
 
-    const variantId = await getWhite11ozVariant(apiKey);
-
-    const mockupRes = await fetch(
-      `${PRINTIFY_BASE}/shops/${shopId}/blueprints/${BLUEPRINT_ID}/print_providers/${PROVIDER_ID}/mockup.json`,
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          variant_ids: [variantId],
-          images: [{ position: "front", image_url: designUrl }],
-        }),
-      }
-    );
-
-    const mockupJson = await mockupRes.json();
-    if (!mockupRes.ok) {
-      console.error("Printify mockup failed:", mockupJson);
-      throw new Error(`Printify mockup failed: ${JSON.stringify(mockupJson)}`);
-    }
-
-    // Printify returns an array of mockups; find the front view
-    const mockups = Array.isArray(mockupJson) ? mockupJson : mockupJson.mockups ?? mockupJson.data ?? [];
-    const front = mockups.find((m: any) => m.position === "front" || m.camera_label?.toLowerCase().includes("front")) ?? mockups[0];
-    const mockupUrl = front?.src ?? front?.url ?? front?.image_url;
-
-    if (!mockupUrl) {
-      console.error("No mockup URL in response:", mockupJson);
-      throw new Error("No mockup URL returned by Printify");
-    }
-
-    return new Response(JSON.stringify({ mockupUrl, designUrl }), {
+    // Note: Printify does not expose a public "generate mockup without creating product" endpoint.
+    // Return the rendered design PNG directly as the preview — shows the user exactly what
+    // will be printed. A true 3D mug mockup requires creating a Printify product first.
+    return new Response(JSON.stringify({ mockupUrl: designUrl, designUrl }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
