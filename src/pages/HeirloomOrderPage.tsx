@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import StripeEmbeddedCheckout from "@/components/StripeEmbeddedCheckout";
 import AuthGate from "@/components/AuthGate";
-import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
 import { getStripeEnvironment } from "@/lib/stripe";
 
@@ -18,6 +17,7 @@ const COUNTRY_LABELS: Record<string, string> = {
 };
 
 interface ShippingAddress {
+  [key: string]: string;
   first_name: string;
   last_name: string;
   address1: string;
@@ -36,7 +36,7 @@ const empty: ShippingAddress = {
 
 export default function HeirloomOrderPage() {
   const navigate = useNavigate();
-  const { surname } = useJourney();
+  const surname = typeof window !== "undefined" ? sessionStorage.getItem("ancestra_journey_surname") : null;
   const { user } = usePurchase();
 
   const [step, setStep] = useState<Step>("details");
