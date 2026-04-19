@@ -24,7 +24,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   {
     id: "legacy-pack",
     name: "Legacy Pack",
-    price: "$29",
+    price: "$29.99",
     priceNote: "Instant delivery",
     description:
       "Custom coat of arms (hi-res PNG & SVG), AI-written family story (9 chapters), visual bloodline tree, legacy certificate. Everything delivered to your inbox in minutes.",
@@ -127,7 +127,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   {
     id: "christmas-ornament",
     name: "Christmas Ornament",
-    price: "$29",
+    price: "$29.99",
     description:
       "The family crest as a keepsake ornament. Goes on the tree every year, forever.",
     tag: "Holiday Favourite",
@@ -152,7 +152,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   {
     id: "phone-case",
     name: "Phone Case",
-    price: "$29",
+    price: "$29.99",
     description:
       "Your family crest on a premium phone case. Carry your legacy everywhere.",
     category: "keepsake",

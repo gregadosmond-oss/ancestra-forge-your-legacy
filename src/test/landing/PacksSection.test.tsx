@@ -32,7 +32,7 @@ describe("PacksSection", () => {
 
   it("renders the Legacy Pack price", () => {
     renderComponent();
-    expect(screen.getByText("$29")).toBeInTheDocument();
+    expect(screen.getByText("$29.99")).toBeInTheDocument();
   });
 
   it("renders the Most Popular badge", () => {
