@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import StripeEmbeddedCheckout from "@/components/StripeEmbeddedCheckout";
 import AuthGate from "@/components/AuthGate";
+import MugPreview from "@/components/MugPreview";
 import { usePurchase } from "@/hooks/usePurchase";
 import { getStripeEnvironment } from "@/lib/stripe";
 
@@ -63,6 +64,11 @@ export default function HeirloomOrderPage() {
 
       <div className="relative z-10 w-full max-w-xl px-6 py-20">
         <SectionLabel>HEIRLOOM ORDER</SectionLabel>
+
+        {/* Live mug preview */}
+        <div className="mt-8 flex justify-center">
+          <MugPreview surname={inputSurname} />
+        </div>
 
         {/* Product card */}
         <motion.div
