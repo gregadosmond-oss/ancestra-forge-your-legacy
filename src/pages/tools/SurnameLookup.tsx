@@ -271,14 +271,26 @@ export default function SurnameLookup() {
               className="mt-10 flex justify-center"
             >
               <div ref={shareRef} className="relative flex flex-col items-center">
+                <button
+                  type="button"
+                  onClick={() => setShareOpen((v) => !v)}
+                  className="rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
+                  style={{
+                    background: "rgba(232,148,58,0.06)",
+                    border: "1px solid rgba(232,148,58,0.18)",
+                    color: "#d4a04a",
+                  }}
+                >
+                  Share Your Results
+                </button>
                 <AnimatePresence>
                   {shareOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: 8 }}
+                      initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 8 }}
+                      exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute bottom-full mb-3 flex flex-col items-center gap-2"
+                      className="absolute top-full mt-3 flex flex-col items-center gap-2 z-20"
                     >
                       <button
                         type="button"
@@ -322,18 +334,6 @@ export default function SurnameLookup() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-                <button
-                  type="button"
-                  onClick={() => setShareOpen((v) => !v)}
-                  className="rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
-                  style={{
-                    background: "rgba(232,148,58,0.06)",
-                    border: "1px solid rgba(232,148,58,0.18)",
-                    color: "#d4a04a",
-                  }}
-                >
-                  Share Your Results
-                </button>
               </div>
             </motion.div>
           </motion.section>
