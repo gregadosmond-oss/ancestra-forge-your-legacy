@@ -172,11 +172,11 @@ const Index = () => {
       {/* ── LANDING SECTIONS ── */}
       <div className="relative z-10 w-full max-w-4xl px-6 pb-24">
         <WarmDivider />
+        <FreeToolsSection />
+        <WarmDivider />
         <PacksSection />
         <WarmDivider />
         <HowItWorksSection />
-        <WarmDivider />
-        <FreeToolsSection />
         <WarmDivider />
         <FinalCtaSection />
       </div>
