@@ -225,9 +225,19 @@ serve(async (req) => {
     // Upload to public storage so Printful can fetch it
     const supabase = createClient(supabaseUrl, serviceKey);
     const fileName = `heirloom/mockup-${surname.toLowerCase().replace(/\s+/g, "-")}.png`;
-    const { error: uploadErr } = await supabase.storage
-      .from("crests")
-      .upload(fileName, pngBytes, { contentType: "image/png", upsert: true });
+    const blob = new Blob([pngBytes], { type: "image/png" });
+    console.log(`[generate-mug-mockup] Uploading ${blob.size} bytes to ${fileName}`);
+
+    let uploadErr: { message: string } | null = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      const { error } = await supabase.storage
+        .from("crests")
+        .upload(fileName, blob, { contentType: "image/png", upsert: true });
+      if (!error) { uploadErr = null; break; }
+      uploadErr = error;
+      console.warn(`[generate-mug-mockup] Upload attempt ${attempt} failed: ${error.message}`);
+      await new Promise((r) => setTimeout(r, 1000 * attempt));
+    }
     if (uploadErr) throw new Error(`Upload failed: ${uploadErr.message}`);
 
     const { data: { publicUrl: designUrl } } = supabase.storage.from("crests").getPublicUrl(fileName);
