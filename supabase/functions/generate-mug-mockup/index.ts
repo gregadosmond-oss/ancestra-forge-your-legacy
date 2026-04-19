@@ -108,7 +108,10 @@ async function findFirstVariantId(apiKey: string, storeId: string, productId: nu
     throw new Error(`No variants for product ${productId}`);
   }
 
-  const whiteVariant = variants.find((v) => /white/i.test(v.color ?? v.name ?? "")) ?? variants[0];
+  const whiteVariant =
+    variants.find((v) => /white/i.test(v.name ?? "")) ??
+    variants.find((v) => /white/i.test(v.color ?? "")) ??
+    variants[0];
   console.log("[generate-mug-mockup] Selected variant:", { id: whiteVariant.id, name: whiteVariant.name, color: whiteVariant.color });
   return whiteVariant.id;
 }
