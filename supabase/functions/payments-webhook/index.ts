@@ -41,16 +41,18 @@ serve(async (req) => {
 
 async function handleCheckoutCompleted(session: any, env: StripeEnv) {
   console.log("Checkout completed:", session.id, "mode:", session.mode);
+  console.log("Full session.metadata:", JSON.stringify(session.metadata ?? {}));
 
-  const userId = session.metadata?.userId;
+  const userId = session.metadata?.user_id || session.metadata?.userId;
+  const surname = session.metadata?.surname;
+  const metadataEmail = session.metadata?.email;
   const isGift = session.metadata?.isGift === 'true';
   const recipientEmail = session.metadata?.recipientEmail;
-  const surname = session.metadata?.surname;
   const productType = session.metadata?.productType;
   const shippingAddressRaw = session.metadata?.shippingAddress;
-  const buyerEmail = session.customer_details?.email ?? session.customer_email;
+  const buyerEmail = metadataEmail ?? session.customer_details?.email ?? session.customer_email;
 
-  console.log("Metadata — productType:", productType, "surname:", surname, "shippingAddress present:", !!shippingAddressRaw, "userId:", userId);
+  console.log("Parsed metadata — surname:", surname, "user_id:", userId, "email:", buyerEmail, "productType:", productType);
 
   // Heirloom physical order — ensure crest exists, then trigger Printify fulfillment
   if (productType === 'heirloom' && surname && shippingAddressRaw) {

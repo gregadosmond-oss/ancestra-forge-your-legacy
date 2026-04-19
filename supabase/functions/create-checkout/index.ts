@@ -28,15 +28,26 @@ serve(async (req) => {
     }
     const stripePrice = prices.data[0];
 
-    const metadata: Record<string, string> = {};
+    // Required metadata fields — webhook depends on these for delivery email
+    const metadata: Record<string, string> = {
+      surname: surname ?? '',
+      user_id: userId ?? '',
+      email: customerEmail ?? '',
+    };
+    // Backward-compat alias used by older webhook code paths
     if (userId) metadata.userId = userId;
-    if (userId) metadata.user_id = userId;
-    if (customerEmail) metadata.email = customerEmail;
     if (isGift) metadata.isGift = 'true';
     if (recipientEmail) metadata.recipientEmail = recipientEmail;
-    if (surname) metadata.surname = surname;
     if (productType) metadata.productType = productType;
     if (shippingAddress) metadata.shippingAddress = shippingAddress;
+
+    console.log('[create-checkout] metadata being sent to Stripe:', JSON.stringify({
+      surname: metadata.surname,
+      user_id: metadata.user_id,
+      email: metadata.email,
+      productType: metadata.productType,
+      isGift: metadata.isGift,
+    }));
 
     const session = await stripe.checkout.sessions.create({
       line_items: [{ price: stripePrice.id, quantity: quantity || 1 }],
@@ -44,8 +55,10 @@ serve(async (req) => {
       ui_mode: "embedded",
       return_url: returnUrl || `${req.headers.get("origin")}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
       ...(customerEmail && { customer_email: customerEmail }),
-      ...(Object.keys(metadata).length > 0 && { metadata }),
+      metadata,
     });
+
+    console.log('[create-checkout] Session created:', session.id, 'metadata keys:', Object.keys(session.metadata ?? {}).join(','));
 
     return new Response(JSON.stringify({ clientSecret: session.client_secret }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
