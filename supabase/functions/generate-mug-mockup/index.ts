@@ -48,19 +48,23 @@ async function buildDesign(crestUrl: string, qrUrl: string, surname: string): Pr
   const crestH = PRINT_H - SAFE_T - SAFE_B - 60;
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="${PRINT_W}" height="${PRINT_H}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <rect width="${PRINT_W}" height="${PRINT_H}" fill="#0d0a07"/>
-  <rect x="0" y="${SAFE_T}" width="${PRINT_W}" height="18" fill="#c9a84c"/>
-  <rect x="0" y="${PRINT_H - SAFE_B - 18}" width="${PRINT_W}" height="18" fill="#c9a84c"/>
-  <rect x="20" y="${SAFE_T + 26}" width="${PRINT_W - 40}" height="${PRINT_H - SAFE_T - SAFE_B - 52}" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.4"/>
-  <text x="330" y="720" font-family="monospace" font-size="28" fill="#a07830" letter-spacing="4" text-anchor="middle">SCAN YOUR LEGACY</text>
+<svg width="${PRINT_W}" height="${PRINT_H}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+  <rect width="${PRINT_W}" height="${PRINT_H}" style="fill:#0d0a07"/>
+  <rect x="0" y="${SAFE_T}" width="${PRINT_W}" height="18" style="fill:#c9a84c"/>
+  <rect x="0" y="${PRINT_H - SAFE_B - 18}" width="${PRINT_W}" height="18" style="fill:#c9a84c"/>
+  <rect x="20" y="${SAFE_T + 26}" width="${PRINT_W - 40}" height="${PRINT_H - SAFE_T - SAFE_B - 52}" style="fill:none;stroke:#c9a84c;stroke-width:1.5;opacity:0.4"/>
+  <!-- DIAGNOSTIC TEST BLOCK -->
+  <rect x="60" y="60" width="400" height="80" style="fill:#ffffff"/>
+  <text x="80" y="115" font-family="monospace" font-size="48" style="fill:#000000">TEST</text>
+  <!-- END DIAGNOSTIC -->
+  <text x="330" y="720" font-family="monospace" font-size="28" style="fill:#a07830" letter-spacing="4" text-anchor="middle">SCAN YOUR LEGACY</text>
   <image href="${qrDataUri}" x="205" y="740" width="250" height="250" preserveAspectRatio="xMidYMid meet"/>
-  <text x="350" y="260" font-family="monospace" font-size="52" fill="#a07830" letter-spacing="6">HOUSE  OF</text>
-  <text x="350" y="430" font-family="monospace" font-size="148" font-weight="bold" fill="#e8b85c">${surname.toUpperCase()}</text>
-  <line x1="350" y1="458" x2="1600" y2="458" stroke="#c9a84c" stroke-width="2" opacity="0.6"/>
-  <line x1="1640" y1="${SAFE_T + 28}" x2="1640" y2="${PRINT_H - SAFE_B - 28}" stroke="#c9a84c" stroke-width="1.5" opacity="0.25"/>
+  <text x="350" y="260" font-family="monospace" font-size="52" style="fill:#a07830" letter-spacing="6">HOUSE  OF</text>
+  <text x="350" y="430" font-family="monospace" font-size="148" font-weight="bold" style="fill:#e8b85c">${surname.toUpperCase()}</text>
+  <line x1="350" y1="458" x2="1600" y2="458" style="stroke:#c9a84c;stroke-width:2;opacity:0.6"/>
+  <line x1="1640" y1="${SAFE_T + 28}" x2="1640" y2="${PRINT_H - SAFE_B - 28}" style="stroke:#c9a84c;stroke-width:1.5;opacity:0.25"/>
   <image href="${crestDataUri}" x="1600" y="${crestY}" width="700" height="${crestH}" preserveAspectRatio="xMidYMid meet"/>
-  <text x="950" y="${PRINT_H - SAFE_B - 28}" font-family="monospace" font-size="34" fill="#c9a84c" opacity="0.18" text-anchor="middle" letter-spacing="10">A N C E S T O R S Q R</text>
+  <text x="950" y="${PRINT_H - SAFE_B - 28}" font-family="monospace" font-size="34" style="fill:#c9a84c;opacity:0.18" text-anchor="middle" letter-spacing="10">A N C E S T O R S Q R</text>
 </svg>`;
 
   const resvg = new Resvg(svg, {
@@ -71,7 +75,11 @@ async function buildDesign(crestUrl: string, qrUrl: string, surname: string): Pr
       loadSystemFonts: false,
     },
   });
-  return resvg.render().asPng();
+  const rendered = resvg.render();
+  const pngBytes = rendered.asPng();
+  console.log(`[generate-mug-mockup] Rendered PNG: ${pngBytes.length} bytes, dimensions ${rendered.width}x${rendered.height}`);
+  console.log(`[generate-mug-mockup] DIAGNOSTIC: white rect + TEST text at top-left. If visible: resvg works. If not: silent failure.`);
+  return pngBytes;
 }
 
 async function findMugProductId(apiKey: string, storeId: string): Promise<number> {
