@@ -6,8 +6,8 @@ const corsHeaders = {
 };
 
 const PRINTFUL_BASE = "https://api.printful.com";
-const PRINTFUL_PRODUCT_ID = 362; // White 11oz mug
-const PRINTFUL_VARIANT_ID = 4012; // White 11oz mug variant
+const PRINTFUL_PRODUCT_ID = 19; // White 11oz mug
+const PRINTFUL_VARIANT_ID = 1320; // White 11oz mug variant
 
 async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl: string): Promise<string> {
   const createRes = await fetch(
