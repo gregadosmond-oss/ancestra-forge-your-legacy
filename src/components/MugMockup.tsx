@@ -95,13 +95,6 @@ export default function MugMockup({ surname }: MugMockupProps) {
           alt={`${surname} family crest mug preview`}
           className="h-full w-full object-contain"
         />
-      ) : noCrest ? (
-        <div className="flex flex-col items-center gap-2 px-6 text-center">
-          <div className="text-5xl">☕</div>
-          <p className="font-serif text-sm italic text-text-dim">
-            No crest yet for "{surname.trim()}" — your mug will be forged after checkout.
-          </p>
-        </div>
       ) : (
         <div className="flex flex-col items-center gap-2 px-6 text-center">
           <div className="text-5xl">☕</div>
