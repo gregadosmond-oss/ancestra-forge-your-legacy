@@ -2,11 +2,10 @@ import { useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { NavLink } from "@/components/NavLink";
 import { toggleAmbientPlayback } from "@/lib/ambientAudio";
-
-const AppLayout = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [isPlaying, setIsPlaying] = useState(true);
+import { useAuth } from "@/hooks/useAuth";
+import AuthGate from "@/components/AuthGate";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
   const isLanding = location.pathname === "/";
   const journeyMatch = location.pathname.match(/^\/journey\/(\d+)$/);
