@@ -29,14 +29,11 @@ const LEGACY_ITEMS = [
 ];
 
 const HEIRLOOM_ITEMS = [
-  "Everything in the Legacy Pack",
-  "Framed crest print (11×14 or 16×20)",
-  "Hardcover legacy book",
-  "Beer mug or whiskey glass",
-  "Christmas ornament",
-  "Metal wall sign",
-  "Coasters, phone case & more",
-  "Ships worldwide",
+  "Custom crest mug — printed & shipped",
+  "Full Legacy Pack included ($29 value)",
+  "\"HOUSE OF [NAME]\" wrap-around design",
+  "QR code linking to your legacy page",
+  "Ships worldwide in 5–7 days",
 ];
 
 const FAQ = [
