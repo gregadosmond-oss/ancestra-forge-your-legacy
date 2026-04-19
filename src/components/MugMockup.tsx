@@ -6,7 +6,7 @@ interface MugMockupProps {
 }
 
 const PLACEHOLDER_CREST =
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Coat_of_arms_of_the_United_Kingdom.svg/600px-Coat_of_arms_of_the_United_Kingdom.svg.png";
+  "https://fjtkjbnvpobawqqkzrst.supabase.co/storage/v1/object/public/crests/wagman.png";
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -18,90 +18,114 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
+/** Fetch a remote image as a Blob and return a local object URL — avoids canvas tainting. */
+async function fetchAsObjectUrl(url: string): Promise<string> {
+  const res = await fetch(url, { mode: "cors" });
+  if (!res.ok) throw new Error(`Fetch failed (${res.status}): ${url}`);
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
+}
+
 async function renderMugDesign(surnameRaw: string, crestUrl: string): Promise<Blob> {
   const SURNAME = surnameRaw.toUpperCase();
   const W = 2475;
   const H = 1155;
 
-  const canvas = document.createElement("canvas");
-  canvas.width = W;
-  canvas.height = H;
-  const ctx = canvas.getContext("2d")!;
+  const objectUrls: string[] = [];
 
-  // Background
-  ctx.fillStyle = "#0d0a07";
-  ctx.fillRect(0, 0, W, H);
-
-  // Gold border strips
-  ctx.fillStyle = "#c9a84c";
-  ctx.fillRect(0, 80, W, 18);
-  ctx.fillRect(0, 1055, W, 18);
-
-  // Inner frame
-  ctx.save();
-  ctx.globalAlpha = 0.4;
-  ctx.strokeStyle = "#c9a84c";
-  ctx.lineWidth = 2;
-  ctx.strokeRect(20, 108, 2435, 919);
-  ctx.restore();
-
-  // Crest (best-effort; continue if it fails)
   try {
-    const crestImg = await loadImage(crestUrl);
-    ctx.drawImage(crestImg, 1600, 110, 700, 895);
-  } catch (e) {
-    console.warn("[MugMockup] Crest image failed to load:", e);
+    const canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Could not get 2D canvas context");
+
+    // Background
+    ctx.fillStyle = "#0d0a07";
+    ctx.fillRect(0, 0, W, H);
+
+    // Gold border strips
+    ctx.fillStyle = "#c9a84c";
+    ctx.fillRect(0, 80, W, 18);
+    ctx.fillRect(0, 1055, W, 18);
+
+    // Inner frame
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.strokeStyle = "#c9a84c";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(20, 108, 2435, 919);
+    ctx.restore();
+
+    // Crest — fetch as blob → object URL to avoid CORS tainting
+    try {
+      const localCrestUrl = await fetchAsObjectUrl(crestUrl);
+      objectUrls.push(localCrestUrl);
+      const crestImg = await loadImage(localCrestUrl);
+      ctx.drawImage(crestImg, 1600, 110, 700, 895);
+    } catch (e) {
+      console.error("[MugMockup] Crest image failed to load:", e);
+    }
+
+    // "HOUSE OF" label (manual letter-spacing)
+    ctx.fillStyle = "#a07830";
+    ctx.font = "52px Georgia, serif";
+    ctx.textBaseline = "alphabetic";
+    drawSpacedText(ctx, "HOUSE OF", 350, 260, 6);
+
+    // Surname
+    ctx.fillStyle = "#e8b85c";
+    ctx.font = "bold 148px Georgia, serif";
+    ctx.fillText(SURNAME, 350, 430);
+
+    // Gold rule line
+    ctx.strokeStyle = "#c9a84c";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(350, 458);
+    ctx.lineTo(1600, 458);
+    ctx.stroke();
+
+    // QR label
+    ctx.fillStyle = "#a07830";
+    ctx.font = "28px Arial, sans-serif";
+    drawSpacedText(ctx, "SCAN YOUR LEGACY", 330, 720, 4);
+
+    // QR — fetch as blob → object URL to avoid CORS tainting
+    try {
+      const qrRemoteUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=c9a84c&bgcolor=0d0a07&qzone=2&data=${encodeURIComponent(
+        `https://ancestorsqr.com/f/${SURNAME}`
+      )}`;
+      const localQrUrl = await fetchAsObjectUrl(qrRemoteUrl);
+      objectUrls.push(localQrUrl);
+      const qrImg = await loadImage(localQrUrl);
+      ctx.drawImage(qrImg, 205, 740, 250, 250);
+    } catch (e) {
+      console.error("[MugMockup] QR image failed to load:", e);
+    }
+
+    // Watermark
+    ctx.save();
+    ctx.globalAlpha = 0.18;
+    ctx.fillStyle = "#c9a84c";
+    ctx.font = "34px Georgia, serif";
+    ctx.fillText("A N C E S T O R S Q R", 950, 1115);
+    ctx.restore();
+
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((b) => {
+        if (b) resolve(b);
+        else reject(new Error("canvas.toBlob returned null (canvas may be tainted)"));
+      }, "image/png");
+    });
+
+    return blob;
+  } catch (err) {
+    console.error("[MugMockup] renderMugDesign failed:", err);
+    throw err;
+  } finally {
+    for (const u of objectUrls) URL.revokeObjectURL(u);
   }
-
-  // "HOUSE OF" label (manual letter-spacing)
-  ctx.fillStyle = "#a07830";
-  ctx.font = "52px Georgia, serif";
-  ctx.textBaseline = "alphabetic";
-  drawSpacedText(ctx, "HOUSE OF", 350, 260, 6);
-
-  // Surname
-  ctx.fillStyle = "#e8b85c";
-  ctx.font = "bold 148px Georgia, serif";
-  ctx.fillText(SURNAME, 350, 430);
-
-  // Gold rule line
-  ctx.strokeStyle = "#c9a84c";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(350, 458);
-  ctx.lineTo(1600, 458);
-  ctx.stroke();
-
-  // QR label
-  ctx.fillStyle = "#a07830";
-  ctx.font = "28px Arial, sans-serif";
-  drawSpacedText(ctx, "SCAN YOUR LEGACY", 330, 720, 4);
-
-  // QR image
-  try {
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=c9a84c&bgcolor=0d0a07&qzone=2&data=${encodeURIComponent(
-      `https://ancestorsqr.com/f/${SURNAME}`
-    )}`;
-    const qrImg = await loadImage(qrUrl);
-    ctx.drawImage(qrImg, 205, 740, 250, 250);
-  } catch (e) {
-    console.warn("[MugMockup] QR image failed to load:", e);
-  }
-
-  // Watermark
-  ctx.save();
-  ctx.globalAlpha = 0.18;
-  ctx.fillStyle = "#c9a84c";
-  ctx.font = "34px Georgia, serif";
-  ctx.fillText("A N C E S T O R S Q R", 950, 1115);
-  ctx.restore();
-
-  return await new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error("canvas.toBlob returned null"));
-    }, "image/png");
-  });
 }
 
 function drawSpacedText(
