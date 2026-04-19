@@ -3,6 +3,24 @@ import { motion } from "framer-motion";
 
 const TOOLS = [
   {
+    icon: "💬",
+    heading: "Chat With Your Ancestor",
+    body: "A live conversation with an AI character drawn from your family's real history.",
+    href: "/tools/chat",
+  },
+  {
+    icon: "👤",
+    heading: "Meet Your Ancestor",
+    body: "AI generates a historically plausible ancestor — name, era, occupation, personality, and a quote.",
+    href: "/tools/ancestor",
+  },
+  {
+    icon: "⚔️",
+    heading: "Motto Generator",
+    body: "Enter 3 values → get a Latin motto with English translation.",
+    href: "/tools/motto",
+  },
+  {
     icon: "🧬",
     heading: "Bloodline Quiz",
     body: "5 questions → your ancestry archetype. Warrior, Builder, Explorer, Healer, or Scholar.",
@@ -15,28 +33,10 @@ const TOOLS = [
     href: "/tools/surname",
   },
   {
-    icon: "⚔️",
-    heading: "Motto Generator",
-    body: "Enter 3 values → get a Latin motto with English translation.",
-    href: "/tools/motto",
-  },
-  {
-    icon: "👤",
-    heading: "Meet Your Ancestor",
-    body: "AI generates a historically plausible ancestor — name, era, occupation, personality, and a quote.",
-    href: "/tools/ancestor",
-  },
-  {
     icon: "🕯️",
     heading: "The 1700s You",
     body: "What would your life look like 300 years ago based on your surname?",
     href: "/tools/1700s",
-  },
-  {
-    icon: "💬",
-    heading: "Chat With Your Ancestor",
-    body: "A live conversation with an AI character drawn from your family's real history.",
-    href: "/tools/chat",
   },
 ] as const;
 
