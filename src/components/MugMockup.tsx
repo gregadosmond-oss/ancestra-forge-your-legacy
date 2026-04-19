@@ -41,9 +41,9 @@ export default function MugMockup({ surname }: MugMockupProps) {
 
         const crestUrl = crest?.image_url ?? PLACEHOLDER_CREST;
 
-        console.log("[MugMockup] Invoking generate-mug-mockup:", { surname: trimmed, crestUrl: crest.image_url });
+        console.log("[MugMockup] Invoking generate-mug-mockup:", { surname: trimmed, crestUrl });
         const { data, error } = await supabase.functions.invoke("generate-mug-mockup", {
-          body: { surname: trimmed, crestUrl: crest.image_url },
+          body: { surname: trimmed, crestUrl },
         });
         console.log("[MugMockup] Response:", { data, error });
 
