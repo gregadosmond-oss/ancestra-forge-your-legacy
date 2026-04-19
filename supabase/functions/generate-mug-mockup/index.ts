@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { Resvg, initWasm } from "npm:@resvg/resvg-wasm";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,103 +7,25 @@ const corsHeaders = {
 };
 
 const PRINTFUL_BASE = "https://api.printful.com";
-const PRINT_W = 2475;
-const PRINT_H = 1155;
-
-let wasmReady = false;
-let fontBuffer: Uint8Array | null = null;
-async function ensureWasm() {
-  if (!wasmReady) {
-    const res = await fetch("https://unpkg.com/@resvg/resvg-wasm/index_bg.wasm");
-    await initWasm(res);
-    wasmReady = true;
-  }
-  if (!fontBuffer) {
-    // Serif font for headlines (Cormorant Garamond — has Georgia-like feel)
-    const fontRes = await fetch("https://fonts.gstatic.com/s/cormorantgaramond/v16/co3YmX5slCNuHLi8bLeY9MK7whWMhyjornFLsS6V7w.ttf");
-    fontBuffer = new Uint8Array(await fontRes.arrayBuffer());
-  }
-}
-
-async function toBase64(url: string): Promise<{ b64: string; mime: string }> {
-  const res = await fetch(url);
-  const mime = res.headers.get("content-type") ?? "image/png";
-  const buf = await res.arrayBuffer();
-  const bytes = new Uint8Array(buf);
-  let binary = "";
-  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-  return { b64: btoa(binary), mime };
-}
-
-async function buildDesign(crestUrl: string, qrUrl: string, surname: string): Promise<Uint8Array> {
-  await ensureWasm();
-
-  const [crest, qr] = await Promise.all([toBase64(crestUrl), toBase64(qrUrl)]);
-  const crestDataUri = `data:${crest.mime};base64,${crest.b64}`;
-  const qrDataUri = `data:${qr.mime};base64,${qr.b64}`;
-  const SAFE_T = 80;
-  const SAFE_B = 80;
-  const crestY = SAFE_T + 30;
-  const crestH = PRINT_H - SAFE_T - SAFE_B - 60;
-
-  const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="${PRINT_W}" height="${PRINT_H}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
-  <rect width="${PRINT_W}" height="${PRINT_H}" style="fill:#0d0a07"/>
-  <rect x="0" y="${SAFE_T}" width="${PRINT_W}" height="18" style="fill:#c9a84c"/>
-  <rect x="0" y="${PRINT_H - SAFE_B - 18}" width="${PRINT_W}" height="18" style="fill:#c9a84c"/>
-  <rect x="20" y="${SAFE_T + 26}" width="${PRINT_W - 40}" height="${PRINT_H - SAFE_T - SAFE_B - 52}" style="fill:none;stroke:#c9a84c;stroke-width:1.5;opacity:0.4"/>
-  <!-- DIAGNOSTIC TEST BLOCK -->
-  <rect x="60" y="60" width="400" height="80" style="fill:#ffffff"/>
-  <text x="80" y="115" font-family="monospace" font-size="48" style="fill:#000000">TEST</text>
-  <!-- END DIAGNOSTIC -->
-  <text x="330" y="720" font-family="monospace" font-size="28" style="fill:#a07830" letter-spacing="4" text-anchor="middle">SCAN YOUR LEGACY</text>
-  <image href="${qrDataUri}" x="205" y="740" width="250" height="250" preserveAspectRatio="xMidYMid meet"/>
-  <text x="350" y="260" font-family="monospace" font-size="52" style="fill:#a07830" letter-spacing="6">HOUSE  OF</text>
-  <text x="350" y="430" font-family="monospace" font-size="148" font-weight="bold" style="fill:#e8b85c">${surname.toUpperCase()}</text>
-  <line x1="350" y1="458" x2="1600" y2="458" style="stroke:#c9a84c;stroke-width:2;opacity:0.6"/>
-  <line x1="1640" y1="${SAFE_T + 28}" x2="1640" y2="${PRINT_H - SAFE_B - 28}" style="stroke:#c9a84c;stroke-width:1.5;opacity:0.25"/>
-  <image href="${crestDataUri}" x="1600" y="${crestY}" width="700" height="${crestH}" preserveAspectRatio="xMidYMid meet"/>
-  <text x="950" y="${PRINT_H - SAFE_B - 28}" font-family="monospace" font-size="34" style="fill:#c9a84c;opacity:0.18" text-anchor="middle" letter-spacing="10">A N C E S T O R S Q R</text>
-</svg>`;
-
-  const resvg = new Resvg(svg, {
-    fitTo: { mode: "width", value: PRINT_W },
-    font: {
-      fontBuffers: fontBuffer ? [fontBuffer] : [],
-      defaultFontFamily: "monospace",
-      loadSystemFonts: false,
-    },
-  });
-  const rendered = resvg.render();
-  const pngBytes = rendered.asPng();
-  console.log(`[generate-mug-mockup] Rendered PNG: ${pngBytes.length} bytes, dimensions ${rendered.width}x${rendered.height}`);
-  console.log(`[generate-mug-mockup] DIAGNOSTIC: white rect + TEST text at top-left. If visible: resvg works. If not: silent failure.`);
-  return pngBytes;
-}
 
 async function findMugProductId(apiKey: string, storeId: string): Promise<number> {
   const res = await fetch(`${PRINTFUL_BASE}/products`, {
     headers: { Authorization: `Bearer ${apiKey}`, "X-PF-Store-Id": storeId },
   });
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Printful /products failed (${res.status}): ${errText}`);
-  }
+  if (!res.ok) throw new Error(`Printful /products failed (${res.status}): ${await res.text()}`);
   const json = await res.json();
   const products: Array<{ id: number; type: string; type_name: string; title: string; model: string }> = json?.result ?? [];
 
   const mugs = products.filter((p) =>
     [p.type, p.type_name, p.title, p.model].some((v) => (v ?? "").toLowerCase().includes("mug"))
   );
-  console.log("[generate-mug-mockup] Mug products from Printful:", JSON.stringify(mugs, null, 2));
 
-  // Prefer a WHITE 11oz mug — exclude black/colored mugs
   const whiteMug =
     mugs.find((p) => /white/i.test(p.title) && !/black|color/i.test(p.title)) ??
     mugs.find((p) => /^(?!.*black).*mug/i.test(p.title)) ??
     mugs[0];
 
-  if (!whiteMug) throw new Error(`No mug product found in Printful catalog (total: ${products.length})`);
+  if (!whiteMug) throw new Error(`No mug product found in Printful catalog`);
   console.log("[generate-mug-mockup] Selected mug product:", { id: whiteMug.id, title: whiteMug.title });
   return whiteMug.id;
 }
@@ -113,87 +34,57 @@ async function findFirstVariantId(apiKey: string, storeId: string, productId: nu
   const res = await fetch(`${PRINTFUL_BASE}/products/${productId}`, {
     headers: { Authorization: `Bearer ${apiKey}`, "X-PF-Store-Id": storeId },
   });
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Printful /products/${productId} failed (${res.status}): ${errText}`);
-  }
+  if (!res.ok) throw new Error(`Printful /products/${productId} failed (${res.status}): ${await res.text()}`);
   const json = await res.json();
-  // Printful catalog returns { result: { product: {...}, variants: [...] } }
-  const variants: Array<{ id: number; name?: string; color?: string; size?: string }> =
+  const variants: Array<{ id: number; name?: string; color?: string }> =
     json?.result?.variants ?? json?.result?.product?.variants ?? [];
-  console.log(`[generate-mug-mockup] Product ${productId} variants count: ${variants.length}. First 3:`,
-    JSON.stringify(variants.slice(0, 3), null, 2));
-
-  if (variants.length === 0) {
-    console.log("[generate-mug-mockup] Raw product detail response:", JSON.stringify(json).slice(0, 1000));
-    throw new Error(`No variants for product ${productId}`);
-  }
+  if (variants.length === 0) throw new Error(`No variants for product ${productId}`);
 
   const whiteVariant =
     variants.find((v) => /white/i.test(v.name ?? "")) ??
     variants.find((v) => /white/i.test(v.color ?? "")) ??
     variants[0];
-  console.log("[generate-mug-mockup] Selected variant:", { id: whiteVariant.id, name: whiteVariant.name, color: whiteVariant.color });
+  console.log("[generate-mug-mockup] Selected variant:", { id: whiteVariant.id, name: whiteVariant.name });
   return whiteVariant.id;
 }
-
 
 async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl: string): Promise<string> {
   const productId = await findMugProductId(apiKey, storeId);
   const variantId = await findFirstVariantId(apiKey, storeId, productId);
 
-  const createRes = await fetch(
-    `${PRINTFUL_BASE}/mockup-generator/create-task/${productId}`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "X-PF-Store-Id": storeId,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        variant_ids: [variantId],
-        format: "jpg",
-        files: [
-          {
-            placement: "default",
-            image_url: designUrl,
-            position: {
-              area_width: 2475,
-              area_height: 1155,
-              width: 2475,
-              height: 1155,
-              top: 0,
-              left: 0,
-            },
-          },
-        ],
-      }),
-    }
-  );
+  const createRes = await fetch(`${PRINTFUL_BASE}/mockup-generator/create-task/${productId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "X-PF-Store-Id": storeId,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      variant_ids: [variantId],
+      format: "jpg",
+      files: [
+        {
+          placement: "default",
+          image_url: designUrl,
+          position: { area_width: 2475, area_height: 1155, width: 2475, height: 1155, top: 0, left: 0 },
+        },
+      ],
+    }),
+  });
 
-  if (!createRes.ok) {
-    const errText = await createRes.text();
-    throw new Error(`Printful create-task failed (${createRes.status}): ${errText}`);
-  }
+  if (!createRes.ok) throw new Error(`Printful create-task failed (${createRes.status}): ${await createRes.text()}`);
 
   const createJson = await createRes.json();
   const taskKey = createJson?.result?.task_key;
-  if (!taskKey) throw new Error(`No task_key in Printful response: ${JSON.stringify(createJson)}`);
+  if (!taskKey) throw new Error(`No task_key in Printful response`);
 
   for (let attempt = 0; attempt < 30; attempt++) {
     await new Promise((r) => setTimeout(r, 2000));
-
     const pollRes = await fetch(
       `${PRINTFUL_BASE}/mockup-generator/task?task_key=${encodeURIComponent(taskKey)}`,
       { headers: { Authorization: `Bearer ${apiKey}`, "X-PF-Store-Id": storeId } }
     );
-
-    if (!pollRes.ok) {
-      const errText = await pollRes.text();
-      throw new Error(`Printful poll failed (${pollRes.status}): ${errText}`);
-    }
-
+    if (!pollRes.ok) throw new Error(`Printful poll failed (${pollRes.status}): ${await pollRes.text()}`);
     const pollJson = await pollRes.json();
     const status = pollJson?.result?.status;
     console.log(`[generate-mug-mockup] Poll ${attempt + 1}: status=${status}`);
@@ -203,10 +94,7 @@ async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl
       if (!mockupUrl) throw new Error(`No mockup_url in completed result`);
       return mockupUrl;
     }
-
-    if (status === "failed") {
-      throw new Error(`Printful task failed: ${JSON.stringify(pollJson)}`);
-    }
+    if (status === "failed") throw new Error(`Printful task failed: ${JSON.stringify(pollJson)}`);
   }
 
   throw new Error("Printful mockup task timed out after 60s");
@@ -236,38 +124,38 @@ serve(async (req) => {
       });
     }
 
-    // Build the full mug design (black bg, HOUSE OF + surname, gold borders, QR placeholder, crest)
-    const legacyUrl = `https://ancestorsqr.com/?s=${encodeURIComponent(surname)}`;
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=c9a84c&bgcolor=1a1510&qzone=2&data=${encodeURIComponent(legacyUrl)}`;
-
-    console.log("[generate-mug-mockup] Rendering design PNG for:", surname);
-    const pngBytes = await buildDesign(crestUrl, qrUrl, surname);
-
-    // Upload to public storage so Printful can fetch it
     const supabase = createClient(supabaseUrl, serviceKey);
-    const fileName = `heirloom/mockup-${surname.toLowerCase().replace(/\s+/g, "-")}.png`;
-    const blob = new Blob([pngBytes], { type: "image/png" });
-    console.log(`[generate-mug-mockup] Uploading ${blob.size} bytes to ${fileName}`);
+    const slug = surname.toLowerCase().replace(/\s+/g, "-");
+    const cacheFile = `heirloom/mockup-${slug}.json`;
 
-    let uploadErr: { message: string } | null = null;
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      const { error } = await supabase.storage
-        .from("crests")
-        .upload(fileName, blob, { contentType: "image/png", upsert: true });
-      if (!error) { uploadErr = null; break; }
-      uploadErr = error;
-      console.warn(`[generate-mug-mockup] Upload attempt ${attempt} failed: ${error.message}`);
-      await new Promise((r) => setTimeout(r, 1000 * attempt));
+    // 1. Check cache
+    const { data: cached } = await supabase.storage.from("crests").download(cacheFile);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(await cached.text());
+        if (parsed?.mockupUrl) {
+          console.log("[generate-mug-mockup] Cache hit:", parsed.mockupUrl);
+          return new Response(JSON.stringify({ mockupUrl: parsed.mockupUrl, cached: true }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      } catch (e) {
+        console.warn("[generate-mug-mockup] Cache parse failed, regenerating:", e);
+      }
     }
-    if (uploadErr) throw new Error(`Upload failed: ${uploadErr.message}`);
 
-    const { data: { publicUrl: designUrl } } = supabase.storage.from("crests").getPublicUrl(fileName);
-    console.log("[generate-mug-mockup] Design uploaded:", designUrl);
-
-    const mockupUrl = await generatePrintfulMockup(printfulKey, printfulStoreId, designUrl);
+    // 2. Call Printful with the raw crest URL directly
+    console.log("[generate-mug-mockup] Cache miss, calling Printful with crestUrl:", crestUrl);
+    const mockupUrl = await generatePrintfulMockup(printfulKey, printfulStoreId, crestUrl);
     console.log("[generate-mug-mockup] Got mockupUrl:", mockupUrl);
 
-    return new Response(JSON.stringify({ mockupUrl, designUrl }), {
+    // 3. Save cache reference (best-effort)
+    const { error: cacheErr } = await supabase.storage
+      .from("crests")
+      .upload(cacheFile, new Blob([JSON.stringify({ mockupUrl, surname, crestUrl, createdAt: new Date().toISOString() })], { type: "application/json" }), { upsert: true, contentType: "application/json" });
+    if (cacheErr) console.warn("[generate-mug-mockup] Cache write failed:", cacheErr.message);
+
+    return new Response(JSON.stringify({ mockupUrl, cached: false }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
