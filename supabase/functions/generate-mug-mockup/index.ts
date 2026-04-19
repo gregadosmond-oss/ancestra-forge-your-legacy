@@ -84,8 +84,15 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const printfulKey = Deno.env.get("PRINTFUL_API_KEY");
+  const printfulStoreId = Deno.env.get("PRINTFUL_STORE_ID");
   if (!printfulKey) {
     return new Response(JSON.stringify({ error: "Missing PRINTFUL_API_KEY" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  if (!printfulStoreId) {
+    return new Response(JSON.stringify({ error: "Missing PRINTFUL_STORE_ID" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -102,7 +109,7 @@ serve(async (req) => {
 
     // Use the crest URL directly as the design — Printful fetches it from the public URL.
     console.log("[generate-mug-mockup] Calling Printful with crestUrl:", crestUrl);
-    const mockupUrl = await generatePrintfulMockup(printfulKey, crestUrl);
+    const mockupUrl = await generatePrintfulMockup(printfulKey, printfulStoreId, crestUrl);
     console.log("[generate-mug-mockup] Got mockupUrl:", mockupUrl);
 
     return new Response(JSON.stringify({ mockupUrl, designUrl: crestUrl }), {
