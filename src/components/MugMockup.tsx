@@ -49,9 +49,11 @@ export default function MugMockup({ surname }: MugMockupProps) {
 
         setNoCrest(false);
 
+        console.log("[MugMockup] Invoking generate-mug-mockup:", { surname: trimmed, crestUrl: crest.image_url });
         const { data, error } = await supabase.functions.invoke("generate-mug-mockup", {
           body: { surname: trimmed, crestUrl: crest.image_url },
         });
+        console.log("[MugMockup] Response:", { data, error });
 
         if (cancelled) return;
 
