@@ -9,13 +9,14 @@ const PRINTFUL_BASE = "https://api.printful.com";
 const PRINTFUL_PRODUCT_ID = 362; // White 11oz mug
 const PRINTFUL_VARIANT_ID = 4012; // White 11oz mug variant
 
-async function generatePrintfulMockup(apiKey: string, designUrl: string): Promise<string> {
+async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl: string): Promise<string> {
   const createRes = await fetch(
     `${PRINTFUL_BASE}/mockup-generator/create-task/${PRINTFUL_PRODUCT_ID}`,
     {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
+        "X-PF-Store-Id": storeId,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
