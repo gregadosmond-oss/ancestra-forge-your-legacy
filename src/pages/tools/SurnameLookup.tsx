@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, MapPin, Calendar, Shield, ScrollText, User, Compass, Crown, Link2, Facebook, Twitter } from "lucide-react";
+import { Search, MapPin, Calendar, Shield, ScrollText, User, Compass, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type SurnameResult = {
@@ -55,19 +55,6 @@ export default function SurnameLookup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
-  const shareRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!shareOpen) return;
-    const onClick = (e: MouseEvent) => {
-      if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
-        setShareOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [shareOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,13 +82,9 @@ export default function SurnameLookup() {
     }
   };
 
-  const shareText = result
-    ? `My surname ${result.surname} means ${result.meaning} first recorded ${result.dateFirstRecorded} in ${result.origin}. Ancestral role: ${result.ancestralRole} What's hiding in your name? ancestorsqr.com`
-    : "";
-  const shareUrl = "https://ancestorsqr.com/tools/surname";
-
   const handleCopy = async () => {
     if (!result) return;
+    const shareText = `My surname ${result.surname} means ${result.meaning} first recorded ${result.dateFirstRecorded} in ${result.origin}. Ancestral role: ${result.ancestralRole} What's hiding in your name? ancestorsqr.com`;
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
@@ -109,18 +92,6 @@ export default function SurnameLookup() {
     } catch {
       setError("Couldn't copy to clipboard.");
     }
-  };
-
-  const openFacebook = () => {
-    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-    window.open(url, "_blank");
-    setShareOpen(false);
-  };
-
-  const openTwitter = () => {
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
-    window.open(url, "_blank");
-    setShareOpen(false);
   };
 
   return (
