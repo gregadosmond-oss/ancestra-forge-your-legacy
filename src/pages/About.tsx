@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import josephOsmondPortrait from "@/assets/joseph-osmond-1827.jpeg";
 
 const reveal = {
   initial: { opacity: 0, y: 28 },
@@ -228,21 +229,26 @@ export default function About() {
             </Body>
           </div>
 
-          {/* Portrait placeholder */}
-          <div
-            className="mx-auto mt-10 flex aspect-[3/4] max-w-[260px] items-center justify-center rounded-[14px] text-center"
-            style={{
-              background: "#0d0a07",
-              border: "1px solid rgba(212,160,74,0.3)",
-            }}
-          >
-            <p
-              className="font-serif italic"
-              style={{ color: "#a07830", fontSize: "13px", padding: "0 16px" }}
+          {/* Portrait — Joseph Osmond c.1827 */}
+          <figure className="mx-auto mt-10" style={{ maxWidth: "380px" }}>
+            <img
+              src={josephOsmondPortrait}
+              alt="Portrait of Joseph Osmond, c.1827, Moreton's Harbour, Newfoundland"
+              className="w-full"
+              style={{
+                borderRadius: "14px",
+                border: "1px solid rgba(212,160,74,0.25)",
+                filter: "sepia(40%) contrast(1.1) brightness(0.9)",
+                display: "block",
+              }}
+            />
+            <figcaption
+              className="mt-4 text-center font-serif italic"
+              style={{ color: "#8a7e6e", fontSize: "14px" }}
             >
-              Portrait: Joseph Osmond, c.1827
-            </p>
-          </div>
+              Joseph Osmond, c.1827 — Moreton's Harbour, Newfoundland
+            </figcaption>
+          </figure>
         </motion.section>
 
         <OrnamentalDivider />
