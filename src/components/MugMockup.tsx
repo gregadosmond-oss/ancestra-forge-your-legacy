@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 
 interface MugMockupProps {
@@ -104,13 +105,26 @@ async function renderMugDesign(surnameRaw: string, crestUrl: string): Promise<st
     ctx.lineTo(s(1600), s(458));
     ctx.stroke();
 
-    // Watermark
-    ctx.save();
-    ctx.globalAlpha = 0.18;
-    ctx.fillStyle = "#c9a84c";
-    ctx.font = `${s(34)}px Georgia, serif`;
-    ctx.fillText("A N C E S T O R S Q R", s(950), s(1115));
-    ctx.restore();
+    // "SCAN YOUR LEGACY" label above QR
+    ctx.fillStyle = "#a07830";
+    ctx.font = `bold ${s(28)}px Arial`;
+    ctx.textAlign = "center";
+    ctx.fillText("SCAN YOUR LEGACY", s(330), s(720));
+    ctx.textAlign = "left";
+
+    // Real QR code — generated client-side, no network/CORS
+    try {
+      const qrUrl = `https://ancestorsqr.com/f/${surnameRaw.toLowerCase()}`;
+      const qrDataUrl = await QRCode.toDataURL(qrUrl, {
+        width: 250,
+        margin: 2,
+        color: { dark: "#c9a84c", light: "#0d0a07" },
+      });
+      const qrImg = await loadImage(qrDataUrl);
+      ctx.drawImage(qrImg, s(205), s(740), s(250), s(250));
+    } catch (e) {
+      console.error("[MugMockup] QR generation failed:", e);
+    }
 
     return canvas.toDataURL("image/png");
   } catch (err) {
