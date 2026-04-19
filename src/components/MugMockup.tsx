@@ -9,7 +9,7 @@ export default function MugMockup({ surname }: MugMockupProps) {
   const [mockupUrl, setMockupUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<number | null>(null);
-  const PLACEHOLDER_CREST = "https://fjtkjbnvpobawqqkzrst.supabase.co/storage/v1/object/public/crests/placeholder-crest.png";
+  const PLACEHOLDER_CREST = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Coat_of_arms_of_the_United_Kingdom.svg/600px-Coat_of_arms_of_the_United_Kingdom.svg.png";
 
   useEffect(() => {
     const trimmed = surname.trim();
