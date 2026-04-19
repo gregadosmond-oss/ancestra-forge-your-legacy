@@ -123,7 +123,7 @@ export default function Cart() {
               </p>
               <div className="grid gap-4 sm:grid-cols-3">
                 {[
-                  { name: "Legacy Pack", price: "$29", note: "Instant delivery", path: "/journey" },
+                  { name: "Legacy Pack", price: "$29.99", note: "Instant delivery", path: "/journey" },
                   { name: "Framed Crest Print", price: "from $79", note: "Ships worldwide", path: "/shop" },
                   { name: "Legacy Book", price: "from $59", note: "Softcover or hardcover", path: "/shop" },
                 ].map((item) => (
