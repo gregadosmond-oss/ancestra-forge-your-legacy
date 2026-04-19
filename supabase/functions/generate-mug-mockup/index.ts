@@ -154,6 +154,17 @@ serve(async (req) => {
       console.log("[generate-mug-mockup] Got mockupUrl:", mockupUrl);
     } catch (printfulErr) {
       console.error("[generate-mug-mockup] Printful failed, returning fallback:", printfulErr);
+      // Cache fallback briefly so we don't hammer Printful while it's rate-limited (429 → 30s cooldown)
+      const fallbackPayload = {
+        mockupUrl: crestUrl,
+        fallback: true,
+        createdAt: new Date().toISOString(),
+      };
+      await supabase.storage
+        .from("crests")
+        .upload(cacheFile, new Blob([JSON.stringify(fallbackPayload)], { type: "application/json" }), { upsert: true, contentType: "application/json" })
+        .catch((e) => console.warn("[generate-mug-mockup] Fallback cache write failed:", e));
+
       return new Response(
         JSON.stringify({
           mockupUrl: crestUrl,
