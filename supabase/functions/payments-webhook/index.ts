@@ -126,7 +126,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     }
   } else if (buyerEmail) {
     // Regular purchase — send confirmation to buyer
-    await sendBuyerConfirmationEmail({ buyerEmail, surname, userId });
+    await sendBuyerConfirmationEmail({ buyerEmail, surname, userId, sessionId: session.id });
   }
 }
 
