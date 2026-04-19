@@ -108,7 +108,10 @@ async function findFirstVariantId(apiKey: string, storeId: string, productId: nu
     throw new Error(`No variants for product ${productId}`);
   }
 
-  const whiteVariant = variants.find((v) => /white/i.test(v.color ?? v.name ?? "")) ?? variants[0];
+  const whiteVariant =
+    variants.find((v) => /white/i.test(v.name ?? "")) ??
+    variants.find((v) => /white/i.test(v.color ?? "")) ??
+    variants[0];
   console.log("[generate-mug-mockup] Selected variant:", { id: whiteVariant.id, name: whiteVariant.name, color: whiteVariant.color });
   return whiteVariant.id;
 }
@@ -135,10 +138,10 @@ async function generatePrintfulMockup(apiKey: string, storeId: string, designUrl
             placement: "default",
             image_url: designUrl,
             position: {
-              area_width: 2400,
-              area_height: 1000,
-              width: 2400,
-              height: 1000,
+              area_width: 2475,
+              area_height: 1155,
+              width: 2475,
+              height: 1155,
               top: 0,
               left: 0,
             },
