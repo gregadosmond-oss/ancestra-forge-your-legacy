@@ -7,9 +7,9 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const PRINTIFY_BASE = "https://api.printify.com/v1";
-const BLUEPRINT_ID = 478;
-const PROVIDER_ID = 99;
+const PRINTFUL_BASE = "https://api.printful.com";
+const PRINTFUL_PRODUCT_ID = 362; // White 11oz mug
+const PRINTFUL_VARIANT_ID = 4012; // White 11oz mug variant
 const PRINT_W = 2475;
 const PRINT_H = 1155;
 
@@ -62,29 +62,89 @@ async function buildDesign(crestUrl: string, qrUrl: string, surname: string): Pr
   return resvg.render().asPng();
 }
 
-async function getWhite11ozVariant(apiKey: string): Promise<number> {
-  const res = await fetch(
-    `${PRINTIFY_BASE}/catalog/blueprints/${BLUEPRINT_ID}/print_providers/${PROVIDER_ID}/variants.json`,
-    { headers: { Authorization: `Bearer ${apiKey}` } }
+async function generatePrintfulMockup(apiKey: string, designUrl: string): Promise<string> {
+  // 1. Create mockup task
+  const createRes = await fetch(
+    `${PRINTFUL_BASE}/mockup-generator/create-task/${PRINTFUL_PRODUCT_ID}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        variant_ids: [PRINTFUL_VARIANT_ID],
+        format: "jpg",
+        files: [
+          {
+            placement: "default",
+            image_url: designUrl,
+            position: {
+              area_width: 2400,
+              area_height: 1000,
+              width: 2400,
+              height: 1000,
+              top: 0,
+              left: 0,
+            },
+          },
+        ],
+      }),
+    }
   );
-  const { variants } = await res.json();
-  const white11 = variants?.find((v: any) =>
-    v.title?.toLowerCase().includes("11") && v.title?.toLowerCase().includes("white")
-  );
-  return white11?.id ?? variants?.[0]?.id;
+
+  if (!createRes.ok) {
+    const errText = await createRes.text();
+    throw new Error(`Printful create-task failed: ${errText}`);
+  }
+
+  const createJson = await createRes.json();
+  const taskKey = createJson?.result?.task_key;
+  if (!taskKey) throw new Error(`No task_key in Printful response: ${JSON.stringify(createJson)}`);
+
+  // 2. Poll for completion (every 2s, max ~60s)
+  for (let attempt = 0; attempt < 30; attempt++) {
+    await new Promise((r) => setTimeout(r, 2000));
+
+    const pollRes = await fetch(
+      `${PRINTFUL_BASE}/mockup-generator/task?task_key=${encodeURIComponent(taskKey)}`,
+      { headers: { Authorization: `Bearer ${apiKey}` } }
+    );
+
+    if (!pollRes.ok) {
+      const errText = await pollRes.text();
+      throw new Error(`Printful poll failed: ${errText}`);
+    }
+
+    const pollJson = await pollRes.json();
+    const status = pollJson?.result?.status;
+    console.log(`[generate-mug-mockup] Poll attempt ${attempt + 1}: status=${status}`);
+
+    if (status === "completed") {
+      const mockupUrl = pollJson?.result?.mockups?.[0]?.mockup_url;
+      if (!mockupUrl) throw new Error(`No mockup_url in completed result: ${JSON.stringify(pollJson)}`);
+      return mockupUrl;
+    }
+
+    if (status === "failed") {
+      throw new Error(`Printful task failed: ${JSON.stringify(pollJson)}`);
+    }
+  }
+
+  throw new Error("Printful mockup task timed out after 60s");
 }
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  const apiKey = Deno.env.get("PRINTIFY_API_KEY");
-  const shopId = Deno.env.get("PRINTIFY_SHOP_ID");
+  const printfulKey = Deno.env.get("PRINTFUL_API_KEY");
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-  if (!apiKey || !shopId) {
-    return new Response(JSON.stringify({ error: "Missing Printify config" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+  if (!printfulKey) {
+    return new Response(JSON.stringify({ error: "Missing PRINTFUL_API_KEY" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
@@ -92,7 +152,8 @@ serve(async (req) => {
     const { surname, crestUrl } = await req.json();
     if (!surname || !crestUrl) {
       return new Response(JSON.stringify({ error: "Missing surname or crestUrl" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -100,8 +161,10 @@ serve(async (req) => {
     const legacyUrl = `https://ancestorsqr.com/family/${slug}`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=c9a84c&bgcolor=1a1510&qzone=2&data=${encodeURIComponent(legacyUrl)}`;
 
+    // Build the design PNG
     const pngBytes = await buildDesign(crestUrl, qrUrl, surname);
 
+    // Upload to Supabase storage so Printful can fetch it
     const supabase = createClient(supabaseUrl, serviceKey);
     const fileName = `heirloom/mockup-${slug}.png`;
     const { error: uploadErr } = await supabase.storage
@@ -112,15 +175,19 @@ serve(async (req) => {
 
     const { data: { publicUrl: designUrl } } = supabase.storage.from("crests").getPublicUrl(fileName);
 
-    // Note: Printify does not expose a public "generate mockup without creating product" endpoint.
-    // Return the rendered design PNG directly as the preview — shows the user exactly what
-    // will be printed. A true 3D mug mockup requires creating a Printify product first.
-    return new Response(JSON.stringify({ mockupUrl: designUrl, designUrl }), {
+    // Generate the Printful 3D mug mockup
+    console.log("[generate-mug-mockup] Calling Printful with designUrl:", designUrl);
+    const mockupUrl = await generatePrintfulMockup(printfulKey, designUrl);
+    console.log("[generate-mug-mockup] Got mockupUrl:", mockupUrl);
+
+    return new Response(JSON.stringify({ mockupUrl, designUrl }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
+    console.error("[generate-mug-mockup] Error:", err);
     return new Response(JSON.stringify({ error: (err as Error).message }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
