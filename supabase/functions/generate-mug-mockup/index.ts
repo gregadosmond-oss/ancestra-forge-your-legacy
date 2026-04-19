@@ -12,11 +12,17 @@ const PRINT_W = 2475;
 const PRINT_H = 1155;
 
 let wasmReady = false;
+let fontBuffer: Uint8Array | null = null;
 async function ensureWasm() {
   if (!wasmReady) {
     const res = await fetch("https://unpkg.com/@resvg/resvg-wasm/index_bg.wasm");
     await initWasm(res);
     wasmReady = true;
+  }
+  if (!fontBuffer) {
+    // Serif font for headlines (Cormorant Garamond — has Georgia-like feel)
+    const fontRes = await fetch("https://fonts.gstatic.com/s/cormorantgaramond/v16/co3YmX5slCNuHLi8bLeY9MK7whWMhyjornFLsS6V7w.ttf");
+    fontBuffer = new Uint8Array(await fontRes.arrayBuffer());
   }
 }
 
@@ -57,7 +63,14 @@ async function buildDesign(crestUrl: string, qrUrl: string, surname: string): Pr
   <text x="950" y="${PRINT_H - SAFE_B - 28}" font-family="Georgia, serif" font-size="34" fill="#c9a84c" opacity="0.18" text-anchor="middle" letter-spacing="10">A N C E S T O R S Q R</text>
 </svg>`;
 
-  const resvg = new Resvg(svg, { fitTo: { mode: "width", value: PRINT_W } });
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "width", value: PRINT_W },
+    font: {
+      fontBuffers: fontBuffer ? [fontBuffer] : [],
+      defaultFontFamily: "Cormorant Garamond",
+      loadSystemFonts: false,
+    },
+  });
   return resvg.render().asPng();
 }
 
