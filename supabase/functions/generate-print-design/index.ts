@@ -18,6 +18,9 @@ const PHONE_CASE_H = 2099;
 // Coaster: 1169x1169px square.
 const COASTER_SIZE = 1169;
 
+// Clock: 3000x3000px square.
+const CLOCK_SIZE = 3000;
+
 let wasmReady = false;
 async function ensureWasm() {
   if (!wasmReady) {
@@ -117,6 +120,66 @@ function getLayout(productType?: string): LayoutParams {
     };
   }
 
+  if (productType === "clock") {
+    // 3000 x 3000 clock canvas, rendered at native size.
+    // Exact SVG attribute values per spec.
+    const canvasW = CLOCK_SIZE;
+    const canvasH = CLOCK_SIZE;
+    const frameInset = 0; // No rect frame for clock, uses circle border
+    const frameStrokeWidth = 0;
+    const crestX = 600;
+    const crestY = 80;
+    const crestW = 1800;
+    const crestH = 1000;
+    const qrSize = 280;
+    const qrX = 1110;
+    const qrY = 2100;
+    return {
+      canvasW,
+      canvasH,
+      renderW: canvasW,
+      crestX,
+      crestY,
+      crestW,
+      crestH,
+      qrX,
+      qrY,
+      qrSize,
+      frameInset,
+      frameStrokeWidth,
+    };
+  }
+
+  if (productType === "clock") {
+    // 3000 x 3000 clock canvas, rendered at native size.
+    // Exact SVG attribute values per spec.
+    const canvasW = CLOCK_SIZE;
+    const canvasH = CLOCK_SIZE;
+    const frameInset = 0; // No rect frame for clock, uses circle border
+    const frameStrokeWidth = 0;
+    const crestX = 600;
+    const crestY = 80;
+    const crestW = 1800;
+    const crestH = 1000;
+    const qrSize = 280;
+    const qrX = 1110;
+    const qrY = 2100;
+    return {
+      canvasW,
+      canvasH,
+      renderW: canvasW,
+      crestX,
+      crestY,
+      crestW,
+      crestH,
+      qrX,
+      qrY,
+      qrSize,
+      frameInset,
+      frameStrokeWidth,
+    };
+  }
+
   // Default: satin print 3600x4200 logical, rendered at 1800x2100.
   return {
     canvasW: DEFAULT_CANVAS_W,
@@ -152,7 +215,15 @@ async function buildDesign(
   const frameW = L.canvasW - L.frameInset * 2;
   const frameH = L.canvasH - L.frameInset * 2;
 
-  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+  const svg = productType === "clock" 
+    ? `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="${L.canvasW}" height="${L.canvasH}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rect width="3000" height="3000" fill="#0d0a07"/>
+  <circle cx="1500" cy="1500" r="1450" fill="none" stroke="#a07830" stroke-width="6" opacity="0.5"/>
+  <image href="${crestDataUri}" x="600" y="80" width="1800" height="1000" preserveAspectRatio="xMidYMid meet"/>${L.qrSize > 0 ? `
+  <image href="${qrDataUri}" x="1110" y="2100" width="280" height="280" preserveAspectRatio="xMidYMid meet"/>` : ''}
+</svg>`
+    : `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${L.canvasW}" height="${L.canvasH}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <rect width="${L.canvasW}" height="${L.canvasH}" fill="#0d0a07"/>
   <rect x="${frameX}" y="${frameY}" width="${frameW}" height="${frameH}" fill="none" stroke="#a07830" stroke-width="${L.frameStrokeWidth}" stroke-opacity="0.5"/>
@@ -183,6 +254,7 @@ serve(async (req) => {
     let suffix = "print-design";
     if (productType === "phone-case") suffix = "phone-case";
     if (productType === "coaster") suffix = "coaster";
+    if (productType === "clock") suffix = "clock";
     const filename = `${(surname ?? "crest").toLowerCase().replace(/\s+/g, "-")}-${suffix}.png`;
 
     return new Response(pngBytes, {
