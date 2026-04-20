@@ -58,6 +58,7 @@ export default SignupEmail
 const main = {
   backgroundColor: '#ffffff',
   fontFamily: "'DM Sans', Arial, sans-serif",
+  padding: '20px 0',
 }
 const container = {
   padding: '40px 32px',
