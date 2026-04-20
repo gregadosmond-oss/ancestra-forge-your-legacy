@@ -132,6 +132,31 @@ const AppLayout = () => {
           >
             Begin Journey →
           </Link>
+          <Link
+            to="/cart"
+            style={{ position: "relative", display: "inline-flex", alignItems: "center", color: "#a07830", transition: "color 0.2s" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#d4a04a")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#a07830")}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+            {totalItems > 0 && (
+              <span style={{
+                position: "absolute", top: "-6px", right: "-8px",
+                background: "linear-gradient(135deg, #e8943a, #c47828)",
+                color: "#1a1208", borderRadius: "999px",
+                fontSize: "9px", fontWeight: 700,
+                minWidth: "16px", height: "16px",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                padding: "0 4px", lineHeight: 1,
+              }}>
+                {totalItems}
+              </span>
+            )}
+          </Link>
         </div>
       </nav>
 
