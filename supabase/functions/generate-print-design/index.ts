@@ -80,7 +80,7 @@ async function buildDesign(
 </svg>`;
 
   const resvg = new Resvg(svg, {
-    fitTo: { mode: "width", value: CANVAS_W },
+    fitTo: { mode: "width", value: RENDER_W },
   });
   return resvg.render().asPng();
 }
