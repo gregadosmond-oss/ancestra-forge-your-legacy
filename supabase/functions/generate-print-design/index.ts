@@ -15,6 +15,9 @@ const DEFAULT_RENDER_W = 1800;
 const PHONE_CASE_W = 1242;
 const PHONE_CASE_H = 2099;
 
+// Coaster: 1169x1169px square.
+const COASTER_SIZE = 1169;
+
 let wasmReady = false;
 async function ensureWasm() {
   if (!wasmReady) {
@@ -84,6 +87,31 @@ function getLayout(productType?: string): LayoutParams {
     };
   }
 
+  if (productType === "coaster") {
+    // 1169 x 1169 coaster canvas, rendered at native size.
+    // Crest takes up 80% of canvas, centered. No QR code.
+    const canvasW = COASTER_SIZE;
+    const canvasH = COASTER_SIZE;
+    const crestW = Math.round(canvasW * 0.8);
+    const crestH = Math.round(crestW * (1100 / 1500)); // preserve ratio
+    const crestX = Math.round((canvasW - crestW) / 2);
+    const crestY = Math.round((canvasH - crestH) / 2);
+    return {
+      canvasW,
+      canvasH,
+      renderW: canvasW,
+      crestX,
+      crestY,
+      crestW,
+      crestH,
+      qrX: 0,
+      qrY: 0,
+      qrSize: 0,
+      frameInset: 40,
+      frameStrokeWidth: 25, // minimum 25px line thickness
+    };
+  }
+
   // Default: satin print 3600x4200 logical, rendered at 1800x2100.
   return {
     canvasW: DEFAULT_CANVAS_W,
@@ -123,8 +151,8 @@ async function buildDesign(
 <svg width="${L.canvasW}" height="${L.canvasH}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <rect width="${L.canvasW}" height="${L.canvasH}" fill="#0d0a07"/>
   <rect x="${frameX}" y="${frameY}" width="${frameW}" height="${frameH}" fill="none" stroke="#a07830" stroke-width="${L.frameStrokeWidth}" stroke-opacity="0.5"/>
-  <image href="${crestDataUri}" x="${L.crestX}" y="${L.crestY}" width="${L.crestW}" height="${L.crestH}" preserveAspectRatio="xMidYMid meet"/>
-  <image href="${qrDataUri}" x="${L.qrX}" y="${L.qrY}" width="${L.qrSize}" height="${L.qrSize}" preserveAspectRatio="xMidYMid meet"/>
+  <image href="${crestDataUri}" x="${L.crestX}" y="${L.crestY}" width="${L.crestW}" height="${L.crestH}" preserveAspectRatio="xMidYMid meet"/>${L.qrSize > 0 ? `
+  <image href="${qrDataUri}" x="${L.qrX}" y="${L.qrY}" width="${L.qrSize}" height="${L.qrSize}" preserveAspectRatio="xMidYMid meet"/>` : ''}
 </svg>`;
 
   const resvg = new Resvg(svg, {
@@ -147,7 +175,9 @@ serve(async (req) => {
     }
 
     const pngBytes = await buildDesign(crestUrl, qrUrl, productType);
-    const suffix = productType === "phone-case" ? "phone-case" : "print-design";
+    let suffix = "print-design";
+    if (productType === "phone-case") suffix = "phone-case";
+    if (productType === "coaster") suffix = "coaster";
     const filename = `${(surname ?? "crest").toLowerCase().replace(/\s+/g, "-")}-${suffix}.png`;
 
     return new Response(pngBytes, {
