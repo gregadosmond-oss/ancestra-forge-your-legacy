@@ -11,6 +11,7 @@ const Stop1EnterName = () => {
   const [surname, setSurname] = useState("");
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [emailError, setEmailError] = useState(false);
 
   // Coming back to Stop 1 after an UNKNOWN bounce: clear provider state
   // so the error message only shows once and subsequent submits start clean.
