@@ -1,499 +1,570 @@
 ═══════════════════════════════════════════════════════
-ANCESTRA — COMPLETE PROJECT BRIEF & SKILLS GUIDE
+ANCESTORSQR — PROJECT BRIEF, CONTROLS & STATE
+Updated: April 2026
 ═══════════════════════════════════════════════════════
-Paste this into: Claude Code, Lovable system prompt,
-Claude Projects, or any AI tool working on Ancestra.
-═══════════════════════════════════════════════════════
-WHAT IS ANCESTRA
-Ancestra is an AI-powered family legacy platform that helps people discover their ancestry, generate a custom coat of arms, and turn their family history into shareable stories and physical products.
-It is NOT a genealogy database. It is an emotional identity discovery experience. The user enters their surname, and within 5 minutes they have a custom crest, a family story, a visual family tree, and the option to gift physical products with their crest on them.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CLAUDE WORKING RULES (READ FIRST — ALWAYS FOLLOW)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. BEFORE WRITING ANY FILE — use the Read tool first. Never Write without reading.
+2. ONE CHANGE AT A TIME — never bundle multiple features into one response.
+3. DO NOT MODIFY existing pages or components unless explicitly asked.
+4. USE AGENTS for research, codebase exploration, and multi-file tasks.
+5. ALWAYS READ files before editing. Never assume file contents.
+6. FOR LOVABLE CHANGES — give Greg a copy-paste prompt, don't try to edit Lovable files directly.
+7. SUPABASE EDGE FUNCTIONS live at: /Users/hrcommb3/Desktop/ancestra/supabase/functions/
+8. LOCAL = Deno edge functions synced from Lovable. Deploy via: supabase functions deploy <name>
+9. MEMORY files live at: /Users/hrcommb3/.claude/projects/-Users-hrcommb3-Desktop-ancestra/memory/
+10. NEVER use cold blue, cold gray, or pure white. Always warm palette (see design system below).
+11. PREFER inline execution for small plans (1–5 tasks). Use subagent-driven-development for large plans.
+12. COMMIT after each meaningful change. Keep commits small and focused.
+13. GREG IS SOLO — no team. Keep solutions simple. Prefer tools he already has over new ones.
+14. PRINTIFY PRODUCTS — all products are created/edited at printify.com, not programmatically (except the dynamic mug via create-heirloom-order).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DECISION GUIDE — WHAT TO DO WHEN GREG ASKS FOR X
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+| If Greg asks to... | Do this |
+|---|---|
+| Change a page, component, copy, color, layout, animation (anything under src/) | Invoke `lovable-prompt` skill. Give him a copy-paste prompt. DO NOT Write/Edit src/ files. |
+| Edit or create a Supabase edge function | Invoke `deploy-edge-function` skill. Edit directly, then remind him to run `supabase functions deploy <name>`. |
+| Add/edit a Printify product (canvas, coaster, clock, t-shirt, blanket, etc.) | He does this manually at printify.com. Your job is only the design SVG/PNG (via generate-print-design). |
+| Change the dynamic mug | That's create-heirloom-order edge function. Treat like any edge function. |
+| Fix a 500 from an edge function | Check Supabase secrets FIRST, then logs: `supabase functions logs <name> --tail`. |
+| Change database schema | He does it via Lovable Cloud / Supabase dashboard. Give him SQL or dashboard steps. |
+| Add a new Claude API tool (e.g. wire Motto Generator) | Write a new edge function under supabase/functions/, then a Lovable prompt to wire the frontend call. |
+| Plan a multi-step feature (3+ files or mixed frontend + edge) | Use a TaskCreate plan; execute inline if ≤5 tasks, subagent-driven-development if larger. |
+| Do exploratory research across the codebase | Dispatch an Agent (Explore subagent). Do not read 10+ files yourself. |
+| Commit changes | Only when he explicitly says so. Small, focused commits. |
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KNOWN ERRORS & GOTCHAS — CHECK BEFORE DEBUGGING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+| Symptom / Error | Likely cause | Fix |
+|---|---|---|
+| Edge function crashes with "CPU/memory budget exceeded" | Rendering at 3600×4200 via resvg-wasm | Drop to 1800×2100 @ 150 DPI. Printify rescales. |
+| SVG renders but crest text missing | resvg-wasm can't render `<text>` without embedded fonts | Remove text from SVG, or upstream a pre-rendered PNG with text baked in. |
+| qrserver.com returns 400 / bad URL | `#` symbol in color or bgcolor param | Strip `#`. Use `color=d4a04a` not `color=%23d4a04a`. |
+| Crest looks tiny inside its SVG box | `preserveAspectRatio="xMidYMid meet"` + transparent PNG padding | Oversize bounding box (e.g. width=2400 in 3000px canvas) OR switch to `slice`. |
+| QR code cut off on canvas print | QR placed inside Printify's 1.5" frame wrap zone | Keep QR ≥600px from all canvas edges. |
+| Charcuterie board print rejected or looks wrong | Laser-engraver is single-color; QR can't burn | Crest only on charcuterie board. No QR. |
+| `generate-legacy` returns wrong shape | `src/types/legacy.ts` and `supabase/functions/generate-legacy/types.ts` drifted | Make the two files byte-identical. Update both together. |
+| Edge function 500s immediately after deploy | Missing or renamed env var | Check Supabase dashboard → Edge Functions → Secrets. |
+| Lovable overwrote a local change to src/ | Greg edited src/ locally and re-published Lovable | Never Write/Edit src/. Always go through Lovable prompts. |
+| Stripe webhook not firing | STRIPE_WEBHOOK_SECRET mismatch OR endpoint not registered | Re-copy the signing secret from Stripe dashboard into Supabase secrets. |
+| Crest generation slow on repeat surnames | Cache miss in surname_crests table | Confirm write path in generate-crest; surname should normalize (lowercase, trim). |
+| TTS audio cuts off mid-sentence | ElevenLabs char limit hit | Chunk story text and concatenate; don't send a full chapter in one call. |
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KEY FILE PATHS — CENTRAL REFERENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Project root:
+  /Users/hrcommb3/Desktop/ancestra/
+
+Instructions & memory:
+  /Users/hrcommb3/Desktop/ancestra/CLAUDE.md
+  /Users/hrcommb3/.claude/projects/-Users-hrcommb3-Desktop-ancestra/memory/MEMORY.md
+  /Users/hrcommb3/.claude/projects/-Users-hrcommb3-Desktop-ancestra/memory/     ← individual memory files
+
+Frontend (Lovable — DO NOT EDIT LOCALLY):
+  /Users/hrcommb3/Desktop/ancestra/src/                      ← all pages, components, types
+  /Users/hrcommb3/Desktop/ancestra/src/types/legacy.ts       ← React-side Legacy types (must mirror Deno)
+
+Edge functions (edit and deploy locally):
+  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-legacy/index.ts
+  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-legacy/types.ts   ← mirrors src/types/legacy.ts
+  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-crest/index.ts
+  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-crest/crest.ts
+  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-print-design/index.ts
+  /Users/hrcommb3/Desktop/ancestra/supabase/functions/create-heirloom-order/index.ts
+  /Users/hrcommb3/Desktop/ancestra/supabase/functions/ancestor-tts/index.ts
+  /Users/hrcommb3/Desktop/ancestra/supabase/functions/expand-chapters/index.ts
+  /Users/hrcommb3/Desktop/ancestra/supabase/functions/stripe-webhook/index.ts
+  /Users/hrcommb3/Desktop/ancestra/supabase/functions/send-legacy-email/index.ts
+
+Custom skills (user-global, usable in any session):
+  /Users/hrcommb3/.claude/skills/lovable-prompt/SKILL.md
+  /Users/hrcommb3/.claude/skills/deploy-edge-function/SKILL.md
+
+Supabase config:
+  /Users/hrcommb3/Desktop/ancestra/supabase/config.toml
+
+Deploy commands:
+  supabase functions deploy <name>         ← single function
+  supabase functions logs <name> --tail    ← live logs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT IS ANCESTORSQR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Domain: ancestorsqr.com
+Brand name used in UI: AncestorsQR (public), Ancestra (legacy references — being phased out)
 One-liner: "Every family has a story worth telling."
-Core product: A guided 6-stop journey from surname input → crest reveal → story → gift.
+
+An AI-powered family legacy platform. User enters their surname → gets a custom coat of arms, family story, visual bloodline tree, and can order physical products with their crest on them.
+
+NOT a genealogy database. An emotional identity discovery experience.
+
 Business model:
+- Free: surname lookup, bloodline quiz, motto generator, ancestor personality, ancestor chat
+- Paid ($29.99): Legacy Pack — full crest (high-res), AI-written family story (9 chapters), bloodline tree, legacy certificate, ancestor chat
+- Physical products ($24–$149): Mug, canvas, coaster, clock, t-shirt, acrylic print, blanket, charcuterie board, speaker, framed crest
+- Premium ($99+): Deep research, hardcover book, Family Circle (future)
 
-* Free: surname lookup, bloodline quiz, motto generator, ancestor personality, 1700s you, ancestor chat
-* Paid ($29): Legacy Pack — full crest (high-res), AI-written family story, visual family tree, legacy certificate, ancestor chat
-* Physical products ($29-$149): Framed crest, beer mug, ornament, legacy book, metal wall sign, coasters, combined wedding crest
-* Premium ($99+): Deep genealogy research, extended tree, hardcover book, Family Circle (collaborative)
-Founder: Gregory Angus Dean Osmond. Traced his own Osmond lineage back to Dorset, England, 1066. Family motto: "Ex Labore, Ascendimus" — From Labour, We Rise. Since 1688.
-BRAND VOICE
-Tone: Warm, emotional, direct. Not corporate. Not techy. Not academic. Like a friend who just discovered something incredible about their family and can't wait to show you.
-Never say: "genealogy database," "data processing," "algorithm," "optimize," "leverage"
-Always say: "legacy," "bloodline," "House," "story," "discover," "forge," "pass it on"
-Emotional register: Pride, identity, connection, warmth, nostalgia, strength. The feeling of discovering you come from something meaningful.
-Competitive positioning: Ancestry.com gives you data. Ancestra gives you identity. We're not competing with genealogy tools — we're competing with gift cards and generic presents.
+Founder: Gregory Angus Dean Osmond (GADO). Traced Osmond lineage to Dorset, England, 1066.
+Family motto: "Ex Labore, Ascendimus" — From Labour, We Rise. Since 1688.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT'S BUILT (Current State — April 2026)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FRONTEND (Lovable — Vite + React + Tailwind + Framer Motion)
+
+Pages / Routes:
+  /                    → Landing page (hero, How It Works, Product Preview, Free Tools, Occasions, CTA)
+  /journey/1           → Stop 1: Surname input
+  /journey/2           → Stop 2: Name meaning reveal
+  /journey/3           → Stop 3: Family tree (visual bloodline — PLACEHOLDER, not real data yet)
+  /journey/4           → Stop 4: Crest forge reveal (REAL — DALL-E 3 generated, cached)
+  /journey/5           → Stop 5: Story preview + $29.99 Stripe paywall
+  /journey/6           → Stop 6: Pass It On (gift options)
+  /checkout            → Stripe checkout page
+  /my-legacy           → User dashboard (post-purchase)
+  /tools               → Free tools hub
+  /tools/quiz          → Bloodline Quiz (frontend only — NOT wired to Claude yet)
+  /tools/surname       → Surname Lookup (frontend only)
+  /tools/motto         → Motto Generator (frontend only — NOT wired to Claude yet)
+  /tools/chat          → Ancestor Chat (frontend only)
+  /shop                → NOT BUILT YET — needs Printify product fetch
+  /about               → Founder story
+
+Components built:
+  - AppLayout (global navbar, back button, step counter)
+  - AuthGate (email/Google/Apple auth modal)
+  - JourneyContext (shared state across all stops)
+  - SectionLabel, RetryInline
+  - FreeCrest component (shows crest on free tier)
+  - Stop5Story (TTS audio playback via ancestor-tts edge function)
+
+BACKEND (Supabase Edge Functions — Deno)
+
+Deployed edge functions:
+  generate-legacy       → Claude API: generates LegacyFacts + LegacyStory for a surname
+  generate-crest        → DALL-E 3: generates coat of arms image, caches in surname_crests table
+  ancestor-tts          → ElevenLabs TTS: converts story text to audio (used in Stop 5)
+  generate-print-design → SVG/PNG design builder for Printify products (canvas, coaster, clock)
+  create-heirloom-order → Dynamic mug order: renders PNG via resvg-wasm, uploads to Supabase, sends to Printify
+  expand-chapters       → Claude API: expands teaserChapters into full chapter bodies (post-purchase)
+  stripe-webhook        → Handles Stripe payment → triggers legacy pack delivery
+  send-legacy-email     → Resend: delivers Legacy Pack files to customer email
+
+Local edge function files:
+  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-print-design/index.ts
+  /Users/hrcommb3/Desktop/ancestra/supabase/functions/create-heirloom-order/index.ts
+  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-crest/crest.ts
+
+DATABASE (Supabase — Lovable Cloud, isolated project)
+
+Tables:
+  surname_crests   → { surname, image_url, prompt } — cached DALL-E crest images
+  users            → Supabase auth (managed by Lovable)
+  orders           → product orders
+  purchases        → Legacy Pack purchases (used by usePurchase hook)
+  gifts            → gift sends and recipient tracking
+
+Storage buckets:
+  crests           → Crest PNG files (generate-crest uploads here)
+  print-designs    → Printify design SVG/PNG files (generate-print-design uploads here)
+
+STRIPE
+
+  Product: Legacy Pack — $29.99 one-time
+  Stripe webhook → stripe-webhook edge function → triggers Legacy Pack generation + email delivery
+  Checkout page: /checkout
+
+PRINTIFY (Physical Products)
+
+  Connected via API store (not Shopify/Etsy)
+  Shop ID: stored in PRINTIFY_SHOP_ID env var
+  API Key: stored in PRINTIFY_API_KEY env var
+
+  Products created in Printify (manual, not programmatic):
+    1. Satin Canvas 8×10 (Vertical) — Blueprint ~530, Provider ~99
+       Design: 1800×2100px SVG, crest centered upper, QR bottom center
+    2. Ceramic Coaster — Blueprint ~304
+       Design: 1169×1169px SVG, crest top 85%, QR centered below
+    3. Wall Clock — Blueprint ~various
+       Design: 3000×3000px SVG, crest large right, QR bottom center
+    4. Classic T-Shirt — crest on chest, blank back (motto text not rendered — no embedded fonts in resvg-wasm)
+    5. Charcuterie Board (CO2 laser engraving) — crest only, NO QR code (single color burn)
+    6. Acrylic Print — crest + QR code
+    7. Sherpa Blanket — crest + QR code
+    8. Java Speaker — crest + QR code
+
+  Dynamic product (code-generated per order):
+    White 11oz Ceramic Mug — Blueprint 478, Provider 99
+    Created by create-heirloom-order edge function
+    Design: 2475×1155px PNG, "HOUSE OF [SURNAME]" text left, crest right, QR left
+
+RESEND (Transactional Email)
+  Used by send-legacy-email for Legacy Pack delivery
+  API key in RESEND_API_KEY env var
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+IMPORTANT TECHNICAL NOTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EDGE FUNCTION MEMORY LIMITS (resvg-wasm):
+  - MAX reliable render size: 1800×2100px at 150 DPI
+  - 3600×4200 crashes with CPU/memory budget exceeded
+  - SVG output (no rasterization) is preferred when Printify accepts SVG
+  - resvg-wasm CANNOT render SVG <text> elements without embedded fonts — avoid text in designs
+
+QR CODE URL FORMAT:
+  https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=d4a04a&bgcolor=0d0a07&data=...
+  CRITICAL: NO # symbols in color params — qrserver.com rejects them
+
+CREST SIZING IN SVG:
+  - preserveAspectRatio="xMidYMid meet" + transparent PNG padding = crest appears smaller
+  - Fix: oversize the bounding box (e.g., set width=2400 when canvas is 3000) to force image larger
+  - Or use preserveAspectRatio="xMidYMid slice" to fill the box
+
+PRINTIFY PRINT AREAS:
+  - Canvas 8×10 satin: actual print area is 3600×4200px (300 DPI)
+  - But 1800×2100 SVG scales fine and avoids memory issues
+  - QR code must be 600px+ from canvas edge to avoid wrap zone (1.5" frame)
+
+LOVABLE DEPLOYMENT:
+  - Greg deploys from Lovable UI (publish button)
+  - Edge functions deployed separately via: supabase functions deploy <function-name>
+  - Environment variables set in Supabase dashboard → Edge Functions → Secrets
+
+TYPES (keep in sync — Deno and React cannot share source):
+  src/types/legacy.ts                                    ← React/Vite side
+  supabase/functions/generate-legacy/types.ts            ← Deno side
+  These MUST stay byte-identical. Any type change needs updating both files.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PENDING / NOT YET BUILT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HIGH PRIORITY:
+  - /shop page — fetch products from Printify API, display with add-to-cart
+  - Stop 3 family tree — real visual bloodline tree (currently placeholder)
+  - Wire Bloodline Quiz → Claude API (frontend exists, no backend)
+  - Wire Motto Generator → Claude API (frontend exists, no backend)
+  - Wire Surname Lookup → generate-legacy function
+  - Fix legacy certificate: "House Osmond" → "House of Osmond"
+
+MEDIUM PRIORITY:
+  - Family Anthem (Suno API) — AI-generated song per family
+  - /my-legacy dashboard improvements
+  - n8n automations: FamilySearch API, Kit.com email flows
+  - T-shirt back: add motto text (needs font embedding solution)
+  - Gift delivery flow (/gifts, /gift/[gift-id])
+
+FUTURE:
+  - Premium tier ($99+): deep research, hardcover book
+  - Family Circle: collaborative multi-user family trees
+  - Etsy shop: AncestraShop / AncestraHeritage
+  - Social automation: Blotato + n8n
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 DESIGN SYSTEM — "FIRESIDE LUXURY"
-The design must feel like sitting by a fire in a beautiful old library, discovering something meaningful. Warm, rich, inviting — not cold, not techy, not blue.
-Colors
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-```
-/* ═══ CORE PALETTE ═══ */
+Feel: Sitting by a fire in a beautiful old library. Warm, rich, inviting. NOT cold, NOT techy, NOT blue.
 
-/* Backgrounds */
---bg:              #0d0a07;     /* Main background — warm near-black */
---bg-warm:         #13100b;     /* Slightly warmer sections */
---bg-card:         #1a1510;     /* Card/panel background */
---bg-card-hover:   #221c14;     /* Card hover state */
---bg-input:        #161210;     /* Input field background */
+COLORS:
+  Backgrounds:
+    --bg:              #0d0a07   Main background — warm near-black
+    --bg-warm:         #13100b   Slightly warmer sections
+    --bg-card:         #1a1510   Card/panel background
+    --bg-card-hover:   #221c14   Card hover state
+    --bg-input:        #161210   Input field background
 
-/* Primary — Amber */
---amber:           #d4a04a;     /* Primary gold/amber */
---amber-light:     #e8b85c;     /* Headlines in italic, emphasis */
---amber-dim:       #a07830;     /* Labels, subtle accents, dividers */
+  Primary — Amber:
+    --amber:           #d4a04a   Primary gold/amber
+    --amber-light:     #e8b85c   Headlines in italic, emphasis
+    --amber-dim:       #a07830   Labels, subtle accents, dividers
 
-/* Accent — Honey (CTAs and warmth) */
---honey:           #e8943a;     /* Primary CTA button color */
---honey-light:     #f0a848;     /* Button hover */
---honey-dim:       #c47828;     /* Button gradient end */
+  Accent — Honey (CTAs):
+    --honey:           #e8943a   Primary CTA button color
+    --honey-light:     #f0a848   Button hover
+    --honey-dim:       #c47828   Button gradient end
 
-/* Text */
---cream:           #e8ddd0;     /* Section headings */
---cream-soft:      #d8cdbf;     /* Secondary headings */
---cream-warm:      #f0e8da;     /* Hero headlines — warmest white */
---text:            #d0c4b4;     /* Body text — clearly readable */
---text-body:       #c4b8a6;     /* Extended body copy */
---text-dim:        #8a7e6e;     /* Labels, captions, hints */
+  Text:
+    --cream:           #e8ddd0   Section headings
+    --cream-soft:      #d8cdbf   Secondary headings
+    --cream-warm:      #f0e8da   Hero headlines — warmest white
+    --text:            #d0c4b4   Body text — clearly readable
+    --text-body:       #c4b8a6   Extended body copy
+    --text-dim:        #8a7e6e   Labels, captions, hints
 
-/* Borders & Lines */
---gold-line:       #3d3020;     /* Subtle border color */
---dark-line:       #2a2018;     /* Very subtle separator */
+  Borders:
+    --gold-line:       #3d3020   Subtle border
+    --dark-line:       #2a2018   Very subtle separator
 
-/* Specialty */
---rose:            #c47070;     /* Wedding/Valentine's accent */
---green:           #4a9e6a;     /* Success/confirmation */
+CRITICAL COLOR RULES:
+  - NEVER cold blue, cold gray, or cold white
+  - NEVER pure black (#000) — always #0d0a07
+  - NEVER pure white (#fff) — always #f0e8da
+  - ALL glows/shadows: amber/orange tint, never blue
+  - Body text: minimum #d0c4b4 on dark backgrounds
+  - CTA buttons: ALWAYS honey-orange (#e8943a), never cold gold
 
-```
+TYPOGRAPHY:
+  --display:  'Libre Caslon Display', serif     Headlines, product names, large text
+  --serif:    'Libre Caslon Text', serif        Italic quotes, subtitles, mottos
+  --sans:     'DM Sans', sans-serif             Body, labels, buttons, UI
 
-CRITICAL COLOR RULES
+  Usage:
+    --display → h1-h4, product names, prices, stats
+    --serif italic → quotes, subtitles, warm accent text, mottos
+    --sans → body paragraphs, labels, buttons, nav, UI elements
+  NEVER use: Inter, Roboto, Arial, system fonts
 
-* NEVER use cold blue, cold gray, or cold white
-* NEVER use pure black (#000000) — always warm-black (#0d0a07)
-* NEVER use pure white (#ffffff) — always warm-cream (#f0e8da)
-* ALL glows and shadows should be amber/orange tinted, never blue
-* Body text must be #d0c4b4 or lighter — readability is critical
-* CTA buttons are ALWAYS honey-orange (#e8943a), never cold gold
-Typography
+BORDER RADIUS:
+  --radius:      14px   Standard cards, inputs
+  --radius-lg:   22px   Large cards, panels
+  --radius-xl:   32px   Hero cards, modals
+  --radius-pill: 60px   ALL buttons (always pill-shaped)
 
-```
-/* Fonts — load from Google Fonts */
---display:     'Libre Caslon Display', serif;   /* Headlines, product names, large text */
---serif:       'Libre Caslon Text', serif;       /* Italic quotes, subtitles, accents */
---sans:        'DM Sans', sans-serif;            /* Body text, labels, buttons, UI */
+BUTTONS:
+  Primary CTA (btn-warm):
+    background: linear-gradient(135deg, #e8943a, #c47828)
+    color: #1a1208
+    font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase
+    padding: 16px 40px; border-radius: 60px
+    Hover: translateY(-2px) + box-shadow: 0 12px 40px rgba(232,148,58,0.2)
 
-```
+  Secondary (btn-soft):
+    background: rgba(232,148,58,0.06)
+    border: 1px solid rgba(232,148,58,0.18)
+    color: #d4a04a; padding: 15px 40px; border-radius: 60px
+    Hover: background rgba(232,148,58,0.12)
 
-Usage rules:
-
-* `--display` for all headings (h1-h4), product names, prices, stats
-* `--serif` italic for quotes, subtitles, warm accent text, mottos
-* `--sans` for body paragraphs, labels, buttons, navigation, UI elements
-* NEVER use Inter, Roboto, Arial, or system fonts
-* Headlines: cream-warm (#f0e8da)
-* Italic accents: amber-light (#e8b85c)
-* Body: text (#d0c4b4)
-* Labels/captions: text-dim (#8a7e6e) with letter-spacing: 2-4px, uppercase
-Border Radius
-
-```
---radius:      14px;     /* Standard cards, inputs */
---radius-lg:   22px;     /* Large cards, panels */
---radius-xl:   32px;     /* Hero cards, modals */
---radius-pill: 60px;     /* ALL buttons — always pill-shaped */
-
-```
-
-CRITICAL: All buttons must be pill-shaped (border-radius: 60px). All cards must have rounded corners (14-32px). No sharp edges anywhere.
-Buttons
-Primary CTA (btn-warm):
-
-```css
-background: linear-gradient(135deg, #e8943a, #c47828);
-color: #1a1208;
-font-size: 13px;
-font-weight: 600;
-letter-spacing: 1.5px;
-text-transform: uppercase;
-padding: 16px 40px;
-border-radius: 60px;
-
-```
-
-Hover: translateY(-2px) + box-shadow: 0 12px 40px rgba(232,148,58,0.2)
-Secondary (btn-soft):
-
-```css
-background: rgba(232,148,58,0.06);
-border: 1px solid rgba(232,148,58,0.18);
-color: #d4a04a;
-padding: 15px 40px;
-border-radius: 60px;
-
-```
-
-Hover: background rgba(232,148,58,0.12)
-Texture & Atmosphere
-
-* Subtle grain overlay on body (fractalNoise SVG filter, opacity 0.018)
-* Warm ambient radial gradient behind hero elements (rgba(232,148,58,0.02))
-* Card borders: rgba(232,148,58,0.03) default → rgba(232,148,58,0.12) on hover
-* Hover transitions: all 0.4s cubic-bezier(0.22, 1, 0.36, 1)
-* Scroll reveal animations: fade up 28px with stagger delay
-Dividers
-
-```html
-<div class="wd">
-  <div class="wd-line"></div>   <!-- 40px, gradient amber line -->
-  <div class="wd-dot"></div>    <!-- 5px amber circle -->
-  <div class="wd-line"></div>
-</div>
-
-```
-
-Section Headers Pattern
-
-```
-.s-label   — 10px, uppercase, letter-spacing 4px, amber-dim, centered
-.s-title   — Libre Caslon Display, clamp(24-42px), cream, centered
-.s-sub     — Libre Caslon Text italic, 17px, text color, centered, max-width 480px
-
-```
-
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TECH STACK
-Tool Purpose Notes Lovable Frontend app + Cloud backend Separate project from RelocateIQ and Life By Design. Lovable Cloud enabled (handles DB, auth, storage, edge functions) Stripe Payments $29 Legacy Pack + physical products n8n Cloud Automations Separate workflow folder from other projects. Connects to Lovable Cloud DB via Supabase-compatible API Claude API AI — story writing, surname research, motto generation, ancestor chat Primary AI engine FamilySearch API Genealogy data Free API, up to 8 generations of ancestors Printful API Print-on-demand fulfillment Mugs, framed prints, ornaments, coasters Gelato API Book printing Hardcover and softcover legacy books Resend Transactional email Order confirmations, gift delivery emails Kit.com Email marketing Newsletter, launch sequences Etsy Sales channel Connected to Printful for auto-fulfillment
-Database Rules (Lovable Cloud)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-* Ancestra uses Lovable Cloud — a dedicated, isolated database for this project (NOT shared with RelocateIQ or Life By Design)
-* Lovable Cloud is built on Supabase under the hood, so all Supabase-compatible tools (n8n Supabase node, edge functions) work normally
-* Table naming: NO prefixes needed. Use clean names since the DB is isolated per project.
-   * `users` — user accounts (managed by Lovable Cloud auth — email, Google, Apple)
-   * `crests` — generated crest images and data
-   * `stories` — generated family stories
-   * `trees` — family tree data
-   * `orders` — product orders
-   * `gifts` — gift sends and recipient data
-   * `quiz_results` — bloodline quiz results
-   * `anthems` — generated family songs (Suno API)
-* Cross-brand funnel tracking (e.g., Life By Design → Ancestra → RelocateIQ) happens via email matching in n8n, NOT shared tables
-* RelocateIQ and Life By Design have their own separate databases with their own schemas
-Lovable Rules
+Frontend:       Lovable (Vite + React + TypeScript + Tailwind + Framer Motion)
+Backend:        Supabase Edge Functions (Deno)
+Database:       Supabase (Lovable Cloud — isolated project, no table prefixes needed)
+Auth:           Supabase Auth (email, Google, Apple — Lovable Cloud managed)
+Storage:        Supabase Storage (buckets: crests, print-designs)
+AI - Text:      Claude API (Anthropic) — story, surname meaning, motto, ancestor chat
+AI - Image:     DALL-E 3 (OpenAI) — crest generation
+AI - TTS:       ElevenLabs — story narration
+Payments:       Stripe — $29.99 Legacy Pack + physical products
+Email:          Resend (transactional), Kit.com (marketing)
+Print-on-demand: Printify (mugs, canvas, coasters, t-shirts, etc.)
+Books:          Gelato (hardcover/softcover — future)
+Automations:    n8n Cloud (FamilySearch, Suno, Blotato, Kit.com flows)
+Social:         Blotato (AI content + scheduling — via n8n)
 
-* This is a SEPARATE Lovable project from RelocateIQ and Life By Design
-* Lovable Cloud is ENABLED — DB, auth, storage, and edge functions are built-in. Never suggest setting up Supabase separately.
-* Use Lovable Cloud auth for all user sign-in (email, Google, Apple — zero config)
-* Use Lovable Cloud Edge Functions for server-side work (Stripe webhooks, Claude API calls, Printful calls) instead of external n8n where possible
-* n8n Cloud is still used for multi-step automations and external integrations (FamilySearch, Suno, Blotato, Resend, Kit.com) — n8n connects to Lovable Cloud DB via the Supabase node
-* One change at a time — never bundle multiple features in one prompt
-* Always specify "do not modify any existing pages or components" unless told otherwise
-* Use the Ancestra design system defined above — NOT the RelocateIQ design system
-* All new components must follow the Fireside Luxury palette
-THE GUIDED JOURNEY (Core UX)
-The app is a linear 6-stop journey. The user moves forward through each stop. No dashboard. No menu confusion. Just forward.
-Stop 1 — "Enter Your Name"
+ENV VARS (Supabase Edge Function Secrets):
+  SUPABASE_URL
+  SUPABASE_SERVICE_ROLE_KEY
+  OPENAI_API_KEY                  ← DALL-E 3 crest generation (generate-crest)
+  ANTHROPIC_API_KEY               ← Claude (generate-legacy, expand-chapters)
+  ELEVENLABS_API_KEY              ← TTS (ancestor-tts)
+  STRIPE_SECRET_KEY               ← payments-webhook, create-checkout
+  STRIPE_WEBHOOK_SECRET           ← payments-webhook signature verification
+  PRINTIFY_API_KEY                ← orders/fulfillment (create-heirloom-order, printify-proxy)
+  PRINTIFY_SHOP_ID                ← Printify shop ID (URL-path param)
+  PRINTFUL_API_KEY                ← mug mockup previews ONLY (generate-mug-mockup)
+  PRINTFUL_STORE_ID               ← legacy v1; api2.printful.com is Bearer-only (see printify-skill)
+  REMOVE_BG_API_KEY               ← strip bg from crests before compositing on dark products (future)
+  IDEOGRAM_API_KEY                ← alt/fallback crest generator; stylized variants, readable text (future)
+  RESEND_API_KEY                  ← transactional email (send-preview, payments-webhook)
 
-* Single input: surname
-* Optional expand: parents, country, birth date
-* CTA: "Discover My Legacy"
-* Behind the scenes: n8n fires → FamilySearch API + Claude API
-Stop 2 — "Your Name Has a Story"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+THE GUIDED JOURNEY (6 Stops)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-* Surname meaning, origin, date, ancestral role
-* Historical context quote
-* Elements stagger in one by one
-* CTA: "Meet Your Bloodline"
-Stop 3 — "Meet Your Bloodline"
+Stop 1 — /journey/1 — Enter Your Name
+  Single surname input → "Discover My Legacy" CTA
+  Calls generate-legacy edge function (Claude API + caches in DB)
 
-* Vertical family tree with names, years, locations
-* Migration badge at bottom
-* User's name highlighted gold at bottom
-* CTA: "Forge Your Crest"
-Stop 4 — "Your Crest is Forged"
+Stop 2 — /journey/2 — Your Name Has a Story
+  Surname meaning, origin, ancestral role, historical context
+  Elements stagger in one by one. CTA: "Meet Your Bloodline"
 
-* Loading animation with forge messages
-* Crest reveals with glow animation
-* Motto in Latin + English
-* Symbolism breakdown (eagle, chevron, gold)
-* CTA: "Read Your Story"
-Stop 5 — "Your Story is Written"
+Stop 3 — /journey/3 — Meet Your Bloodline
+  Visual family tree with names, years, locations
+  Currently: PLACEHOLDER — not yet wired to real data
+  CTA: "Forge Your Crest"
 
-* Chapter I appears in typewriter style
-* Cinematic narrative from Claude API
-* Fades out after preview with "8 more chapters..."
-* PAYWALL: "Unlock your full Legacy Pack — $29"
-* CTA: "See the Full Legacy" (Stripe checkout)
-Stop 6 — "Pass It On"
+Stop 4 — /journey/4 — Your Crest is Forged
+  Forge animation → DALL-E 3 crest reveals with glow
+  Motto in Latin + English. Symbolism breakdown.
+  CTA: "Read Your Story"
 
-* "Who in your family needs to see this?"
-* Option A: Send free preview (email/text — viral loop)
-* Option B: Gift the Legacy Pack ($29)
-* Option C: Gift physical products (linked to shop)
-* Product cards with occasion tags (Father's Day, Christmas, Wedding)
-FREE TOOLS (6 tools, all Claude API calls)
+Stop 5 — /journey/5 — Your Story is Written (PAYWALL)
+  Chapter I in manuscript style with drop cap
+  TTS "Listen" button (ancestor-tts edge function)
+  Teaser of 8 more chapters fades out
+  PAYWALL: "Unlock My Full Legacy — $29.99" → /checkout
 
-1. Bloodline Quiz — 5 personality questions → archetype result (Warrior/Builder/Explorer/Healer/Scholar) → shareable card
-2. Surname Lookup — instant meaning, origin, date, role for any surname
-3. Meet Your Ancestor — AI generates a historically plausible ancestor profile with name, year, occupation, personality, diet, skills, quote
-4. The 1700s You — what your life would look like 300 years ago based on your surname
-5. Motto Generator — enter 3 values → get a Latin motto with English translation and word breakdown
-6. Chat With Your Ancestor — live chat interface with an AI character based on family history
-All tools end with CTA: "Want to discover your full legacy? → Begin Your Journey"
-PRODUCT CATALOG
-Digital Products
-Product Price Fulfillment Legacy Pack (crest + story + tree + certificate) $29 Instant digital delivery Custom Crest Download (high-res PNG/SVG) $19 Instant digital delivery Legacy Certificate (PDF) $49 Instant digital delivery Combined Wedding Crest (digital) $79 24-48hr delivery
-Physical Products (Printful)
-Product Price Supplier Framed Crest Print (11x14) $79 Printful Framed Crest Print (16x20) $99 Printful Beer Mug / Whiskey Glass $39 Printful Christmas Ornament $29 Printful Coaster Set (4) $24 Printful Phone Case $29 Printful Blanket/Throw $59 Printful Canvas Print $89 Printful
-Physical Products (Gelato)
-Product Price Supplier Hardcover Legacy Book $89 Gelato Softcover Legacy Book $59 Gelato
-Physical Products (Specialty)
-Product Price Supplier Metal Wall Sign $149 Printify Wax Seal Stamp $49 Artisaire Crest Cufflinks $39 CustomInk
-Bundles
-Bundle Contents Price Dad Bundle Framed crest + whiskey glass + certificate $129 Mom Bundle Legacy book + family tree print + certificate $139 Christmas Bundle 3x ornaments + legacy book + coaster set $129 Wedding Bundle Combined crest + framed print + toasting glasses + wax seal $249 Grad Bundle Certificate + framed crest + mug $119 Reunion Bundle 10x ornaments + family tree poster + legacy book $249
-Occasions
-Father's Day, Mother's Day, Christmas, Wedding, Graduation, Birthday, Anniversary, New Baby, Housewarming, Retirement, Valentine's Day, Family Reunion
-N8N AUTOMATION WORKFLOWS
-Workflow 1: Legacy Pack Generation
+Stop 6 — /journey/6 — Pass It On
+  "Who in your family needs to see this?"
+  Option A: Send free preview (viral loop)
+  Option B: Gift Legacy Pack ($29.99)
+  Option C: Gift physical products (linked to shop)
 
-```
-Trigger: Stripe payment webhook ($29)
-→ Extract surname + country from Supabase
-→ Call FamilySearch API (search ancestors, up to 8 generations)
-→ Call Claude API (generate story, motto, surname meaning, crest symbolism)
-→ Call AI Image API (generate crest image)
-→ Save all outputs to Lovable Cloud DB (crests, stories, trees)
-→ Generate PDF (certificate + story)
-→ Send delivery email via Resend
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GENERATE-PRINT-DESIGN EDGE FUNCTION SPECS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-```
+Endpoint: POST /generate-print-design
+Body: { surname: string, productType?: "canvas" | "coaster" | "clock" }
+Returns: { url: string, format: "svg", width: number, height: number }
 
-Workflow 2: Physical Product Order
+Canvas (default):
+  Width: 1800px, Height: 2100px (150 DPI, scales to 3600×4200 Printify print area)
+  Background: #0d0a07
+  Crest: x=150, y=200, w=1500, h=1100
+  QR: x=775, y=1375, w=250, h=250
+  QR URL: ancestorsqr.com/f/{surname}
 
-```
-Trigger: Stripe payment webhook (product order)
-→ Pull crest image from Supabase storage
-→ Send to Printful API (product type + crest image + shipping address)
-→ Receive tracking number from Printful
-→ Update orders table in Lovable Cloud DB
-→ Send tracking email via Resend
+Coaster:
+  Width: 1169px, Height: 1169px
+  Crest: centered, upper 85% of width
+  QR: centered below crest
 
-```
+Clock:
+  Width: 3000px, Height: 3000px
+  Crest: x=300, y=50, w=2400, h=1400 (oversized box to fill space)
+  QR: x=1350, y=2100, w=300, h=300
 
-Workflow 3: Gift Delivery
+File naming: {surname}-8x10.svg (canvas), {surname}-coaster.svg, {surname}-clock.svg
+Storage bucket: print-designs
 
-```
-Trigger: Gift purchase on app
-→ Generate gift preview page URL
-→ Send gift email to recipient via Resend
-→ Include personal message from sender
-→ Track gift opens in Supabase
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BRAND VOICE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-```
+Tone: Warm, emotional, direct. Like a friend who just discovered something incredible about their family.
+NOT: corporate, techy, academic, cold
 
-Workflow 4: Etsy Order (manual at first, automate later)
+NEVER say: "genealogy database," "data processing," "algorithm," "optimize," "leverage"
+ALWAYS say: "legacy," "bloodline," "House," "story," "discover," "forge," "pass it on"
 
-```
-Trigger: Etsy order notification
-→ Extract surname from order personalization
-→ Generate crest (same as Workflow 1)
-→ Send to Printful via Etsy-Printful integration
-→ Auto-fulfills and ships
+Emotional register: Pride, identity, connection, warmth, nostalgia, strength.
+Every experience ends with: "Who in your family needs to see this?"
 
-```
+Positioning: Ancestry.com gives you data. AncestorsQR gives you identity.
 
-PAGES / ROUTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GREG'S WORKING STYLE & PREFERENCES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-```
-/                    → Landing page (marketing)
-/journey             → The 6-stop guided experience
-/journey/step/1      → Enter your name
-/journey/step/2      → Name meaning reveal
-/journey/step/3      → Family tree
-/journey/step/4      → Crest reveal
-/journey/step/5      → Story preview + paywall
-/journey/step/6      → Pass it on (gift options)
-/tools               → Free tools hub
-/tools/quiz          → Bloodline quiz
-/tools/surname       → Surname lookup
-/tools/ancestor      → Meet your ancestor
-/tools/1700s         → The 1700s you
-/tools/motto         → Motto generator
-/tools/chat          → Ancestor chat
-/shop                → Product catalog
-/shop/[product-id]   → Product detail page
-/shop/wedding        → Combined wedding crest experience
-/gifts               → Gift guide by occasion
-/gifts/fathers-day   → Father's Day collection
-/gifts/christmas     → Christmas collection
-/gifts/wedding       → Wedding collection
-/gifts/mothers-day   → Mother's Day collection
-/gifts/graduation    → Graduation collection
-/gifts/birthday      → Birthday collection
-/gifts/anniversary   → Anniversary collection
-/gifts/new-baby      → New baby collection
-/gifts/housewarming  → Housewarming collection
-/gifts/retirement    → Retirement collection
-/gifts/valentines    → Valentine's Day collection
-/gifts/reunion       → Family reunion collection
-/about               → Founder story (Gregory Osmond)
-/pricing             → Pricing page
-/cart                → Shopping cart
-/checkout            → Stripe checkout
-/confirmation        → Order confirmation
-/gift/[gift-id]      → Gift recipient landing page
-/my-legacy           → User dashboard (after purchase)
+- Solo founder. Keep things simple. No over-engineering.
+- Prefers inline execution for small tasks (1–5 steps), subagent-driven for large features.
+- Prefers merging locally over creating PRs.
+- Uses Lovable for frontend changes — Claude provides copy-paste Lovable prompts.
+- Uses Higgsfield for video content.
+- Deploys edge functions via Supabase CLI: supabase functions deploy <name>
+- Reviews Blotato social queue weekly (15-min sprint).
+- Email: gregadosmond@gmail.com
 
-```
+Lovable prompt format Greg uses:
+  - "Do not modify any existing pages or components."
+  - "One change at a time."
+  - Give him the exact prompt to paste into Lovable chat.
 
-FOUNDER STORY (Use in marketing copy)
-Gregory Angus Dean Osmond spent years tracing his family through historical documents — wills from the 1700s, church records in Piddletrenthide, Domesday Book entries from 1066. His ancestors were Haywards — land managers and protectors in Dorset, England. They weren't born wealthy. They earned everything through work, resilience, and grit.
-They later migrated to Newfoundland, Canada, where Joseph Osmond built a fishing operation from nothing. His sons Mark and Ambrose grew it into one of the largest shipping businesses in Newfoundland, trading across the West Indies and Caribbean for over 100 years.
-Gregory uncovered a real Osmond Coat of Arms (since 1688), documented 12 generations of lineage, 80+ historical documents, and a family motto that crystallized everything:
-"Ex Labore, Ascendimus" — From Labour, We Rise.
-Ancestra exists so everyone can have that same experience — in five minutes instead of five years.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRODUCT CATALOG (PHYSICAL — PRINTIFY)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Mugs:
+  White 11oz Ceramic Mug     $27.99    Dynamic per-order via create-heirloom-order
+  White 15oz Ceramic Mug     TBD       Future
+  Whiskey Glass              TBD       Future
+
+Canvas & Prints:
+  Satin Canvas 8×10          $47.99    Created in Printify
+  Satin Canvas 11×14         TBD       Future
+  Acrylic Print              TBD       Created in Printify
+
+Coasters:
+  Ceramic Coaster            TBD       Created in Printify
+
+Clocks:
+  Wall Clock                 TBD       Created in Printify
+
+Apparel:
+  Classic T-Shirt            TBD       Created in Printify (crest front, blank back)
+
+Kitchen:
+  Charcuterie Board          TBD       Laser engraved — crest only, NO QR
+
+Lifestyle:
+  Sherpa Blanket             TBD       Created in Printify
+  Java Speaker               TBD       Created in Printify
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRODUCT CATALOG (DIGITAL)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Legacy Pack (core product)    $29.99    9-chapter family story + crest + tree + certificate
+Custom Crest Download         $19       High-res PNG/SVG
+Legacy Certificate            $49       Frameable PDF
+Combined Wedding Crest        $79       24–48hr delivery
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FREE TOOLS (All Claude API — mostly frontend-only right now)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Bloodline Quiz      → 5 questions → archetype (Warrior/Builder/Explorer/Healer/Scholar)
+2. Surname Lookup      → meaning, origin, date, role for any surname
+3. Motto Generator     → 3 values → Latin motto with English translation
+4. Meet Your Ancestor  → AI ancestor profile (name, year, occupation, personality)
+5. The 1700s You       → what your life would look like 300 years ago
+6. Ancestor Chat       → live chat with AI ancestor character
+
+All tools end with: "Want to discover your full legacy? → Begin Your Journey"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FOUNDER STORY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Gregory Angus Dean Osmond traced his family through 80+ historical documents — wills from the 1700s, church records in Piddletrenthide, Domesday Book entries from 1066. Osmond ancestors were Haywards (land managers) in Dorset, England.
+
+They later migrated to Newfoundland, Canada, where Joseph Osmond built a fishing operation from nothing. Sons Mark and Ambrose grew it into one of the largest shipping businesses in Newfoundland, trading across the West Indies for 100+ years.
+
+Real Osmond Coat of Arms documented since 1688. 12 generations, 80+ documents.
+Motto: "Ex Labore, Ascendimus" — From Labour, We Rise.
+
 Key quote: "Most people don't know where they come from — and that disconnect affects who they believe they can become."
-IMPORTANT RULES
 
-1. Ancestra is a SEPARATE brand/project from RelocateIQ and Life By Design
-2. Never mix design systems — Ancestra uses Fireside Luxury, not RelocateIQ's design
-3. Lovable Cloud is used for DB/auth/storage/edge functions — no table prefixes (DB is isolated per project)
-4. Every page must use the warm color palette — no cold blues/grays
-5. All buttons are pill-shaped (border-radius: 60px)
-6. All cards have rounded corners (14-32px)
-7. Body text must be readable — minimum #d0c4b4 on dark backgrounds
-8. The journey is LINEAR — no complex navigation, no dashboards at launch
-9. Free tools exist to drive virality — they must be shareable
-10. Every experience ends with a gift CTA — "Who needs to see this?"
-11. The domain target is ancestorsqr.com — if unavailable, alternatives: ancestra.co, ancestra.io, getancestorsqr.com
-12. Physical products are fulfilled by Printful (most items) and Gelato (books)
-13. Do not modify any existing pages or components unless explicitly asked
-14. One change at a time — never bundle multiple features
-BRAND NAME — ANCESTRA
-Name: Ancestra Pronunciation: an-SESS-truh Domain target: ancestorsqr.com (alternatives: ancestra.co, ancestra.io, getancestorsqr.com)
-Why Ancestra:
+GADO: Gregory's initials (Gregory Angus Dean Osmond) = anagram of "A GOD". "Osmond" = Old English for "Divine Protector" (os = god, mund = protector). Used in founder marketing, NOT in the public brand.
 
-* Sounds like "ancestry" but isn't — unique, ownable
-* Latin feminine ending — feels ancient, premium, European
-* Easy to spell, easy to say, easy to remember
-* Works as a verb: "Ancestra your family"
-* The "-a" ending gives it warmth and femininity (all bloodlines pass through mothers)
-Brand lines:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ROUTES / PAGES REFERENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-* "Ancestra — What's hiding in your name?"
-* "Ancestra — Every family has a story worth telling."
-* "Ancestra — Discover. Forge. Pass it on."
-* "Forged by Ancestra"
-* "An Ancestra Original"
-Product stamps:
-
-* On physical products: "Forged by Ancestra"
-* On digital deliverables: "An Ancestra Original"
-* On certificates: "Ancestra — Est. 2026"
-Founder hidden layer — GADO: The founder's initials (Gregory Angus Dean Osmond) spell GADO, which is an anagram of "A GOD." His surname "Osmond" means "Divine Protector" in Old English (os = god, mund = protector). This is used in founder story marketing content, NOT in the brand name. Ancestra is the public brand. GADO is the founder's personal story.
-Etsy shop name: AncestraShop or AncestraHeritage Social handles target: @ancestra on all platforms
-FAMILY ANTHEM (Song Generation)
-The most unique feature — nobody else offers this. AI generates a custom song about the user's family using their actual surname, motto, ancestor names, and family story.
-Tool: Suno AI API Integration: n8n → Claude API (lyrics) → Suno API (music generation)
-Flow:
-
-1. User completes the Legacy Journey (has surname, motto, story, crest)
-2. Claude API writes custom song lyrics using their specific family data
-3. Suno API generates a 2-3 minute produced song
-4. User receives MP3 + lyric card in the app
-Claude Lyric Prompt Template:
-
-```
-Write an epic cinematic folk anthem about the [SURNAME] family.
-They come from [ORIGIN]. Their motto is "[MOTTO_EN]."
-They were [ANCESTRAL_ROLE]. Key ancestors: [ANCESTOR_NAMES].
-Key events: [KEY_EVENTS].
-End with the Latin motto: "[MOTTO_LATIN]."
-
-Style: Cinematic folk, epic orchestral, deep vocals,
-Celtic instruments, building crescendo
-
-```
-
-Style Options (user selects):
-
-* Epic Cinematic Folk (default — Celtic, orchestral, dramatic)
-* Modern Hip-Hop (younger audience, urban)
-* Classical Piano Ballad (emotional, Mother's Day, soft)
-* Rock Anthem (Father's Day, man cave energy, power)
-* Acoustic Indie (warm, personal, intimate)
-Pricing:
-
-* 30-second preview: FREE (viral hook — plays after crest reveal)
-* Full song MP3 download: +$9 add-on to Legacy Pack
-* Song + AI lyric video with crest visuals: +$19
-* Song + QR code printed on physical plaque: +$29
-Placement in Journey:
-
-* Appears after Stop 5 (story reveal)
-* "Your story has been written. Now hear it."
-* 30-sec preview plays automatically with crest visual animation
-* Full song is behind the Legacy Pack paywall
-* Share button generates 15-sec TikTok/Reels clip
-Viral Strategy:
-
-* Shareable 15-sec clip auto-formatted for TikTok/Reels/Stories
-* Caption template: "This AI just made a song about MY family 🔥"
-* QR code on all physical products links to the family anthem
-* Gift option: "Send their anthem" via email/text with crest visual
-QR Code Integration:
-Every physical product (framed crest, mug, ornament, wall sign) includes a small QR code that links to the family's anthem. Scan the QR on the framed crest hanging on the wall → the family song plays. This turns every product into a multimedia experience.
-SOCIAL MEDIA AUTOMATION
-Tool: Blotato (blotato.com) — Greg already uses this Integration: n8n native node + Blotato API + Claude Code/Cowork
-Content Pipeline:
-
-1. Claude Code/Cowork generates platform-specific content
-2. Blotato receives content via n8n workflow or Blotato API
-3. Blotato auto-formats for each platform's requirements
-4. Posts queue as drafts in Blotato calendar
-5. Greg reviews weekly (15-minute sprint)
-6. Approved posts publish on schedule automatically
-Platforms:
-LinkedIn, TikTok, Instagram, X (Twitter), Facebook, Pinterest, YouTube, Threads
-Content Pillars:
-
-1. Product showcases — Crest reveals, unboxing videos, product mockups
-2. Emotional story clips — Ancestor discoveries, family revelations
-3. Occasion marketing — Father's Day, Christmas, wedding content
-4. Free tool shares — Bloodline quiz results, motto generator outputs
-5. Founder story — Greg's Osmond discovery journey, real documents
-6. User stories — Customer reactions, review videos, gift moments
-7. Anthem clips — 15-sec family song previews (highly shareable)
-Blotato Features Used:
-
-* AI content remixing (1 piece → 10+ platform versions)
-* Faceless video generation (TikTok content without showing face)
-* Calendar scheduling across all platforms
-* Native n8n node for automated publishing triggers
-Review Process:
-
-* Blotato queues all AI-generated posts as DRAFTS
-* Greg reviews queue once per week (15 minutes)
-* Approve, tweak, or reject each post
-* Approved posts publish automatically on schedule
-* Never auto-publish without review (brand quality control)
-EMAIL STRATEGY
-Transactional Email (Resend)
-
-* Order confirmations
-* Gift delivery notifications ("Someone sent you a family legacy")
-* Digital product delivery (Legacy Pack, anthem MP3)
-* Shipping/tracking updates (from Printful via n8n)
-* Password reset, account notifications
-Marketing Email (Kit.com)
-
-* Welcome sequence (5 emails after signup)
-* Lead magnet: "5 Things Hiding in Your Surname" PDF
-* Occasion campaigns (Father's Day, Christmas — 3-4 weeks before)
-* New product announcements
-* Founder story series (Greg's journey emails)
-* Win-back sequences for abandoned carts
-Email Flows (n8n automated):
-
-1. New user signup → Kit welcome sequence triggers
-2. Free tool used → Kit tags user with interest (quiz, motto, etc.)
-3. Legacy Pack purchased → Resend delivers files + Kit moves to buyer segment
-4. Physical product ordered → Resend sends confirmation + tracking
-5. Gift sent → Resend delivers gift email to recipient with preview
-6. No purchase after 7 days → Kit sends "Your crest is waiting" nudge
+/                    Landing page
+/journey/1           Stop 1: Enter surname
+/journey/2           Stop 2: Name meaning
+/journey/3           Stop 3: Family tree
+/journey/4           Stop 4: Crest forge
+/journey/5           Stop 5: Story preview + paywall
+/journey/6           Stop 6: Pass it on
+/checkout            Stripe checkout
+/my-legacy           User dashboard (post-purchase)
+/tools               Free tools hub
+/tools/quiz          Bloodline Quiz
+/tools/surname       Surname Lookup
+/tools/motto         Motto Generator
+/tools/chat          Ancestor Chat
+/shop                Product catalog (NOT BUILT)
+/shop/[product-id]   Product detail (NOT BUILT)
+/gifts               Gift guide by occasion (NOT BUILT)
+/about               Founder story
+/gift/[gift-id]      Gift recipient landing (NOT BUILT)
