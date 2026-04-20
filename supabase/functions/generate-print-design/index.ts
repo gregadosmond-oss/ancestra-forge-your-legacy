@@ -21,9 +21,6 @@ const COASTER_SIZE = 1169;
 // Clock: 3000x3000px square.
 const CLOCK_SIZE = 3000;
 
-// Clock: 3000x3000px square.
-const CLOCK_SIZE = 3000;
-
 let wasmReady = false;
 async function ensureWasm() {
   if (!wasmReady) {
