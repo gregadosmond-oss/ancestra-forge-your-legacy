@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { CartProvider } from "@/contexts/CartContext";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -39,55 +40,57 @@ import Terms from "./pages/Terms.tsx";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/home" element={<Navigate to="/" replace />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/tools" element={<ToolsHub />} />
-            <Route path="/tools/surname" element={<SurnameLookup />} />
-            <Route path="/tools/motto" element={<MottoGenerator />} />
-            <Route path="/tools/quiz" element={<BloodlineQuiz />} />
-            <Route path="/tools/ancestor" element={<MeetYourAncestor />} />
-            <Route path="/tools/1700s" element={<The1700sYou />} />
-            <Route path="/tools/chat" element={<AncestorChat />} />
-            <Route path="/journey" element={<JourneyLayout />}>
-              <Route index element={<Navigate to="/journey/1" replace />} />
-              <Route path="1" element={<Stop1EnterName />} />
-              <Route path="2" element={<Stop2NameMeaning />} />
-              <Route path="3" element={<Stop3Bloodline />} />
-              <Route path="4" element={<Stop4CrestForge />} />
-              <Route path="5" element={<Stop5Story />} />
-              <Route path="6" element={<Stop6PassItOn />} />
+  <CartProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/home" element={<Navigate to="/" replace />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/tools" element={<ToolsHub />} />
+              <Route path="/tools/surname" element={<SurnameLookup />} />
+              <Route path="/tools/motto" element={<MottoGenerator />} />
+              <Route path="/tools/quiz" element={<BloodlineQuiz />} />
+              <Route path="/tools/ancestor" element={<MeetYourAncestor />} />
+              <Route path="/tools/1700s" element={<The1700sYou />} />
+              <Route path="/tools/chat" element={<AncestorChat />} />
+              <Route path="/journey" element={<JourneyLayout />}>
+                <Route index element={<Navigate to="/journey/1" replace />} />
+                <Route path="1" element={<Stop1EnterName />} />
+                <Route path="2" element={<Stop2NameMeaning />} />
+                <Route path="3" element={<Stop3Bloodline />} />
+                <Route path="4" element={<Stop4CrestForge />} />
+                <Route path="5" element={<Stop5Story />} />
+                <Route path="6" element={<Stop6PassItOn />} />
+              </Route>
+              <Route path="/checkout" element={<JourneyLayout />}>
+                <Route index element={<CheckoutPage />} />
+                <Route path="return" element={<CheckoutReturn />} />
+              </Route>
+              <Route path="/heirloom-order" element={<HeirloomOrderPage />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/confirmation" element={<Confirmation />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/my-legacy" element={<MyLegacy />} />
+              <Route path="/f/:surname" element={<FamilySharePage />} />
+              <Route path="/gift/:giftId" element={<GiftPage />} />
+              <Route path="/gifts/:occasion" element={<GiftOccasionPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<Terms />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
             </Route>
-            <Route path="/checkout" element={<JourneyLayout />}>
-              <Route index element={<CheckoutPage />} />
-              <Route path="return" element={<CheckoutReturn />} />
-            </Route>
-            <Route path="/heirloom-order" element={<HeirloomOrderPage />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/confirmation" element={<Confirmation />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/my-legacy" element={<MyLegacy />} />
-            <Route path="/f/:surname" element={<FamilySharePage />} />
-            <Route path="/gift/:giftId" element={<GiftPage />} />
-            <Route path="/gifts/:occasion" element={<GiftOccasionPage />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<Terms />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </CartProvider>
 );
 
 export default App;
