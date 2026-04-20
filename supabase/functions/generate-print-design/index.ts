@@ -58,14 +58,13 @@ type LayoutParams = {
 function getLayout(productType?: string): LayoutParams {
   if (productType === "phone-case") {
     // 1242 x 2099 phone case canvas, rendered at native size.
+    // Top 30% (~y=0 to y=630) reserved for camera cutout — keep clear.
     const canvasW = PHONE_CASE_W;
     const canvasH = PHONE_CASE_H;
-    // Crest centered in upper 65% of canvas.
-    const upperZoneH = canvasH * 0.65; // 1364.35
-    const crestW = Math.round(canvasW * 0.78); // ~969
-    const crestH = Math.round(crestW * (1100 / 1500)); // preserve ~1500x1100 ratio -> ~711
+    const crestH = 900;
+    const crestW = Math.round(crestH * (1500 / 1100)); // preserve ~1500x1100 ratio -> ~1227
     const crestX = Math.round((canvasW - crestW) / 2);
-    const crestY = Math.round((upperZoneH - crestH) / 2);
+    const crestY = 650; // below camera cutout
     const qrSize = 220;
     const qrX = Math.round((canvasW - qrSize) / 2);
     const qrY = crestY + crestH + 60; // 60px gap below crest
