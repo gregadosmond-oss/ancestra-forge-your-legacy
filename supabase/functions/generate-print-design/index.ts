@@ -6,8 +6,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Logical canvas is Printify's 8x10 satin (3600x4200 @ 300 DPI).
+// Output is rendered at half scale (1800x2100 @ 150 DPI) to fit edge function limits.
 const CANVAS_W = 3600;
 const CANVAS_H = 4200;
+const RENDER_W = 1800;
 
 let wasmReady = false;
 async function ensureWasm() {
@@ -77,7 +80,7 @@ async function buildDesign(
 </svg>`;
 
   const resvg = new Resvg(svg, {
-    fitTo: { mode: "width", value: CANVAS_W },
+    fitTo: { mode: "width", value: RENDER_W },
   });
   return resvg.render().asPng();
 }
