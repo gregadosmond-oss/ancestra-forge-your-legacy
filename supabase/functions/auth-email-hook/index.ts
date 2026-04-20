@@ -17,7 +17,7 @@ const corsHeaders = {
 }
 
 const EMAIL_SUBJECTS: Record<string, (data: any) => string> = {
-  signup: () => 'Confirm your AncestorsQR email',
+  signup: () => 'Your AncestorsQR code',
   invite: () => "You've been invited to AncestorsQR",
   magiclink: (data) => `Your AncestorsQR code — ${data?.token ?? ''}`.trim(),
   recovery: () => 'Reset your AncestorsQR password',
@@ -36,7 +36,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "legacy-forge-stories"
+const SITE_NAME = "AncestorsQR"
 const SENDER_DOMAIN = "notify.ancestorsqr.com"
 const ROOT_DOMAIN = "ancestorsqr.com"
 const FROM_DOMAIN = "notify.ancestorsqr.com" // Domain shown in From address (may be root or sender subdomain)

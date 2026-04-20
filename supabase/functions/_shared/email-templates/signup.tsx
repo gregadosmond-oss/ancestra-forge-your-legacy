@@ -9,7 +9,6 @@ import {
   Head,
   Heading,
   Html,
-  Link,
   Preview,
   Text,
 } from 'npm:@react-email/components@0.0.22'
@@ -22,36 +21,31 @@ interface SignupEmailProps {
 }
 
 export const SignupEmail = ({
-  siteName,
-  siteUrl,
-  recipient,
   confirmationUrl,
 }: SignupEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Confirm your email for {siteName}</Preview>
+    <Preview>Your story is waiting — confirm your AncestorsQR email</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Confirm your email</Heading>
+        <Text style={brand}>ANCESTORSQR</Text>
+        <Heading style={h1}>Your story is waiting.</Heading>
         <Text style={text}>
-          Thanks for signing up for{' '}
-          <Link href={siteUrl} style={link}>
-            <strong>{siteName}</strong>
-          </Link>
-          !
+          Welcome to AncestorsQR — every family has a story worth telling.
         </Text>
         <Text style={text}>
-          Please confirm your email address (
-          <Link href={`mailto:${recipient}`} style={link}>
-            {recipient}
-          </Link>
-          ) by clicking the button below:
+          Confirm your email to begin your journey and unlock your family's legacy.
         </Text>
-        <Button style={button} href={confirmationUrl}>
-          Verify Email
-        </Button>
+        <div style={buttonWrap}>
+          <Button style={button} href={confirmationUrl}>
+            Confirm My Email
+          </Button>
+        </div>
+        <Text style={footerItalic}>
+          Every family has a story worth telling.
+        </Text>
         <Text style={footer}>
-          If you didn't create an account, you can safely ignore this email.
+          ANCESTORSQR — EST. 2026
         </Text>
       </Container>
     </Body>
@@ -60,27 +54,70 @@ export const SignupEmail = ({
 
 export default SignupEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
+const main = {
+  backgroundColor: '#ffffff',
+  fontFamily: "'DM Sans', Arial, sans-serif",
+}
+const container = {
+  padding: '40px 32px',
+  maxWidth: '480px',
+  margin: '0 auto',
+  backgroundColor: '#0d0a07',
+  borderRadius: '22px',
+}
+const brand = {
+  fontFamily: "'Libre Caslon Display', Georgia, serif",
+  fontSize: '14px',
+  color: '#d4a04a',
+  textAlign: 'center' as const,
+  letterSpacing: '4px',
+  margin: '0 0 32px',
+  fontWeight: 'normal' as const,
+}
 const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
+  fontFamily: "'Libre Caslon Display', Georgia, serif",
+  fontSize: '28px',
+  fontWeight: 'normal' as const,
+  color: '#f0e8da',
   margin: '0 0 20px',
+  textAlign: 'center' as const,
+  lineHeight: '1.3',
 }
 const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
+  fontSize: '15px',
+  color: '#d0c4b4',
+  lineHeight: '1.6',
+  margin: '0 0 20px',
+  textAlign: 'center' as const,
 }
-const link = { color: 'inherit', textDecoration: 'underline' }
+const buttonWrap = {
+  textAlign: 'center' as const,
+  margin: '32px 0 32px',
+}
 const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
+  background: 'linear-gradient(135deg, #e8943a, #c47828)',
+  color: '#1a1208',
+  fontSize: '13px',
+  fontWeight: 600,
+  letterSpacing: '1.5px',
+  textTransform: 'uppercase' as const,
+  borderRadius: '60px',
+  padding: '16px 40px',
   textDecoration: 'none',
+  display: 'inline-block',
 }
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+const footerItalic = {
+  fontFamily: "'Libre Caslon Text', Georgia, serif",
+  fontStyle: 'italic' as const,
+  fontSize: '12px',
+  color: '#8a7e6e',
+  margin: '40px 0 12px',
+  textAlign: 'center' as const,
+}
+const footer = {
+  fontSize: '10px',
+  color: '#8a7e6e',
+  textAlign: 'center' as const,
+  letterSpacing: '3px',
+  margin: '0',
+}
