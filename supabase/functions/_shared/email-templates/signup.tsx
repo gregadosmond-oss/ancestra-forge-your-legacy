@@ -10,6 +10,7 @@ import {
   Heading,
   Html,
   Preview,
+  Section,
   Text,
 } from 'npm:@react-email/components@0.0.22'
 
@@ -36,11 +37,11 @@ export const SignupEmail = ({
         <Text style={text}>
           Confirm your email to begin your journey and unlock your family's legacy.
         </Text>
-        <div style={buttonWrap}>
+        <Section style={buttonWrap}>
           <Button style={button} href={confirmationUrl}>
             Confirm My Email
           </Button>
-        </div>
+        </Section>
         <Text style={footerItalic}>
           Every family has a story worth telling.
         </Text>
