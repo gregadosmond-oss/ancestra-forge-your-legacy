@@ -89,22 +89,17 @@ function getLayout(productType?: string): LayoutParams {
 
   if (productType === "coaster") {
     // 1169 x 1169 coaster canvas, rendered at native size.
-    // Crest source has heavy transparent padding (~30% on each side),
-    // so we oversize the bounding box well beyond the canvas to make the
-    // visible artwork fill the coaster. SVG clipping handles the overflow.
+    // Exact SVG attribute values per spec: crest y=30 h=750, qr y=810.
     const canvasW = COASTER_SIZE;
     const canvasH = COASTER_SIZE;
     const frameInset = 40;
     const frameStrokeWidth = 25;
-    // Oversize crest bounding box to ~140% of canvas so visible art fills frame
-    const crestW = Math.round(canvasW * 1.4);
-    const crestH = Math.round(crestW * (1100 / 1500));
+    const crestH = 750;
+    const crestW = Math.round(crestH * (1500 / 1100)); // preserve ratio
     const crestX = Math.round((canvasW - crestW) / 2);
+    const crestY = 30;
     const qrSize = 220;
-    // Visible art bottom sits roughly at 75% of crest box height
-    const visibleCrestBottom = Math.round(crestH * 0.78);
-    const crestY = 80 - Math.round(crestH * 0.11) - 60; // shifted up 60px
-    const qrY = crestY + visibleCrestBottom + 10 + 60; // restore gap so QR stays put, adds 60px breathing room
+    const qrY = 810;
     const qrX = Math.round((canvasW - qrSize) / 2);
     return {
       canvasW,
