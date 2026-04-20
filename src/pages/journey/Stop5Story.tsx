@@ -361,48 +361,50 @@ const Stop5Story = () => {
             </div>
           </motion.div>
 
-          {!purchaseLoading && hasPurchased ? (
+{!purchaseLoading && hasPurchased ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1.2, delay: 2 }}
               className="mt-14 w-full max-w-xl text-center"
             >
-              <div className="mb-6 rounded-[18px] border border-amber-dim/25 bg-amber-dim/10 px-6 py-5">
-                <p className="font-serif text-sm italic text-amber-light">
-                  Your full Legacy Pack is being prepared.
-                </p>
-                <p className="mt-2 font-sans text-xs text-text-dim">
-                  All 9 chapters of your family story, your high-res crest, family tree, and legacy certificate will be sent to your email after payment is confirmed.
-                </p>
-              </div>
-
-              <p className="mb-4 font-sans text-[10px] uppercase tracking-[3px] text-amber-dim">
-                Your 9 chapters
-              </p>
-              <ul className="space-y-3 text-left">
-                {[story.data.chapterOneTitle, ...story.data.teaserChapters].map((title, i) => (
-                  <motion.li
-                    key={`${title}-${i}`}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 2.2 + i * 0.1 }}
-                    className="flex items-center gap-3 font-serif text-sm"
-                    style={{ color: i === 0 ? "#e8b85c" : "#8a7e6e" }}
-                  >
-                    <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: i === 0 ? "#e8b85c" : "#3d3020" }} />
-                    {stripMarkdown(title)}
-                  </motion.li>
-                ))}
-              </ul>
-
-              <button
-                onClick={handleUnlock}
-                className="mt-10 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
-                style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
+              <motion.h2
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 2.2 }}
+                className="font-display text-2xl text-cream-warm"
+                style={{ fontSize: "clamp(24px, 3vw, 32px)", lineHeight: 1.2 }}
               >
-                Unlock Legacy Pack — $29.99
-              </button>
+                Your Legacy Pack is ready.
+              </motion.h2>
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 2.4 }}
+                className="mt-4 font-serif text-sm italic"
+                style={{ color: "#c4b8a6" }}
+              >
+                Check your email — your crest, story, and certificate have been delivered.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 2.6 }}
+                className="mt-8"
+              >
+                <button
+                  onClick={() => navigate("/my-legacy")}
+                  className="rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                  style={{
+                    background: "linear-gradient(135deg, #e8943a, #c47828)",
+                    color: "#1a1208",
+                  }}
+                >
+                  Go to My Legacy
+                </button>
+              </motion.div>
             </motion.div>
           ) : (
             <motion.div
