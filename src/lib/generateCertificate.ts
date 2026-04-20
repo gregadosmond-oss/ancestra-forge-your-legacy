@@ -422,7 +422,7 @@ export function generateCertificate({ facts, story, crestUrl, surname }: Certifi
 
       <!-- Declaration -->
       <div class="declaration">
-        Be it known to all who bear witness that <strong>House ${displaySurname}</strong> is hereby formally recognised
+        Be it known to all who bear witness that <strong>House of ${displaySurname}</strong> is hereby formally recognised
         as a family of verified ancestral lineage, heraldic standing, and enduring legacy.
         ${facts.meaning.etymology} ${facts.meaning.historicalContext ? facts.meaning.historicalContext : ""}
       </div>
