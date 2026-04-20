@@ -285,22 +285,37 @@ export default function Shop() {
 
                 {isLive ? (
                   product.live ? (
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className="mt-5 self-start rounded-pill font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
-                      style={{
-                        padding: "10px 22px",
-                        background: addedIds.has(product.id)
-                          ? "linear-gradient(135deg, #4a9e6a, #3a7e52)"
-                          : "linear-gradient(135deg, #e8943a, #c47828)",
-                        color: "#1a1208",
-                        border: "none",
-                        cursor: "pointer",
-                        transition: "background 0.3s ease, transform 0.3s ease",
-                      }}
-                    >
-                      {addedIds.has(product.id) ? "Added ✓" : "Add to Cart"}
-                    </button>
+                    product.href?.startsWith("/product-order") ? (
+                      <Link
+                        to={product.href}
+                        className="mt-5 self-start rounded-pill font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                        style={{
+                          padding: "10px 22px",
+                          background: "linear-gradient(135deg, #e8943a, #c47828)",
+                          color: "#1a1208",
+                          textDecoration: "none",
+                        }}
+                      >
+                        Order Now →
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={() => handleAddToCart(product)}
+                        className="mt-5 self-start rounded-pill font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                        style={{
+                          padding: "10px 22px",
+                          background: addedIds.has(product.id)
+                            ? "linear-gradient(135deg, #4a9e6a, #3a7e52)"
+                            : "linear-gradient(135deg, #e8943a, #c47828)",
+                          color: "#1a1208",
+                          border: "none",
+                          cursor: "pointer",
+                          transition: "background 0.3s ease, transform 0.3s ease",
+                        }}
+                      >
+                        {addedIds.has(product.id) ? "Added ✓" : "Add to Cart"}
+                      </button>
+                    )
                   ) : (
                     <Link
                       to={linkHref}
