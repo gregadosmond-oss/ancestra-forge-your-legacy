@@ -9,6 +9,7 @@ const Stop1EnterName = () => {
   const navigate = useNavigate();
   const { startJourney, unknownSurname, reset } = useJourney();
   const [surname, setSurname] = useState("");
+  const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   // Coming back to Stop 1 after an UNKNOWN bounce: clear provider state
@@ -27,6 +28,12 @@ const Stop1EnterName = () => {
     e.preventDefault();
     if (submitting || surname.trim().length === 0) return;
     setSubmitting(true);
+    
+    // Store email in localStorage if provided
+    if (email.trim().length > 0) {
+      localStorage.setItem("ancestra_email", email.trim());
+    }
+    
     // Fire in the background and navigate immediately — cinematic reveals
     // on Stops 2-5 absorb the latency.
     void startJourney(surname.trim());
@@ -79,6 +86,24 @@ const Stop1EnterName = () => {
             disabled={submitting}
             className="w-full rounded-pill border border-amber-dim/30 bg-input px-8 py-5 text-center font-display text-2xl text-cream-warm placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30 disabled:opacity-60"
           />
+
+          {/* Email capture section */}
+          <div className="w-full flex flex-col items-center gap-3">
+            <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
+              Save your legacy & skip checkout forms
+            </p>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              disabled={submitting}
+              className="w-full rounded-pill border border-amber-dim/30 bg-input px-8 py-4 text-center font-sans text-base text-cream-warm placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30 disabled:opacity-60"
+            />
+            <p className="font-serif text-xs italic text-text-dim">
+              No spam. Just your legacy.
+            </p>
+          </div>
 
           <button
             type="submit"
