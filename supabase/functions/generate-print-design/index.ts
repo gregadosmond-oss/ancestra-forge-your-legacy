@@ -54,10 +54,10 @@ async function buildDesign(
   const crestX = Math.round((CANVAS_W - crestW) / 2);
   const crestY = Math.round((200 + 3400) / 2 - crestH / 2); // 600
 
-  // QR: centered horizontally, 150px from bottom edge
+  // QR: centered horizontally, exactly 1.5 inches (225px @ 150 DPI = 450px in logical 300 DPI coords) below crest
   const qrSize = 400;
   const qrX = Math.round((CANVAS_W - qrSize) / 2);
-  const qrY = CANVAS_H - qrSize - 150;
+  const qrY = crestY + crestH + 450;
 
   // Gold border frame: inset 80px
   const frameInset = 80;
