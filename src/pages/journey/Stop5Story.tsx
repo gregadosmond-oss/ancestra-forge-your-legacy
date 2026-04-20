@@ -119,8 +119,8 @@ const Stop5Story = () => {
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = gateCode.trim();
-    if (!/^\d{6}$/.test(code)) {
-      setGateError("Enter the 6-digit code from your email.");
+    if (!/^\d{8}$/.test(code)) {
+      setGateError("Enter the 8-digit code from your email.");
       return;
     }
     setGateLoading(true);
