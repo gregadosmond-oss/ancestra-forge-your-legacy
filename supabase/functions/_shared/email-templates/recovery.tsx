@@ -19,25 +19,31 @@ interface RecoveryEmailProps {
 }
 
 export const RecoveryEmail = ({
-  siteName,
   confirmationUrl,
 }: RecoveryEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Reset your password for {siteName}</Preview>
+    <Preview>Reset your AncestorsQR password</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Reset your password</Heading>
+        <Text style={brand}>ANCESTORSQR</Text>
+        <Heading style={h1}>Let's get you back in.</Heading>
         <Text style={text}>
-          We received a request to reset your password for {siteName}. Click
-          the button below to choose a new password.
+          We received a request to reset your password. Click below to choose a new one and return to your family's story.
         </Text>
-        <Button style={button} href={confirmationUrl}>
-          Reset Password
-        </Button>
+        <div style={buttonWrap}>
+          <Button style={button} href={confirmationUrl}>
+            Reset My Password
+          </Button>
+        </div>
+        <Text style={textSmall}>
+          If you didn't request this, you can safely ignore this email — your password won't change.
+        </Text>
+        <Text style={footerItalic}>
+          Every family has a story worth telling.
+        </Text>
         <Text style={footer}>
-          If you didn't request a password reset, you can safely ignore this
-          email. Your password will not be changed.
+          ANCESTORSQR — EST. 2026
         </Text>
       </Container>
     </Body>
@@ -46,26 +52,77 @@ export const RecoveryEmail = ({
 
 export default RecoveryEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
+const main = {
+  backgroundColor: '#ffffff',
+  fontFamily: "'DM Sans', Arial, sans-serif",
+}
+const container = {
+  padding: '40px 32px',
+  maxWidth: '480px',
+  margin: '0 auto',
+  backgroundColor: '#0d0a07',
+  borderRadius: '22px',
+}
+const brand = {
+  fontFamily: "'Libre Caslon Display', Georgia, serif",
+  fontSize: '14px',
+  color: '#d4a04a',
+  textAlign: 'center' as const,
+  letterSpacing: '4px',
+  margin: '0 0 32px',
+  fontWeight: 'normal' as const,
+}
 const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
+  fontFamily: "'Libre Caslon Display', Georgia, serif",
+  fontSize: '28px',
+  fontWeight: 'normal' as const,
+  color: '#f0e8da',
   margin: '0 0 20px',
+  textAlign: 'center' as const,
+  lineHeight: '1.3',
 }
 const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
+  fontSize: '15px',
+  color: '#d0c4b4',
+  lineHeight: '1.6',
+  margin: '0 0 20px',
+  textAlign: 'center' as const,
+}
+const textSmall = {
+  fontSize: '13px',
+  color: '#8a7e6e',
+  lineHeight: '1.6',
+  margin: '24px 0 0',
+  textAlign: 'center' as const,
+}
+const buttonWrap = {
+  textAlign: 'center' as const,
+  margin: '32px 0 8px',
 }
 const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
+  background: 'linear-gradient(135deg, #e8943a, #c47828)',
+  color: '#1a1208',
+  fontSize: '13px',
+  fontWeight: 600,
+  letterSpacing: '1.5px',
+  textTransform: 'uppercase' as const,
+  borderRadius: '60px',
+  padding: '16px 40px',
   textDecoration: 'none',
+  display: 'inline-block',
 }
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+const footerItalic = {
+  fontFamily: "'Libre Caslon Text', Georgia, serif",
+  fontStyle: 'italic' as const,
+  fontSize: '12px',
+  color: '#8a7e6e',
+  margin: '40px 0 12px',
+  textAlign: 'center' as const,
+}
+const footer = {
+  fontSize: '10px',
+  color: '#8a7e6e',
+  textAlign: 'center' as const,
+  letterSpacing: '3px',
+  margin: '0',
+}
