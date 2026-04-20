@@ -311,7 +311,7 @@ export default function About() {
 
         <OrnamentalDivider />
 
-        {/* ── SECTION 5: Why I built Ancestra ── */}
+        {/* ── SECTION 5: Why I built AncestorsQR ── */}
         <motion.section {...reveal}>
           <SectionLabel>The Reason</SectionLabel>
           <h2
@@ -322,7 +322,7 @@ export default function About() {
               lineHeight: 1.2,
             }}
           >
-            Why I built Ancestra
+            Why I built AncestorsQR
           </h2>
           <div className="mt-10">
             <p
@@ -383,7 +383,7 @@ export default function About() {
                 marginBottom: "1.5rem",
               }}
             >
-              Ancestra exists so you don't have to spend five years to get what I got.
+              AncestorsQR exists so you don't have to spend five years to get what I got.
             </p>
             <p
               className="font-serif"
