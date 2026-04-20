@@ -47,17 +47,17 @@ async function buildDesign(
   const crestDataUri = `data:${crest.mime};base64,${crest.b64}`;
   const qrDataUri = `data:${qr.mime};base64,${qr.b64}`;
 
-  // Crest: centered horizontally; vertically centered between y=200 and y=3400
-  // (logical 3600x4200 canvas → renders to y=100..1700 on 1800x2100 output)
-  const crestW = 2400;
-  const crestH = 2400;
-  const crestX = Math.round((CANVAS_W - crestW) / 2);
-  const crestY = Math.round((200 + 3400) / 2 - crestH / 2); // 600
+  // Exact pixel positions on the 1800x2100 output canvas, scaled 2x for the 3600x4200 logical canvas.
+  // Crest (output): x=150, y=200, w=1500, h=1100
+  const crestX = 300;
+  const crestY = 400;
+  const crestW = 3000;
+  const crestH = 2200;
 
-  // QR: centered horizontally, exactly 1.5 inches (225px @ 150 DPI = 450px in logical 300 DPI coords) below crest
-  const qrSize = 400;
-  const qrX = Math.round((CANVAS_W - qrSize) / 2);
-  const qrY = crestY + crestH + 450;
+  // QR (output): x=775, y=1375, w=250, h=250 — directly below crest
+  const qrX = 1550;
+  const qrY = 2750;
+  const qrSize = 500;
 
   // Gold border frame: inset 80px
   const frameInset = 80;
