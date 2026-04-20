@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { Image } from "https://deno.land/x/imagescript@1.2.17/mod.ts";
+import { Resvg, initWasm } from "npm:@resvg/resvg-wasm";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,51 +8,78 @@ const corsHeaders = {
 
 const CANVAS_W = 3600;
 const CANVAS_H = 4200;
-const BG_COLOR = 0x0d0a07ff; // #0d0a07 opaque
 
-// Crest centered in the middle 2400×3000 zone (600px offset from each side)
-const CREST_W = 2400;
-const CREST_H = 3000;
-const CREST_X = 600;
-const CREST_Y = 600;
-
-// QR code at fixed position inside the front face
-const QR_SIZE = 300;
-const QR_X = 2700;
-const QR_Y = 3500;
-
-async function fetchImage(url: string): Promise<Image> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
-  const buf = new Uint8Array(await res.arrayBuffer());
-  return await Image.decode(buf);
+let wasmReady = false;
+async function ensureWasm() {
+  if (!wasmReady) {
+    const res = await fetch("https://unpkg.com/@resvg/resvg-wasm/index_bg.wasm");
+    await initWasm(res);
+    wasmReady = true;
+  }
 }
 
-async function buildDesign(crestUrl: string, qrUrl: string): Promise<Uint8Array> {
-  const [crestRaw, qrRaw] = await Promise.all([
-    fetchImage(crestUrl),
-    fetchImage(qrUrl),
-  ]);
-
-  // Resize while preserving aspect ratio, fit inside the target box
-  const crestRatio = crestRaw.width / crestRaw.height;
-  let cw = CREST_W;
-  let ch = Math.round(CREST_W / crestRatio);
-  if (ch > CREST_H) {
-    ch = CREST_H;
-    cw = Math.round(CREST_H * crestRatio);
+async function toBase64(url: string): Promise<{ b64: string; mime: string }> {
+  const res = await fetch(url);
+  const mime = res.headers.get("content-type") ?? "image/png";
+  const buf = await res.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(
+      null,
+      bytes.subarray(i, i + chunk) as unknown as number[],
+    );
   }
-  const crest = crestRaw.resize(cw, ch);
-  const cx = CREST_X + Math.round((CREST_W - cw) / 2);
-  const cy = CREST_Y + Math.round((CREST_H - ch) / 2);
+  return { b64: btoa(binary), mime };
+}
 
-  const qr = qrRaw.resize(QR_SIZE, QR_SIZE);
+async function buildDesign(
+  crestUrl: string,
+  qrUrl: string,
+): Promise<Uint8Array> {
+  await ensureWasm();
 
-  const canvas = new Image(CANVAS_W, CANVAS_H).fill(BG_COLOR);
-  canvas.composite(crest, cx, cy);
-  canvas.composite(qr, QR_X, QR_Y);
+  const [crest, qr] = await Promise.all([toBase64(crestUrl), toBase64(qrUrl)]);
+  const crestDataUri = `data:${crest.mime};base64,${crest.b64}`;
+  const qrDataUri = `data:${qr.mime};base64,${qr.b64}`;
 
-  return await canvas.encode();
+  // Crest: centered horizontally, in upper 70% of canvas
+  // Upper 70% zone height = 2940. Crest fills width 2400, centered.
+  const crestW = 2400;
+  const crestH = 2400;
+  const crestX = Math.round((CANVAS_W - crestW) / 2);
+  const crestY = 200; // top margin within upper zone
+
+  // QR: centered horizontally, 80px below crest, 400x400
+  const qrSize = 400;
+  const qrX = Math.round((CANVAS_W - qrSize) / 2);
+  const qrY = crestY + crestH + 80;
+
+  // Text: centered, 60px below QR
+  const textY = qrY + qrSize + 60 + 52; // baseline approx
+  const textX = CANVAS_W / 2;
+
+  // Gold border frame: inset 80px
+  const frameInset = 80;
+  const frameX = frameInset;
+  const frameY = frameInset;
+  const frameW = CANVAS_W - frameInset * 2;
+  const frameH = CANVAS_H - frameInset * 2;
+
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="${CANVAS_W}" height="${CANVAS_H}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rect width="${CANVAS_W}" height="${CANVAS_H}" fill="#0d0a07"/>
+  <rect x="${frameX}" y="${frameY}" width="${frameW}" height="${frameH}" fill="none" stroke="#a07830" stroke-width="3" stroke-opacity="0.5"/>
+  <image href="${crestDataUri}" x="${crestX}" y="${crestY}" width="${crestW}" height="${crestH}" preserveAspectRatio="xMidYMid meet"/>
+  <image href="${qrDataUri}" x="${qrX}" y="${qrY}" width="${qrSize}" height="${qrSize}" preserveAspectRatio="xMidYMid meet"/>
+  <text x="${textX}" y="${textY}" font-family="sans-serif" font-size="52" letter-spacing="4" fill="#a07830" text-anchor="middle">SCAN TO DISCOVER YOUR FULL FAMILY LEGACY</text>
+</svg>`;
+
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "width", value: CANVAS_W },
+  });
+  return resvg.render().asPng();
 }
 
 serve(async (req) => {
