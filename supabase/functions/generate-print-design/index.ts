@@ -6,8 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const CANVAS_W = 2400;
-const CANVAS_H = 3000;
+const CANVAS_W = 3600;
+const CANVAS_H = 4200;
 
 let wasmReady = false;
 async function ensureWasm() {
