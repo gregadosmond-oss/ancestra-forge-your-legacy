@@ -414,7 +414,7 @@ export function generateCertificate({ facts, story, crestUrl, surname }: Certifi
       <!-- Header -->
       <div>
         <p class="cert-label">Legacy Certificate &nbsp;·&nbsp; An AncestorsQR Original</p>
-        <p class="house-name">House ${displaySurname}</p>
+        <p class="house-name">House of ${displaySurname}</p>
         <p class="house-sub">Est. ${facts.meaning.origin.replace(/[^0-9–—,\s]/g, "").trim() || facts.meaning.origin} &nbsp;✦&nbsp; ${facts.meaning.role}</p>
       </div>
 
