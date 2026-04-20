@@ -21,12 +21,12 @@ async function ensureWasm() {
 // Font URLs — TTF files served by Google Fonts CDN (cached after first cold start)
 const FONT_URLS = {
   // Cinzel — Caslon-like display serif, perfect for the gold surname/HOUSE OF
-  cinzelRegular: "https://fonts.gstatic.com/s/cinzel/v23/8vIU7ww63mVu7gtR-kwKxNvkNOjw-tbnTYrvDE5ZdqU.ttf",
-  cinzelBold:    "https://fonts.gstatic.com/s/cinzel/v23/8vIJ7ww63mVu7gtR-kwKxNvkNOjw-tbnSamYHJYNzGw.ttf",
+  cinzelRegular: "https://fonts.gstatic.com/s/cinzel/v26/8vIU7ww63mVu7gtR-kwKxNvkNOjw-tbnTYo.ttf",
+  cinzelBold:    "https://fonts.gstatic.com/s/cinzel/v26/8vIU7ww63mVu7gtR-kwKxNvkNOjw-jHgTYo.ttf",
   // EB Garamond Italic — for the motto
-  garamondItalic: "https://fonts.gstatic.com/s/ebgaramond/v30/SlGUmQSNjdsmc35JDF1K5GRwUjcdlttVFm-rI7e8QL98.ttf",
+  garamondItalic: "https://fonts.gstatic.com/s/ebgaramond/v32/SlGFmQSNjdsmc35JDF1K5GRwUjcdlttVFm-rI7e8QI96.ttf",
   // DM Sans — body / labels
-  dmSansRegular: "https://fonts.gstatic.com/s/dmsans/v15/rP2Hp2ywxg089UriOZSCHBeHFl0.ttf",
+  dmSansRegular: "https://fonts.gstatic.com/s/dmsans/v17/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAopxhTg.ttf",
 };
 
 let fontBuffersCache: Uint8Array[] | null = null;
