@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
+import { useCart } from "@/contexts/CartContext";
 import {
   SHOP_PRODUCTS,
   SHOP_BUNDLES,
@@ -32,6 +33,27 @@ const CATEGORIES: Array<{ value: ShopProduct["category"] | "all"; label: string 
 
 export default function Shop() {
   const [activeCategory, setActiveCategory] = useState<ShopProduct["category"] | "all">("all");
+  const { addItem } = useCart();
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+
+  const handleAddToCart = (product: ShopProduct) => {
+    const numericPrice = parseFloat(product.price.replace(/[^0-9.]/g, ""));
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: numericPrice,
+      priceId: product.id,
+      productType: product.category,
+    });
+    setAddedIds(prev => new Set(prev).add(product.id));
+    setTimeout(() => {
+      setAddedIds(prev => {
+        const next = new Set(prev);
+        next.delete(product.id);
+        return next;
+      });
+    }, 2000);
+  };
 
   const filtered =
     activeCategory === "all"
@@ -263,17 +285,22 @@ export default function Shop() {
 
                 {isLive ? (
                   product.live ? (
-                    <Link
-                      to={linkHref}
+                    <button
+                      onClick={() => handleAddToCart(product)}
                       className="mt-5 self-start rounded-pill font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
                       style={{
                         padding: "10px 22px",
-                        background: "linear-gradient(135deg, #e8943a, #c47828)",
+                        background: addedIds.has(product.id)
+                          ? "linear-gradient(135deg, #4a9e6a, #3a7e52)"
+                          : "linear-gradient(135deg, #e8943a, #c47828)",
                         color: "#1a1208",
+                        border: "none",
+                        cursor: "pointer",
+                        transition: "background 0.3s ease, transform 0.3s ease",
                       }}
                     >
-                      Order Now →
-                    </Link>
+                      {addedIds.has(product.id) ? "Added ✓" : "Add to Cart"}
+                    </button>
                   ) : (
                     <Link
                       to={linkHref}
