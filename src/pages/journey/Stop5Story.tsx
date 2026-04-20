@@ -8,6 +8,7 @@ import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
 import { stripMarkdown } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 const Stop5Story = () => {
   const navigate = useNavigate();
@@ -118,8 +119,8 @@ const Stop5Story = () => {
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = gateCode.trim();
-    if (!/^\d{6}$/.test(code)) {
-      setGateError("Enter the 6-digit code from your email.");
+    if (!/^\d{8}$/.test(code)) {
+      setGateError("Enter the 8-digit code from your email.");
       return;
     }
     setGateLoading(true);
@@ -205,32 +206,26 @@ const Stop5Story = () => {
           ) : (
             <form onSubmit={handleVerifyCode} className="flex flex-col items-center gap-4">
               <p className="font-serif text-sm italic text-text-dim text-center">
-                We sent a 6-digit code to <span className="text-amber-light not-italic">{gateEmail}</span>
+                We sent an 8-digit code to <span className="text-amber-light not-italic">{gateEmail}</span>
               </p>
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="\d{6}"
-                maxLength={6}
+              <InputOTP
+                maxLength={8}
                 value={gateCode}
-                onChange={(e) => { setGateCode(e.target.value.replace(/\D/g, "").slice(0, 6)); if (gateError) setGateError(null); }}
-                placeholder="000000"
-                autoFocus
+                onChange={(value) => { setGateCode(value); if (gateError) setGateError(null); }}
                 disabled={gateLoading}
-                className="w-full rounded-pill px-8 py-4 text-center font-display text-2xl tracking-[0.5em] text-cream-warm placeholder:text-text-dim focus:outline-none disabled:opacity-60"
-                style={{
-                  background: "#161210",
-                  border: "1px solid rgba(212,160,74,0.15)",
-                }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(212,160,74,0.4)")}
-                onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(212,160,74,0.15)")}
-              />
+              >
+                <InputOTPGroup>
+                  {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+                    <InputOTPSlot key={i} index={i} />
+                  ))}
+                </InputOTPGroup>
+              </InputOTP>
               {gateError && (
                 <p className="font-sans text-xs" style={{ color: "#c47070" }}>{gateError}</p>
               )}
               <button
                 type="submit"
-                disabled={gateLoading || gateCode.length !== 6}
+                disabled={gateLoading || gateCode.length !== 8}
                 className="mt-2 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-60"
                 style={{
                   background: "linear-gradient(135deg, #e8943a, #c47828)",
