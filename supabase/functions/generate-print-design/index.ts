@@ -47,12 +47,12 @@ async function buildDesign(
   const crestDataUri = `data:${crest.mime};base64,${crest.b64}`;
   const qrDataUri = `data:${qr.mime};base64,${qr.b64}`;
 
-  // Crest: centered horizontally, vertically centered in the upper 75% of the canvas
+  // Crest: centered horizontally; vertically centered between y=200 and y=3400
+  // (logical 3600x4200 canvas → renders to y=100..1700 on 1800x2100 output)
   const crestW = 2400;
   const crestH = 2400;
   const crestX = Math.round((CANVAS_W - crestW) / 2);
-  const upperZoneH = Math.round(CANVAS_H * 0.75); // 3150
-  const crestY = Math.round((upperZoneH - crestH) / 2); // centered in upper zone
+  const crestY = Math.round((200 + 3400) / 2 - crestH / 2); // 600
 
   // QR: centered horizontally, 150px from bottom edge
   const qrSize = 400;
