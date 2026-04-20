@@ -1,19 +1,3 @@
-/// <reference types="npm:@types/react@18.3.1" />
-
-import * as React from 'npm:react@18.3.1'
-
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Preview,
-  Section,
-  Text,
-} from 'npm:@react-email/components@0.0.22'
-
 interface SignupEmailProps {
   siteName: string
   siteUrl: string
@@ -21,105 +5,54 @@ interface SignupEmailProps {
   confirmationUrl: string
 }
 
-export const SignupEmail = ({
-  confirmationUrl,
-}: SignupEmailProps) => (
-  <Html lang="en" dir="ltr">
-    <Head />
-    <Preview>Your story is waiting — confirm your AncestorsQR email</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Text style={brand}>ANCESTORSQR</Text>
-        <Heading style={h1}>Your story is waiting.</Heading>
-        <Text style={text}>
-          Welcome to AncestorsQR — every family has a story worth telling.
-        </Text>
-        <Text style={text}>
-          Confirm your email to begin your journey and unlock your family's legacy.
-        </Text>
-        <Section style={buttonWrap}>
-          <Button style={button} href={confirmationUrl}>
-            Confirm My Email
-          </Button>
-        </Section>
-        <Text style={footerItalic}>
-          Every family has a story worth telling.
-        </Text>
-        <Text style={footer}>
-          ANCESTORSQR — EST. 2026
-        </Text>
-      </Container>
-    </Body>
-  </Html>
-)
+const escapeHtmlAttribute = (value: string) =>
+  value
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+
+export const SignupEmail = ({ confirmationUrl }: SignupEmailProps) => `<!DOCTYPE html>
+
+<html>
+
+<head><meta charset="utf-8"></head>
+
+<body style="margin:0;padding:0;background:#ffffff;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0d0a07;min-height:100vh;">
+
+<tr><td align="center" style="padding:40px 20px;">
+
+<table width="480" cellpadding="0" cellspacing="0" style="background:#1a1510;border-radius:14px;border:1px solid rgba(212,160,74,0.15);">
+
+<tr><td align="center" style="padding:40px 32px;">
+
+<p style="margin:0 0 24px;font-family:Georgia,serif;font-size:12px;letter-spacing:4px;text-transform:uppercase;color:#a07830;">ANCESTORSQR</p>
+
+<h1 style="margin:0 0 16px;font-family:Georgia,serif;font-size:32px;color:#f0e8da;">Your story is waiting.</h1>
+
+<p style="margin:0 0 32px;font-family:Georgia,serif;font-style:italic;font-size:17px;color:#c4b8a6;">Confirm your email to begin your journey.</p>
+
+<a href="${escapeHtmlAttribute(confirmationUrl)}" style="display:inline-block;background:linear-gradient(135deg,#e8943a,#c47828);color:#1a1208;font-family:Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:60px;">Confirm My Email</a>
+
+<p style="margin:32px 0 0;font-family:Georgia,serif;font-style:italic;font-size:12px;color:#8a7e6e;">Every family has a story worth telling.</p>
+
+<p style="margin:8px 0 0;font-family:Arial,sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#8a7e6e;">ANCESTORSQR — EST. 2026</p>
+
+</td></tr>
+
+</table>
+
+</td></tr>
+
+</table>
+
+</body>
+
+</html>`
+
+export const SignupEmailText = ({ confirmationUrl }: SignupEmailProps) => `Your story is waiting.\n\nConfirm your email to begin your journey.\n\nConfirm My Email: ${confirmationUrl}\n\nEvery family has a story worth telling.\n\nANCESTORSQR — EST. 2026`
 
 export default SignupEmail
-
-const main = {
-  backgroundColor: '#ffffff',
-  fontFamily: "'DM Sans', Arial, sans-serif",
-  padding: '20px 0',
-}
-const container = {
-  padding: '40px 32px',
-  maxWidth: '480px',
-  margin: '0 auto',
-  backgroundColor: '#0d0a07',
-  borderRadius: '22px',
-}
-const brand = {
-  fontFamily: "'Libre Caslon Display', Georgia, serif",
-  fontSize: '14px',
-  color: '#d4a04a',
-  textAlign: 'center' as const,
-  letterSpacing: '4px',
-  margin: '0 0 32px',
-  fontWeight: 'normal' as const,
-}
-const h1 = {
-  fontFamily: "'Libre Caslon Display', Georgia, serif",
-  fontSize: '28px',
-  fontWeight: 'normal' as const,
-  color: '#f0e8da',
-  margin: '0 0 20px',
-  textAlign: 'center' as const,
-  lineHeight: '1.3',
-}
-const text = {
-  fontSize: '15px',
-  color: '#d0c4b4',
-  lineHeight: '1.6',
-  margin: '0 0 20px',
-  textAlign: 'center' as const,
-}
-const buttonWrap = {
-  textAlign: 'center' as const,
-  margin: '32px 0 32px',
-}
-const button = {
-  background: 'linear-gradient(135deg, #e8943a, #c47828)',
-  color: '#1a1208',
-  fontSize: '13px',
-  fontWeight: 600,
-  letterSpacing: '1.5px',
-  textTransform: 'uppercase' as const,
-  borderRadius: '60px',
-  padding: '16px 40px',
-  textDecoration: 'none',
-  display: 'inline-block',
-}
-const footerItalic = {
-  fontFamily: "'Libre Caslon Text', Georgia, serif",
-  fontStyle: 'italic' as const,
-  fontSize: '12px',
-  color: '#8a7e6e',
-  margin: '40px 0 12px',
-  textAlign: 'center' as const,
-}
-const footer = {
-  fontSize: '10px',
-  color: '#8a7e6e',
-  textAlign: 'center' as const,
-  letterSpacing: '3px',
-  margin: '0',
-}
