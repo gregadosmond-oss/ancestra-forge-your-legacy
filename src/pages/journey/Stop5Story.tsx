@@ -94,6 +94,52 @@ const Stop5Story = () => {
     navigate("/checkout");
   };
 
+  const handleSendCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = gateEmail.trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) {
+      setGateError("Enter a valid email address.");
+      return;
+    }
+    setGateLoading(true);
+    setGateError(null);
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true, emailRedirectTo: window.location.origin },
+    });
+    setGateLoading(false);
+    if (error) {
+      setGateError(error.message);
+      return;
+    }
+    setGateStage("code");
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const code = gateCode.trim();
+    if (!/^\d{6}$/.test(code)) {
+      setGateError("Enter the 6-digit code from your email.");
+      return;
+    }
+    setGateLoading(true);
+    setGateError(null);
+    const { error } = await supabase.auth.verifyOtp({
+      email: gateEmail.trim().toLowerCase(),
+      token: code,
+      type: "email",
+    });
+    setGateLoading(false);
+    if (error) {
+      setGateError(error.message);
+      return;
+    }
+    // Success — usePurchase will pick up the session and re-render with story content
+  };
+
+  const showGate = !purchaseLoading && !user;
+
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
       <SectionLabel>YOUR STORY</SectionLabel>
