@@ -18,6 +18,33 @@ async function ensureWasm() {
   }
 }
 
+// Font URLs — TTF files served by Google Fonts CDN (cached after first cold start)
+const FONT_URLS = {
+  // Cinzel — Caslon-like display serif, perfect for the gold surname/HOUSE OF
+  cinzelRegular: "https://fonts.gstatic.com/s/cinzel/v26/8vIU7ww63mVu7gtR-kwKxNvkNOjw-tbnTYo.ttf",
+  cinzelBold:    "https://fonts.gstatic.com/s/cinzel/v26/8vIU7ww63mVu7gtR-kwKxNvkNOjw-jHgTYo.ttf",
+  // EB Garamond Italic — for the motto
+  garamondItalic: "https://fonts.gstatic.com/s/ebgaramond/v32/SlGFmQSNjdsmc35JDF1K5GRwUjcdlttVFm-rI7e8QI96.ttf",
+  // DM Sans — body / labels
+  dmSansRegular: "https://fonts.gstatic.com/s/dmsans/v17/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAopxhTg.ttf",
+};
+
+let fontBuffersCache: Uint8Array[] | null = null;
+async function loadFontBuffers(): Promise<Uint8Array[]> {
+  if (fontBuffersCache) return fontBuffersCache;
+  const urls = Object.values(FONT_URLS);
+  const results = await Promise.all(
+    urls.map(async (u) => {
+      const r = await fetch(u);
+      if (!r.ok) throw new Error(`Font fetch failed (${r.status}): ${u}`);
+      return new Uint8Array(await r.arrayBuffer());
+    }),
+  );
+  fontBuffersCache = results;
+  return results;
+}
+
+
 async function toBase64(url: string): Promise<{ b64: string; mime: string }> {
   const res = await fetch(url);
   const mime = res.headers.get("content-type") ?? "image/png";
@@ -62,15 +89,15 @@ async function buildDesign(
   // Motto below surname
   const mottoY = surnameY + px(220);
 
-  // QR bottom right (300x300 in source spec, scaled)
-  const qrSize = px(300);
+  // QR bottom right — keep at 300x300 absolute (per spec) regardless of canvas size
+  const qrSize = 300;
   const qrMargin = px(200);
   const qrX = CANVAS_W - qrSize - qrMargin;
   const qrY = CANVAS_H - qrSize - qrMargin - px(80);
   const qrLabelY = qrY + qrSize + px(70);
 
   const mottoSvg = motto
-    ? `<text x="${CANVAS_W / 2}" y="${mottoY}" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="${px(120)}" fill="#e8b85c" text-anchor="middle" opacity="0.9">${escapeXml(motto)}</text>`
+    ? `<text x="${CANVAS_W / 2}" y="${mottoY}" font-family="EB Garamond" font-style="italic" font-size="${px(120)}" fill="#e8b85c" text-anchor="middle" opacity="0.9">${escapeXml(motto)}</text>`
     : "";
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
@@ -87,11 +114,11 @@ async function buildDesign(
   <image href="${crestDataUri}" x="${crestX}" y="${crestY}" width="${crestW}" height="${crestH}" preserveAspectRatio="xMidYMid meet"/>
 
   <!-- HOUSE OF label -->
-  <text x="${CANVAS_W / 2}" y="${surnameY - px(130)}" font-family="Georgia, 'Times New Roman', serif"
+  <text x="${CANVAS_W / 2}" y="${surnameY - px(130)}" font-family="Cinzel"
         font-size="${px(90)}" fill="#a07830" letter-spacing="${px(14)}" text-anchor="middle">HOUSE  OF</text>
 
   <!-- Surname (large gold display) -->
-  <text x="${CANVAS_W / 2}" y="${surnameY}" font-family="Georgia, 'Times New Roman', serif"
+  <text x="${CANVAS_W / 2}" y="${surnameY}" font-family="Cinzel"
         font-size="${px(240)}" font-weight="bold" fill="#e8b85c" text-anchor="middle"
         letter-spacing="${px(8)}">${escapeXml(surname.toUpperCase())}</text>
 
@@ -102,17 +129,23 @@ async function buildDesign(
   <image href="${qrDataUri}" x="${qrX}" y="${qrY}" width="${qrSize}" height="${qrSize}" preserveAspectRatio="xMidYMid meet"/>
 
   <!-- QR label -->
-  <text x="${qrX + qrSize / 2}" y="${qrLabelY}" font-family="Arial, Helvetica, sans-serif"
+  <text x="${qrX + qrSize / 2}" y="${qrLabelY}" font-family="DM Sans"
         font-size="${px(40)}" fill="#a07830" letter-spacing="${px(4)}" text-anchor="middle">SCAN YOUR LEGACY</text>
 
   <!-- Ancestra wordmark (bottom left) -->
-  <text x="${qrMargin}" y="${CANVAS_H - qrMargin}" font-family="Georgia, serif"
+  <text x="${qrMargin}" y="${CANVAS_H - qrMargin}" font-family="Cinzel"
         font-size="${px(42)}" fill="#c9a84c" opacity="0.35" letter-spacing="${px(12)}">A N C E S T R A</text>
 
 </svg>`;
 
+  const fontBuffers = await loadFontBuffers();
   const resvg = new Resvg(svg, {
     fitTo: { mode: "width", value: CANVAS_W },
+    font: {
+      fontBuffers,
+      loadSystemFonts: false,
+      defaultFontFamily: "Cinzel",
+    },
   });
   return resvg.render().asPng();
 }
