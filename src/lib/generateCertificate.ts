@@ -55,7 +55,7 @@ export function generateCertificate({ facts, story, crestUrl, surname }: Certifi
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>House ${displaySurname} — Legacy Certificate</title>
+  <title>House of ${displaySurname} — Legacy Certificate</title>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital@0;1&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     @page { size: A4 landscape; margin: 0; }
