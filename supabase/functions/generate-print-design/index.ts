@@ -218,7 +218,15 @@ async function buildDesign(
   const frameW = L.canvasW - L.frameInset * 2;
   const frameH = L.canvasH - L.frameInset * 2;
 
-  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+  const svg = productType === "clock" 
+    ? `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="${L.canvasW}" height="${L.canvasH}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rect width="3000" height="3000" fill="#0d0a07"/>
+  <circle cx="1500" cy="1500" r="1450" fill="none" stroke="#a07830" stroke-width="6" opacity="0.5"/>
+  <image href="${crestDataUri}" x="600" y="80" width="1800" height="1000" preserveAspectRatio="xMidYMid meet"/>${L.qrSize > 0 ? `
+  <image href="${qrDataUri}" x="1110" y="2100" width="280" height="280" preserveAspectRatio="xMidYMid meet"/>` : ''}
+</svg>`
+    : `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${L.canvasW}" height="${L.canvasH}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <rect width="${L.canvasW}" height="${L.canvasH}" fill="#0d0a07"/>
   <rect x="${frameX}" y="${frameY}" width="${frameW}" height="${frameH}" fill="none" stroke="#a07830" stroke-width="${L.frameStrokeWidth}" stroke-opacity="0.5"/>
