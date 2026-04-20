@@ -82,11 +82,13 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   },
   {
     id: "canvas-print",
-    name: "Canvas Print",
+    name: "Satin Canvas Print",
     price: "$89",
     description:
       "Gallery-wrapped canvas of your family crest. Artwork that actually means something.",
     category: "print",
+    live: true,
+    href: "/product-order?type=canvas",
   },
   {
     id: "metal-wall-sign",
@@ -130,11 +132,13 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   },
   {
     id: "coaster-set",
-    name: "Coaster Set (×4)",
+    name: "Heraldic Crest Corkwood Coaster Set",
     price: "$24",
     description:
       "Four coasters, each bearing the family crest. Elegant, personal, and used every day.",
     category: "drinkware",
+    live: true,
+    href: "/product-order?type=coaster",
   },
 
   // ── KEEPSAKE ──
@@ -173,11 +177,23 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   },
   {
     id: "blanket",
-    name: "Blanket / Throw",
+    name: "Osmond Family Crest Velveteen Plush Blanket",
     price: "$59",
     description:
       "A full-size throw with your family crest woven in. Warmth with a story.",
     category: "keepsake",
+    live: true,
+    href: "/product-order?type=blanket",
+  },
+  {
+    id: "charcuterie-board",
+    name: "Engraved Family Crest Charcuterie Board",
+    price: "$79",
+    description:
+      "A laser-engraved hardwood charcuterie board bearing your family crest. A centerpiece for every gathering.",
+    category: "keepsake",
+    live: true,
+    href: "/product-order?type=charcuterie",
   },
 
   // ── BOOKS ──
