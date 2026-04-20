@@ -18,33 +18,6 @@ async function ensureWasm() {
   }
 }
 
-// Font URLs — TTF files served by Google Fonts CDN (cached after first cold start)
-const FONT_URLS = {
-  // Cinzel — Caslon-like display serif, perfect for the gold surname/HOUSE OF
-  cinzelRegular: "https://fonts.gstatic.com/s/cinzel/v26/8vIU7ww63mVu7gtR-kwKxNvkNOjw-tbnTYo.ttf",
-  cinzelBold:    "https://fonts.gstatic.com/s/cinzel/v26/8vIU7ww63mVu7gtR-kwKxNvkNOjw-jHgTYo.ttf",
-  // EB Garamond Italic — for the motto
-  garamondItalic: "https://fonts.gstatic.com/s/ebgaramond/v32/SlGFmQSNjdsmc35JDF1K5GRwUjcdlttVFm-rI7e8QI96.ttf",
-  // DM Sans — body / labels
-  dmSansRegular: "https://fonts.gstatic.com/s/dmsans/v17/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAopxhTg.ttf",
-};
-
-let fontBuffersCache: Uint8Array[] | null = null;
-async function loadFontBuffers(): Promise<Uint8Array[]> {
-  if (fontBuffersCache) return fontBuffersCache;
-  const urls = Object.values(FONT_URLS);
-  const results = await Promise.all(
-    urls.map(async (u) => {
-      const r = await fetch(u);
-      if (!r.ok) throw new Error(`Font fetch failed (${r.status}): ${u}`);
-      return new Uint8Array(await r.arrayBuffer());
-    }),
-  );
-  fontBuffersCache = results;
-  return results;
-}
-
-
 async function toBase64(url: string): Promise<{ b64: string; mime: string }> {
   const res = await fetch(url);
   const mime = res.headers.get("content-type") ?? "image/png";
@@ -62,10 +35,8 @@ async function toBase64(url: string): Promise<{ b64: string; mime: string }> {
 }
 
 async function buildDesign(
-  surname: string,
   crestUrl: string,
   qrUrl: string,
-  motto?: string,
 ): Promise<Uint8Array> {
   await ensureWasm();
 
@@ -73,112 +44,55 @@ async function buildDesign(
   const crestDataUri = `data:${crest.mime};base64,${crest.b64}`;
   const qrDataUri = `data:${qr.mime};base64,${qr.b64}`;
 
-  // Scale factor — design originally tuned for 4500w; everything scales with canvas width
   const k = CANVAS_W / 4500;
   const px = (n: number) => Math.round(n * k);
 
-  // Crest at 70% canvas width, centered horizontally, positioned in upper portion
+  // Crest at 70% canvas width, centered
   const crestW = Math.round(CANVAS_W * 0.7);
   const crestH = crestW;
   const crestX = Math.round((CANVAS_W - crestW) / 2);
-  const crestY = px(500);
+  const crestY = Math.round((CANVAS_H - crestH) / 2);
 
-  // Surname positioned below crest
-  const surnameY = crestY + crestH + px(280);
-
-  // Motto below surname
-  const mottoY = surnameY + px(220);
-
-  // QR bottom right — keep at 300x300 absolute (per spec) regardless of canvas size
+  // QR bottom right — keep at 300x300 absolute
   const qrSize = 300;
   const qrMargin = px(200);
   const qrX = CANVAS_W - qrSize - qrMargin;
-  const qrY = CANVAS_H - qrSize - qrMargin - px(80);
-  const qrLabelY = qrY + qrSize + px(70);
-
-  const mottoSvg = motto
-    ? `<text x="${CANVAS_W / 2}" y="${mottoY}" font-family="EB Garamond" font-style="italic" font-size="${px(120)}" fill="#e8b85c" text-anchor="middle" opacity="0.9">${escapeXml(motto)}</text>`
-    : "";
+  const qrY = CANVAS_H - qrSize - qrMargin;
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${CANVAS_W}" height="${CANVAS_H}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-
-  <!-- Background -->
   <rect width="${CANVAS_W}" height="${CANVAS_H}" fill="#0d0a07"/>
-
-  <!-- Inner gold frame -->
-  <rect x="${px(120)}" y="${px(120)}" width="${CANVAS_W - px(240)}" height="${CANVAS_H - px(240)}"
-        fill="none" stroke="#c9a84c" stroke-width="${Math.max(2, px(3))}" opacity="0.35"/>
-
-  <!-- Crest -->
   <image href="${crestDataUri}" x="${crestX}" y="${crestY}" width="${crestW}" height="${crestH}" preserveAspectRatio="xMidYMid meet"/>
-
-  <!-- HOUSE OF label -->
-  <text x="${CANVAS_W / 2}" y="${surnameY - px(130)}" font-family="Cinzel"
-        font-size="${px(90)}" fill="#a07830" letter-spacing="${px(14)}" text-anchor="middle">HOUSE  OF</text>
-
-  <!-- Surname (large gold display) -->
-  <text x="${CANVAS_W / 2}" y="${surnameY}" font-family="Cinzel"
-        font-size="${px(240)}" font-weight="bold" fill="#e8b85c" text-anchor="middle"
-        letter-spacing="${px(8)}">${escapeXml(surname.toUpperCase())}</text>
-
-  <!-- Motto (italic) -->
-  ${mottoSvg}
-
-  <!-- QR code (bottom right) -->
   <image href="${qrDataUri}" x="${qrX}" y="${qrY}" width="${qrSize}" height="${qrSize}" preserveAspectRatio="xMidYMid meet"/>
-
-  <!-- QR label -->
-  <text x="${qrX + qrSize / 2}" y="${qrLabelY}" font-family="DM Sans"
-        font-size="${px(40)}" fill="#a07830" letter-spacing="${px(4)}" text-anchor="middle">SCAN YOUR LEGACY</text>
-
-  <!-- Ancestra wordmark (bottom left) -->
-  <text x="${qrMargin}" y="${CANVAS_H - qrMargin}" font-family="Cinzel"
-        font-size="${px(42)}" fill="#c9a84c" opacity="0.35" letter-spacing="${px(12)}">A N C E S T R A</text>
-
 </svg>`;
 
-  const fontBuffers = await loadFontBuffers();
   const resvg = new Resvg(svg, {
     fitTo: { mode: "width", value: CANVAS_W },
-    font: {
-      fontBuffers,
-      loadSystemFonts: false,
-      defaultFontFamily: "Cinzel",
-    },
   });
   return resvg.render().asPng();
-}
-
-function escapeXml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
 }
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { surname, crestUrl, qrUrl, motto } = await req.json();
+    const { crestUrl, qrUrl, surname } = await req.json();
 
-    if (!surname || !crestUrl || !qrUrl) {
+    if (!crestUrl || !qrUrl) {
       return new Response(
-        JSON.stringify({ error: "Missing required fields: surname, crestUrl, qrUrl" }),
+        JSON.stringify({ error: "Missing required fields: crestUrl, qrUrl" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const pngBytes = await buildDesign(surname, crestUrl, qrUrl, motto);
+    const pngBytes = await buildDesign(crestUrl, qrUrl);
+    const filename = `${(surname ?? "crest").toLowerCase().replace(/\s+/g, "-")}-print-design.png`;
 
     return new Response(pngBytes, {
       headers: {
         ...corsHeaders,
         "Content-Type": "image/png",
-        "Content-Disposition": `inline; filename="${surname.toLowerCase().replace(/\s+/g, "-")}-print-design.png"`,
+        "Content-Disposition": `inline; filename="${filename}"`,
       },
     });
   } catch (err) {
