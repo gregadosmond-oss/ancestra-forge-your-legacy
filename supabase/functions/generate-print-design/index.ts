@@ -44,19 +44,16 @@ async function buildDesign(
   const crestDataUri = `data:${crest.mime};base64,${crest.b64}`;
   const qrDataUri = `data:${qr.mime};base64,${qr.b64}`;
 
-  const k = CANVAS_W / 4500;
-  const px = (n: number) => Math.round(n * k);
+  // Crest centered in the middle 2400×3000 zone (600px offset from each side)
+  const crestW = 2400;
+  const crestH = 3000;
+  const crestX = 600;
+  const crestY = 600;
 
-  // Crest at 70% canvas width, centered
-  const crestW = Math.round(CANVAS_W * 0.7);
-  const crestH = crestW;
-  const crestX = Math.round((CANVAS_W - crestW) / 2);
-  const crestY = Math.round((CANVAS_H - crestH) / 2);
-
-  // QR bottom right — 300px from right edge, 300px from bottom
+  // QR code at fixed position inside the front face
   const qrSize = 300;
-  const qrX = CANVAS_W - qrSize - 300;
-  const qrY = CANVAS_H - qrSize - 300;
+  const qrX = 2700;
+  const qrY = 3500;
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${CANVAS_W}" height="${CANVAS_H}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
