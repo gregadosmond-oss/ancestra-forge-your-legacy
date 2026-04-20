@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
+import { useCart } from "@/contexts/CartContext";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },
@@ -8,13 +9,19 @@ const reveal = {
   transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
 };
 
-// Placeholder empty state — cart items will be wired in when cart state is added
 export default function Cart() {
-  const isEmpty = true; // TODO: replace with actual cart context
+  const navigate = useNavigate();
+  const { items, removeItem, updateQuantity, totalItems, totalPrice } = useCart();
+  const isEmpty = items.length === 0;
 
   return (
     <div className="relative min-h-screen bg-background">
-      <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
+      <img
+        src="/hero.jpg"
+        alt=""
+        className="pointer-events-none fixed inset-0 h-full w-full object-cover"
+        style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }}
+      />
       {/* Grain overlay */}
       <svg className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-[0.018]">
         <filter id="grain-cart">
@@ -156,7 +163,156 @@ export default function Cart() {
               </div>
             </div>
           </motion.div>
-        ) : null}
+        ) : (
+          /* ── CART ITEMS VIEW ── */
+          <motion.div
+            {...reveal}
+            transition={{ ...reveal.transition, delay: 0.2 }}
+            className="mt-10 flex flex-col gap-4"
+          >
+            {/* Items list */}
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="rounded-[18px]"
+                style={{
+                  background: "#1a1510",
+                  border: "1px solid rgba(212,160,74,0.18)",
+                  padding: 20,
+                }}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  {/* Left: name + unit price */}
+                  <div className="flex-1">
+                    <p className="font-display text-base" style={{ color: "#f0e8da" }}>
+                      {item.name}
+                    </p>
+                    <p className="mt-1 font-display" style={{ color: "#d4a04a" }}>
+                      ${item.price.toFixed(2)}
+                    </p>
+                  </div>
+
+                  {/* Right: quantity controls */}
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        className="flex items-center justify-center rounded-full"
+                        style={{
+                          width: 28,
+                          height: 28,
+                          background: "rgba(212,160,74,0.08)",
+                          border: "1px solid rgba(212,160,74,0.2)",
+                          color: "#d4a04a",
+                          outline: "none",
+                          cursor: "pointer",
+                        }}
+                        aria-label="Decrease quantity"
+                      >
+                        −
+                      </button>
+                      <span className="font-sans text-[14px]" style={{ color: "#d0c4b4", minWidth: 18, textAlign: "center" }}>
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        className="flex items-center justify-center rounded-full"
+                        style={{
+                          width: 28,
+                          height: 28,
+                          background: "rgba(212,160,74,0.08)",
+                          border: "1px solid rgba(212,160,74,0.2)",
+                          color: "#d4a04a",
+                          outline: "none",
+                          cursor: "pointer",
+                        }}
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className="font-sans text-[10px] uppercase tracking-[1.5px] transition-colors duration-200"
+                      style={{ color: "#5a4e3e", background: "transparent", border: "none", cursor: "pointer" }}
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.color = "#c47070")}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.color = "#5a4e3e")}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+
+                {/* Line subtotal */}
+                <p className="mt-3 text-right font-sans text-[13px]" style={{ color: "#a07830" }}>
+                  ${(item.price * item.quantity).toFixed(2)}
+                </p>
+              </div>
+            ))}
+
+            {/* Order summary card */}
+            <div
+              className="mt-4 rounded-[18px]"
+              style={{
+                background: "rgba(26,21,14,0.9)",
+                border: "1px solid rgba(212,160,74,0.15)",
+                padding: 24,
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-sans text-[13px]" style={{ color: "#8a7e6e" }}>
+                  Subtotal ({totalItems} item{totalItems !== 1 ? "s" : ""})
+                </span>
+                <span className="font-sans text-[13px]" style={{ color: "#8a7e6e" }}>
+                  ${totalPrice.toFixed(2)}
+                </span>
+              </div>
+
+              <div className="my-4" style={{ height: 1, background: "rgba(212,160,74,0.1)" }} />
+
+              <div className="flex items-center justify-between">
+                <span className="font-display text-base" style={{ color: "#f0e8da" }}>
+                  Order Total
+                </span>
+                <span className="font-display text-xl" style={{ color: "#d4a04a" }}>
+                  ${totalPrice.toFixed(2)}
+                </span>
+              </div>
+
+              <button
+                onClick={() => navigate("/heirloom-order")}
+                className="mt-6 w-full rounded-pill font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                style={{
+                  padding: 16,
+                  background: "linear-gradient(135deg, #e8943a, #c47828)",
+                  color: "#1a1208",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Proceed to Checkout
+              </button>
+
+              <p
+                className="mt-4 text-center font-sans text-[10px] uppercase tracking-[3px]"
+                style={{ color: "#5a4e3e" }}
+              >
+                Free to start · Secure checkout
+              </p>
+            </div>
+
+            {/* Continue shopping */}
+            <Link
+              to="/shop"
+              className="mt-4 text-center font-sans text-[11px] uppercase tracking-[1.5px] transition-colors duration-200"
+              style={{ color: "#a07830" }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "#d4a04a")}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "#a07830")}
+            >
+              ← Continue Shopping
+            </Link>
+          </motion.div>
+        )}
       </div>
     </div>
   );
