@@ -89,13 +89,19 @@ function getLayout(productType?: string): LayoutParams {
 
   if (productType === "coaster") {
     // 1169 x 1169 coaster canvas, rendered at native size.
-    // Crest takes up 80% of canvas, centered. No QR code.
+    // Crest takes up 80% of canvas, centered. Gold QR centered below.
     const canvasW = COASTER_SIZE;
     const canvasH = COASTER_SIZE;
     const crestW = Math.round(canvasW * 0.8);
     const crestH = Math.round(crestW * (1100 / 1500)); // preserve ratio
     const crestX = Math.round((canvasW - crestW) / 2);
-    const crestY = Math.round((canvasH - crestH) / 2);
+    const qrSize = 180;
+    // Stack crest + gap + QR vertically and center the group
+    const gap = 40;
+    const totalH = crestH + gap + qrSize;
+    const crestY = Math.round((canvasH - totalH) / 2);
+    const qrY = crestY + crestH + gap;
+    const qrX = Math.round((canvasW - qrSize) / 2);
     return {
       canvasW,
       canvasH,
@@ -104,9 +110,9 @@ function getLayout(productType?: string): LayoutParams {
       crestY,
       crestW,
       crestH,
-      qrX: 0,
-      qrY: 0,
-      qrSize: 0,
+      qrX,
+      qrY,
+      qrSize,
       frameInset: 40,
       frameStrokeWidth: 25, // minimum 25px line thickness
     };
