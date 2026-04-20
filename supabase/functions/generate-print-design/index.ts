@@ -89,15 +89,15 @@ async function buildDesign(
   // Motto below surname
   const mottoY = surnameY + px(220);
 
-  // QR bottom right (300x300 in source spec, scaled)
-  const qrSize = px(300);
+  // QR bottom right — keep at 300x300 absolute (per spec) regardless of canvas size
+  const qrSize = 300;
   const qrMargin = px(200);
   const qrX = CANVAS_W - qrSize - qrMargin;
   const qrY = CANVAS_H - qrSize - qrMargin - px(80);
   const qrLabelY = qrY + qrSize + px(70);
 
   const mottoSvg = motto
-    ? `<text x="${CANVAS_W / 2}" y="${mottoY}" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="${px(120)}" fill="#e8b85c" text-anchor="middle" opacity="0.9">${escapeXml(motto)}</text>`
+    ? `<text x="${CANVAS_W / 2}" y="${mottoY}" font-family="EB Garamond" font-style="italic" font-size="${px(120)}" fill="#e8b85c" text-anchor="middle" opacity="0.9">${escapeXml(motto)}</text>`
     : "";
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
@@ -114,11 +114,11 @@ async function buildDesign(
   <image href="${crestDataUri}" x="${crestX}" y="${crestY}" width="${crestW}" height="${crestH}" preserveAspectRatio="xMidYMid meet"/>
 
   <!-- HOUSE OF label -->
-  <text x="${CANVAS_W / 2}" y="${surnameY - px(130)}" font-family="Georgia, 'Times New Roman', serif"
+  <text x="${CANVAS_W / 2}" y="${surnameY - px(130)}" font-family="Cinzel"
         font-size="${px(90)}" fill="#a07830" letter-spacing="${px(14)}" text-anchor="middle">HOUSE  OF</text>
 
   <!-- Surname (large gold display) -->
-  <text x="${CANVAS_W / 2}" y="${surnameY}" font-family="Georgia, 'Times New Roman', serif"
+  <text x="${CANVAS_W / 2}" y="${surnameY}" font-family="Cinzel"
         font-size="${px(240)}" font-weight="bold" fill="#e8b85c" text-anchor="middle"
         letter-spacing="${px(8)}">${escapeXml(surname.toUpperCase())}</text>
 
@@ -129,17 +129,23 @@ async function buildDesign(
   <image href="${qrDataUri}" x="${qrX}" y="${qrY}" width="${qrSize}" height="${qrSize}" preserveAspectRatio="xMidYMid meet"/>
 
   <!-- QR label -->
-  <text x="${qrX + qrSize / 2}" y="${qrLabelY}" font-family="Arial, Helvetica, sans-serif"
+  <text x="${qrX + qrSize / 2}" y="${qrLabelY}" font-family="DM Sans"
         font-size="${px(40)}" fill="#a07830" letter-spacing="${px(4)}" text-anchor="middle">SCAN YOUR LEGACY</text>
 
   <!-- Ancestra wordmark (bottom left) -->
-  <text x="${qrMargin}" y="${CANVAS_H - qrMargin}" font-family="Georgia, serif"
+  <text x="${qrMargin}" y="${CANVAS_H - qrMargin}" font-family="Cinzel"
         font-size="${px(42)}" fill="#c9a84c" opacity="0.35" letter-spacing="${px(12)}">A N C E S T R A</text>
 
 </svg>`;
 
+  const fontBuffers = await loadFontBuffers();
   const resvg = new Resvg(svg, {
     fitTo: { mode: "width", value: CANVAS_W },
+    font: {
+      fontBuffers,
+      loadSystemFonts: false,
+      defaultFontFamily: "Cinzel",
+    },
   });
   return resvg.render().asPng();
 }
