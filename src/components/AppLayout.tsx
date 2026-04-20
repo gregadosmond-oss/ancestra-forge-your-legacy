@@ -14,6 +14,7 @@ const AppLayout = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [showAuthGate, setShowAuthGate] = useState(false);
   const { user, loading } = useAuth();
+  const { totalItems } = useCart();
 
   const isLanding = location.pathname === "/";
   const journeyMatch = location.pathname.match(/^\/journey\/(\d+)$/);
