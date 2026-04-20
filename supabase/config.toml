@@ -1,19 +1,17 @@
 project_id = "fjtkjbnvpobawqqkzrst"
 
-[functions.create-checkout]
-verify_jwt = false
-
-[functions.get-stripe-price]
-verify_jwt = false
-
-[functions.payments-webhook]
-verify_jwt = false
-
-[functions.resend-legacy-email]
-verify_jwt = false
-
-[functions.og-preview]
-verify_jwt = false
-
-[functions.process-email-queue]
-verify_jwt = true
+[functions]
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.create-checkout]
+    verify_jwt = false
+  [functions.get-stripe-price]
+    verify_jwt = false
+  [functions.og-preview]
+    verify_jwt = false
+  [functions.payments-webhook]
+    verify_jwt = false
+  [functions.process-email-queue]
+    verify_jwt = true
+  [functions.resend-legacy-email]
+    verify_jwt = false
