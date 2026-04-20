@@ -72,7 +72,7 @@ async function buildDesign(
   <rect x="${frameX}" y="${frameY}" width="${frameW}" height="${frameH}" fill="none" stroke="#a07830" stroke-width="3" stroke-opacity="0.5"/>
   <image href="${crestDataUri}" x="${crestX}" y="${crestY}" width="${crestW}" height="${crestH}" preserveAspectRatio="xMidYMid meet"/>
   <image href="${qrDataUri}" x="${qrX}" y="${qrY}" width="${qrSize}" height="${qrSize}" preserveAspectRatio="xMidYMid meet"/>
-  <text x="${textX}" y="${textY}" font-family="sans-serif" font-size="52" letter-spacing="4" fill="#a07830" text-anchor="middle">SCAN TO DISCOVER YOUR FULL FAMILY LEGACY</text>
+  
 </svg>`;
 
   const resvg = new Resvg(svg, {
