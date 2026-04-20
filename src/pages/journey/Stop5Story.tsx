@@ -8,6 +8,7 @@ import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
 import { stripMarkdown } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 const Stop5Story = () => {
   const navigate = useNavigate();
