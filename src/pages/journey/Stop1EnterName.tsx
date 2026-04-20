@@ -9,9 +9,7 @@ const Stop1EnterName = () => {
   const navigate = useNavigate();
   const { startJourney, unknownSurname, reset } = useJourney();
   const [surname, setSurname] = useState("");
-  const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [emailError, setEmailError] = useState(false);
 
   // Coming back to Stop 1 after an UNKNOWN bounce: clear provider state
   // so the error message only shows once and subsequent submits start clean.
@@ -28,20 +26,8 @@ const Stop1EnterName = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting || surname.trim().length === 0) return;
-    
-    // Email is required
-    const trimmedEmail = email.trim();
-    if (trimmedEmail.length === 0) {
-      setEmailError(true);
-      return;
-    }
-    setEmailError(false);
-    
     setSubmitting(true);
-    
-    // Store email in localStorage
-    localStorage.setItem("ancestra_email", trimmedEmail);
-    
+
     // Fire in the background and navigate immediately — cinematic reveals
     // on Stops 2-5 absorb the latency.
     void startJourney(surname.trim());
@@ -95,32 +81,9 @@ const Stop1EnterName = () => {
             className="w-full rounded-pill border border-amber-dim/30 bg-input px-8 py-5 text-center font-display text-2xl text-cream-warm placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30 disabled:opacity-60"
           />
 
-          {/* Email capture section */}
-          <div className="w-full flex flex-col items-center gap-3">
-            <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
-              YOUR EMAIL
-            </p>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (emailError) setEmailError(false);
-              }}
-              placeholder="your@email.com"
-              disabled={submitting}
-              className="w-full rounded-pill border border-amber-dim/30 bg-input px-8 py-4 text-center font-sans text-base text-cream-warm placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30 disabled:opacity-60"
-            />
-            {emailError && (
-              <p className="font-sans text-xs text-rose-400">
-                Enter your email to begin
-              </p>
-            )}
-          </div>
-
           <button
             type="submit"
-            disabled={submitting || surname.trim().length === 0 || email.trim().length === 0}
+            disabled={submitting || surname.trim().length === 0}
             className="mt-6 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-60"
             style={{
               background: "linear-gradient(135deg, #e8943a, #c47828)",
