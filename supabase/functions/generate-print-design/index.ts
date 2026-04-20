@@ -220,7 +220,7 @@ async function buildDesign(
 <svg width="${L.canvasW}" height="${L.canvasH}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <rect width="3000" height="3000" fill="#0d0a07"/>
   <circle cx="1500" cy="1500" r="1450" fill="none" stroke="#a07830" stroke-width="6" opacity="0.5"/>
-  <image href="${crestDataUri}" x="600" y="80" width="1800" height="1000" preserveAspectRatio="xMidYMid meet"/>${L.qrSize > 0 ? `
+  <image href="${crestDataUri}" x="300" y="50" width="2400" height="1400" preserveAspectRatio="xMidYMid meet"/>${L.qrSize > 0 ? `
   <image href="${qrDataUri}" x="1350" y="2100" width="300" height="300" preserveAspectRatio="xMidYMid meet"/>` : ''}
 </svg>`
     : `<?xml version="1.0" encoding="UTF-8"?>
