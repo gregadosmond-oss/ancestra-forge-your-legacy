@@ -55,7 +55,7 @@ export function generateCertificate({ facts, story, crestUrl, surname }: Certifi
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>House ${displaySurname} — Legacy Certificate</title>
+  <title>House of ${displaySurname} — Legacy Certificate</title>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital@0;1&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     @page { size: A4 landscape; margin: 0; }
@@ -414,7 +414,7 @@ export function generateCertificate({ facts, story, crestUrl, surname }: Certifi
       <!-- Header -->
       <div>
         <p class="cert-label">Legacy Certificate &nbsp;·&nbsp; An AncestorsQR Original</p>
-        <p class="house-name">House ${displaySurname}</p>
+        <p class="house-name">House of ${displaySurname}</p>
         <p class="house-sub">Est. ${facts.meaning.origin.replace(/[^0-9–—,\s]/g, "").trim() || facts.meaning.origin} &nbsp;✦&nbsp; ${facts.meaning.role}</p>
       </div>
 
@@ -422,7 +422,7 @@ export function generateCertificate({ facts, story, crestUrl, surname }: Certifi
 
       <!-- Declaration -->
       <div class="declaration">
-        Be it known to all who bear witness that <strong>House ${displaySurname}</strong> is hereby formally recognised
+        Be it known to all who bear witness that <strong>House of ${displaySurname}</strong> is hereby formally recognised
         as a family of verified ancestral lineage, heraldic standing, and enduring legacy.
         ${facts.meaning.etymology} ${facts.meaning.historicalContext ? facts.meaning.historicalContext : ""}
       </div>
