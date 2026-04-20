@@ -41,9 +41,20 @@ serve(async (req) => {
       supabase.from("surname_facts").select("payload, story_payload").eq("surname", normalized).maybeSingle(),
     ]);
 
-    const crestUrl = (crestRow as any).data?.image_url ?? null;
-    const facts = (factsRow as any).data?.payload ?? null;
-    const story = (factsRow as any).data?.story_payload ?? null;
+    type FactsPayload = {
+      displaySurname?: string;
+      mottoLatin?: string;
+      mottoEnglish?: string;
+    };
+    type StoryPayload = {
+      teaserChapters?: string[];
+      chapters?: Array<{ title?: string }>;
+      chapterOneTitle?: string;
+    };
+    const crestUrl = (crestRow as { data: { image_url?: string | null } | null }).data?.image_url ?? null;
+    const factsData = (factsRow as { data: { payload?: FactsPayload | null; story_payload?: StoryPayload | null } | null }).data;
+    const facts = factsData?.payload ?? null;
+    const story = factsData?.story_payload ?? null;
 
     console.log("[resend-legacy-email] crestUrl present:", !!crestUrl, "facts present:", !!facts, "story present:", !!story);
 
@@ -56,7 +67,7 @@ serve(async (req) => {
     const teaserChapters: string[] = Array.isArray(story?.teaserChapters)
       ? story.teaserChapters.slice(0, 4)
       : Array.isArray(story?.chapters)
-        ? story.chapters.slice(1, 5).map((c: any) => c?.title ?? "")
+        ? story.chapters.slice(1, 5).map((c: { title?: string }) => c?.title ?? "")
         : [];
     const chapterOneTitle: string =
       story?.chapterOneTitle ??

@@ -150,36 +150,6 @@ function getLayout(productType?: string): LayoutParams {
     };
   }
 
-  if (productType === "clock") {
-    // 3000 x 3000 clock canvas, rendered at native size.
-    // Exact SVG attribute values per spec.
-    const canvasW = CLOCK_SIZE;
-    const canvasH = CLOCK_SIZE;
-    const frameInset = 0; // No rect frame for clock, uses circle border
-    const frameStrokeWidth = 0;
-    const crestX = 600;
-    const crestY = 80;
-    const crestW = 1800;
-    const crestH = 1000;
-    const qrSize = 280;
-    const qrX = 1110;
-    const qrY = 2100;
-    return {
-      canvasW,
-      canvasH,
-      renderW: canvasW,
-      crestX,
-      crestY,
-      crestW,
-      crestH,
-      qrX,
-      qrY,
-      qrSize,
-      frameInset,
-      frameStrokeWidth,
-    };
-  }
-
   // Default: satin print 3600x4200 logical, rendered at 1800x2100.
   return {
     canvasW: DEFAULT_CANVAS_W,
