@@ -1,74 +1,58 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { Resvg, initWasm } from "npm:@resvg/resvg-wasm";
+import { Image } from "https://deno.land/x/imagescript@1.2.17/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const CANVAS_W = 2400;
-const CANVAS_H = 3000;
+const CANVAS_W = 3600;
+const CANVAS_H = 4200;
+const BG_COLOR = 0x0d0a07ff; // #0d0a07 opaque
 
-let wasmReady = false;
-async function ensureWasm() {
-  if (!wasmReady) {
-    const res = await fetch("https://unpkg.com/@resvg/resvg-wasm/index_bg.wasm");
-    await initWasm(res);
-    wasmReady = true;
-  }
-}
+// Crest centered in the middle 2400×3000 zone (600px offset from each side)
+const CREST_W = 2400;
+const CREST_H = 3000;
+const CREST_X = 600;
+const CREST_Y = 600;
 
-async function toBase64(url: string): Promise<{ b64: string; mime: string }> {
+// QR code at fixed position inside the front face
+const QR_SIZE = 300;
+const QR_X = 2700;
+const QR_Y = 3500;
+
+async function fetchImage(url: string): Promise<Image> {
   const res = await fetch(url);
-  const mime = res.headers.get("content-type") ?? "image/png";
-  const buf = await res.arrayBuffer();
-  const bytes = new Uint8Array(buf);
-  let binary = "";
-  const chunk = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunk) {
-    binary += String.fromCharCode.apply(
-      null,
-      bytes.subarray(i, i + chunk) as unknown as number[],
-    );
-  }
-  return { b64: btoa(binary), mime };
+  if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
+  const buf = new Uint8Array(await res.arrayBuffer());
+  return await Image.decode(buf);
 }
 
-async function buildDesign(
-  crestUrl: string,
-  qrUrl: string,
-): Promise<Uint8Array> {
-  await ensureWasm();
+async function buildDesign(crestUrl: string, qrUrl: string): Promise<Uint8Array> {
+  const [crestRaw, qrRaw] = await Promise.all([
+    fetchImage(crestUrl),
+    fetchImage(qrUrl),
+  ]);
 
-  const [crest, qr] = await Promise.all([toBase64(crestUrl), toBase64(qrUrl)]);
-  const crestDataUri = `data:${crest.mime};base64,${crest.b64}`;
-  const qrDataUri = `data:${qr.mime};base64,${qr.b64}`;
+  // Resize while preserving aspect ratio, fit inside the target box
+  const crestRatio = crestRaw.width / crestRaw.height;
+  let cw = CREST_W;
+  let ch = Math.round(CREST_W / crestRatio);
+  if (ch > CREST_H) {
+    ch = CREST_H;
+    cw = Math.round(CREST_H * crestRatio);
+  }
+  const crest = crestRaw.resize(cw, ch);
+  const cx = CREST_X + Math.round((CREST_W - cw) / 2);
+  const cy = CREST_Y + Math.round((CREST_H - ch) / 2);
 
-  const k = CANVAS_W / 4500;
-  const px = (n: number) => Math.round(n * k);
+  const qr = qrRaw.resize(QR_SIZE, QR_SIZE);
 
-  // Crest at 70% canvas width, centered
-  const crestW = Math.round(CANVAS_W * 0.7);
-  const crestH = crestW;
-  const crestX = Math.round((CANVAS_W - crestW) / 2);
-  const crestY = Math.round((CANVAS_H - crestH) / 2);
+  const canvas = new Image(CANVAS_W, CANVAS_H).fill(BG_COLOR);
+  canvas.composite(crest, cx, cy);
+  canvas.composite(qr, QR_X, QR_Y);
 
-  // QR bottom right — 300px from right edge, 300px from bottom
-  const qrSize = 300;
-  const qrX = CANVAS_W - qrSize - 300;
-  const qrY = CANVAS_H - qrSize - 300;
-
-  const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="${CANVAS_W}" height="${CANVAS_H}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <rect width="${CANVAS_W}" height="${CANVAS_H}" fill="#0d0a07"/>
-  <image href="${crestDataUri}" x="${crestX}" y="${crestY}" width="${crestW}" height="${crestH}" preserveAspectRatio="xMidYMid meet"/>
-  <image href="${qrDataUri}" x="${qrX}" y="${qrY}" width="${qrSize}" height="${qrSize}" preserveAspectRatio="xMidYMid meet"/>
-</svg>`;
-
-  const resvg = new Resvg(svg, {
-    fitTo: { mode: "width", value: CANVAS_W },
-  });
-  return resvg.render().asPng();
+  return await canvas.encode();
 }
 
 serve(async (req) => {
