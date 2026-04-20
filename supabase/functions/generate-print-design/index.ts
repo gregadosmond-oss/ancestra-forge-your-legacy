@@ -6,8 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const CANVAS_W = 2250;
-const CANVAS_H = 2700;
+const CANVAS_W = 2400;
+const CANVAS_H = 3000;
 
 let wasmReady = false;
 async function ensureWasm() {
@@ -53,11 +53,10 @@ async function buildDesign(
   const crestX = Math.round((CANVAS_W - crestW) / 2);
   const crestY = Math.round((CANVAS_H - crestH) / 2);
 
-  // QR bottom right — keep at 300x300 absolute
+  // QR bottom right — 300px from right edge, 300px from bottom
   const qrSize = 300;
-  const qrMargin = px(200);
-  const qrX = CANVAS_W - qrSize - qrMargin;
-  const qrY = CANVAS_H - qrSize - qrMargin;
+  const qrX = CANVAS_W - qrSize - 300;
+  const qrY = CANVAS_H - qrSize - 300;
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${CANVAS_W}" height="${CANVAS_H}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
