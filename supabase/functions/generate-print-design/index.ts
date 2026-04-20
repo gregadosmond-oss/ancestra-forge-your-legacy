@@ -47,21 +47,17 @@ async function buildDesign(
   const crestDataUri = `data:${crest.mime};base64,${crest.b64}`;
   const qrDataUri = `data:${qr.mime};base64,${qr.b64}`;
 
-  // Crest: centered horizontally, in upper 70% of canvas
-  // Upper 70% zone height = 2940. Crest fills width 2400, centered.
+  // Crest: centered horizontally, vertically centered in the upper 75% of the canvas
   const crestW = 2400;
   const crestH = 2400;
   const crestX = Math.round((CANVAS_W - crestW) / 2);
-  const crestY = 200; // top margin within upper zone
+  const upperZoneH = Math.round(CANVAS_H * 0.75); // 3150
+  const crestY = Math.round((upperZoneH - crestH) / 2); // centered in upper zone
 
-  // QR: centered horizontally, 80px below crest, 400x400
+  // QR: centered horizontally, 150px from bottom edge
   const qrSize = 400;
   const qrX = Math.round((CANVAS_W - qrSize) / 2);
-  const qrY = crestY + crestH + 80;
-
-  // Text: centered, 60px below QR
-  const textY = qrY + qrSize + 60 + 52; // baseline approx
-  const textX = CANVAS_W / 2;
+  const qrY = CANVAS_H - qrSize - 150;
 
   // Gold border frame: inset 80px
   const frameInset = 80;
