@@ -19,6 +19,13 @@ const Stop5Story = () => {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
 
+  // OTP gate state
+  const [gateEmail, setGateEmail] = useState("");
+  const [gateCode, setGateCode] = useState("");
+  const [gateStage, setGateStage] = useState<"email" | "code">("email");
+  const [gateLoading, setGateLoading] = useState(false);
+  const [gateError, setGateError] = useState<string | null>(null);
+
   const unlockAudio = () => {
     if (!audioCtxRef.current) {
       audioCtxRef.current = new AudioContext();
