@@ -103,8 +103,8 @@ function getLayout(productType?: string): LayoutParams {
     const qrSize = 220;
     // Visible art bottom sits roughly at 75% of crest box height
     const visibleCrestBottom = Math.round(crestH * 0.78);
-    const crestY = 80 - Math.round(crestH * 0.11); // pull box up so visible art starts near top
-    const qrY = crestY + visibleCrestBottom + 10;
+    const crestY = 80 - Math.round(crestH * 0.11) - 60; // shifted up 60px
+    const qrY = crestY + visibleCrestBottom + 10 + 60; // restore gap so QR stays put, adds 60px breathing room
     const qrX = Math.round((canvasW - qrSize) / 2);
     return {
       canvasW,
