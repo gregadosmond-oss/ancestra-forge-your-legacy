@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import AuthGate from "@/components/AuthGate";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useCart } from "@/contexts/CartContext";
 
 const AppLayout = () => {
   const location = useLocation();
