@@ -46,27 +46,31 @@ async function buildDesign(
   const crestDataUri = `data:${crest.mime};base64,${crest.b64}`;
   const qrDataUri = `data:${qr.mime};base64,${qr.b64}`;
 
+  // Scale factor — design originally tuned for 4500w; everything scales with canvas width
+  const k = CANVAS_W / 4500;
+  const px = (n: number) => Math.round(n * k);
+
   // Crest at 70% canvas width, centered horizontally, positioned in upper portion
-  const crestW = Math.round(CANVAS_W * 0.7); // 3150
-  const crestH = crestW; // square
-  const crestX = Math.round((CANVAS_W - crestW) / 2); // 675
-  const crestY = 500;
+  const crestW = Math.round(CANVAS_W * 0.7);
+  const crestH = crestW;
+  const crestX = Math.round((CANVAS_W - crestW) / 2);
+  const crestY = px(500);
 
   // Surname positioned below crest
-  const surnameY = crestY + crestH + 280;
+  const surnameY = crestY + crestH + px(280);
 
   // Motto below surname
-  const mottoY = surnameY + 220;
+  const mottoY = surnameY + px(220);
 
-  // QR bottom right
-  const qrSize = 300;
-  const qrMargin = 200;
+  // QR bottom right (300x300 in source spec, scaled)
+  const qrSize = px(300);
+  const qrMargin = px(200);
   const qrX = CANVAS_W - qrSize - qrMargin;
-  const qrY = CANVAS_H - qrSize - qrMargin - 80;
-  const qrLabelY = qrY + qrSize + 70;
+  const qrY = CANVAS_H - qrSize - qrMargin - px(80);
+  const qrLabelY = qrY + qrSize + px(70);
 
   const mottoSvg = motto
-    ? `<text x="${CANVAS_W / 2}" y="${mottoY}" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="120" fill="#e8b85c" text-anchor="middle" opacity="0.9">${escapeXml(motto)}</text>`
+    ? `<text x="${CANVAS_W / 2}" y="${mottoY}" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="${px(120)}" fill="#e8b85c" text-anchor="middle" opacity="0.9">${escapeXml(motto)}</text>`
     : "";
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
@@ -76,20 +80,20 @@ async function buildDesign(
   <rect width="${CANVAS_W}" height="${CANVAS_H}" fill="#0d0a07"/>
 
   <!-- Inner gold frame -->
-  <rect x="120" y="120" width="${CANVAS_W - 240}" height="${CANVAS_H - 240}"
-        fill="none" stroke="#c9a84c" stroke-width="3" opacity="0.35"/>
+  <rect x="${px(120)}" y="${px(120)}" width="${CANVAS_W - px(240)}" height="${CANVAS_H - px(240)}"
+        fill="none" stroke="#c9a84c" stroke-width="${Math.max(2, px(3))}" opacity="0.35"/>
 
   <!-- Crest -->
   <image href="${crestDataUri}" x="${crestX}" y="${crestY}" width="${crestW}" height="${crestH}" preserveAspectRatio="xMidYMid meet"/>
 
   <!-- HOUSE OF label -->
-  <text x="${CANVAS_W / 2}" y="${surnameY - 130}" font-family="Georgia, 'Times New Roman', serif"
-        font-size="90" fill="#a07830" letter-spacing="14" text-anchor="middle">HOUSE  OF</text>
+  <text x="${CANVAS_W / 2}" y="${surnameY - px(130)}" font-family="Georgia, 'Times New Roman', serif"
+        font-size="${px(90)}" fill="#a07830" letter-spacing="${px(14)}" text-anchor="middle">HOUSE  OF</text>
 
   <!-- Surname (large gold display) -->
   <text x="${CANVAS_W / 2}" y="${surnameY}" font-family="Georgia, 'Times New Roman', serif"
-        font-size="240" font-weight="bold" fill="#e8b85c" text-anchor="middle"
-        letter-spacing="8">${escapeXml(surname.toUpperCase())}</text>
+        font-size="${px(240)}" font-weight="bold" fill="#e8b85c" text-anchor="middle"
+        letter-spacing="${px(8)}">${escapeXml(surname.toUpperCase())}</text>
 
   <!-- Motto (italic) -->
   ${mottoSvg}
@@ -99,11 +103,11 @@ async function buildDesign(
 
   <!-- QR label -->
   <text x="${qrX + qrSize / 2}" y="${qrLabelY}" font-family="Arial, Helvetica, sans-serif"
-        font-size="40" fill="#a07830" letter-spacing="4" text-anchor="middle">SCAN YOUR LEGACY</text>
+        font-size="${px(40)}" fill="#a07830" letter-spacing="${px(4)}" text-anchor="middle">SCAN YOUR LEGACY</text>
 
   <!-- Ancestra wordmark (bottom left) -->
   <text x="${qrMargin}" y="${CANVAS_H - qrMargin}" font-family="Georgia, serif"
-        font-size="42" fill="#c9a84c" opacity="0.35" letter-spacing="12">A N C E S T R A</text>
+        font-size="${px(42)}" fill="#c9a84c" opacity="0.35" letter-spacing="${px(12)}">A N C E S T R A</text>
 
 </svg>`;
 
