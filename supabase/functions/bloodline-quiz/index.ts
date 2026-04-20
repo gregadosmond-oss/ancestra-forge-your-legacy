@@ -30,6 +30,7 @@ Return valid JSON ONLY matching this schema:
 {
   "archetype": "string — exactly one of: Warrior, Builder, Explorer, Healer",
   "description": "string — 2 sentences describing this bloodline type, warm and emotional",
+  "traits": ["string", "string", "string"] — exactly 3 short trait phrases (4-8 words each) that define this bloodline",
   "historicalExample": "string — a famous historical figure who embodies this archetype, with one sentence about them",
   "motto": "string — a one-line ancestral motto for this archetype, powerful and timeless"
 }`;
@@ -73,7 +74,7 @@ Deno.serve(async (req: Request) => {
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 512,
+        max_tokens: 600,
         system: SYSTEM,
         messages: [
           {

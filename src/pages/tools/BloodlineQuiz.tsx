@@ -8,6 +8,7 @@ import { toast } from "sonner";
 type QuizResult = {
   archetype: string;
   description: string;
+  traits: string[];
   historicalExample: string;
   motto: string;
 };
@@ -301,11 +302,35 @@ export default function BloodlineQuiz() {
                   {result.description}
                 </motion.p>
 
+                {/* Traits */}
+                {result.traits?.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                    className="mt-8 flex flex-wrap justify-center gap-3"
+                  >
+                    {result.traits.map((trait, i) => (
+                      <span
+                        key={i}
+                        className="rounded-pill px-5 py-2 text-[11px] uppercase tracking-[2px] font-sans font-semibold"
+                        style={{
+                          background: "rgba(212,160,74,0.08)",
+                          border: "1px solid rgba(212,160,74,0.2)",
+                          color: "#d4a04a",
+                        }}
+                      >
+                        {trait}
+                      </span>
+                    ))}
+                  </motion.div>
+                )}
+
                 {/* Historical Example Card */}
                 <motion.div
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.55, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ delay: 0.65, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   className="mt-8 rounded-xl border border-gold-line bg-card p-6"
                   style={{ borderLeft: "3px solid rgba(232,148,58,0.3)" }}
                 >
@@ -321,7 +346,7 @@ export default function BloodlineQuiz() {
                 <motion.div
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ delay: 0.8, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   className="mt-8"
                 >
                   <p className="mb-2 text-[10px] uppercase tracking-[3px] text-amber-dim font-sans">
