@@ -18,6 +18,33 @@ async function ensureWasm() {
   }
 }
 
+// Font URLs — TTF files served by Google Fonts CDN (cached after first cold start)
+const FONT_URLS = {
+  // Cinzel — Caslon-like display serif, perfect for the gold surname/HOUSE OF
+  cinzelRegular: "https://fonts.gstatic.com/s/cinzel/v23/8vIU7ww63mVu7gtR-kwKxNvkNOjw-tbnTYrvDE5ZdqU.ttf",
+  cinzelBold:    "https://fonts.gstatic.com/s/cinzel/v23/8vIJ7ww63mVu7gtR-kwKxNvkNOjw-tbnSamYHJYNzGw.ttf",
+  // EB Garamond Italic — for the motto
+  garamondItalic: "https://fonts.gstatic.com/s/ebgaramond/v30/SlGUmQSNjdsmc35JDF1K5GRwUjcdlttVFm-rI7e8QL98.ttf",
+  // DM Sans — body / labels
+  dmSansRegular: "https://fonts.gstatic.com/s/dmsans/v15/rP2Hp2ywxg089UriOZSCHBeHFl0.ttf",
+};
+
+let fontBuffersCache: Uint8Array[] | null = null;
+async function loadFontBuffers(): Promise<Uint8Array[]> {
+  if (fontBuffersCache) return fontBuffersCache;
+  const urls = Object.values(FONT_URLS);
+  const results = await Promise.all(
+    urls.map(async (u) => {
+      const r = await fetch(u);
+      if (!r.ok) throw new Error(`Font fetch failed (${r.status}): ${u}`);
+      return new Uint8Array(await r.arrayBuffer());
+    }),
+  );
+  fontBuffersCache = results;
+  return results;
+}
+
+
 async function toBase64(url: string): Promise<{ b64: string; mime: string }> {
   const res = await fetch(url);
   const mime = res.headers.get("content-type") ?? "image/png";
