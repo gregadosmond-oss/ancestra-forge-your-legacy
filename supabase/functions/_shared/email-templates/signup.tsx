@@ -35,9 +35,9 @@ export const SignupEmail = ({ confirmationUrl }: SignupEmailProps) => `<!DOCTYPE
 
 <p style="margin:0 0 32px;font-family:Georgia,serif;font-style:italic;font-size:17px;color:#c4b8a6;">Confirm your email to begin your journey.</p>
 
-<a href="${escapeHtmlAttribute(confirmationUrl)}" style="display:inline-block;background:linear-gradient(135deg,#e8943a,#c47828);color:#1a1208;font-family:Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:60px;">Confirm My Email</a>
+<a href="${escapeHtmlAttribute(confirmationUrl)}" style="display:inline-block;background:#e8943a;color:#1a1208;font-family:Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:60px;margin-top:24px;">Confirm My Email</a>
 
-<p style="margin:32px 0 0;font-family:Georgia,serif;font-style:italic;font-size:12px;color:#8a7e6e;">Every family has a story worth telling.</p>
+<p style="margin:32px 0 0;font-family:Georgia,serif;font-style:italic;font-size:12px;color:#c4b8a6;">Every family has a story worth telling.</p>
 
 <p style="margin:8px 0 0;font-family:Arial,sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#8a7e6e;">ANCESTORSQR — EST. 2026</p>
 
