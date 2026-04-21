@@ -127,6 +127,54 @@ export default function DeepLegacyInterview() {
     setFocused(false);
   };
 
+  const stopListening = () => {
+    try {
+      recognitionRef.current?.stop();
+    } catch {
+      // ignore
+    }
+    setIsListening(false);
+  };
+
+  const startListening = () => {
+    if (!SpeechRecognition) return;
+    if (isListening) {
+      stopListening();
+      return;
+    }
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
+
+      const baseValue = (answers[currentQuestion] || "").trim();
+
+      recognition.onresult = (event: { results: ArrayLike<{ 0: { transcript: string } }> }) => {
+        let transcript = "";
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        const next = baseValue ? `${baseValue} ${transcript}`.trim() : transcript;
+        setAnswers((prev) => ({ ...prev, [currentQuestion]: next }));
+      };
+      recognition.onend = () => setIsListening(false);
+      recognition.onerror = () => setIsListening(false);
+
+      recognitionRef.current = recognition;
+      recognition.start();
+      setIsListening(true);
+    } catch {
+      setIsListening(false);
+    }
+  };
+
+  // Stop listening when navigating between questions
+  useEffect(() => {
+    stopListening();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentQuestion]);
+
   const progress = ((currentQuestion + 1) / QUESTIONS.length) * 100;
 
   const inputBaseStyle: React.CSSProperties = {
