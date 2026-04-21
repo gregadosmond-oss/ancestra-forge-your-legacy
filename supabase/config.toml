@@ -19,3 +19,5 @@ project_id = "fjtkjbnvpobawqqkzrst"
     verify_jwt = false
   [functions.create-printful-order]
     verify_jwt = false
+  [functions.deep-legacy-research]
+    verify_jwt = false
