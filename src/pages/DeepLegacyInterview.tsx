@@ -1,5 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const SpeechRecognition: any =
+  typeof window !== "undefined"
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    : null;
 
 const BG = "#0d0a07";
 const BG_INPUT = "#161210";
@@ -62,6 +69,10 @@ export default function DeepLegacyInterview() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fadeKey, setFadeKey] = useState(0);
   const [focused, setFocused] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+  const speechSupported = !!SpeechRecognition;
 
   // Pre-fill surname from localStorage
   useEffect(() => {
@@ -69,6 +80,17 @@ export default function DeepLegacyInterview() {
     if (stored) {
       setAnswers((prev) => ({ ...prev, 0: stored }));
     }
+  }, []);
+
+  // Stop listening when question changes or unmounts
+  useEffect(() => {
+    return () => {
+      try {
+        recognitionRef.current?.stop();
+      } catch {
+        // ignore
+      }
+    };
   }, []);
 
   const q = QUESTIONS[currentQuestion];
@@ -104,6 +126,54 @@ export default function DeepLegacyInterview() {
     setFadeKey((k) => k + 1);
     setFocused(false);
   };
+
+  const stopListening = () => {
+    try {
+      recognitionRef.current?.stop();
+    } catch {
+      // ignore
+    }
+    setIsListening(false);
+  };
+
+  const startListening = () => {
+    if (!SpeechRecognition) return;
+    if (isListening) {
+      stopListening();
+      return;
+    }
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
+
+      const baseValue = (answers[currentQuestion] || "").trim();
+
+      recognition.onresult = (event: { results: ArrayLike<{ 0: { transcript: string } }> }) => {
+        let transcript = "";
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        const next = baseValue ? `${baseValue} ${transcript}`.trim() : transcript;
+        setAnswers((prev) => ({ ...prev, [currentQuestion]: next }));
+      };
+      recognition.onend = () => setIsListening(false);
+      recognition.onerror = () => setIsListening(false);
+
+      recognitionRef.current = recognition;
+      recognition.start();
+      setIsListening(true);
+    } catch {
+      setIsListening(false);
+    }
+  };
+
+  // Stop listening when navigating between questions
+  useEffect(() => {
+    stopListening();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentQuestion]);
 
   const progress = ((currentQuestion + 1) / QUESTIONS.length) * 100;
 
@@ -182,30 +252,90 @@ export default function DeepLegacyInterview() {
             {q.question}
           </h2>
 
-          {q.type === "text" ? (
-            <input
-              type="text"
-              autoFocus
-              value={value}
-              onChange={(e) => updateValue(e.target.value)}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") goNext();
+          <div style={{ position: "relative" }}>
+            {q.type === "text" ? (
+              <input
+                type="text"
+                autoFocus
+                value={value}
+                onChange={(e) => updateValue(e.target.value)}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") goNext();
+                }}
+                style={{ ...inputBaseStyle, paddingRight: speechSupported ? 56 : 20 }}
+                placeholder="Type your answer..."
+              />
+            ) : (
+              <textarea
+                autoFocus
+                value={value}
+                onChange={(e) => updateValue(e.target.value)}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                style={{
+                  ...inputBaseStyle,
+                  minHeight: 120,
+                  paddingRight: speechSupported ? 56 : 20,
+                }}
+                placeholder="Share what you remember..."
+              />
+            )}
+
+            {speechSupported && (
+              <button
+                type="button"
+                onClick={startListening}
+                aria-label={isListening ? "Stop voice input" : "Start voice input"}
+                style={{
+                  position: "absolute",
+                  right: 12,
+                  ...(q.type === "textarea" ? { top: 12 } : { bottom: 12 }),
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  border: "none",
+                  background: "transparent",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                  animation: isListening ? "micPulse 1.4s ease-out infinite" : "none",
+                }}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill={isListening ? AMBER : "none"}
+                  stroke={isListening ? AMBER : TEXT_DIM}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="9" y="2" width="6" height="12" rx="3" />
+                  <path d="M5 10v2a7 7 0 0 0 14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="22" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {isListening && (
+            <p
+              style={{
+                ...sansFont,
+                fontStyle: "italic",
+                color: TEXT_DIM,
+                fontSize: 13,
+                marginTop: 12,
+                animation: "listenFade 1.6s ease-in-out infinite",
               }}
-              style={inputBaseStyle}
-              placeholder="Type your answer..."
-            />
-          ) : (
-            <textarea
-              autoFocus
-              value={value}
-              onChange={(e) => updateValue(e.target.value)}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-              style={{ ...inputBaseStyle, minHeight: 120 }}
-              placeholder="Share what you remember..."
-            />
+            >
+              Listening... speak now
+            </p>
           )}
         </div>
 
@@ -267,6 +397,15 @@ export default function DeepLegacyInterview() {
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes micPulse {
+          0% { box-shadow: 0 0 0 0 rgba(212,160,74,0.45); }
+          70% { box-shadow: 0 0 0 12px rgba(212,160,74,0); }
+          100% { box-shadow: 0 0 0 0 rgba(212,160,74,0); }
+        }
+        @keyframes listenFade {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 1; }
         }
       `}</style>
     </div>
