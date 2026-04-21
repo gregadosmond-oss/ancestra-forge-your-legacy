@@ -39,6 +39,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
 import Terms from "./pages/Terms.tsx";
 import DeepLegacy from "./pages/DeepLegacy.tsx";
 import DeepLegacyInterview from "./pages/DeepLegacyInterview.tsx";
+import DeepLegacyProcessing from "./pages/DeepLegacyProcessing.tsx";
 
 const queryClient = new QueryClient();
 
@@ -89,6 +90,7 @@ const App = () => (
               <Route path="/terms" element={<Terms />} />
               <Route path="/deep-legacy" element={<DeepLegacy />} />
               <Route path="/deep-legacy/interview" element={<DeepLegacyInterview />} />
+              <Route path="/deep-legacy/processing" element={<DeepLegacyProcessing />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Route>
