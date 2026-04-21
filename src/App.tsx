@@ -41,6 +41,7 @@ import DeepLegacy from "./pages/DeepLegacy.tsx";
 import DeepLegacyInterview from "./pages/DeepLegacyInterview.tsx";
 import DeepLegacyProcessing from "./pages/DeepLegacyProcessing.tsx";
 import DeepLegacyResults from "./pages/DeepLegacyResults.tsx";
+import DeepLegacyCheckout from "./pages/DeepLegacyCheckout.tsx";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +94,7 @@ const App = () => (
               <Route path="/deep-legacy/interview" element={<DeepLegacyInterview />} />
               <Route path="/deep-legacy/processing" element={<DeepLegacyProcessing />} />
               <Route path="/deep-legacy/results" element={<DeepLegacyResults />} />
+              <Route path="/deep-legacy/checkout" element={<DeepLegacyCheckout />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Route>
