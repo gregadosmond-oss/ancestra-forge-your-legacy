@@ -152,17 +152,16 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
 // ─── Printful order trigger ──────────────────────────────────────────────────
 
 // Maps productType (set in Stripe checkout metadata) → Printful sync_variant_id.
-// Update these IDs to match the variants configured in your Printful store.
-const PRINTFUL_VARIANT_IDS: Record<string, number> = {
-  heirloom: 0,        // 11oz mug — replace with real Printful sync_variant_id
-  mug: 0,             // 11oz mug alias
-  "canvas-8x10": 0,
-  "canvas-12x16": 0,
-  "canvas-18x24": 0,
-  "canvas-24x36": 0,
-  "blanket-30x40": 0,
-  "blanket-50x60": 0,
-  "blanket-60x80": 0,
+const PRINTFUL_VARIANT_MAP: Record<string, number> = {
+  "heirloom": 5275365052,
+  "mug":      5275365052,
+  "canvas-8x10":   5275406007,
+  "canvas-12x16":  5275406008,
+  "canvas-18x24":  5275406009,
+  "canvas-24x36":  5275406010,
+  "blanket-30x40": 5275420030,
+  "blanket-50x60": 5275420031,
+  "blanket-60x80": 5275420029,
 };
 
 async function triggerPrintfulOrder({ productType, surname, shippingAddress, buyerEmail }: {
