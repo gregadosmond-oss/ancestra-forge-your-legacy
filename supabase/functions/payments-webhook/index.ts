@@ -66,11 +66,16 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
 
   console.log("Parsed metadata — surname:", surname, "user_id:", userId, "email:", buyerEmail, "productType:", productType);
 
-  // Heirloom physical order — ensure crest exists, then trigger Printify fulfillment
-  if (productType === 'heirloom' && surname && shippingAddressRaw) {
-    console.log("Heirloom order detected — ensuring crest exists for:", surname);
+  // Printful physical order — ensure crest exists, then trigger Printful fulfillment
+  if (productType && PRINTFUL_VARIANT_IDS[productType] && surname && shippingAddressRaw) {
+    console.log("Printful order detected — productType:", productType, "surname:", surname);
     await triggerCrestGeneration(surname);
-    await triggerHeirloomOrder({ surname, shippingAddress: JSON.parse(shippingAddressRaw), buyerEmail });
+    await triggerPrintfulOrder({
+      productType,
+      surname,
+      shippingAddress: JSON.parse(shippingAddressRaw),
+      buyerEmail,
+    });
   }
 
   if (!userId) {
@@ -114,8 +119,8 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
   }
 
   // Trigger real crest generation server-side — non-fatal if it fails
-  // Skip for heirloom orders (already awaited above)
-  if (surname && userId && productType !== 'heirloom') {
+  // Skip for Printful physical orders (already awaited above)
+  if (surname && userId && !(productType && PRINTFUL_VARIANT_IDS[productType])) {
     void triggerCrestGeneration(surname);
   }
 
@@ -144,9 +149,24 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
   }
 }
 
-// ─── Heirloom order trigger ──────────────────────────────────────────────────
+// ─── Printful order trigger ──────────────────────────────────────────────────
 
-async function triggerHeirloomOrder({ surname, shippingAddress, buyerEmail }: {
+// Maps productType (set in Stripe checkout metadata) → Printful sync_variant_id.
+// Update these IDs to match the variants configured in your Printful store.
+const PRINTFUL_VARIANT_IDS: Record<string, number> = {
+  heirloom: 0,        // 11oz mug — replace with real Printful sync_variant_id
+  mug: 0,             // 11oz mug alias
+  "canvas-8x10": 0,
+  "canvas-12x16": 0,
+  "canvas-18x24": 0,
+  "canvas-24x36": 0,
+  "blanket-30x40": 0,
+  "blanket-50x60": 0,
+  "blanket-60x80": 0,
+};
+
+async function triggerPrintfulOrder({ productType, surname, shippingAddress, buyerEmail }: {
+  productType: string;
   surname: string;
   shippingAddress: Record<string, string>;
   buyerEmail?: string;
@@ -154,6 +174,12 @@ async function triggerHeirloomOrder({ surname, shippingAddress, buyerEmail }: {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supabaseUrl || !serviceKey) return;
+
+  const variantId = PRINTFUL_VARIANT_IDS[productType];
+  if (!variantId) {
+    console.warn("triggerPrintfulOrder: no Printful variant mapped for productType:", productType);
+    return;
+  }
 
   const normalized = surname.trim().toLowerCase();
   const legacySlug = normalized.replace(/\s+/g, "-");
@@ -168,24 +194,31 @@ async function triggerHeirloomOrder({ surname, shippingAddress, buyerEmail }: {
 
   const crestUrl = crestRow?.image_url ?? null;
   if (!crestUrl) {
-    console.warn("triggerHeirloomOrder: no crest found for", normalized);
+    console.warn("triggerPrintfulOrder: no crest found for", normalized);
     return;
   }
 
   try {
-    const res = await fetch(`${supabaseUrl}/functions/v1/create-heirloom-order`, {
+    const res = await fetch(`${supabaseUrl}/functions/v1/create-printful-order`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
-      body: JSON.stringify({ surname, crestUrl, legacyUrl, shippingAddress, customerEmail: buyerEmail }),
+      body: JSON.stringify({
+        variantId,
+        crestUrl,
+        shippingAddress,
+        customerEmail: buyerEmail,
+        legacyUrl,
+        surname,
+      }),
     });
     const body = await res.json();
     if (body.success) {
-      console.log("Heirloom order created:", body.orderId);
+      console.log("Printful order created:", body.orderId, "productType:", productType);
     } else {
-      console.error("Heirloom order failed:", body.error);
+      console.error("Printful order failed:", body.error);
     }
   } catch (err) {
-    console.error("triggerHeirloomOrder threw:", (err as Error).message);
+    console.error("triggerPrintfulOrder threw:", (err as Error).message);
   }
 }
 
