@@ -45,6 +45,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "drinkware",
     live: true,
     href: "/product-order?type=heirloom",
+    image: "https://files.cdn.printful.com/files/efe/efe390879b96bcdb68cf3564c0afe4e3_preview.png",
   },
 
   // Canvas
@@ -57,6 +58,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "print",
     live: true,
     href: "/product-order?type=canvas-8x10",
+    image: "https://files.cdn.printful.com/files/520/5209f95941909f05f7eca8ae285c4c9f_preview.png",
   },
 
   {
@@ -68,6 +70,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "print",
     live: true,
     href: "/product-order?type=canvas-12x16",
+    image: "https://files.cdn.printful.com/files/520/5209f95941909f05f7eca8ae285c4c9f_preview.png",
   },
 
   {
@@ -80,6 +83,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "print",
     live: true,
     href: "/product-order?type=canvas-18x24",
+    image: "https://files.cdn.printful.com/files/520/5209f95941909f05f7eca8ae285c4c9f_preview.png",
   },
 
   {
@@ -91,6 +95,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "print",
     live: true,
     href: "/product-order?type=canvas-24x36",
+    image: "https://files.cdn.printful.com/files/520/5209f95941909f05f7eca8ae285c4c9f_preview.png",
   },
 
   // Blanket
@@ -103,6 +108,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "keepsake",
     live: true,
     href: "/product-order?type=blanket-30x40",
+    image: "https://files.cdn.printful.com/files/3da/3daf86b8a3807aac2c064f01fc9c36d1_preview.png",
   },
 
   {
@@ -115,6 +121,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "keepsake",
     live: true,
     href: "/product-order?type=blanket-50x60",
+    image: "https://files.cdn.printful.com/files/3da/3daf86b8a3807aac2c064f01fc9c36d1_preview.png",
   },
 
   {
@@ -126,6 +133,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "keepsake",
     live: true,
     href: "/product-order?type=blanket-60x80",
+    image: "https://files.cdn.printful.com/files/3da/3daf86b8a3807aac2c064f01fc9c36d1_preview.png",
   },
 
   // Coaster
@@ -138,6 +146,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "drinkware",
     live: true,
     href: "/product-order?type=coaster",
+    image: "https://files.cdn.printful.com/files/90e/90e7c448edbc138f5529418d472b05cb_preview.png",
   },
 ];
 
