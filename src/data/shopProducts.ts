@@ -8,6 +8,7 @@ export type ShopProduct = {
   category: "digital" | "print" | "drinkware" | "keepsake" | "book";
   live?: boolean;
   href?: string;
+  image?: string;
 };
 
 export type ShopBundle = {
