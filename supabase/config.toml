@@ -17,3 +17,5 @@ project_id = "fjtkjbnvpobawqqkzrst"
     verify_jwt = false
   [functions.create-product-order]
     verify_jwt = false
+  [functions.create-printful-order]
+    verify_jwt = false
