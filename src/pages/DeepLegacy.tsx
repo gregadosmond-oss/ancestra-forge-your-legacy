@@ -1,4 +1,5 @@
 import { Mic, Search, BookOpen, Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const BG = "#0d0a07";
 const BG_CARD = "#1a1510";
