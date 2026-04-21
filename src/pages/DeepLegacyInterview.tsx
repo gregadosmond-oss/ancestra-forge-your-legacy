@@ -252,30 +252,90 @@ export default function DeepLegacyInterview() {
             {q.question}
           </h2>
 
-          {q.type === "text" ? (
-            <input
-              type="text"
-              autoFocus
-              value={value}
-              onChange={(e) => updateValue(e.target.value)}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") goNext();
+          <div style={{ position: "relative" }}>
+            {q.type === "text" ? (
+              <input
+                type="text"
+                autoFocus
+                value={value}
+                onChange={(e) => updateValue(e.target.value)}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") goNext();
+                }}
+                style={{ ...inputBaseStyle, paddingRight: speechSupported ? 56 : 20 }}
+                placeholder="Type your answer..."
+              />
+            ) : (
+              <textarea
+                autoFocus
+                value={value}
+                onChange={(e) => updateValue(e.target.value)}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                style={{
+                  ...inputBaseStyle,
+                  minHeight: 120,
+                  paddingRight: speechSupported ? 56 : 20,
+                }}
+                placeholder="Share what you remember..."
+              />
+            )}
+
+            {speechSupported && (
+              <button
+                type="button"
+                onClick={startListening}
+                aria-label={isListening ? "Stop voice input" : "Start voice input"}
+                style={{
+                  position: "absolute",
+                  right: 12,
+                  ...(q.type === "textarea" ? { top: 12 } : { bottom: 12 }),
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  border: "none",
+                  background: "transparent",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                  animation: isListening ? "micPulse 1.4s ease-out infinite" : "none",
+                }}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill={isListening ? AMBER : "none"}
+                  stroke={isListening ? AMBER : TEXT_DIM}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="9" y="2" width="6" height="12" rx="3" />
+                  <path d="M5 10v2a7 7 0 0 0 14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="22" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {isListening && (
+            <p
+              style={{
+                ...sansFont,
+                fontStyle: "italic",
+                color: TEXT_DIM,
+                fontSize: 13,
+                marginTop: 12,
+                animation: "listenFade 1.6s ease-in-out infinite",
               }}
-              style={inputBaseStyle}
-              placeholder="Type your answer..."
-            />
-          ) : (
-            <textarea
-              autoFocus
-              value={value}
-              onChange={(e) => updateValue(e.target.value)}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-              style={{ ...inputBaseStyle, minHeight: 120 }}
-              placeholder="Share what you remember..."
-            />
+            >
+              Listening... speak now
+            </p>
           )}
         </div>
 
