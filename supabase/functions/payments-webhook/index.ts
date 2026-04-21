@@ -67,7 +67,7 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
   console.log("Parsed metadata — surname:", surname, "user_id:", userId, "email:", buyerEmail, "productType:", productType);
 
   // Printful physical order — ensure crest exists, then trigger Printful fulfillment
-  if (productType && PRINTFUL_VARIANT_IDS[productType] && surname && shippingAddressRaw) {
+  if (productType && PRINTFUL_VARIANT_MAP[productType] && surname && shippingAddressRaw) {
     console.log("Printful order detected — productType:", productType, "surname:", surname);
     await triggerCrestGeneration(surname);
     await triggerPrintfulOrder({
