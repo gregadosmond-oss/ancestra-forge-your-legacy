@@ -120,7 +120,7 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
 
   // Trigger real crest generation server-side — non-fatal if it fails
   // Skip for Printful physical orders (already awaited above)
-  if (surname && userId && !(productType && PRINTFUL_VARIANT_IDS[productType])) {
+  if (surname && userId && !(productType && PRINTFUL_VARIANT_MAP[productType])) {
     void triggerCrestGeneration(surname);
   }
 
