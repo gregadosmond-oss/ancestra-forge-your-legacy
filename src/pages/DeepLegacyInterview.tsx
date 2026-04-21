@@ -1,5 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const SpeechRecognition: any =
+  typeof window !== "undefined"
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    : null;
 
 const BG = "#0d0a07";
 const BG_INPUT = "#161210";
