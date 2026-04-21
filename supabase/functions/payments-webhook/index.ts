@@ -162,6 +162,7 @@ const PRINTFUL_VARIANT_MAP: Record<string, number> = {
   "blanket-30x40": 5275420030,
   "blanket-50x60": 5275420031,
   "blanket-60x80": 5275420029,
+  "coaster":       5275439553,
 };
 
 async function triggerPrintfulOrder({ productType, surname, shippingAddress, buyerEmail }: {
