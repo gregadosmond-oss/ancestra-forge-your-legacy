@@ -99,6 +99,7 @@ function Cell({ value, highlight }: { value: string; highlight?: boolean }) {
 }
 
 export default function DeepLegacy() {
+  const navigate = useNavigate();
   const rows = [
     ["Surname meaning", "✓", "✓", "✓"],
     ["Family crest", "preview", "full", "full"],
@@ -140,6 +141,7 @@ export default function DeepLegacy() {
           A guided AI interview + deep historical research reveals 5 generations of your bloodline in cinematic detail.
         </p>
         <button
+          onClick={() => navigate('/deep-legacy/interview')}
           style={ctaButtonStyle}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = "translateY(-2px)";
@@ -299,6 +301,7 @@ export default function DeepLegacy() {
           Ready to Uncover Your Full Legacy?
         </h2>
         <button
+          onClick={() => navigate('/deep-legacy/interview')}
           style={ctaButtonStyle}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = "translateY(-2px)";
