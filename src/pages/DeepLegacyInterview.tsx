@@ -93,9 +93,11 @@ export default function DeepLegacyInterview() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
   const baseValueRef = useRef<string>("");
   const speechSupported = !!SpeechRecognition;
-  const ttsSupported = !!synth;
+  const ttsSupported = true; // ElevenLabs via edge function (with browser fallback)
 
   const q = QUESTIONS[currentQuestion];
   const value = answers[currentQuestion] || "";
