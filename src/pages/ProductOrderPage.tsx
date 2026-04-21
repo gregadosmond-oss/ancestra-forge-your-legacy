@@ -1,47 +1,31 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import StripeEmbeddedCheckout from "@/components/StripeEmbeddedCheckout";
 import AuthGate from "@/components/AuthGate";
 import { usePurchase } from "@/hooks/usePurchase";
 
-type ProductType = "canvas" | "coaster" | "blanket" | "charcuterie";
 type Step = "details" | "payment";
 
-const PRODUCT_CONFIG: Record<ProductType, { label: string; sizes: string[]; defaultSize: string }> = {
-  canvas: {
-    label: "Satin Canvas Print",
-    sizes: ['8" × 10"', '11" × 14"', '18" × 24"', '24" × 36"'],
-    defaultSize: '18" × 24"',
-  },
-  coaster: {
-    label: "Corkwood Coaster Set",
-    sizes: ['3.75" × 3.75"'],
-    defaultSize: '3.75" × 3.75"',
-  },
-  blanket: {
-    label: "Velveteen Plush Blanket",
-    sizes: ['30" × 40"', '50" × 60"', '60" × 80"'],
-    defaultSize: '50" × 60"',
-  },
-  charcuterie: {
-    label: "Engraved Charcuterie Board",
-    sizes: ['12.5" × 7.75"', '13.25" × 7"', '13.75" × 9.75"', '8.25" × 12.25"'],
-    defaultSize: '13.75" × 9.75"',
-  },
-};
+interface ProductConfig {
+  name: string;
+  price: string;
+  priceId: string;
+  emoji: string;
+  desc: string;
+}
 
-const VARIANT_IDS: Record<ProductType, Record<string, number>> = {
-  canvas: { '8" × 10"': 77257, '11" × 14"': 77253, '18" × 24"': 77255, '24" × 36"': 77251 },
-  coaster: { '3.75" × 3.75"': 72872 },
-  blanket: { '30" × 40"': 68322, '50" × 60"': 68323, '60" × 80"': 68324 },
-  charcuterie: {
-    '12.5" × 7.75"': 123099,
-    '13.25" × 7"': 123100,
-    '13.75" × 9.75"': 123101,
-    '8.25" × 12.25"': 123102,
-  },
+const PRODUCT_CONFIG: Record<string, ProductConfig> = {
+  "heirloom":      { name: 'Family Crest Mug',           price: '$39.99', priceId: 'heirloom_mug_once',       emoji: '☕', desc: 'Custom ceramic mug with your family crest, name & QR code — ships worldwide. Includes the full digital Legacy Pack.' },
+  "canvas-8x10":   { name: 'Canvas Print 8"×10"',         price: '$34.99', priceId: 'heirloom_canvas_8x10',    emoji: '🖼️', desc: 'Gallery-wrapped canvas of your family crest. Artwork that actually means something. Includes Legacy Pack.' },
+  "canvas-12x16":  { name: 'Canvas Print 12"×16"',        price: '$42.99', priceId: 'heirloom_canvas_12x16',   emoji: '🖼️', desc: 'Gallery-wrapped canvas of your family crest. Includes Legacy Pack.' },
+  "canvas-18x24":  { name: 'Canvas Print 18"×24"',        price: '$59.99', priceId: 'heirloom_canvas_18x24',   emoji: '🖼️', desc: 'A bold statement piece for the living room or study. Includes Legacy Pack.' },
+  "canvas-24x36":  { name: 'Canvas Print 24"×36"',        price: '$89.99', priceId: 'heirloom_canvas_24x36',   emoji: '🖼️', desc: 'Large-format gallery canvas — the centrepiece of any room. Includes Legacy Pack.' },
+  "blanket-30x40": { name: 'Throw Blanket 30"×40"',       price: '$39.99', priceId: 'heirloom_blanket_30x40',  emoji: '🛋️', desc: 'Your family crest on a cozy throw blanket. Warmth with a story. Includes Legacy Pack.' },
+  "blanket-50x60": { name: 'Throw Blanket 50"×60"',       price: '$49.99', priceId: 'heirloom_blanket_50x60',  emoji: '🛋️', desc: 'Full-size throw with your family crest — the most popular size. Includes Legacy Pack.' },
+  "blanket-60x80": { name: 'Throw Blanket 60"×80"',       price: '$59.99', priceId: 'heirloom_blanket_60x80',  emoji: '🛋️', desc: 'Our largest throw — built to be passed down for generations. Includes Legacy Pack.' },
+  "coaster":       { name: 'Cork-Back Coaster',            price: '$34.99', priceId: 'heirloom_coaster',        emoji: '🪵', desc: 'Your family crest on a high-quality cork-back coaster. Elegant, personal, used every day. Includes Legacy Pack.' },
 };
 
 const COUNTRIES = ["US", "CA", "GB", "AU", "NZ", "IE", "DE", "FR", "NL", "SE", "NO", "DK"];
@@ -70,22 +54,15 @@ const empty: ShippingAddress = {
 };
 
 export default function ProductOrderPage() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const rawType = searchParams.get("type") ?? "canvas";
-  const productType = (Object.keys(PRODUCT_CONFIG).includes(rawType) ? rawType : "canvas") as ProductType;
-  const config = PRODUCT_CONFIG[productType];
+  const type = searchParams.get("type") ?? "heirloom";
+  const config = PRODUCT_CONFIG[type];
 
   const { user } = usePurchase();
   const [step, setStep] = useState<Step>("details");
+  const [surname, setSurname] = useState("");
   const [address, setAddress] = useState<ShippingAddress>(empty);
-  const [selectedSize, setSelectedSize] = useState<string>(config.defaultSize);
   const [showAuth, setShowAuth] = useState(false);
-
-  const variantId = useMemo(
-    () => VARIANT_IDS[productType][selectedSize] ?? VARIANT_IDS[productType][config.defaultSize],
-    [productType, selectedSize, config.defaultSize],
-  );
 
   const set = (k: keyof ShippingAddress) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setAddress((a) => ({ ...a, [k]: e.target.value }));
@@ -99,6 +76,27 @@ export default function ProductOrderPage() {
   const inputCls = "w-full rounded-[12px] border border-amber-dim/25 bg-input px-4 py-3 font-sans text-sm text-cream-warm placeholder:text-text-dim focus:border-amber focus:outline-none";
   const labelCls = "block mb-1 font-sans text-[10px] uppercase tracking-[2px] text-amber-dim";
 
+  // Product not found
+  if (!config) {
+    return (
+      <div className="relative flex min-h-screen flex-col items-center justify-center px-6" style={{ background: "#0d0a07" }}>
+        <div className="text-center">
+          <h1 className="font-display text-3xl" style={{ color: "#f0e8da" }}>Product not found</h1>
+          <p className="mt-3 font-serif italic" style={{ color: "#c4b8a6" }}>
+            We couldn't find that heirloom in our shop.
+          </p>
+          <Link
+            to="/shop"
+            className="mt-8 inline-block rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+            style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
+          >
+            Back to Shop
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative flex min-h-screen flex-col items-center" style={{ background: "#0d0a07" }}>
       <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover"
@@ -107,20 +105,35 @@ export default function ProductOrderPage() {
       <div className="relative z-10 w-full max-w-xl px-6 py-20">
         <SectionLabel>HEIRLOOM ORDER</SectionLabel>
 
-        <motion.h1
+        {/* Product card */}
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mt-6 text-center font-display text-3xl"
-          style={{ color: "#f0e8da" }}
+          className="mt-6 rounded-[22px] border p-7 text-center"
+          style={{
+            background: "rgba(26,21,16,0.85)",
+            borderColor: "rgba(212,160,74,0.2)",
+            backdropFilter: "blur(8px)",
+          }}
         >
-          {config.label}
-        </motion.h1>
+          <div className="text-5xl">{config.emoji}</div>
+          <h1 className="mt-4 font-display text-3xl" style={{ color: "#f0e8da" }}>
+            {config.name}
+          </h1>
+          <p className="mt-2 font-display text-2xl" style={{ color: "#e8b85c" }}>
+            {config.price}
+          </p>
+          <p className="mt-4 font-serif italic text-sm leading-relaxed" style={{ color: "#c4b8a6" }}>
+            {config.desc}
+          </p>
+        </motion.div>
+
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="mt-2 text-center font-serif italic"
+          className="mt-8 text-center font-serif italic"
           style={{ color: "#c4b8a6" }}
         >
           Where should we send it?
@@ -132,8 +145,19 @@ export default function ProductOrderPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             onSubmit={handleContinue}
-            className="mt-10 space-y-5"
+            className="mt-8 space-y-5"
           >
+            <div>
+              <label className={labelCls}>Family Surname</label>
+              <input
+                value={surname}
+                onChange={(e) => setSurname(e.target.value)}
+                placeholder="Murphy"
+                required
+                className={inputCls}
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>First Name</label>
@@ -195,7 +219,7 @@ export default function ProductOrderPage() {
             </button>
 
             <p className="text-center font-sans text-[10px]" style={{ color: "#8a7e6e" }}>
-              Ships in 5–7 business days · Worldwide delivery
+              Includes Legacy Pack · Ships in 5–7 business days · Worldwide delivery
             </p>
           </motion.form>
         ) : (
@@ -203,35 +227,8 @@ export default function ProductOrderPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="mt-10"
+            className="mt-8"
           >
-            {/* Size selector */}
-            {config.sizes.length > 1 && (
-              <div className="mb-8">
-                <p className={labelCls}>Choose Size</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {config.sizes.map((size) => {
-                    const selected = size === selectedSize;
-                    return (
-                      <button
-                        key={size}
-                        type="button"
-                        onClick={() => setSelectedSize(size)}
-                        className="rounded-pill px-5 py-2.5 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-300"
-                        style={
-                          selected
-                            ? { background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208", border: "none" }
-                            : { background: "rgba(212,160,74,0.06)", border: "1px solid rgba(212,160,74,0.2)", color: "#d4a04a" }
-                        }
-                      >
-                        {size}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
             <div
               style={{
                 background: "#ffffff",
@@ -241,12 +238,13 @@ export default function ProductOrderPage() {
               }}
             >
               <StripeEmbeddedCheckout
-                priceId="heirloom_product_once"
+                priceId={config.priceId}
                 customerEmail={user?.email ?? address.email}
                 userId={user?.id}
                 returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
-                shippingAddress={{ ...address, variant_id: String(variantId), size: selectedSize }}
-                productType={productType}
+                surname={surname}
+                shippingAddress={address}
+                productType={type}
               />
             </div>
 
