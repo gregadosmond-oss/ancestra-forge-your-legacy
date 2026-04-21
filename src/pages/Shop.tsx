@@ -246,6 +246,17 @@ export default function Shop() {
                   </span>
                 )}
 
+                {/* Product image */}
+                {product.image && (
+                  <div className="mb-4 h-[160px] w-full overflow-hidden rounded-[14px]" style={{ background: "#13100b" }}>
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                )}
+
                 {/* Category label */}
                 <p
                   className="mb-2 font-sans text-[9px] uppercase tracking-[2px]"
