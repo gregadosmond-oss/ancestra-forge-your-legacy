@@ -252,7 +252,7 @@ export default function Shop() {
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover object-bottom"
                     />
                   </div>
                 )}
