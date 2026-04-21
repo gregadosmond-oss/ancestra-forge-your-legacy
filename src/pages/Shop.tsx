@@ -248,11 +248,11 @@ export default function Shop() {
 
                 {/* Product image */}
                 {product.image && (
-                  <div className="mb-4 h-[160px] w-full overflow-hidden rounded-[14px]" style={{ background: "#13100b" }}>
+                  <div className="mb-4 h-[200px] w-full overflow-hidden rounded-[14px]" style={{ background: "#13100b" }}>
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="h-full w-full object-cover object-bottom"
+                      className="h-full w-full object-contain"
                     />
                   </div>
                 )}
