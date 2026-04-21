@@ -174,7 +174,7 @@ async function triggerPrintfulOrder({ productType, surname, shippingAddress, buy
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supabaseUrl || !serviceKey) return;
 
-  const variantId = PRINTFUL_VARIANT_IDS[productType];
+  const variantId = PRINTFUL_VARIANT_MAP[productType];
   if (!variantId) {
     console.warn("triggerPrintfulOrder: no Printful variant mapped for productType:", productType);
     return;
