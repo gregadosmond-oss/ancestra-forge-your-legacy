@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -7,6 +7,8 @@ const SpeechRecognition: any =
     ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     : null;
+
+const synth = typeof window !== "undefined" ? window.speechSynthesis : null;
 
 const BG = "#0d0a07";
 const BG_INPUT = "#161210";
@@ -62,6 +64,20 @@ const labelStyle: React.CSSProperties = {
   color: AMBER,
 };
 
+const pickWarmVoice = (): SpeechSynthesisVoice | null => {
+  if (!synth) return null;
+  const voices = synth.getVoices();
+  if (!voices.length) return null;
+  return (
+    voices.find(
+      (v) =>
+        v.name.includes("Samantha") ||
+        v.name.includes("Karen") ||
+        v.name.toLowerCase().includes("female")
+    ) || voices.find((v) => v.lang.startsWith("en")) || voices[0]
+  );
+};
+
 export default function DeepLegacyInterview() {
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -70,28 +86,15 @@ export default function DeepLegacyInterview() {
   const [fadeKey, setFadeKey] = useState(0);
   const [focused, setFocused] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [interimTranscript, setInterimTranscript] = useState("");
+  const [voiceMode, setVoiceMode] = useState(true);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
+  const baseValueRef = useRef<string>("");
   const speechSupported = !!SpeechRecognition;
-
-  // Pre-fill surname from localStorage
-  useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("userSurname") : null;
-    if (stored) {
-      setAnswers((prev) => ({ ...prev, 0: stored }));
-    }
-  }, []);
-
-  // Stop listening when question changes or unmounts
-  useEffect(() => {
-    return () => {
-      try {
-        recognitionRef.current?.stop();
-      } catch {
-        // ignore
-      }
-    };
-  }, []);
+  const ttsSupported = !!synth;
 
   const q = QUESTIONS[currentQuestion];
   const value = answers[currentQuestion] || "";
@@ -102,8 +105,162 @@ export default function DeepLegacyInterview() {
     setAnswers((prev) => ({ ...prev, [currentQuestion]: v }));
   };
 
+  const stopListening = useCallback(() => {
+    try {
+      recognitionRef.current?.stop();
+    } catch {
+      // ignore
+    }
+    setIsListening(false);
+    setInterimTranscript("");
+  }, []);
+
+  const cancelSpeaking = useCallback(() => {
+    try {
+      synth?.cancel();
+    } catch {
+      // ignore
+    }
+    setIsSpeaking(false);
+  }, []);
+
+  const startListening = useCallback(() => {
+    if (!SpeechRecognition) return;
+    try {
+      recognitionRef.current?.stop();
+    } catch {
+      // ignore
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
+
+      baseValueRef.current = (answers[currentQuestion] || "").trim();
+
+      recognition.onresult = (event: {
+        resultIndex: number;
+        results: ArrayLike<{ 0: { transcript: string }; isFinal: boolean; length: number }>;
+      }) => {
+        let finalText = "";
+        let interim = "";
+        for (let i = 0; i < event.results.length; i++) {
+          const res = event.results[i];
+          if (res.isFinal) {
+            finalText += res[0].transcript;
+          } else {
+            interim += res[0].transcript;
+          }
+        }
+
+        const base = baseValueRef.current;
+        const combinedFinal = finalText
+          ? (base ? `${base} ${finalText}`.trim() : finalText.trim())
+          : base;
+
+        setAnswers((prev) => ({ ...prev, [currentQuestion]: combinedFinal }));
+        setInterimTranscript(interim.trim());
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+        setInterimTranscript("");
+      };
+      recognition.onerror = () => {
+        setIsListening(false);
+        setInterimTranscript("");
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+      setIsListening(true);
+    } catch {
+      setIsListening(false);
+      setInterimTranscript("");
+    }
+  }, [answers, currentQuestion]);
+
+  const speakQuestion = useCallback(
+    (text: string, autoListen: boolean) => {
+      if (!synth) {
+        if (autoListen) startListening();
+        return;
+      }
+      try {
+        synth.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 0.9;
+        utter.pitch = 1.0;
+        utter.lang = "en-US";
+        const voice = pickWarmVoice();
+        if (voice) utter.voice = voice;
+        utter.onstart = () => setIsSpeaking(true);
+        utter.onend = () => {
+          setIsSpeaking(false);
+          if (autoListen) startListening();
+        };
+        utter.onerror = () => {
+          setIsSpeaking(false);
+          if (autoListen) startListening();
+        };
+        synth.speak(utter);
+      } catch {
+        setIsSpeaking(false);
+        if (autoListen) startListening();
+      }
+    },
+    [startListening]
+  );
+
+  // Pre-fill surname from localStorage
+  useEffect(() => {
+    const stored = typeof window !== "undefined" ? localStorage.getItem("userSurname") : null;
+    if (stored) {
+      setAnswers((prev) => ({ ...prev, 0: stored }));
+    }
+  }, []);
+
+  // Warm up voice list (Chrome loads asynchronously)
+  useEffect(() => {
+    if (!synth) return;
+    const handler = () => {
+      // triggers voices load
+      synth.getVoices();
+    };
+    synth.addEventListener?.("voiceschanged", handler);
+    return () => synth.removeEventListener?.("voiceschanged", handler);
+  }, []);
+
+  // Auto-speak each question, then auto-listen — only when voiceMode is ON
+  useEffect(() => {
+    cancelSpeaking();
+    stopListening();
+
+    if (!voiceMode) return;
+
+    const t = setTimeout(() => {
+      speakQuestion(q.question, speechSupported);
+    }, 300);
+
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentQuestion, voiceMode]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      cancelSpeaking();
+      stopListening();
+    };
+  }, [cancelSpeaking, stopListening]);
+
   const goNext = () => {
     if (!canAdvance) return;
+    cancelSpeaking();
+    stopListening();
+
     if (isLast) {
       setIsSubmitting(true);
       const payload: Record<string, string> = {};
@@ -122,58 +279,33 @@ export default function DeepLegacyInterview() {
 
   const goBack = () => {
     if (currentQuestion === 0) return;
+    cancelSpeaking();
+    stopListening();
     setCurrentQuestion((n) => n - 1);
     setFadeKey((k) => k + 1);
     setFocused(false);
   };
 
-  const stopListening = () => {
-    try {
-      recognitionRef.current?.stop();
-    } catch {
-      // ignore
-    }
-    setIsListening(false);
-  };
-
-  const startListening = () => {
-    if (!SpeechRecognition) return;
+  const handleMicToggle = () => {
     if (isListening) {
       stopListening();
       return;
     }
-    try {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = true;
-      recognition.lang = "en-US";
-
-      const baseValue = (answers[currentQuestion] || "").trim();
-
-      recognition.onresult = (event: { results: ArrayLike<{ 0: { transcript: string } }> }) => {
-        let transcript = "";
-        for (let i = 0; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
-        }
-        const next = baseValue ? `${baseValue} ${transcript}`.trim() : transcript;
-        setAnswers((prev) => ({ ...prev, [currentQuestion]: next }));
-      };
-      recognition.onend = () => setIsListening(false);
-      recognition.onerror = () => setIsListening(false);
-
-      recognitionRef.current = recognition;
-      recognition.start();
-      setIsListening(true);
-    } catch {
-      setIsListening(false);
+    if (voiceMode) {
+      // Re-speak then listen
+      speakQuestion(q.question, true);
+    } else {
+      startListening();
     }
   };
 
-  // Stop listening when navigating between questions
-  useEffect(() => {
-    stopListening();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentQuestion]);
+  const toggleVoiceMode = () => {
+    if (voiceMode) {
+      cancelSpeaking();
+      stopListening();
+    }
+    setVoiceMode((v) => !v);
+  };
 
   const progress = ((currentQuestion + 1) / QUESTIONS.length) * 100;
 
@@ -191,6 +323,8 @@ export default function DeepLegacyInterview() {
     resize: q.type === "textarea" ? ("vertical" as const) : ("none" as const),
   };
 
+  const showVoiceUI = speechSupported || ttsSupported;
+
   return (
     <div
       style={{
@@ -203,8 +337,47 @@ export default function DeepLegacyInterview() {
       }}
     >
       <div style={{ width: "100%", maxWidth: 640 }}>
-        {/* Header */}
-        <div style={labelStyle}>Deep Legacy Interview</div>
+        {/* Header row */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            flexWrap: "wrap",
+          }}
+        >
+          <div style={labelStyle}>Deep Legacy Interview</div>
+
+          {showVoiceUI && (
+            <button
+              type="button"
+              onClick={toggleVoiceMode}
+              style={{
+                ...sansFont,
+                background: "transparent",
+                border: `1px solid rgba(212,160,74,0.2)`,
+                color: TEXT_DIM,
+                fontSize: 12,
+                letterSpacing: 0.5,
+                padding: "8px 16px",
+                borderRadius: 60,
+                cursor: "pointer",
+                transition: "color 0.2s ease, border-color 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = AMBER;
+                e.currentTarget.style.borderColor = "rgba(212,160,74,0.5)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = TEXT_DIM;
+                e.currentTarget.style.borderColor = "rgba(212,160,74,0.2)";
+              }}
+            >
+              {voiceMode ? "🔊 Voice Mode ON" : "🔇 Voice Mode OFF"}
+            </button>
+          )}
+        </div>
 
         {/* Progress */}
         <div style={{ marginTop: 20 }}>
@@ -252,6 +425,43 @@ export default function DeepLegacyInterview() {
             {q.question}
           </h2>
 
+          {/* Speaking indicator */}
+          {isSpeaking && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                marginBottom: 16,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 18 }}>
+                {[0, 1, 2, 3].map((i) => (
+                  <span
+                    key={i}
+                    style={{
+                      width: 3,
+                      background: AMBER,
+                      borderRadius: 2,
+                      animation: `wave 1s ease-in-out ${i * 0.12}s infinite`,
+                    }}
+                  />
+                ))}
+              </div>
+              <p
+                style={{
+                  ...sansFont,
+                  fontStyle: "italic",
+                  color: TEXT_DIM,
+                  fontSize: 13,
+                  margin: 0,
+                }}
+              >
+                Asking your question...
+              </p>
+            </div>
+          )}
+
           <div style={{ position: "relative" }}>
             {q.type === "text" ? (
               <input
@@ -264,8 +474,8 @@ export default function DeepLegacyInterview() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter") goNext();
                 }}
-                style={{ ...inputBaseStyle, paddingRight: speechSupported ? 56 : 20 }}
-                placeholder="Type your answer..."
+                style={inputBaseStyle}
+                placeholder="Type or speak your answer..."
               />
             ) : (
               <textarea
@@ -274,55 +484,29 @@ export default function DeepLegacyInterview() {
                 onChange={(e) => updateValue(e.target.value)}
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
-                style={{
-                  ...inputBaseStyle,
-                  minHeight: 120,
-                  paddingRight: speechSupported ? 56 : 20,
-                }}
+                style={{ ...inputBaseStyle, minHeight: 120 }}
                 placeholder="Share what you remember..."
               />
             )}
-
-            {speechSupported && (
-              <button
-                type="button"
-                onClick={startListening}
-                aria-label={isListening ? "Stop voice input" : "Start voice input"}
-                style={{
-                  position: "absolute",
-                  right: 12,
-                  ...(q.type === "textarea" ? { top: 12 } : { bottom: 12 }),
-                  width: 36,
-                  height: 36,
-                  borderRadius: "50%",
-                  border: "none",
-                  background: "transparent",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: 0,
-                  animation: isListening ? "micPulse 1.4s ease-out infinite" : "none",
-                }}
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill={isListening ? AMBER : "none"}
-                  stroke={isListening ? AMBER : TEXT_DIM}
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="9" y="2" width="6" height="12" rx="3" />
-                  <path d="M5 10v2a7 7 0 0 0 14 0v-2" />
-                  <line x1="12" y1="19" x2="12" y2="22" />
-                </svg>
-              </button>
-            )}
           </div>
 
+          {/* Interim transcript (live partial) */}
+          {isListening && interimTranscript && (
+            <p
+              style={{
+                ...sansFont,
+                color: TEXT_DIM,
+                fontStyle: "italic",
+                fontSize: 15,
+                marginTop: 10,
+                opacity: 0.7,
+              }}
+            >
+              {interimTranscript}
+            </p>
+          )}
+
+          {/* Listening indicator */}
           {isListening && (
             <p
               style={{
@@ -334,8 +518,54 @@ export default function DeepLegacyInterview() {
                 animation: "listenFade 1.6s ease-in-out infinite",
               }}
             >
-              Listening... speak now
+              Listening... speak your answer
             </p>
+          )}
+
+          {/* Mic toggle button below input */}
+          {speechSupported && (
+            <div style={{ marginTop: 20 }}>
+              <button
+                type="button"
+                onClick={handleMicToggle}
+                disabled={isSpeaking}
+                aria-label={isListening ? "Stop listening" : "Speak answer"}
+                style={{
+                  ...sansFont,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 10,
+                  background: isListening ? "rgba(212,160,74,0.12)" : "transparent",
+                  border: `1px solid ${isListening ? AMBER : "rgba(212,160,74,0.25)"}`,
+                  color: isListening ? AMBER : TEXT,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  letterSpacing: 1,
+                  padding: "10px 22px",
+                  borderRadius: 60,
+                  cursor: isSpeaking ? "default" : "pointer",
+                  opacity: isSpeaking ? 0.5 : 1,
+                  transition: "all 0.2s ease",
+                  animation: isListening ? "micPulse 1.4s ease-out infinite" : "none",
+                }}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill={isListening ? AMBER : "none"}
+                  stroke={isListening ? AMBER : TEXT}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="9" y="2" width="6" height="12" rx="3" />
+                  <path d="M5 10v2a7 7 0 0 0 14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="22" />
+                </svg>
+                {isListening ? "Stop" : "Speak answer"}
+              </button>
+            </div>
           )}
         </div>
 
@@ -400,12 +630,16 @@ export default function DeepLegacyInterview() {
         }
         @keyframes micPulse {
           0% { box-shadow: 0 0 0 0 rgba(212,160,74,0.45); }
-          70% { box-shadow: 0 0 0 12px rgba(212,160,74,0); }
+          70% { box-shadow: 0 0 0 14px rgba(212,160,74,0); }
           100% { box-shadow: 0 0 0 0 rgba(212,160,74,0); }
         }
         @keyframes listenFade {
           0%, 100% { opacity: 0.5; }
           50% { opacity: 1; }
+        }
+        @keyframes wave {
+          0%, 100% { height: 4px; }
+          50% { height: 18px; }
         }
       `}</style>
     </div>
