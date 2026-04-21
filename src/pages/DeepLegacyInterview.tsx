@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const SpeechRecognition: any =
@@ -92,9 +93,11 @@ export default function DeepLegacyInterview() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
   const baseValueRef = useRef<string>("");
   const speechSupported = !!SpeechRecognition;
-  const ttsSupported = !!synth;
+  const ttsSupported = true; // ElevenLabs via edge function (with browser fallback)
 
   const q = QUESTIONS[currentQuestion];
   const value = answers[currentQuestion] || "";
@@ -116,6 +119,19 @@ export default function DeepLegacyInterview() {
   }, []);
 
   const cancelSpeaking = useCallback(() => {
+    try {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current = null;
+      }
+      if (audioUrlRef.current) {
+        URL.revokeObjectURL(audioUrlRef.current);
+        audioUrlRef.current = null;
+      }
+    } catch {
+      // ignore
+    }
     try {
       synth?.cancel();
     } catch {
@@ -182,7 +198,7 @@ export default function DeepLegacyInterview() {
     }
   }, [answers, currentQuestion]);
 
-  const speakQuestion = useCallback(
+  const speakWithBrowser = useCallback(
     (text: string, autoListen: boolean) => {
       if (!synth) {
         if (autoListen) startListening();
@@ -212,6 +228,81 @@ export default function DeepLegacyInterview() {
       }
     },
     [startListening]
+  );
+
+  const speakQuestion = useCallback(
+    async (text: string, autoListen: boolean) => {
+      // Cancel any prior playback first
+      try {
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.src = "";
+          audioRef.current = null;
+        }
+        if (audioUrlRef.current) {
+          URL.revokeObjectURL(audioUrlRef.current);
+          audioUrlRef.current = null;
+        }
+      } catch {
+        // ignore
+      }
+      try {
+        synth?.cancel();
+      } catch {
+        // ignore
+      }
+
+      setIsSpeaking(true);
+
+      try {
+        const { data, error } = await supabase.functions.invoke("ancestor-tts", {
+          body: { text },
+        });
+
+        if (error || !data?.audio) {
+          throw new Error(error?.message || "No audio returned");
+        }
+
+        // Decode base64 → Blob (audio/mpeg)
+        const binary = atob(data.audio);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        const blob = new Blob([bytes], { type: "audio/mpeg" });
+        const url = URL.createObjectURL(blob);
+        audioUrlRef.current = url;
+
+        const audio = new Audio(url);
+        audioRef.current = audio;
+
+        audio.onended = () => {
+          setIsSpeaking(false);
+          if (audioUrlRef.current) {
+            URL.revokeObjectURL(audioUrlRef.current);
+            audioUrlRef.current = null;
+          }
+          audioRef.current = null;
+          if (autoListen) startListening();
+        };
+        audio.onerror = () => {
+          setIsSpeaking(false);
+          if (audioUrlRef.current) {
+            URL.revokeObjectURL(audioUrlRef.current);
+            audioUrlRef.current = null;
+          }
+          audioRef.current = null;
+          // Fallback to browser TTS on playback error
+          speakWithBrowser(text, autoListen);
+        };
+
+        await audio.play();
+      } catch (err) {
+        // Fallback: browser speechSynthesis
+        console.warn("ElevenLabs TTS failed, falling back to browser TTS:", err);
+        setIsSpeaking(false);
+        speakWithBrowser(text, autoListen);
+      }
+    },
+    [startListening, speakWithBrowser]
   );
 
   // Pre-fill surname from localStorage
