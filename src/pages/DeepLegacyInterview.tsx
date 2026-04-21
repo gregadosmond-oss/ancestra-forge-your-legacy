@@ -398,6 +398,15 @@ export default function DeepLegacyInterview() {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes micPulse {
+          0% { box-shadow: 0 0 0 0 rgba(212,160,74,0.45); }
+          70% { box-shadow: 0 0 0 12px rgba(212,160,74,0); }
+          100% { box-shadow: 0 0 0 0 rgba(212,160,74,0); }
+        }
+        @keyframes listenFade {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 1; }
+        }
       `}</style>
     </div>
   );
