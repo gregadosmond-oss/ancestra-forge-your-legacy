@@ -64,6 +64,17 @@ export default function ProductOrderPage() {
   const [address, setAddress] = useState<ShippingAddress>(empty);
   const [showAuth, setShowAuth] = useState(false);
 
+  // Transform address for create-printful-order
+  const shippingAddress = useMemo(() => ({
+    name: `${address.first_name} ${address.last_name}`.trim(),
+    address1: address.address1,
+    city: address.city,
+    state: address.region,
+    country: address.country,
+    zip: address.zip,
+    phone: address.phone,
+  }), [address]);
+
   const set = (k: keyof ShippingAddress) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setAddress((a) => ({ ...a, [k]: e.target.value }));
 
@@ -243,7 +254,7 @@ export default function ProductOrderPage() {
                 userId={user?.id}
                 returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
                 surname={surname}
-                shippingAddress={address}
+                shippingAddress={shippingAddress}
                 productType={type}
               />
             </div>
