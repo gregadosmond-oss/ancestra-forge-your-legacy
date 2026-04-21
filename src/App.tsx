@@ -38,6 +38,7 @@ import FamilySharePage from "./pages/FamilySharePage.tsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
 import Terms from "./pages/Terms.tsx";
 import DeepLegacy from "./pages/DeepLegacy.tsx";
+import DeepLegacyInterview from "./pages/DeepLegacyInterview.tsx";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,7 @@ const App = () => (
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/deep-legacy" element={<DeepLegacy />} />
+              <Route path="/deep-legacy/interview" element={<DeepLegacyInterview />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Route>
