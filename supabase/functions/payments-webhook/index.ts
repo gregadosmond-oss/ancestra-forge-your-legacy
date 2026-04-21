@@ -119,8 +119,8 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
   }
 
   // Trigger real crest generation server-side — non-fatal if it fails
-  // Skip for heirloom orders (already awaited above)
-  if (surname && userId && productType !== 'heirloom') {
+  // Skip for Printful physical orders (already awaited above)
+  if (surname && userId && !(productType && PRINTFUL_VARIANT_IDS[productType])) {
     void triggerCrestGeneration(surname);
   }
 
