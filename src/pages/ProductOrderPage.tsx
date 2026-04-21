@@ -254,7 +254,7 @@ export default function ProductOrderPage() {
                 userId={user?.id}
                 returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
                 surname={surname}
-                shippingAddress={address}
+                shippingAddress={shippingAddress}
                 productType={type}
               />
             </div>
