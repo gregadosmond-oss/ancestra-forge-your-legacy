@@ -69,6 +69,10 @@ export default function DeepLegacyInterview() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fadeKey, setFadeKey] = useState(0);
   const [focused, setFocused] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+  const speechSupported = !!SpeechRecognition;
 
   // Pre-fill surname from localStorage
   useEffect(() => {
@@ -76,6 +80,17 @@ export default function DeepLegacyInterview() {
     if (stored) {
       setAnswers((prev) => ({ ...prev, 0: stored }));
     }
+  }, []);
+
+  // Stop listening when question changes or unmounts
+  useEffect(() => {
+    return () => {
+      try {
+        recognitionRef.current?.stop();
+      } catch {
+        // ignore
+      }
+    };
   }, []);
 
   const q = QUESTIONS[currentQuestion];
