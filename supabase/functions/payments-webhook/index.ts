@@ -66,11 +66,16 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
 
   console.log("Parsed metadata — surname:", surname, "user_id:", userId, "email:", buyerEmail, "productType:", productType);
 
-  // Heirloom physical order — ensure crest exists, then trigger Printify fulfillment
-  if (productType === 'heirloom' && surname && shippingAddressRaw) {
-    console.log("Heirloom order detected — ensuring crest exists for:", surname);
+  // Printful physical order — ensure crest exists, then trigger Printful fulfillment
+  if (productType && PRINTFUL_VARIANT_IDS[productType] && surname && shippingAddressRaw) {
+    console.log("Printful order detected — productType:", productType, "surname:", surname);
     await triggerCrestGeneration(surname);
-    await triggerHeirloomOrder({ surname, shippingAddress: JSON.parse(shippingAddressRaw), buyerEmail });
+    await triggerPrintfulOrder({
+      productType,
+      surname,
+      shippingAddress: JSON.parse(shippingAddressRaw),
+      buyerEmail,
+    });
   }
 
   if (!userId) {
