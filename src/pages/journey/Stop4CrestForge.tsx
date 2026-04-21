@@ -139,7 +139,7 @@ const Stop4CrestForge = () => {
             Read Your Story
           </Link>
           <p className="mt-3 font-sans text-[12px] uppercase tracking-[1.5px]" style={{ color: "#e8b85c" }}>
-            Unlock the full Legacy Pack for $29.99 · One-time · Instant delivery
+            Unlock the full Legacy Pack for $19.99 · One-time · Instant delivery
           </p>
         </motion.div>
       </motion.div>
