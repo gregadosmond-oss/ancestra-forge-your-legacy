@@ -421,7 +421,7 @@ export default function DeepLegacyInterview() {
     borderRadius: 14,
     outline: "none",
     transition: "border-color 0.2s ease",
-    resize: q.type === "textarea" ? ("vertical" as const) : ("none" as const),
+    resize: "vertical" as const,
   };
 
   const showVoiceUI = speechSupported || ttsSupported;
