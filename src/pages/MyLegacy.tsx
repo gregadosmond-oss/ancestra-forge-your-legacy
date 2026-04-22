@@ -75,8 +75,8 @@ function useLegacyData(userId: string | undefined): LegacyData {
           await supabase.from("profiles").upsert({ id: userId, surname }, { onConflict: "id" });
         }
 
-        // Step 2: load facts + story + crest in parallel
-        const [factsRes, crestRes] = await Promise.all([
+        // Step 2: load facts + story + crest + deep legacy research in parallel
+        const [factsRes, crestRes, deepRes] = await Promise.all([
           supabase
             .from("surname_facts")
             .select("payload, story_payload")
@@ -87,6 +87,11 @@ function useLegacyData(userId: string | undefined): LegacyData {
             .select("image_url")
             .eq("surname", surname)
             .maybeSingle(),
+          supabase
+            .from("deep_legacy_results")
+            .select("research_summary, sources")
+            .eq("user_id", userId)
+            .maybeSingle(),
         ]);
 
         let facts = ((factsRes.data?.payload as any)?.facts as LegacyFacts) ?? (factsRes.data?.payload as LegacyFacts) ?? null;
@@ -94,6 +99,12 @@ function useLegacyData(userId: string | undefined): LegacyData {
           ?? ((factsRes.data as any)?.story_payload as LegacyStory)
           ?? null;
         let crestUrl = crestRes.data?.image_url ?? null;
+        const deepLegacyResearch: DeepLegacyResearch | null = deepRes.data?.research_summary
+          ? {
+              summary: deepRes.data.research_summary,
+              sources: (deepRes.data.sources as { title: string; url: string }[] | null) ?? [],
+            }
+          : null;
 
         // Step 3: generate if no facts at all (e.g. user skipped the journey)
         if (!facts) {
