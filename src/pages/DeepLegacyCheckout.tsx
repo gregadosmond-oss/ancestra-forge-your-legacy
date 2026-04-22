@@ -59,13 +59,21 @@ function TrustBadge({ children }: { children: React.ReactNode }) {
 
 export default function DeepLegacyCheckout() {
   const [surname, setSurname] = useState<string>("");
+  const [country, setCountry] = useState<string>("");
   const [mounted, setMounted] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setSurname(localStorage.getItem("userSurname") || "");
+      // Prefer the Deep Legacy-specific keys, fall back to the legacy userSurname key
+      const sn =
+        localStorage.getItem("deepLegacy_surname") ||
+        localStorage.getItem("userSurname") ||
+        "";
+      const co = localStorage.getItem("deepLegacy_country") || "";
+      setSurname(sn);
+      setCountry(co);
     }
     // Brief loading state to give the checkout iframe time to settle
     const t = setTimeout(() => setMounted(true), 250);
@@ -155,6 +163,8 @@ export default function DeepLegacyCheckout() {
               priceId="deep_legacy_once"
               returnUrl={returnUrl}
               surname={surname}
+              productType="deep_legacy"
+              shippingAddress={country ? { country } : undefined}
             />
           </div>
         )}
