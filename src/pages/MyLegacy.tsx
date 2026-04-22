@@ -142,7 +142,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
           return;
         }
 
-        setData({ facts, story, crestUrl, surname, loading: false, generating: false, error: null });
+        setData({ facts, story, crestUrl, surname, deepLegacyResearch, loading: false, generating: false, error: null });
       } catch (err) {
         setData((d) => ({ ...d, loading: false, generating: false, error: (err as Error).message }));
       }
