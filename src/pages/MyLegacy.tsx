@@ -36,6 +36,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
     story: null,
     crestUrl: null,
     surname: null,
+    deepLegacyResearch: null,
     loading: true,
     generating: false,
     error: null,
