@@ -58,25 +58,19 @@ export default function DeepLegacyProcessing() {
     setError(null);
 
     try {
-      const rawAnswers = localStorage.getItem("deepLegacyAnswers");
-      const answers: Record<string, string> = rawAnswers ? JSON.parse(rawAnswers) : {};
       const surname =
-        (answers.surname && answers.surname.trim()) ||
-        localStorage.getItem("userSurname") ||
-        "";
+        (localStorage.getItem("deepLegacy_surname") || "").trim() ||
+        (localStorage.getItem("userSurname") || "").trim();
+      const country = (localStorage.getItem("deepLegacy_country") || "").trim();
 
       if (!surname) {
         throw new Error("No surname found. Please complete the interview first.");
       }
 
-      const body = {
-        surname,
-        country: answers.origin || "",
-        interviewAnswers: {
-          knownAncestors: answers.earliestAncestor || "",
-          homeRegion: answers.settlement || "",
-        },
-      };
+      const savedAnswers = localStorage.getItem("deepLegacy_interviewAnswers");
+      const interviewAnswers = savedAnswers ? JSON.parse(savedAnswers) : [];
+
+      const body = { surname, country, interviewAnswers };
 
       const res = await fetch(`${SUPABASE_URL}/functions/v1/deep-legacy-research`, {
         method: "POST",
