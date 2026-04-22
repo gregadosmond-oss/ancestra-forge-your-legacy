@@ -19,12 +19,15 @@ type DeepLegacyResearch = {
   sources: { title: string; url: string }[];
 };
 
+type DeepChapter = { chapter_num: number; title: string; body: string };
+
 type LegacyData = {
   facts: LegacyFacts | null;
   story: LegacyStory | null;
   crestUrl: string | null;
   surname: string | null;
   deepLegacyResearch: DeepLegacyResearch | null;
+  deepChapters: DeepChapter[];
   loading: boolean;
   generating: boolean;
   error: string | null;
@@ -37,6 +40,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
     crestUrl: null,
     surname: null,
     deepLegacyResearch: null,
+    deepChapters: [],
     loading: true,
     generating: false,
     error: null,
@@ -63,7 +67,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
         const rawSurname = sessionSurname ?? profile?.surname ?? null;
 
         if (!rawSurname) {
-          setData({ facts: null, story: null, crestUrl: null, surname: null, deepLegacyResearch: null, loading: false, generating: false, error: null });
+          setData({ facts: null, story: null, crestUrl: null, surname: null, deepLegacyResearch: null, deepChapters: [], loading: false, generating: false, error: null });
           return;
         }
 
@@ -75,8 +79,8 @@ function useLegacyData(userId: string | undefined): LegacyData {
           await supabase.from("profiles").upsert({ id: userId, surname }, { onConflict: "id" });
         }
 
-        // Step 2: load facts + story + crest + deep legacy research in parallel
-        const [factsRes, crestRes, deepRes] = await Promise.all([
+        // Step 2: load facts + story + crest + deep legacy research + chapters in parallel
+        const [factsRes, crestRes, deepRes, chaptersRes] = await Promise.all([
           supabase
             .from("surname_facts")
             .select("payload, story_payload")
@@ -92,6 +96,11 @@ function useLegacyData(userId: string | undefined): LegacyData {
             .select("research_summary, sources")
             .eq("user_id", userId)
             .maybeSingle(),
+          supabase
+            .from("deep_legacy_chapters")
+            .select("chapter_num, title, body")
+            .eq("user_id", userId)
+            .order("chapter_num", { ascending: true }),
         ]);
 
         let facts = ((factsRes.data?.payload as any)?.facts as LegacyFacts) ?? (factsRes.data?.payload as LegacyFacts) ?? null;
@@ -105,6 +114,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
               sources: (deepRes.data.sources as { title: string; url: string }[] | null) ?? [],
             }
           : null;
+        const deepChapters: DeepChapter[] = (chaptersRes.data as DeepChapter[] | null) ?? [];
 
         // Step 3: generate if no facts at all (e.g. user skipped the journey)
         if (!facts) {
@@ -138,11 +148,11 @@ function useLegacyData(userId: string | undefined): LegacyData {
           } catch {
             // generation failure is non-fatal — show what we have
           }
-          setData({ facts, story, crestUrl, surname, deepLegacyResearch, loading: false, generating: false, error: null });
+          setData({ facts, story, crestUrl, surname, deepLegacyResearch, deepChapters, loading: false, generating: false, error: null });
           return;
         }
 
-        setData({ facts, story, crestUrl, surname, deepLegacyResearch, loading: false, generating: false, error: null });
+        setData({ facts, story, crestUrl, surname, deepLegacyResearch, deepChapters, loading: false, generating: false, error: null });
       } catch (err) {
         setData((d) => ({ ...d, loading: false, generating: false, error: (err as Error).message }));
       }
@@ -334,12 +344,108 @@ function ListenButton({ chapterKey, text, tts }: {
   );
 }
 
+// ─── Roman numerals ───────────────────────────────────────────────────────────
+
+function toRoman(num: number): string {
+  const map: [number, string][] = [
+    [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
+    [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
+    [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
+  ];
+  let n = num;
+  let out = "";
+  for (const [val, sym] of map) {
+    while (n >= val) { out += sym; n -= val; }
+  }
+  return out;
+}
+
+// ─── Deep Book chapter card ───────────────────────────────────────────────────
+
+function DeepBookChapterCard({ chapter, tts }: { chapter: DeepChapter; tts: ReturnType<typeof useChapterTTS> }) {
+  const [expanded, setExpanded] = useState(false);
+  const paragraphs = chapter.body.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  const chapterKey = `book-${chapter.chapter_num}`;
+  const ttsText = `${chapter.title}. ${chapter.body}`;
+
+  return (
+    <div
+      className="rounded-[22px] border p-6 sm:p-8"
+      style={{ background: "rgba(26,18,8,0.7)", borderColor: "rgba(160,120,48,0.15)" }}
+    >
+      <p
+        className="font-sans uppercase"
+        style={{ fontSize: "10px", letterSpacing: "2px", color: "#a07830" }}
+      >
+        Chapter {toRoman(chapter.chapter_num)}
+      </p>
+      <h3 className="mt-2 font-display text-cream-warm" style={{ fontSize: "22px", lineHeight: 1.25 }}>
+        {chapter.title}
+      </h3>
+
+      {!expanded ? (
+        <button
+          onClick={() => setExpanded(true)}
+          className="mt-5 rounded-full border px-5 py-2 font-sans text-[10px] font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
+          style={{ borderColor: "rgba(212,160,74,0.3)", color: "#d4a04a", background: "rgba(232,148,58,0.06)" }}
+        >
+          Read Chapter
+        </button>
+      ) : (
+        <>
+          <div className="mt-6 space-y-5">
+            {paragraphs.map((para, i) => (
+              <p
+                key={i}
+                className="font-serif text-text-body text-justify"
+                style={{ lineHeight: 1.95, fontSize: "1.0625rem" }}
+              >
+                {i === 0 ? (
+                  <>
+                    <span
+                      style={{
+                        float: "left",
+                        fontFamily: "'Libre Caslon Display', serif",
+                        fontSize: "4.2rem",
+                        lineHeight: 0.9,
+                        color: "#e8b85c",
+                        paddingRight: "0.5rem",
+                        paddingTop: "0.35rem",
+                      }}
+                    >
+                      {para.charAt(0)}
+                    </span>
+                    {para.slice(1)}
+                  </>
+                ) : (
+                  para
+                )}
+              </p>
+            ))}
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <ListenButton chapterKey={chapterKey} text={ttsText} tts={tts} />
+            <button
+              onClick={() => setExpanded(false)}
+              className="rounded-full border px-4 py-1.5 font-sans text-[10px] font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
+              style={{ borderColor: "rgba(138,126,110,0.25)", color: "#8a7e6e", background: "transparent" }}
+            >
+              Collapse
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // ─── Main component ────────────────────────────────────────────────────────────
 
 const MyLegacy = () => {
   const navigate = useNavigate();
   const { user, hasPurchased, loading: purchaseLoading } = usePurchase();
-  const { facts, story, crestUrl: initialCrestUrl, surname, deepLegacyResearch, loading, generating, error } = useLegacyData(
+  const { facts, story, crestUrl: initialCrestUrl, surname, deepLegacyResearch, deepChapters, loading, generating, error } = useLegacyData(
     !purchaseLoading && hasPurchased ? user?.id : undefined
   );
   const crestUrl = useCrestPoller(surname, initialCrestUrl);
@@ -805,6 +911,57 @@ const MyLegacy = () => {
                   </ul>
                 </div>
               )}
+            </div>
+          </motion.section>
+        )}
+
+        {/* ── Deep Legacy Book (12 chapters) ── */}
+        {deepChapters.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 1.45 }}
+            className="mt-14"
+          >
+            <OrnamentDivider />
+            <p
+              className="mb-2 text-center font-sans uppercase"
+              style={{ fontSize: "10px", letterSpacing: "3px", color: "#a07830" }}
+            >
+              Your Deep Legacy Book
+            </p>
+            <p
+              className="mb-8 text-center font-serif italic"
+              style={{ fontSize: "14px", color: "#c4b8a6" }}
+            >
+              A 12-chapter family novella
+            </p>
+            <div className="space-y-6">
+              {deepChapters.map((ch) => (
+                <DeepBookChapterCard key={ch.chapter_num} chapter={ch} tts={tts} />
+              ))}
+            </div>
+          </motion.section>
+        )}
+
+        {/* ── Deep Legacy Book pending state ── */}
+        {deepLegacyResearch?.summary && deepChapters.length === 0 && (
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 1.45 }}
+            className="mt-10"
+          >
+            <div
+              className="rounded-[22px] border p-6 sm:p-8 text-center"
+              style={{ background: "rgba(26,18,8,0.5)", borderColor: "rgba(160,120,48,0.15)" }}
+            >
+              <p className="font-serif italic text-amber-dim" style={{ fontSize: "16px" }}>
+                Your 12-chapter book is being written…
+              </p>
+              <p className="mt-2 font-sans text-text-dim" style={{ fontSize: "11px" }}>
+                This takes about 2 minutes. Refresh the page when you're ready.
+              </p>
             </div>
           </motion.section>
         )}
