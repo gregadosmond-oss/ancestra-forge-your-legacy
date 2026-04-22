@@ -14,11 +14,17 @@ import type { LegacyFacts, LegacyStory } from "@/types/legacy";
 
 // ─── Data hook ────────────────────────────────────────────────────────────────
 
+type DeepLegacyResearch = {
+  summary: string;
+  sources: { title: string; url: string }[];
+};
+
 type LegacyData = {
   facts: LegacyFacts | null;
   story: LegacyStory | null;
   crestUrl: string | null;
   surname: string | null;
+  deepLegacyResearch: DeepLegacyResearch | null;
   loading: boolean;
   generating: boolean;
   error: string | null;
@@ -30,6 +36,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
     story: null,
     crestUrl: null,
     surname: null,
+    deepLegacyResearch: null,
     loading: true,
     generating: false,
     error: null,
@@ -56,7 +63,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
         const rawSurname = sessionSurname ?? profile?.surname ?? null;
 
         if (!rawSurname) {
-          setData({ facts: null, story: null, crestUrl: null, surname: null, loading: false, generating: false, error: null });
+          setData({ facts: null, story: null, crestUrl: null, surname: null, deepLegacyResearch: null, loading: false, generating: false, error: null });
           return;
         }
 
@@ -68,8 +75,8 @@ function useLegacyData(userId: string | undefined): LegacyData {
           await supabase.from("profiles").upsert({ id: userId, surname }, { onConflict: "id" });
         }
 
-        // Step 2: load facts + story + crest in parallel
-        const [factsRes, crestRes] = await Promise.all([
+        // Step 2: load facts + story + crest + deep legacy research in parallel
+        const [factsRes, crestRes, deepRes] = await Promise.all([
           supabase
             .from("surname_facts")
             .select("payload, story_payload")
@@ -80,6 +87,11 @@ function useLegacyData(userId: string | undefined): LegacyData {
             .select("image_url")
             .eq("surname", surname)
             .maybeSingle(),
+          supabase
+            .from("deep_legacy_results")
+            .select("research_summary, sources")
+            .eq("user_id", userId)
+            .maybeSingle(),
         ]);
 
         let facts = ((factsRes.data?.payload as any)?.facts as LegacyFacts) ?? (factsRes.data?.payload as LegacyFacts) ?? null;
@@ -87,6 +99,12 @@ function useLegacyData(userId: string | undefined): LegacyData {
           ?? ((factsRes.data as any)?.story_payload as LegacyStory)
           ?? null;
         let crestUrl = crestRes.data?.image_url ?? null;
+        const deepLegacyResearch: DeepLegacyResearch | null = deepRes.data?.research_summary
+          ? {
+              summary: deepRes.data.research_summary,
+              sources: (deepRes.data.sources as { title: string; url: string }[] | null) ?? [],
+            }
+          : null;
 
         // Step 3: generate if no facts at all (e.g. user skipped the journey)
         if (!facts) {
@@ -120,11 +138,11 @@ function useLegacyData(userId: string | undefined): LegacyData {
           } catch {
             // generation failure is non-fatal — show what we have
           }
-          setData({ facts, story, crestUrl, surname, loading: false, generating: false, error: null });
+          setData({ facts, story, crestUrl, surname, deepLegacyResearch, loading: false, generating: false, error: null });
           return;
         }
 
-        setData({ facts, story, crestUrl, surname, loading: false, generating: false, error: null });
+        setData({ facts, story, crestUrl, surname, deepLegacyResearch, loading: false, generating: false, error: null });
       } catch (err) {
         setData((d) => ({ ...d, loading: false, generating: false, error: (err as Error).message }));
       }
@@ -321,7 +339,7 @@ function ListenButton({ chapterKey, text, tts }: {
 const MyLegacy = () => {
   const navigate = useNavigate();
   const { user, hasPurchased, loading: purchaseLoading } = usePurchase();
-  const { facts, story, crestUrl: initialCrestUrl, surname, loading, generating, error } = useLegacyData(
+  const { facts, story, crestUrl: initialCrestUrl, surname, deepLegacyResearch, loading, generating, error } = useLegacyData(
     !purchaseLoading && hasPurchased ? user?.id : undefined
   );
   const crestUrl = useCrestPoller(surname, initialCrestUrl);
@@ -724,6 +742,69 @@ const MyLegacy = () => {
                   </div>
                 )}
               </div>
+            </div>
+          </motion.section>
+        )}
+
+        {/* ── Deep Legacy Research ── */}
+        {deepLegacyResearch?.summary && (
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 1.4 }}
+            className="mt-14"
+          >
+            <OrnamentDivider />
+            <p className="mb-6 text-center font-sans uppercase" style={{ fontSize: "10px", letterSpacing: "3px", color: "#a07830" }}>
+              Deep Legacy Research
+            </p>
+            <div
+              className="rounded-[18px] border p-6 sm:p-8"
+              style={{ background: "rgba(26,18,8,0.7)", borderColor: "rgba(160,120,48,0.15)" }}
+            >
+              <div className="space-y-5">
+                {deepLegacyResearch.summary
+                  .split(/\n\s*\n/)
+                  .map((chunk) => chunk.trim())
+                  .filter(Boolean)
+                  .map((chunk, i) => (
+                    <p
+                      key={i}
+                      className="font-serif text-text-body text-justify"
+                      style={{ lineHeight: 1.95 }}
+                    >
+                      {chunk}
+                    </p>
+                  ))}
+              </div>
+
+              {deepLegacyResearch.sources.length > 0 && (
+                <div className="mt-8">
+                  <p
+                    className="mb-3 font-sans uppercase"
+                    style={{ fontSize: "9px", letterSpacing: "3px", color: "#a07830" }}
+                  >
+                    Sources
+                  </p>
+                  <ul className="space-y-2">
+                    {deepLegacyResearch.sources.map((src, i) => (
+                      <li key={i}>
+                        <a
+                          href={src.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-sans transition-colors"
+                          style={{ fontSize: "12px", color: "#8a7e6e" }}
+                          onMouseEnter={(e) => (e.currentTarget.style.color = "#d4a04a")}
+                          onMouseLeave={(e) => (e.currentTarget.style.color = "#8a7e6e")}
+                        >
+                          → {src.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </motion.section>
         )}
