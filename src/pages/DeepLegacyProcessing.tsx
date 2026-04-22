@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const BG = "#0d0a07";
 const AMBER = "#d4a04a";
@@ -84,6 +85,26 @@ export default function DeepLegacyProcessing() {
 
       const data = await res.json();
       localStorage.setItem("deepLegacyResearch", JSON.stringify(data));
+
+      // Persist interview answers to deep_legacy_results so the post-purchase
+      // webhook can use them to generate the 12-chapter book.
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from("deep_legacy_results").upsert(
+            {
+              user_id: user.id,
+              surname: surname.trim().toLowerCase(),
+              country: country || null,
+              interview_answers: interviewAnswers,
+            },
+            { onConflict: "user_id" }
+          );
+        }
+      } catch (saveErr) {
+        console.warn("Failed to save interview answers:", saveErr);
+      }
+
       navigate("/deep-legacy/results");
     } catch (err) {
       setError((err as Error).message || "Unknown error");
