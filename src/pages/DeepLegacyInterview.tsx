@@ -564,31 +564,15 @@ export default function DeepLegacyInterview() {
           )}
 
           <div style={{ position: "relative" }}>
-            {q.type === "text" ? (
-              <input
-                type="text"
-                autoFocus
-                value={value}
-                onChange={(e) => updateValue(e.target.value)}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") goNext();
-                }}
-                style={inputBaseStyle}
-                placeholder="Type or speak your answer..."
-              />
-            ) : (
-              <textarea
-                autoFocus
-                value={value}
-                onChange={(e) => updateValue(e.target.value)}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
-                style={{ ...inputBaseStyle, minHeight: 120 }}
-                placeholder="Share what you remember..."
-              />
-            )}
+            <textarea
+              autoFocus
+              value={value}
+              onChange={(e) => updateValue(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              style={{ ...inputBaseStyle, minHeight: 140 }}
+              placeholder="Share what you remember..."
+            />
           </div>
 
           {/* Interim transcript (live partial) */}
