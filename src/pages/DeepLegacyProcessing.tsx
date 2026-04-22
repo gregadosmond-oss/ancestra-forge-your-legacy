@@ -107,7 +107,9 @@ export default function DeepLegacyProcessing() {
 
       navigate("/deep-legacy/results");
     } catch (err) {
-      setError((err as Error).message || "Unknown error");
+      console.error('[DeepLegacyProcessing] Failure:', err);
+      const e = err as { message?: string; error?: string };
+      setError(e?.message || e?.error || "Unknown error");
     } finally {
       inFlightRef.current = false;
     }
@@ -196,11 +198,26 @@ export default function DeepLegacyProcessing() {
                 color: TEXT,
                 fontSize: 16,
                 lineHeight: 1.6,
-                marginBottom: 32,
+                marginBottom: 16,
               }}
             >
               Something went wrong uncovering your legacy. Please try again.
             </p>
+            {error && (
+              <p
+                style={{
+                  ...sansFont,
+                  color: "#a07830",
+                  fontSize: 11,
+                  maxWidth: 480,
+                  margin: "0 auto 32px",
+                  lineHeight: 1.5,
+                  wordBreak: "break-word",
+                }}
+              >
+                {error}
+              </p>
+            )}
             <button
               style={ctaButtonStyle}
               onClick={() => setAttempt((a) => a + 1)}
