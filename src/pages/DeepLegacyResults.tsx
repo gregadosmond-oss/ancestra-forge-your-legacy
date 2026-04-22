@@ -252,7 +252,45 @@ export default function DeepLegacyResults() {
     );
   }
 
-  const sources = research.sources || [];
+  const rawSources = research.sources || [];
+
+  // Filter and dedupe sources: irrelevant titles, one per domain, max 5
+  const IRRELEVANT_TITLE_FRAGMENTS = [
+    "donny osmond",
+    "marie osmond",
+    "osmond brothers",
+    "osmonds band",
+    "search results",
+    "books search",
+    "library catalog",
+    "celebrity",
+    "singer",
+    "musician",
+  ];
+
+  const getDomain = (url?: string): string => {
+    if (!url) return "";
+    try {
+      const host = new URL(url).hostname.toLowerCase();
+      return host.replace(/^www\./, "");
+    } catch {
+      return "";
+    }
+  };
+
+  const seenDomains = new Set<string>();
+  const sources: Source[] = [];
+  for (const s of rawSources) {
+    const title = (s.title || "").toLowerCase();
+    if (IRRELEVANT_TITLE_FRAGMENTS.some((frag) => title.includes(frag))) continue;
+    const domain = getDomain(s.url);
+    if (domain) {
+      if (seenDomains.has(domain)) continue;
+      seenDomains.add(domain);
+    }
+    sources.push(s);
+    if (sources.length >= 5) break;
+  }
 
   return (
     <div style={{ background: BG, minHeight: "100vh", color: TEXT }}>
