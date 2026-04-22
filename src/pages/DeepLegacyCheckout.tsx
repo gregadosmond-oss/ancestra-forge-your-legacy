@@ -92,7 +92,7 @@ export default function DeepLegacyCheckout() {
     return () => window.removeEventListener("unhandledrejection", handler);
   }, []);
 
-  const returnUrl = `${window.location.origin}/deep-legacy/confirmation?session_id={CHECKOUT_SESSION_ID}`;
+  const returnUrl = `${window.location.origin}/deep-legacy/confirmation`;
 
   return (
     <div style={{ background: BG, minHeight: "100vh", color: TEXT }}>
