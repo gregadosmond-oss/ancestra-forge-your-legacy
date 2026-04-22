@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      book_orders: {
+        Row: {
+          created_at: string | null
+          format: string
+          gelato_order_id: string | null
+          gelato_order_reference: string | null
+          id: string
+          page_count: number | null
+          pdf_url: string | null
+          shipping_address: Json | null
+          status: string | null
+          surname: string | null
+          tracking_code: string | null
+          tracking_url: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          format: string
+          gelato_order_id?: string | null
+          gelato_order_reference?: string | null
+          id?: string
+          page_count?: number | null
+          pdf_url?: string | null
+          shipping_address?: Json | null
+          status?: string | null
+          surname?: string | null
+          tracking_code?: string | null
+          tracking_url?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          format?: string
+          gelato_order_id?: string | null
+          gelato_order_reference?: string | null
+          id?: string
+          page_count?: number | null
+          pdf_url?: string | null
+          shipping_address?: Json | null
+          status?: string | null
+          surname?: string | null
+          tracking_code?: string | null
+          tracking_url?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       crests: {
         Row: {
           created_at: string
