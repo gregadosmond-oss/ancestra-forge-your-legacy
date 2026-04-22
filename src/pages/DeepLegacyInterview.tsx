@@ -315,13 +315,7 @@ export default function DeepLegacyInterview() {
     [startListening, speakWithBrowser]
   );
 
-  // Pre-fill surname from localStorage
-  useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("userSurname") : null;
-    if (stored) {
-      setAnswers((prev) => ({ ...prev, 0: stored }));
-    }
-  }, []);
+  // (No pre-fill — first question is open-ended, not the surname)
 
   // Warm up voice list (Chrome loads asynchronously)
   useEffect(() => {
