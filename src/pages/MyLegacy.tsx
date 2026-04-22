@@ -63,7 +63,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
         const rawSurname = sessionSurname ?? profile?.surname ?? null;
 
         if (!rawSurname) {
-          setData({ facts: null, story: null, crestUrl: null, surname: null, loading: false, generating: false, error: null });
+          setData({ facts: null, story: null, crestUrl: null, surname: null, deepLegacyResearch: null, loading: false, generating: false, error: null });
           return;
         }
 
