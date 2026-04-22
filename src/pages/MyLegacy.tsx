@@ -339,7 +339,7 @@ function ListenButton({ chapterKey, text, tts }: {
 const MyLegacy = () => {
   const navigate = useNavigate();
   const { user, hasPurchased, loading: purchaseLoading } = usePurchase();
-  const { facts, story, crestUrl: initialCrestUrl, surname, loading, generating, error } = useLegacyData(
+  const { facts, story, crestUrl: initialCrestUrl, surname, deepLegacyResearch, loading, generating, error } = useLegacyData(
     !purchaseLoading && hasPurchased ? user?.id : undefined
   );
   const crestUrl = useCrestPoller(surname, initialCrestUrl);
