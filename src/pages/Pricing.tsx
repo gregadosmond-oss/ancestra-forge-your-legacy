@@ -10,30 +10,30 @@ const reveal = {
 };
 
 const FREE_ITEMS = [
-  "Surname meaning & origin",
-  "Bloodline personality quiz",
+  "Surname lookup",
+  "Bloodline quiz",
   "Motto generator",
   "Meet your ancestor",
-  "The 1700s you",
   "Ancestor chat",
+  "1700s you",
 ];
 
 const LEGACY_ITEMS = [
-  "Custom coat of arms (hi-res PNG & SVG)",
-  "AI-written family story — all 9 chapters",
-  "Visual bloodline tree",
-  "Legacy certificate (PDF)",
-  "Full ancestor chat access",
-  "Shareable legacy page",
-  "Delivered to your email instantly",
+  "Full crest (high-res PNG)",
+  "AI family story (9 chapters)",
+  "Visual family tree",
+  "Legacy certificate",
+  "Family motto in Latin",
+  "Ancestor chat unlocked",
 ];
 
-const HEIRLOOM_ITEMS = [
-  "Custom crest mug — printed & shipped",
-  "Full Legacy Pack included ($29.99 value)",
-  "\"HOUSE OF [NAME]\" wrap-around design",
-  "QR code linking to your legacy page",
-  "Ships worldwide in 5–7 days",
+const DEEP_LEGACY_ITEMS = [
+  "Everything in Legacy Pack",
+  "15-question guided interview",
+  "AI-researched genealogical history",
+  "Verified historical sources",
+  "Full migration record",
+  "Confirmation email with research summary",
 ];
 
 const FAQ = [
@@ -81,11 +81,13 @@ const Pricing = () => (
     {/* 3-tier cards */}
     <motion.div {...reveal} className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-3">
 
-      {/* Explorer */}
+      {/* Free Tools */}
       <div className="flex flex-col rounded-[22px] border bg-card p-8" style={{ borderColor: "rgba(232,148,58,0.1)" }}>
-        <div className="mb-2 text-3xl">🔍</div>
+        <p className="mb-3 font-sans text-[10px] font-semibold uppercase tracking-[3px]" style={{ color: "#a07830" }}>
+          Free Tools
+        </p>
         <h2 className="font-display text-xl text-cream-warm">Explorer</h2>
-        <div className="mt-3 font-display text-4xl" style={{ color: "#e8b85c" }}>Free</div>
+        <div className="mt-3 font-display text-4xl" style={{ color: "#e8b85c" }}>$0</div>
         <p className="mt-1 font-sans text-[11px]" style={{ color: "#8a7e6e" }}>No credit card needed</p>
         <ul className="mt-6 flex-1 space-y-2">
           {FREE_ITEMS.map((item) => (
@@ -110,10 +112,12 @@ const Pricing = () => (
           style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}>
           Most Popular
         </div>
-        <div className="mb-2 text-3xl">🛡</div>
-        <h2 className="font-display text-xl text-cream-warm">Legacy Pack</h2>
+        <p className="mb-3 font-sans text-[10px] font-semibold uppercase tracking-[3px]" style={{ color: "#a07830" }}>
+          Legacy Pack
+        </p>
+        <h2 className="font-display text-xl text-cream-warm">Your Full Story</h2>
         <div className="mt-3 font-display text-4xl" style={{ color: "#e8b85c" }}>
-          $29.99
+          $19.99
         </div>
         <p className="mt-1 font-sans text-[11px]" style={{ color: "#8a7e6e" }}>One-time · Instant delivery</p>
         <ul className="mt-6 flex-1 space-y-2">
@@ -129,33 +133,39 @@ const Pricing = () => (
           className="mt-8 block rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
           style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
         >
-          Unlock My Legacy
+          Get Your Legacy
         </Link>
       </div>
 
-      {/* Heirloom Shop */}
-      <div className="relative flex flex-col rounded-[22px] border bg-card p-8" style={{ borderColor: "rgba(232,148,58,0.1)" }}>
-        <div className="mb-2 text-3xl">🎁</div>
-        <h2 className="font-display text-xl text-cream-warm">Heirloom Shop</h2>
-        <div className="mt-3 font-display text-4xl" style={{ color: "#e8b85c" }}>$49.99</div>
-        <p className="mt-1 font-sans text-[11px]" style={{ color: "#8a7e6e" }}>Mug · Legacy Pack included · Ships worldwide</p>
-        <p className="mt-3 text-xs italic" style={{ color: "#8a7e6e" }}>
-          Your family crest, name & QR code on a ceramic mug — plus the full digital Legacy Pack.
+      {/* Deep Legacy — premium */}
+      <div
+        className="relative flex flex-col rounded-[22px] p-8"
+        style={{
+          background: "linear-gradient(180deg, #1a1208 0%, #13100b 100%)",
+          border: "1px solid rgba(212,160,74,0.5)",
+          boxShadow: "0 0 40px rgba(232,148,58,0.08)",
+        }}
+      >
+        <p className="mb-3 font-sans text-[10px] font-semibold uppercase tracking-[3px]" style={{ color: "#d4a04a" }}>
+          Deep Legacy
         </p>
-        <ul className="mt-4 flex-1 space-y-2">
-          {HEIRLOOM_ITEMS.map((item) => (
+        <h2 className="font-display text-xl text-cream-warm">Premium Research</h2>
+        <div className="mt-3 font-display text-4xl" style={{ color: "#f0e8da" }}>$79</div>
+        <p className="mt-1 font-sans text-[11px]" style={{ color: "#8a7e6e" }}>One-time · Delivered within 24 hours</p>
+        <ul className="mt-6 flex-1 space-y-2">
+          {DEEP_LEGACY_ITEMS.map((item) => (
             <li key={item} className="flex items-start gap-2 text-sm" style={{ color: "#c4b8a6" }}>
-              <span className="mt-1 font-sans text-[8px]" style={{ color: "#a07830" }}>✦</span>
+              <span className="mt-1 font-sans text-[8px]" style={{ color: "#d4a04a" }}>✦</span>
               {item}
             </li>
           ))}
         </ul>
         <Link
-          to="/heirloom-order"
+          to="/deep-legacy"
           className="mt-8 block rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
           style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
         >
-          Order Your Mug
+          Begin Deep Research
         </Link>
       </div>
 
