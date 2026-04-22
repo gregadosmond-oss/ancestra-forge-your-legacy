@@ -14,11 +14,17 @@ import type { LegacyFacts, LegacyStory } from "@/types/legacy";
 
 // ─── Data hook ────────────────────────────────────────────────────────────────
 
+type DeepLegacyResearch = {
+  summary: string;
+  sources: { title: string; url: string }[];
+};
+
 type LegacyData = {
   facts: LegacyFacts | null;
   story: LegacyStory | null;
   crestUrl: string | null;
   surname: string | null;
+  deepLegacyResearch: DeepLegacyResearch | null;
   loading: boolean;
   generating: boolean;
   error: string | null;
