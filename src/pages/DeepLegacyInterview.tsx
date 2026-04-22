@@ -496,7 +496,7 @@ export default function DeepLegacyInterview() {
             />
           </div>
           <p style={{ ...sansFont, color: TEXT_DIM, fontSize: 13, marginTop: 12, letterSpacing: 1 }}>
-            Question {currentQuestion + 1} of {QUESTIONS.length}
+            Question {currentQuestion + 1} of 20
           </p>
         </div>
 
@@ -508,12 +508,24 @@ export default function DeepLegacyInterview() {
             animation: "fadeIn 0.4s ease",
           }}
         >
+          <p
+            style={{
+              ...sansFont,
+              fontSize: 10,
+              letterSpacing: 4,
+              textTransform: "uppercase",
+              color: "#a07830",
+              marginBottom: 18,
+            }}
+          >
+            {q.section}
+          </p>
           <h2
             style={{
               ...displayFont,
               color: CREAM_WARM,
-              fontSize: "clamp(26px, 3.4vw, 36px)",
-              lineHeight: 1.25,
+              fontSize: "clamp(24px, 3.2vw, 32px)",
+              lineHeight: 1.3,
               marginBottom: 32,
             }}
           >
