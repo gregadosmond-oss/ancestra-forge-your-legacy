@@ -58,11 +58,42 @@ export type Database = {
           },
         ]
       }
+      deep_legacy_chapters: {
+        Row: {
+          body: string
+          chapter_num: number
+          created_at: string | null
+          id: string
+          surname: string
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          body: string
+          chapter_num: number
+          created_at?: string | null
+          id?: string
+          surname: string
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          body?: string
+          chapter_num?: number
+          created_at?: string | null
+          id?: string
+          surname?: string
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       deep_legacy_results: {
         Row: {
           country: string | null
           created_at: string | null
           id: string
+          interview_answers: Json | null
           research_summary: string | null
           sources: Json | null
           surname: string
@@ -72,6 +103,7 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           id?: string
+          interview_answers?: Json | null
           research_summary?: string | null
           sources?: Json | null
           surname: string
@@ -81,6 +113,7 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           id?: string
+          interview_answers?: Json | null
           research_summary?: string | null
           sources?: Json | null
           surname?: string
