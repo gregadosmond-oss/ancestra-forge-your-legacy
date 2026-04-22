@@ -19,12 +19,15 @@ type DeepLegacyResearch = {
   sources: { title: string; url: string }[];
 };
 
+type DeepChapter = { chapter_num: number; title: string; body: string };
+
 type LegacyData = {
   facts: LegacyFacts | null;
   story: LegacyStory | null;
   crestUrl: string | null;
   surname: string | null;
   deepLegacyResearch: DeepLegacyResearch | null;
+  deepChapters: DeepChapter[];
   loading: boolean;
   generating: boolean;
   error: string | null;
@@ -37,6 +40,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
     crestUrl: null,
     surname: null,
     deepLegacyResearch: null,
+    deepChapters: [],
     loading: true,
     generating: false,
     error: null,
@@ -63,7 +67,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
         const rawSurname = sessionSurname ?? profile?.surname ?? null;
 
         if (!rawSurname) {
-          setData({ facts: null, story: null, crestUrl: null, surname: null, deepLegacyResearch: null, loading: false, generating: false, error: null });
+          setData({ facts: null, story: null, crestUrl: null, surname: null, deepLegacyResearch: null, deepChapters: [], loading: false, generating: false, error: null });
           return;
         }
 
@@ -75,8 +79,8 @@ function useLegacyData(userId: string | undefined): LegacyData {
           await supabase.from("profiles").upsert({ id: userId, surname }, { onConflict: "id" });
         }
 
-        // Step 2: load facts + story + crest + deep legacy research in parallel
-        const [factsRes, crestRes, deepRes] = await Promise.all([
+        // Step 2: load facts + story + crest + deep legacy research + chapters in parallel
+        const [factsRes, crestRes, deepRes, chaptersRes] = await Promise.all([
           supabase
             .from("surname_facts")
             .select("payload, story_payload")
@@ -92,6 +96,11 @@ function useLegacyData(userId: string | undefined): LegacyData {
             .select("research_summary, sources")
             .eq("user_id", userId)
             .maybeSingle(),
+          supabase
+            .from("deep_legacy_chapters")
+            .select("chapter_num, title, body")
+            .eq("user_id", userId)
+            .order("chapter_num", { ascending: true }),
         ]);
 
         let facts = ((factsRes.data?.payload as any)?.facts as LegacyFacts) ?? (factsRes.data?.payload as LegacyFacts) ?? null;
@@ -105,6 +114,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
               sources: (deepRes.data.sources as { title: string; url: string }[] | null) ?? [],
             }
           : null;
+        const deepChapters: DeepChapter[] = (chaptersRes.data as DeepChapter[] | null) ?? [];
 
         // Step 3: generate if no facts at all (e.g. user skipped the journey)
         if (!facts) {
@@ -138,11 +148,11 @@ function useLegacyData(userId: string | undefined): LegacyData {
           } catch {
             // generation failure is non-fatal — show what we have
           }
-          setData({ facts, story, crestUrl, surname, deepLegacyResearch, loading: false, generating: false, error: null });
+          setData({ facts, story, crestUrl, surname, deepLegacyResearch, deepChapters, loading: false, generating: false, error: null });
           return;
         }
 
-        setData({ facts, story, crestUrl, surname, deepLegacyResearch, loading: false, generating: false, error: null });
+        setData({ facts, story, crestUrl, surname, deepLegacyResearch, deepChapters, loading: false, generating: false, error: null });
       } catch (err) {
         setData((d) => ({ ...d, loading: false, generating: false, error: (err as Error).message }));
       }
@@ -339,7 +349,7 @@ function ListenButton({ chapterKey, text, tts }: {
 const MyLegacy = () => {
   const navigate = useNavigate();
   const { user, hasPurchased, loading: purchaseLoading } = usePurchase();
-  const { facts, story, crestUrl: initialCrestUrl, surname, deepLegacyResearch, loading, generating, error } = useLegacyData(
+  const { facts, story, crestUrl: initialCrestUrl, surname, deepLegacyResearch, deepChapters, loading, generating, error } = useLegacyData(
     !purchaseLoading && hasPurchased ? user?.id : undefined
   );
   const crestUrl = useCrestPoller(surname, initialCrestUrl);
