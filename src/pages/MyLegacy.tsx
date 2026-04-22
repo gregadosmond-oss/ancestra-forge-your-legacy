@@ -138,7 +138,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
           } catch {
             // generation failure is non-fatal — show what we have
           }
-          setData({ facts, story, crestUrl, surname, loading: false, generating: false, error: null });
+          setData({ facts, story, crestUrl, surname, deepLegacyResearch, loading: false, generating: false, error: null });
           return;
         }
 
