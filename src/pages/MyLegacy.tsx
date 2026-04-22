@@ -344,6 +344,102 @@ function ListenButton({ chapterKey, text, tts }: {
   );
 }
 
+// ─── Roman numerals ───────────────────────────────────────────────────────────
+
+function toRoman(num: number): string {
+  const map: [number, string][] = [
+    [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
+    [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
+    [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
+  ];
+  let n = num;
+  let out = "";
+  for (const [val, sym] of map) {
+    while (n >= val) { out += sym; n -= val; }
+  }
+  return out;
+}
+
+// ─── Deep Book chapter card ───────────────────────────────────────────────────
+
+function DeepBookChapterCard({ chapter, tts }: { chapter: DeepChapter; tts: ReturnType<typeof useChapterTTS> }) {
+  const [expanded, setExpanded] = useState(false);
+  const paragraphs = chapter.body.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  const chapterKey = `book-${chapter.chapter_num}`;
+  const ttsText = `${chapter.title}. ${chapter.body}`;
+
+  return (
+    <div
+      className="rounded-[22px] border p-6 sm:p-8"
+      style={{ background: "rgba(26,18,8,0.7)", borderColor: "rgba(160,120,48,0.15)" }}
+    >
+      <p
+        className="font-sans uppercase"
+        style={{ fontSize: "10px", letterSpacing: "2px", color: "#a07830" }}
+      >
+        Chapter {toRoman(chapter.chapter_num)}
+      </p>
+      <h3 className="mt-2 font-display text-cream-warm" style={{ fontSize: "22px", lineHeight: 1.25 }}>
+        {chapter.title}
+      </h3>
+
+      {!expanded ? (
+        <button
+          onClick={() => setExpanded(true)}
+          className="mt-5 rounded-full border px-5 py-2 font-sans text-[10px] font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
+          style={{ borderColor: "rgba(212,160,74,0.3)", color: "#d4a04a", background: "rgba(232,148,58,0.06)" }}
+        >
+          Read Chapter
+        </button>
+      ) : (
+        <>
+          <div className="mt-6 space-y-5">
+            {paragraphs.map((para, i) => (
+              <p
+                key={i}
+                className="font-serif text-text-body text-justify"
+                style={{ lineHeight: 1.95, fontSize: "1.0625rem" }}
+              >
+                {i === 0 ? (
+                  <>
+                    <span
+                      style={{
+                        float: "left",
+                        fontFamily: "'Libre Caslon Display', serif",
+                        fontSize: "4.2rem",
+                        lineHeight: 0.9,
+                        color: "#e8b85c",
+                        paddingRight: "0.5rem",
+                        paddingTop: "0.35rem",
+                      }}
+                    >
+                      {para.charAt(0)}
+                    </span>
+                    {para.slice(1)}
+                  </>
+                ) : (
+                  para
+                )}
+              </p>
+            ))}
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <ListenButton chapterKey={chapterKey} text={ttsText} tts={tts} />
+            <button
+              onClick={() => setExpanded(false)}
+              className="rounded-full border px-4 py-1.5 font-sans text-[10px] font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
+              style={{ borderColor: "rgba(138,126,110,0.25)", color: "#8a7e6e", background: "transparent" }}
+            >
+              Collapse
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // ─── Main component ────────────────────────────────────────────────────────────
 
 const MyLegacy = () => {
