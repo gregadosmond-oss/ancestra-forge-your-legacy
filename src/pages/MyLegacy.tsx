@@ -915,6 +915,57 @@ const MyLegacy = () => {
           </motion.section>
         )}
 
+        {/* ── Deep Legacy Book (12 chapters) ── */}
+        {deepChapters.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 1.45 }}
+            className="mt-14"
+          >
+            <OrnamentDivider />
+            <p
+              className="mb-2 text-center font-sans uppercase"
+              style={{ fontSize: "10px", letterSpacing: "3px", color: "#a07830" }}
+            >
+              Your Deep Legacy Book
+            </p>
+            <p
+              className="mb-8 text-center font-serif italic"
+              style={{ fontSize: "14px", color: "#c4b8a6" }}
+            >
+              A 12-chapter family novella
+            </p>
+            <div className="space-y-6">
+              {deepChapters.map((ch) => (
+                <DeepBookChapterCard key={ch.chapter_num} chapter={ch} tts={tts} />
+              ))}
+            </div>
+          </motion.section>
+        )}
+
+        {/* ── Deep Legacy Book pending state ── */}
+        {deepLegacyResearch?.summary && deepChapters.length === 0 && (
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 1.45 }}
+            className="mt-10"
+          >
+            <div
+              className="rounded-[22px] border p-6 sm:p-8 text-center"
+              style={{ background: "rgba(26,18,8,0.5)", borderColor: "rgba(160,120,48,0.15)" }}
+            >
+              <p className="font-serif italic text-amber-dim" style={{ fontSize: "16px" }}>
+                Your 12-chapter book is being written…
+              </p>
+              <p className="mt-2 font-sans text-text-dim" style={{ fontSize: "11px" }}>
+                This takes about 2 minutes. Refresh the page when you're ready.
+              </p>
+            </div>
+          </motion.section>
+        )}
+
         {/* ── Actions ── */}
         <motion.section
           initial={{ opacity: 0 }}
