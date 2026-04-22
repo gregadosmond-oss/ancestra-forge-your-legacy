@@ -364,12 +364,12 @@ export default function DeepLegacyInterview() {
 
     if (isLast) {
       setIsSubmitting(true);
-      const payload: Record<string, string> = {};
-      QUESTIONS.forEach((qq, i) => {
-        payload[qq.key] = (answers[i] || "").trim();
-      });
-      localStorage.setItem("deepLegacyAnswers", JSON.stringify(payload));
-      if (payload.surname) localStorage.setItem("userSurname", payload.surname);
+      const payload = QUESTIONS.map((qq, i) => ({
+        sectionTitle: qq.section,
+        question: qq.question,
+        answer: (answers[i] || "").trim(),
+      }));
+      localStorage.setItem("deepLegacy_interviewAnswers", JSON.stringify(payload));
       setTimeout(() => navigate("/deep-legacy/processing"), 300);
       return;
     }
