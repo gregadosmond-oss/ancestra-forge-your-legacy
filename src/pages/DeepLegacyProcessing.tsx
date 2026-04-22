@@ -107,7 +107,9 @@ export default function DeepLegacyProcessing() {
 
       navigate("/deep-legacy/results");
     } catch (err) {
-      setError((err as Error).message || "Unknown error");
+      console.error('[DeepLegacyProcessing] Failure:', err);
+      const e = err as { message?: string; error?: string };
+      setError(e?.message || e?.error || "Unknown error");
     } finally {
       inFlightRef.current = false;
     }
