@@ -58,6 +58,36 @@ export type Database = {
           },
         ]
       }
+      deep_legacy_results: {
+        Row: {
+          country: string | null
+          created_at: string | null
+          id: string
+          research_summary: string | null
+          sources: Json | null
+          surname: string
+          user_id: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          research_summary?: string | null
+          sources?: Json | null
+          surname: string
+          user_id?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          research_summary?: string | null
+          sources?: Json | null
+          surname?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
