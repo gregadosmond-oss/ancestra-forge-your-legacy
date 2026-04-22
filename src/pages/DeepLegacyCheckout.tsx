@@ -163,6 +163,8 @@ export default function DeepLegacyCheckout() {
               priceId="deep_legacy_once"
               returnUrl={returnUrl}
               surname={surname}
+              productType="deep_legacy"
+              shippingAddress={country ? { country } : undefined}
             />
           </div>
         )}
