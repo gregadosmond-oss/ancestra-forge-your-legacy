@@ -13,6 +13,7 @@ interface StripeEmbeddedCheckoutProps {
   surname?: string;
   shippingAddress?: Record<string, string>;
   productType?: string;
+  environment?: 'sandbox' | 'live';
 }
 
 const StripeEmbeddedCheckout = ({
@@ -26,6 +27,7 @@ const StripeEmbeddedCheckout = ({
   surname,
   shippingAddress,
   productType,
+  environment,
 }: StripeEmbeddedCheckoutProps) => {
   if (!isStripeConfigured()) {
     return (
