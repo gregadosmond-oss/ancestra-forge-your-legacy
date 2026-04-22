@@ -165,6 +165,7 @@ export default function DeepLegacyCheckout() {
               surname={surname}
               productType="deep_legacy"
               shippingAddress={country ? { country } : undefined}
+              environment="sandbox"
             />
           </div>
         )}
