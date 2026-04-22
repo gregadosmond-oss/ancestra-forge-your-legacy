@@ -21,24 +21,34 @@ const TEXT_DIM = "#8a7e6e";
 const displayFont = { fontFamily: "'Libre Caslon Display', serif" };
 const sansFont = { fontFamily: "'DM Sans', sans-serif" };
 
-type Q = { question: string; type: "text" | "textarea"; key: string };
+type Q = { section: string; question: string };
 
 const QUESTIONS: Q[] = [
-  { question: "What is your family surname?", type: "text", key: "surname" },
-  { question: "What country or region did your family originally come from?", type: "text", key: "origin" },
-  { question: "What is the earliest ancestor you know of by name?", type: "text", key: "earliestAncestor" },
-  { question: "Roughly what year or era did they live in?", type: "text", key: "ancestorEra" },
-  { question: "What did your ancestors do for work or trade?", type: "text", key: "ancestralWork" },
-  { question: "What region or town did your family settle in?", type: "text", key: "settlement" },
-  { question: "Did your family migrate or move countries? Where from and to?", type: "text", key: "migration" },
-  { question: "What family stories or legends have been passed down to you?", type: "textarea", key: "stories" },
-  { question: "Are there any notable achievements, struggles, or events in your family history?", type: "textarea", key: "events" },
-  { question: "What values or traits seem to run through your family?", type: "text", key: "traits" },
-  { question: "Do you know of any family mottos, sayings, or beliefs?", type: "text", key: "mottos" },
-  { question: "Are there any family names that repeat across generations?", type: "text", key: "repeatingNames" },
-  { question: "What do you most want to preserve about your family's story?", type: "textarea", key: "preserve" },
-  { question: "Who in your family would most treasure this legacy?", type: "text", key: "recipient" },
-  { question: "Is there anything else you want us to know about your family?", type: "textarea", key: "extra" },
+  // ORIGINS & IDENTITY
+  { section: "Origins & Identity", question: "What do you know about where your family originally came from, and how did they end up where they are now?" },
+  { section: "Origins & Identity", question: "What's the oldest story, photograph, or heirloom in your family — and what do you know about it?" },
+  { section: "Origins & Identity", question: "Are there any family names, nicknames, or naming traditions that carry meaning across generations?" },
+  { section: "Origins & Identity", question: "What languages, accents, or dialects were spoken in your home growing up?" },
+  // THE PEOPLE
+  { section: "The People", question: "Who is the ancestor you feel most connected to, even if you never met them — and why?" },
+  { section: "The People", question: "Tell me about your grandparents. What did they do, what were they like, what did they survive?" },
+  { section: "The People", question: "Was there a \"black sheep\" or mysterious figure in your family tree? What do you know (or suspect)?" },
+  { section: "The People", question: "Who in your family was known as the storyteller, the matriarch, or the one who held everyone together?" },
+  // DAILY LIFE & TEXTURE
+  { section: "Daily Life & Texture", question: "What did a typical Sunday look like in your family when you were growing up?" },
+  { section: "Daily Life & Texture", question: "What foods, recipes, or smells instantly transport you back to your childhood or a grandparent's home?" },
+  { section: "Daily Life & Texture", question: "What songs, prayers, sayings, or superstitions were passed down?" },
+  { section: "Daily Life & Texture", question: "What did your ancestors do for work, and how did that shape the family?" },
+  // TURNING POINTS
+  { section: "Turning Points", question: "What's the biggest migration, move, or uprooting in your family's history?" },
+  { section: "Turning Points", question: "How did world events — wars, depressions, revolutions — touch your family personally?" },
+  { section: "Turning Points", question: "Is there a moment you'd call the \"before and after\" of your family story?" },
+  { section: "Turning Points", question: "What losses or tragedies shaped who your family became?" },
+  // VALUES, SECRETS, LEGACY
+  { section: "Values, Secrets, Legacy", question: "What values, beliefs, or rules got passed down — spoken or unspoken?" },
+  { section: "Values, Secrets, Legacy", question: "Is there a family secret, rumor, or unanswered question you've always wondered about?" },
+  { section: "Values, Secrets, Legacy", question: "What patterns do you see repeating across generations — good or bad?" },
+  { section: "Values, Secrets, Legacy", question: "If you could sit down with one ancestor for an hour, who would it be and what would you ask them?" },
 ];
 
 const ctaButtonStyle: React.CSSProperties = {
@@ -305,13 +315,7 @@ export default function DeepLegacyInterview() {
     [startListening, speakWithBrowser]
   );
 
-  // Pre-fill surname from localStorage
-  useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("userSurname") : null;
-    if (stored) {
-      setAnswers((prev) => ({ ...prev, 0: stored }));
-    }
-  }, []);
+  // (No pre-fill — first question is open-ended, not the surname)
 
   // Warm up voice list (Chrome loads asynchronously)
   useEffect(() => {
@@ -354,12 +358,12 @@ export default function DeepLegacyInterview() {
 
     if (isLast) {
       setIsSubmitting(true);
-      const payload: Record<string, string> = {};
-      QUESTIONS.forEach((qq, i) => {
-        payload[qq.key] = (answers[i] || "").trim();
-      });
-      localStorage.setItem("deepLegacyAnswers", JSON.stringify(payload));
-      if (payload.surname) localStorage.setItem("userSurname", payload.surname);
+      const payload = QUESTIONS.map((qq, i) => ({
+        sectionTitle: qq.section,
+        question: qq.question,
+        answer: (answers[i] || "").trim(),
+      }));
+      localStorage.setItem("deepLegacy_interviewAnswers", JSON.stringify(payload));
       setTimeout(() => navigate("/deep-legacy/processing"), 300);
       return;
     }
@@ -411,7 +415,7 @@ export default function DeepLegacyInterview() {
     borderRadius: 14,
     outline: "none",
     transition: "border-color 0.2s ease",
-    resize: q.type === "textarea" ? ("vertical" as const) : ("none" as const),
+    resize: "vertical" as const,
   };
 
   const showVoiceUI = speechSupported || ttsSupported;
@@ -492,7 +496,7 @@ export default function DeepLegacyInterview() {
             />
           </div>
           <p style={{ ...sansFont, color: TEXT_DIM, fontSize: 13, marginTop: 12, letterSpacing: 1 }}>
-            Question {currentQuestion + 1} of {QUESTIONS.length}
+            Question {currentQuestion + 1} of 20
           </p>
         </div>
 
@@ -504,12 +508,24 @@ export default function DeepLegacyInterview() {
             animation: "fadeIn 0.4s ease",
           }}
         >
+          <p
+            style={{
+              ...sansFont,
+              fontSize: 10,
+              letterSpacing: 4,
+              textTransform: "uppercase",
+              color: "#a07830",
+              marginBottom: 18,
+            }}
+          >
+            {q.section}
+          </p>
           <h2
             style={{
               ...displayFont,
               color: CREAM_WARM,
-              fontSize: "clamp(26px, 3.4vw, 36px)",
-              lineHeight: 1.25,
+              fontSize: "clamp(24px, 3.2vw, 32px)",
+              lineHeight: 1.3,
               marginBottom: 32,
             }}
           >
@@ -554,31 +570,15 @@ export default function DeepLegacyInterview() {
           )}
 
           <div style={{ position: "relative" }}>
-            {q.type === "text" ? (
-              <input
-                type="text"
-                autoFocus
-                value={value}
-                onChange={(e) => updateValue(e.target.value)}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") goNext();
-                }}
-                style={inputBaseStyle}
-                placeholder="Type or speak your answer..."
-              />
-            ) : (
-              <textarea
-                autoFocus
-                value={value}
-                onChange={(e) => updateValue(e.target.value)}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
-                style={{ ...inputBaseStyle, minHeight: 120 }}
-                placeholder="Share what you remember..."
-              />
-            )}
+            <textarea
+              autoFocus
+              value={value}
+              onChange={(e) => updateValue(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              style={{ ...inputBaseStyle, minHeight: 140 }}
+              placeholder="Share what you remember..."
+            />
           </div>
 
           {/* Interim transcript (live partial) */}
