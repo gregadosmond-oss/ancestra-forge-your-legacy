@@ -746,6 +746,69 @@ const MyLegacy = () => {
           </motion.section>
         )}
 
+        {/* ── Deep Legacy Research ── */}
+        {deepLegacyResearch?.summary && (
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 1.4 }}
+            className="mt-14"
+          >
+            <OrnamentDivider />
+            <p className="mb-6 text-center font-sans uppercase" style={{ fontSize: "10px", letterSpacing: "3px", color: "#a07830" }}>
+              Deep Legacy Research
+            </p>
+            <div
+              className="rounded-[18px] border p-6 sm:p-8"
+              style={{ background: "rgba(26,18,8,0.7)", borderColor: "rgba(160,120,48,0.15)" }}
+            >
+              <div className="space-y-5">
+                {deepLegacyResearch.summary
+                  .split(/\n\s*\n/)
+                  .map((chunk) => chunk.trim())
+                  .filter(Boolean)
+                  .map((chunk, i) => (
+                    <p
+                      key={i}
+                      className="font-serif text-text-body text-justify"
+                      style={{ lineHeight: 1.95 }}
+                    >
+                      {chunk}
+                    </p>
+                  ))}
+              </div>
+
+              {deepLegacyResearch.sources.length > 0 && (
+                <div className="mt-8">
+                  <p
+                    className="mb-3 font-sans uppercase"
+                    style={{ fontSize: "9px", letterSpacing: "3px", color: "#a07830" }}
+                  >
+                    Sources
+                  </p>
+                  <ul className="space-y-2">
+                    {deepLegacyResearch.sources.map((src, i) => (
+                      <li key={i}>
+                        <a
+                          href={src.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-sans transition-colors"
+                          style={{ fontSize: "12px", color: "#8a7e6e" }}
+                          onMouseEnter={(e) => (e.currentTarget.style.color = "#d4a04a")}
+                          onMouseLeave={(e) => (e.currentTarget.style.color = "#8a7e6e")}
+                        >
+                          → {src.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </motion.section>
+        )}
+
         {/* ── Actions ── */}
         <motion.section
           initial={{ opacity: 0 }}
