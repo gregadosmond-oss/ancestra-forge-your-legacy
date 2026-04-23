@@ -219,12 +219,14 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     .title-page {
       page: title-page;
       page-break-after: always;
-      height: 230mm;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      min-height: calc(280mm - 56mm);
+      max-height: calc(280mm - 56mm);
+      box-sizing: border-box;
     }
     .title-page .eyebrow {
       font-family: 'DM Sans', sans-serif;
