@@ -197,6 +197,15 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     @page dedication-page {
       @bottom-center { content: ""; }
     }
+    @page chapter-title-page {
+      @bottom-center { content: ""; }
+    }
+    @page afterword-page {
+      @bottom-center { content: ""; }
+    }
+    @page colophon-page {
+      @bottom-center { content: ""; }
+    }
     html, body {
       margin: 0;
       padding: 0;
