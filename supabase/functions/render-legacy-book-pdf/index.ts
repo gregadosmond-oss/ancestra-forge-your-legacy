@@ -199,7 +199,8 @@ ${chapterTitlePage(num, title)}
     .map((title, i) => {
       const n = i + 1;
       const roman = romanNumerals[i];
-      const headText = `${roman} \u00B7 ${title}`;
+      const cleanTitle = String(title ?? "").replace(/^Chapter [IVX]+ — /, "");
+      const headText = `${roman} \u00B7 ${cleanTitle}`;
       return `
     @page chapter-${n} {
       margin-top: 20mm;
