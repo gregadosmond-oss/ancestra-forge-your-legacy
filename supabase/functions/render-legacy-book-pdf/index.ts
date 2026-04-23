@@ -440,15 +440,17 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
 ${laterChaptersHtml}
 
 <section class="certificate">
-  <div class="eyebrow">Legacy Certificate</div>
-  <h2>House of ${escapeHtml(displaySurname)}</h2>
-  <div class="body-text">
-    This certifies that the House of ${escapeHtml(displaySurname)}
-    bears the arms since ${escapeHtml(String(migrationYear))}.
-  </div>
-  <div class="motto-block">
-    ${mottoLatin ? `"${escapeHtml(mottoLatin)}"` : ""}
-    ${mottoEnglish ? `<div class="motto-en">— ${escapeHtml(mottoEnglish)}</div>` : ""}
+  <div class="certificate-frame">
+    <div class="eyebrow">Legacy Certificate</div>
+    <h2>House of ${escapeHtml(displaySurname)}</h2>
+    <div class="body-text">
+      This certifies that the House of ${escapeHtml(displaySurname)}
+      bears the arms since ${escapeHtml(String(migrationYear))}.
+    </div>
+    <div class="motto-block">
+      ${mottoLatin ? `"${escapeHtml(mottoLatin)}"` : ""}
+      ${mottoEnglish ? `<div class="motto-en">— ${escapeHtml(mottoEnglish)}</div>` : ""}
+    </div>
   </div>
 </section>
 
