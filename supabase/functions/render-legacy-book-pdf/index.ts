@@ -654,7 +654,7 @@ ${chapterTitlePage(num, title)}
 </head>
 <body>
 
-<section class="title-page">
+<section class="title-page clean-page">
   <div class="eyebrow">A Family Legacy</div>
   <h1>The House of</h1>
   <div class="display-surname">${escapeHtml(displaySurname)}</div>
@@ -664,21 +664,21 @@ ${chapterTitlePage(num, title)}
   <div class="generated-date">Forged ${escapeHtml(generatedDate)}</div>
 </section>
 
-<section class="dedication">
+<section class="dedication clean-page">
   <div class="dedication-text">
     For the House of ${escapeHtml(displaySurname)} —<br/>
     past, present, and future.
   </div>
 </section>
 
-<section class="toc">
+<section class="toc clean-page">
   <h2>Contents</h2>
   <ul>
     ${tocHtml}
   </ul>
 </section>
 
-<section class="chapter-title-page">
+<section class="chapter-title-page clean-page">
   <div class="ct-eyebrow">Chapter</div>
   <div class="ct-numeral">I</div>
   <div class="ct-title">${escapeHtml(chapterOneTitle)}</div>
