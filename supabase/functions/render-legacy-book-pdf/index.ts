@@ -508,6 +508,13 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
   <div class="generated-date">Forged ${escapeHtml(generatedDate)}</div>
 </section>
 
+<section class="dedication">
+  <div class="dedication-text">
+    For the House of ${escapeHtml(displaySurname)} —<br/>
+    past, present, and future.
+  </div>
+</section>
+
 <section class="toc">
   <h2>Contents</h2>
   <ul>
