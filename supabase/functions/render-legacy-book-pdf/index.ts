@@ -443,7 +443,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         source: html,
         landscape: false,
-        format: "210mm 280mm",
+        format: "210mmx280mm",
         margin: {
           top: "25mm",
           bottom: "25mm",
