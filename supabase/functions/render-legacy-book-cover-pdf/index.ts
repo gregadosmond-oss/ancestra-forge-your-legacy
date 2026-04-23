@@ -61,7 +61,12 @@ function paletteCss(mode: PaletteMode): string {
     .join("\n")}\n}`;
 }
 
-function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
+function buildHtml(
+  fixture: any,
+  mode: PaletteMode = "print",
+  crestOverrideUrl: string | null = null,
+  qrUrl: string | null = null,
+): string {
   const facts = fixture?.facts ?? {};
 
   const displaySurname: string =
@@ -70,6 +75,7 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
   const mottoEnglish: string = facts.mottoEnglish || "";
 
   const crestImageUrl: string =
+    crestOverrideUrl ||
     facts.crestImageUrl ||
     facts.crestUrl ||
     fixture.crestImageUrl ||
