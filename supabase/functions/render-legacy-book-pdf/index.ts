@@ -441,13 +441,17 @@ Deno.serve(async (req) => {
   }
 
   let fixtureUrl = DEFAULT_FIXTURE_URL;
+  let mode: PaletteMode = "print";
   try {
     const body = await req.json().catch(() => ({}));
     if (body && typeof body.fixtureUrl === "string" && body.fixtureUrl.trim()) {
       fixtureUrl = body.fixtureUrl.trim();
     }
+    if (body && (body.mode === "print" || body.mode === "digital")) {
+      mode = body.mode;
+    }
   } catch (_) {
-    // keep default
+    // keep defaults
   }
 
   let fixture: any;
@@ -461,7 +465,7 @@ Deno.serve(async (req) => {
     return fail("fixture", (err as Error).message);
   }
 
-  const html = buildHtml(fixture);
+  const html = buildHtml(fixture, mode);
 
   let pdfBytes: Uint8Array;
   try {
