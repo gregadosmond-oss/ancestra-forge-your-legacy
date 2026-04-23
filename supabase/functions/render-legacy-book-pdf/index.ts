@@ -89,6 +89,20 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     day: "numeric",
   });
 
+  const crestImageUrl: string =
+    facts.crestImageUrl ||
+    facts.crestUrl ||
+    fixture.crestImageUrl ||
+    fixture.crestUrl ||
+    "";
+
+  const nowTs = Date.now().toString();
+  const surnameSlug = String(displaySurname).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const certNumber = `${surnameSlug.slice(0, 8)}-${nowTs.slice(-6)}`;
+  const todayDate = new Date()
+    .toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })
+    .toUpperCase();
+
   const chapterOneTitle: string = story.chapterOneTitle || "Chapter I";
   const chapterOneBody: string = story.chapterOneBody || "";
   const teaserChapters: string[] = Array.isArray(story.teaserChapters)
