@@ -89,6 +89,20 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     day: "numeric",
   });
 
+  const crestImageUrl: string =
+    facts.crestImageUrl ||
+    facts.crestUrl ||
+    fixture.crestImageUrl ||
+    fixture.crestUrl ||
+    "";
+
+  const nowTs = Date.now().toString();
+  const surnameSlug = String(displaySurname).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const certNumber = `${surnameSlug.slice(0, 8)}-${nowTs.slice(-6)}`;
+  const todayDate = new Date()
+    .toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })
+    .toUpperCase();
+
   const chapterOneTitle: string = story.chapterOneTitle || "Chapter I";
   const chapterOneBody: string = story.chapterOneBody || "";
   const teaserChapters: string[] = Array.isArray(story.teaserChapters)
@@ -178,6 +192,9 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       @bottom-center { content: ""; }
     }
     @page title-page {
+      @bottom-center { content: ""; }
+    }
+    @page dedication-page {
       @bottom-center { content: ""; }
     }
     html, body {
@@ -345,6 +362,27 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       height: 0;
     }
 
+    .dedication {
+      page: dedication-page;
+      page-break-before: always;
+      page-break-after: always;
+      height: calc(100vh - 56mm);
+      max-height: calc(280mm - 56mm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .dedication .dedication-text {
+      font-family: 'Libre Caslon Text', serif;
+      font-style: italic;
+      font-size: 14pt;
+      color: var(--motto);
+      text-align: center;
+      max-width: 130mm;
+      line-height: 1.7;
+    }
+
     .certificate {
       page-break-before: always;
       page-break-after: avoid;
@@ -355,49 +393,97 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       overflow: hidden;
       box-sizing: border-box;
     }
+    .certificate .certificate-outer {
+      height: 100%;
+      border: 2px solid var(--divider);
+      padding: 12mm;
+      box-sizing: border-box;
+    }
     .certificate .certificate-frame {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       height: 100%;
       text-align: center;
-      border: 2px solid var(--divider);
-      padding: 20mm;
+      border: 1px solid var(--divider);
+      padding: 10mm;
       box-sizing: border-box;
     }
-    .certificate .eyebrow {
+    .certificate .cert-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      width: 100%;
+    }
+    .certificate .cert-label {
       font-family: 'DM Sans', sans-serif;
-      font-size: 10pt;
+      font-size: 9pt;
       letter-spacing: 0.4em;
       text-transform: uppercase;
       color: var(--chapter-label);
-      margin-bottom: 10mm;
+      margin-bottom: 6mm;
+    }
+    .certificate .cert-flourish {
+      font-size: 24pt;
+      color: var(--divider);
+      line-height: 1;
+      margin-bottom: 6mm;
+    }
+    .certificate .cert-crest {
+      width: 90mm;
+      height: auto;
+      display: block;
+      margin: 0 auto 6mm auto;
     }
     .certificate h2 {
-      font-size: 32pt;
-      margin-bottom: 14mm;
+      font-family: 'Libre Caslon Display', serif;
+      font-size: 38pt;
+      color: var(--heading);
+      margin: 0 0 4mm 0;
+      font-style: italic;
+      font-weight: 400;
+    }
+    .certificate .cert-rule {
+      border: none;
+      border-top: 1px solid var(--divider);
+      width: 40%;
+      margin: 8mm auto;
     }
     .certificate .body-text {
       font-family: 'Libre Caslon Text', serif;
-      font-style: italic;
-      font-size: 14pt;
+      font-size: 13pt;
       color: var(--body-text);
       max-width: 140mm;
-      line-height: 1.7;
-      margin-bottom: 14mm;
+      line-height: 1.6;
+      margin: 0 auto;
     }
-    .certificate .motto-block {
+    .certificate .cert-motto-latin {
       font-family: 'Libre Caslon Text', serif;
       font-style: italic;
-      font-size: 13pt;
-      color: var(--heading);
-    }
-    .certificate .motto-en {
+      font-size: 15pt;
       color: var(--motto);
+      margin-top: 4mm;
+    }
+    .certificate .cert-motto-en {
+      font-family: 'Libre Caslon Text', serif;
+      font-style: italic;
       font-size: 11pt;
+      color: var(--chapter-label);
       margin-top: 2mm;
     }
+    .certificate .cert-footer {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8pt;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--chapter-label);
+      width: 100%;
+      line-height: 1.8;
+    }
+    .certificate .cert-footer div { display: block; }
   `;
 
   return `<!DOCTYPE html>
@@ -422,6 +508,13 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
   <div class="generated-date">Forged ${escapeHtml(generatedDate)}</div>
 </section>
 
+<section class="dedication">
+  <div class="dedication-text">
+    For the House of ${escapeHtml(displaySurname)} —<br/>
+    past, present, and future.
+  </div>
+</section>
+
 <section class="toc">
   <h2>Contents</h2>
   <ul>
@@ -440,16 +533,27 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
 ${laterChaptersHtml}
 
 <section class="certificate">
-  <div class="certificate-frame">
-    <div class="eyebrow">Legacy Certificate</div>
-    <h2>House of ${escapeHtml(displaySurname)}</h2>
-    <div class="body-text">
-      This certifies that the House of ${escapeHtml(displaySurname)}
-      bears the arms since ${escapeHtml(String(migrationYear))}.
-    </div>
-    <div class="motto-block">
-      ${mottoLatin ? `"${escapeHtml(mottoLatin)}"` : ""}
-      ${mottoEnglish ? `<div class="motto-en">— ${escapeHtml(mottoEnglish)}</div>` : ""}
+  <div class="certificate-outer">
+    <div class="certificate-frame">
+      <div class="cert-main">
+        <div class="cert-label">Legacy Certificate</div>
+        <div class="cert-flourish">❦</div>
+        ${crestImageUrl ? `<img class="cert-crest" src="${escapeHtml(crestImageUrl)}" alt="" />` : ""}
+        <h2>House of ${escapeHtml(displaySurname)}</h2>
+        <hr class="cert-rule" />
+        <div class="body-text">
+          This certifies that the House of ${escapeHtml(displaySurname)}
+          bears the arms since ${escapeHtml(String(migrationYear))}.
+        </div>
+        ${mottoLatin ? `<div class="cert-motto-latin">"${escapeHtml(mottoLatin)}"</div>` : ""}
+        ${mottoEnglish ? `<div class="cert-motto-en">— ${escapeHtml(mottoEnglish)}</div>` : ""}
+        <hr class="cert-rule" />
+      </div>
+      <div class="cert-footer">
+        <div>Issued by AncestorsQR</div>
+        <div>Certificate № ${escapeHtml(certNumber)}</div>
+        <div>${escapeHtml(todayDate)}</div>
+      </div>
     </div>
   </div>
 </section>
@@ -550,7 +654,7 @@ Deno.serve(async (req) => {
       success: true,
       url: pub.publicUrl,
       bytes: pdfBytes.byteLength,
-      pageCount: 11,
+      pageCount: 12,
     });
   } catch (err) {
     return fail("upload", (err as Error).message);
