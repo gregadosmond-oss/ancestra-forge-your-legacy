@@ -347,11 +347,20 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
 
     .certificate {
       page-break-before: always;
-      height: 230mm;
+      page-break-after: avoid;
+      break-inside: avoid;
+      page-break-inside: avoid;
+      height: calc(100vh - 56mm);
+      max-height: calc(280mm - 56mm);
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+    .certificate .certificate-frame {
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      height: 100%;
       text-align: center;
       border: 2px solid var(--divider);
       padding: 20mm;
