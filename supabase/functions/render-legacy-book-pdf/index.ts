@@ -172,9 +172,10 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     .map((title, i) => {
       const body = chapterBodies[i] || "";
       const num = romanNumerals[i + 1];
+      const chapterIndex = i + 2;
       return `
 ${chapterTitlePage(num, title)}
-<section class="chapter">
+<section class="chapter chapter-${chapterIndex}-body">
   <div class="chapter-num">Chapter ${escapeHtml(num)}</div>
   <h2 class="chapter-title">${escapeHtml(title)}</h2>
   <div class="chapter-body">
@@ -184,7 +185,39 @@ ${chapterTitlePage(num, title)}
     })
     .join("\n");
 
+  // Pass 2: per-chapter running heads. Build one @page chapter-N rule + class
+  // for each of the 9 chapters. Roman numeral · chapter title at top-center.
+  const chapterTitlesForHeads: string[] = [
+    chapterOneTitle,
+    ...teaserChapters.slice(0, 8),
+  ];
+  const escapeForCssString = (s: string): string =>
+    String(s ?? "")
+      .replace(/\\/g, "\\\\")
+      .replace(/"/g, '\\"');
+  const runningHeadCss = chapterTitlesForHeads
+    .map((title, i) => {
+      const n = i + 1;
+      const roman = romanNumerals[i];
+      const headText = `${roman} \u00B7 ${title}`;
+      return `
+    @page chapter-${n} {
+      margin-top: 20mm;
+      @top-center {
+        content: "${escapeForCssString(headText)}";
+        font-family: 'Libre Caslon Text', serif;
+        font-style: italic;
+        font-size: 8.5pt;
+        letter-spacing: 0.12em;
+        color: #8a6d3e;
+      }
+    }
+    .chapter-${n}-body { page: chapter-${n}; }`;
+    })
+    .join("\n");
+
   const css = `
+    ${runningHeadCss}
     ${paletteCss(mode)}
     @page {
       size: 210mm 280mm;
@@ -685,7 +718,7 @@ ${chapterTitlePage(num, title)}
   <div class="ct-flourish">✦ ❦ ✦</div>
 </section>
 
-<section class="chapter">
+<section class="chapter chapter-1-body">
   <div class="chapter-num">Chapter I</div>
   <h2 class="chapter-title">${escapeHtml(chapterOneTitle)}</h2>
   <div class="chapter-body">
