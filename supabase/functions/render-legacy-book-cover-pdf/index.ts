@@ -364,7 +364,36 @@ Deno.serve(async (req) => {
     }
   }
 
-  const html = buildHtml(fixture, mode);
+  const surnameForLookup = (
+    surnameOverride ||
+    fixture?.facts?.displaySurname ||
+    fixture?.facts?.surname ||
+    fixture?.surname ||
+    "osmond"
+  )
+    .toString()
+    .toLowerCase()
+    .trim();
+
+  let crestUrl: string | null = null;
+  try {
+    const lookupClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+    const { data: crestRow } = await lookupClient
+      .from("surname_crests")
+      .select("image_url")
+      .eq("surname", surnameForLookup)
+      .maybeSingle();
+    crestUrl = crestRow?.image_url ?? null;
+  } catch (_) {
+    crestUrl = null;
+  }
+
+  const qrTarget = encodeURIComponent(
+    `https://ancestorsqr.com/f/${surnameForLookup}`,
+  );
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&color=d4a04a&bgcolor=0d0a07&data=${qrTarget}`;
+
+  const html = buildHtml(fixture, mode, crestUrl, qrUrl);
 
   let pdfBytes: Uint8Array;
   try {
