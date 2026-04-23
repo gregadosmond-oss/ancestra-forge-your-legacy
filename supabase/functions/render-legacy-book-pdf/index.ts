@@ -160,7 +160,7 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     .join("\n");
 
   const chapterTitlePage = (num: string, title: string) => `
-<section class="chapter-title-page">
+<section class="chapter-title-page clean-page">
   <div class="ct-eyebrow">Chapter</div>
   <div class="ct-numeral">${escapeHtml(num)}</div>
   <div class="ct-title">${escapeHtml(title)}</div>
@@ -188,17 +188,28 @@ ${chapterTitlePage(num, title)}
     ${paletteCss(mode)}
     @page {
       size: 210mm 280mm;
-      margin: 28mm 25mm 28mm 28mm;
+      margin: 28mm 25mm 18mm 28mm;
       background: var(--page-bg);
       @bottom-center {
         content: counter(page);
-        font-family: 'DM Sans', sans-serif;
+        font-family: 'Libre Caslon Text', serif;
+        font-style: italic;
         font-size: 9pt;
-        color: var(--chapter-label);
+        color: #b89553;
       }
     }
     @page :first {
       @bottom-center { content: ""; }
+      @top-center    { content: ""; }
+    }
+    @page clean {
+      @bottom-center { content: ""; }
+      @top-center    { content: ""; }
+    }
+    .clean-page {
+      page: clean;
+      break-before: page;
+      break-after: page;
     }
     @page title-page {
       @bottom-center { content: ""; }
@@ -351,6 +362,8 @@ ${chapterTitlePage(num, title)}
       font-size: 12pt;
       line-height: 1.78;
       margin-bottom: 0.9em;
+      orphans: 3;
+      widows: 3;
     }
     .chapter-flourish {
       text-align: center;
@@ -641,7 +654,7 @@ ${chapterTitlePage(num, title)}
 </head>
 <body>
 
-<section class="title-page">
+<section class="title-page clean-page">
   <div class="eyebrow">A Family Legacy</div>
   <h1>The House of</h1>
   <div class="display-surname">${escapeHtml(displaySurname)}</div>
@@ -651,21 +664,21 @@ ${chapterTitlePage(num, title)}
   <div class="generated-date">Forged ${escapeHtml(generatedDate)}</div>
 </section>
 
-<section class="dedication">
+<section class="dedication clean-page">
   <div class="dedication-text">
     For the House of ${escapeHtml(displaySurname)} —<br/>
     past, present, and future.
   </div>
 </section>
 
-<section class="toc">
+<section class="toc clean-page">
   <h2>Contents</h2>
   <ul>
     ${tocHtml}
   </ul>
 </section>
 
-<section class="chapter-title-page">
+<section class="chapter-title-page clean-page">
   <div class="ct-eyebrow">Chapter</div>
   <div class="ct-numeral">I</div>
   <div class="ct-title">${escapeHtml(chapterOneTitle)}</div>
