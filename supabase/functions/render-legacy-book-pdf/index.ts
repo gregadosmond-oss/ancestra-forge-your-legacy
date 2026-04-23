@@ -159,12 +159,21 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     )
     .join("\n");
 
+  const chapterTitlePage = (num: string, title: string) => `
+<section class="chapter-title-page">
+  <div class="ct-eyebrow">Chapter</div>
+  <div class="ct-numeral">${escapeHtml(num)}</div>
+  <div class="ct-title">${escapeHtml(title)}</div>
+  <div class="ct-flourish">✦ ❦ ✦</div>
+</section>`;
+
   const laterChaptersHtml = teaserChapters
     .slice(0, 8)
     .map((title, i) => {
       const body = chapterBodies[i] || "";
       const num = romanNumerals[i + 1];
       return `
+${chapterTitlePage(num, title)}
 <section class="chapter">
   <div class="chapter-num">Chapter ${escapeHtml(num)}</div>
   <h2 class="chapter-title">${escapeHtml(title)}</h2>
