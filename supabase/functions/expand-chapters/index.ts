@@ -56,7 +56,7 @@ Deno.serve(async (req: Request) => {
     return json({ error: "missing env" }, 500);
   }
 
-  let body: { surname?: unknown };
+  let body: { surname?: unknown; forceRegenerate?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -67,6 +67,7 @@ Deno.serve(async (req: Request) => {
   }
 
   const surname = body.surname.trim().toLowerCase();
+  const forceRegenerate = body.forceRegenerate === true;
   const client = createClient(supabaseUrl, supabaseKey);
 
   // Read existing story from cache
