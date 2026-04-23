@@ -172,9 +172,10 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     .map((title, i) => {
       const body = chapterBodies[i] || "";
       const num = romanNumerals[i + 1];
+      const chapterIndex = i + 2;
       return `
 ${chapterTitlePage(num, title)}
-<section class="chapter">
+<section class="chapter chapter-${chapterIndex}-body">
   <div class="chapter-num">Chapter ${escapeHtml(num)}</div>
   <h2 class="chapter-title">${escapeHtml(title)}</h2>
   <div class="chapter-body">
