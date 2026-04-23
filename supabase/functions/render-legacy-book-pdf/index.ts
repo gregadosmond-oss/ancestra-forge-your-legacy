@@ -506,7 +506,9 @@ Deno.serve(async (req) => {
 
   try {
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
-    const path = "books/osmond-book-interior.pdf";
+    const path = mode === "digital"
+      ? "books/osmond-book-interior-digital.pdf"
+      : "books/osmond-book-interior.pdf";
     const { error: uploadErr } = await supabase.storage
       .from("print-designs")
       .upload(path, pdfBytes, {
