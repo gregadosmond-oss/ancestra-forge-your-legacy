@@ -495,6 +495,129 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       line-height: 1.8;
     }
     .certificate .cert-footer div { display: block; }
+
+    .chapter-title-page {
+      page: chapter-title-page;
+      page-break-before: always;
+      page-break-after: always;
+      min-height: calc(280mm - 56mm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .chapter-title-page .ct-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10pt;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--chapter-label);
+      margin-bottom: 14mm;
+    }
+    .chapter-title-page .ct-numeral {
+      font-family: 'Libre Caslon Display', serif;
+      font-style: italic;
+      font-size: 96pt;
+      color: var(--heading);
+      line-height: 1;
+      margin: 0 0 16mm 0;
+    }
+    .chapter-title-page .ct-title {
+      font-family: 'Libre Caslon Text', serif;
+      font-style: italic;
+      font-size: 20pt;
+      color: var(--body-text);
+      max-width: 130mm;
+      line-height: 1.3;
+      margin: 0 auto;
+    }
+    .chapter-title-page .ct-flourish {
+      font-size: 14pt;
+      color: var(--divider);
+      margin-top: 20mm;
+      letter-spacing: 0.4em;
+    }
+
+    .afterword {
+      page: afterword-page;
+      page-break-before: always;
+      page-break-after: always;
+      min-height: calc(280mm - 56mm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .afterword h2 {
+      font-family: 'Libre Caslon Display', serif;
+      font-style: italic;
+      font-size: 32pt;
+      color: var(--heading);
+      margin: 0 0 14mm 0;
+      text-align: center;
+    }
+    .afterword .afterword-body {
+      font-family: 'Libre Caslon Text', serif;
+      font-size: 13pt;
+      line-height: 1.7;
+      text-align: center;
+      max-width: 140mm;
+      color: var(--body-text);
+      margin: 0 auto 12mm auto;
+    }
+    .afterword .afterword-motto-latin {
+      font-family: 'Libre Caslon Text', serif;
+      font-style: italic;
+      font-size: 15pt;
+      color: var(--motto);
+      margin-top: 4mm;
+    }
+    .afterword .afterword-motto-en {
+      font-family: 'Libre Caslon Text', serif;
+      font-style: italic;
+      font-size: 11pt;
+      color: var(--chapter-label);
+      margin-top: 2mm;
+    }
+
+    .colophon {
+      page: colophon-page;
+      page-break-before: always;
+      page-break-after: always;
+      min-height: calc(280mm - 56mm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .colophon h2 {
+      font-family: 'Libre Caslon Display', serif;
+      font-style: italic;
+      font-size: 28pt;
+      color: var(--heading);
+      margin: 0 0 14mm 0;
+      text-align: center;
+    }
+    .colophon .colophon-body {
+      font-family: 'Libre Caslon Text', serif;
+      font-size: 11pt;
+      line-height: 1.8;
+      max-width: 130mm;
+      text-align: center;
+      color: var(--body-text);
+      margin: 0 auto;
+    }
+    .colophon .colophon-flourish {
+      font-size: 18pt;
+      color: var(--divider);
+      margin-top: 12mm;
+    }
   `;
 
   return `<!DOCTYPE html>
