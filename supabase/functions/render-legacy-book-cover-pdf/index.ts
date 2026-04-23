@@ -112,34 +112,52 @@ function buildHtml(
       background: var(--page-bg);
       overflow: hidden;
     }
-    .panel {
+    /* Locked geometry:
+       Spread 464.4 x 325.4mm. Spine 6mm + 8mm joints each side.
+       Back panel:  201.2 x 285.4mm at (20, 20)    -> center x = 120.6mm
+       Front panel: 201.2 x 285.4mm at (243.2, 20) -> center x = 343.8mm
+    */
+    .back-panel {
+      position: absolute;
+      left: 20mm;
+      top: 20mm;
+      width: 201.2mm;
+      height: 285.4mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .spine {
       position: absolute;
       top: 0;
+      left: 229.2mm;
+      width: 6mm;
       height: 325.4mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       box-sizing: border-box;
       overflow: hidden;
     }
-    .back {
-      left: 0;
-      width: 229.2mm;
-      padding: 12mm 12mm 12mm 12mm;
-    }
-    .spine {
-      left: 229.2mm;
-      width: 22mm;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .front {
-      left: 251.2mm;
-      width: 229.2mm;
-      padding: 10mm 10mm 10mm 10mm;
+    .front-panel {
+      position: absolute;
+      left: 243.2mm;
+      top: 20mm;
+      width: 201.2mm;
+      height: 285.4mm;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       text-align: center;
+      box-sizing: border-box;
+    }
+    .front-panel > * {
+      margin-left: 0;
+      margin-right: 0;
     }
 
     /* Front cover */
@@ -160,13 +178,16 @@ function buildHtml(
       margin: 8mm 0 0 0;
     }
     .front .crest-wrap {
-      margin: 10mm 0 0 0;
+      margin: 10mm auto 0 auto;
       line-height: 0;
+      text-align: center;
     }
     .front .crest {
-      width: 100mm;
+      display: block;
+      margin: 0 auto;
+      width: 90mm;
+      max-width: 160mm;
       height: auto;
-      display: inline-block;
     }
     .front .house-of {
       font-family: 'Libre Caslon Text', serif;
@@ -286,14 +307,14 @@ function buildHtml(
 
 <div class="cover">
 
-  <div class="panel back">
+  <div class="back-panel back">
     <div class="back-text">
       Every family has a story worth telling. This is the story of the House of ${escapeHtml(displaySurname)} — forged across centuries, carried forward by every generation that came before you, and now entrusted to you.
     </div>
     ${
       qrUrl
         ? `<div style="text-align:center; margin-top:18mm; margin-bottom:14mm;">
-      <img src="${escapeHtml(qrUrl)}" style="width:40mm; height:40mm; display:inline-block; border:2px solid #3d3020; padding:4mm; background:#0d0a07;" />
+      <img src="${escapeHtml(qrUrl)}" style="width:40mm; height:40mm; display:block; margin:0 auto; border:2px solid #3d3020; padding:4mm; background:#0d0a07;" />
       <div style="font-family:'DM Sans',sans-serif; font-size:8pt; letter-spacing:3px; color:#8a7e6e; margin-top:6mm; text-transform:uppercase;">Scan to explore your House</div>
     </div>`
         : ""
@@ -303,12 +324,12 @@ function buildHtml(
     <div class="cert">LEGACY № ${escapeHtml(certNumber)}</div>
   </div>
 
-  <div class="panel spine">
+  <div class="spine">
     <div class="spine-ornament">✦</div>
     <div class="spine-inner">THE HOUSE OF ${escapeHtml(spineSurname)}</div>
   </div>
 
-  <div class="panel front">
+  <div class="front-panel front">
     <div class="eyebrow">A Family Legacy</div>
     <hr class="eyebrow-rule" />
     ${
