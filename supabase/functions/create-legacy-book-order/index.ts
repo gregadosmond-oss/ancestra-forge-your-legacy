@@ -8,10 +8,8 @@ const corsHeaders = {
 
 const DEFAULT_PRODUCT_UID =
   "photobooks-hardcover_pf_8x11-inch-210x280-mm_pt_170-gsm-65lb-coated-silk_cl_4-4_ccl_4-4_bt_glued-left_ct_matt-lamination_prt_1-0_cpt_130-gsm-65-lb-cover-coated-silk_ver";
-const DEFAULT_INTERIOR_URL =
-  "https://fjtkjbnvpobawqqkzrst.supabase.co/storage/v1/object/public/print-designs/legacy-book-interior-placeholder.pdf";
-const DEFAULT_COVER_URL =
-  "https://fjtkjbnvpobawqqkzrst.supabase.co/storage/v1/object/public/print-designs/legacy-book-cover-placeholder.pdf";
+const STORAGE_BASE =
+  "https://fjtkjbnvpobawqqkzrst.supabase.co/storage/v1/object/public/print-designs/books";
 
 const GELATO_ORDERS_URL = "https://order.gelatoapis.com/v4/orders";
 
@@ -37,6 +35,7 @@ interface RequestBody {
   interiorUrl?: string;
   coverUrl?: string;
   currency?: string;
+  dryRun?: boolean;
 }
 
 serve(async (req) => {
@@ -63,13 +62,17 @@ serve(async (req) => {
   }
 
   const surname = body.surname ?? "Osmond";
+  const normalizedSurname = surname.toLowerCase().trim();
   const orderType = body.orderType ?? "draft";
   const quantity = body.quantity ?? 1;
   const pageCount = body.pageCount ?? 40;
   const productUid = body.productUid ?? DEFAULT_PRODUCT_UID;
-  const interiorUrl = body.interiorUrl ?? DEFAULT_INTERIOR_URL;
-  const coverUrl = body.coverUrl ?? DEFAULT_COVER_URL;
+  const interiorUrl = body.interiorUrl ??
+    `${STORAGE_BASE}/${normalizedSurname}-book-interior.pdf`;
+  const coverUrl = body.coverUrl ??
+    `${STORAGE_BASE}/${normalizedSurname}-book-cover.pdf`;
   const currency = body.currency ?? "USD";
+  const dryRun = body.dryRun === true;
   const shippingAddress = body.shippingAddress;
 
   if (!shippingAddress || typeof shippingAddress !== "object") {
@@ -94,7 +97,31 @@ serve(async (req) => {
     });
   }
 
-  const orderReferenceId = `ancestorsqr-book-${surname.toLowerCase()}-${Date.now()}`;
+  // Verify rendered PDFs exist before building the order
+  try {
+    const [interiorHead, coverHead] = await Promise.all([
+      fetch(interiorUrl, { method: "HEAD" }),
+      fetch(coverUrl, { method: "HEAD" }),
+    ]);
+    if (!interiorHead.ok || !coverHead.ok) {
+      return json(400, {
+        error:
+          `Missing rendered PDFs for surname ${surname}. Run render-legacy-book-pdf and render-legacy-book-cover-pdf first.`,
+        interiorStatus: interiorHead.status,
+        coverStatus: coverHead.status,
+        interiorUrl,
+        coverUrl,
+      });
+    }
+  } catch (err) {
+    return json(400, {
+      error:
+        `Missing rendered PDFs for surname ${surname}. Run render-legacy-book-pdf and render-legacy-book-cover-pdf first.`,
+      detail: (err as Error).message,
+    });
+  }
+
+  const orderReferenceId = `ancestorsqr-book-${normalizedSurname}-${Date.now()}`;
   const customerReferenceId = `ancestorsqr-${shippingAddress.email}`;
 
   const payload = {
@@ -104,7 +131,7 @@ serve(async (req) => {
     currency,
     items: [
       {
-        itemReferenceId: `legacy-book-${surname.toLowerCase()}`,
+        itemReferenceId: `legacy-book-${normalizedSurname}`,
         productUid,
         pageCount,
         quantity,
@@ -126,6 +153,14 @@ serve(async (req) => {
       email: shippingAddress.email,
     },
   };
+
+  if (dryRun) {
+    return json(200, {
+      success: true,
+      dryRun: true,
+      payload,
+    });
+  }
 
   try {
     const res = await fetch(GELATO_ORDERS_URL, {
