@@ -307,14 +307,14 @@ function buildHtml(
 
 <div class="cover">
 
-  <div class="panel back">
+  <div class="back-panel back">
     <div class="back-text">
       Every family has a story worth telling. This is the story of the House of ${escapeHtml(displaySurname)} — forged across centuries, carried forward by every generation that came before you, and now entrusted to you.
     </div>
     ${
       qrUrl
         ? `<div style="text-align:center; margin-top:18mm; margin-bottom:14mm;">
-      <img src="${escapeHtml(qrUrl)}" style="width:40mm; height:40mm; display:inline-block; border:2px solid #3d3020; padding:4mm; background:#0d0a07;" />
+      <img src="${escapeHtml(qrUrl)}" style="width:40mm; height:40mm; display:block; margin:0 auto; border:2px solid #3d3020; padding:4mm; background:#0d0a07;" />
       <div style="font-family:'DM Sans',sans-serif; font-size:8pt; letter-spacing:3px; color:#8a7e6e; margin-top:6mm; text-transform:uppercase;">Scan to explore your House</div>
     </div>`
         : ""
@@ -324,12 +324,12 @@ function buildHtml(
     <div class="cert">LEGACY № ${escapeHtml(certNumber)}</div>
   </div>
 
-  <div class="panel spine">
+  <div class="spine">
     <div class="spine-ornament">✦</div>
     <div class="spine-inner">THE HOUSE OF ${escapeHtml(spineSurname)}</div>
   </div>
 
-  <div class="panel front">
+  <div class="front-panel front">
     <div class="eyebrow">A Family Legacy</div>
     <hr class="eyebrow-rule" />
     ${
