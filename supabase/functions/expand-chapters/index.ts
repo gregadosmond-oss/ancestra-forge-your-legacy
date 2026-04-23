@@ -15,22 +15,31 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-const EXPAND_SYSTEM = `You are AncestorsQR. You are given chapter titles for a family legacy story and must write the body text for each chapter. Each chapter is cinematic, sensory prose in third person, set in the ancestral period. ~150 words per chapter.
+const EXPAND_SYSTEM = `You are AncestorsQR. You are given chapter titles for a family legacy story and must write the body text for each chapter. Each chapter is full-length, cinematic, sensory prose in third person, set in the ancestral period — long enough to fill a printed book page.
 
 Return valid JSON ONLY:
 
 {
   "chapterBodies": [
-    "string — ~150 words for the chapter, one vivid scene, no exposition dumps"
+    "string — 700 to 850 words of prose for the chapter"
   ]
 }
 
+Hard requirements for EVERY chapter body:
+- Length: 700–850 words. Not shorter. Not one long block.
+- Structure: 3 to 4 distinct prose paragraphs, separated by blank lines (\\n\\n).
+- Sensory detail woven throughout: smells (woodsmoke, salt, tallow, wet wool), weather (fog, frost, summer haze), light (lantern, hearth, dawn), fabric and texture (linen, leather, stone), and sound (bells, hooves, sea, fire).
+- At least one line of dialogue OR inner voice per chapter, rendered in quotes ("...") or italics with plain quote marks — no markdown asterisks.
+- Historical grounding: anchor each scene in details consistent with the chapter's century and the family's ancestral region (tools, trades, clothing, customs of that period).
+- Continuity: each chapter must pick up from where the previous chapter ended — reference a person, object, place, or unresolved thread from the prior chapter so the arc reads as one continuous bloodline, not isolated vignettes.
+- Voice: warm, emotional, identity-forward — the Fireside Luxury voice. The reader should feel pride and belonging. Never corporate, academic, clinical, or genealogical. No phrases like "records show," "data suggests," "research indicates."
+
 Constraints:
-- Return one chapterBody per title provided in the user prompt, in the same order
-- Each body is a standalone scene from a different moment in the family's history
-- Never use: genealogy database, data, algorithm, research
-- Always use: legacy, bloodline, House, story, forge, name
-- NEVER use markdown formatting — plain prose only.`;
+- Return one chapterBody per title provided in the user prompt, in the same order.
+- Each body is a standalone scene from that moment in the family's history, but linked to the chapter before it.
+- Never use: genealogy database, data, algorithm, research, optimize, leverage.
+- Always use: legacy, bloodline, House, story, forge, name.
+- NEVER use markdown formatting — no asterisks, no underscores, no bold. Plain prose only, with \\n\\n between paragraphs.`;
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
