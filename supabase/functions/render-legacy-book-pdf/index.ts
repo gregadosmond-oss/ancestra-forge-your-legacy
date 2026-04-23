@@ -347,11 +347,20 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
 
     .certificate {
       page-break-before: always;
-      height: 230mm;
+      page-break-after: avoid;
+      break-inside: avoid;
+      page-break-inside: avoid;
+      height: calc(100vh - 56mm);
+      max-height: calc(280mm - 56mm);
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+    .certificate .certificate-frame {
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      height: 100%;
       text-align: center;
       border: 2px solid var(--divider);
       padding: 20mm;
@@ -431,15 +440,17 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
 ${laterChaptersHtml}
 
 <section class="certificate">
-  <div class="eyebrow">Legacy Certificate</div>
-  <h2>House of ${escapeHtml(displaySurname)}</h2>
-  <div class="body-text">
-    This certifies that the House of ${escapeHtml(displaySurname)}
-    bears the arms since ${escapeHtml(String(migrationYear))}.
-  </div>
-  <div class="motto-block">
-    ${mottoLatin ? `"${escapeHtml(mottoLatin)}"` : ""}
-    ${mottoEnglish ? `<div class="motto-en">— ${escapeHtml(mottoEnglish)}</div>` : ""}
+  <div class="certificate-frame">
+    <div class="eyebrow">Legacy Certificate</div>
+    <h2>House of ${escapeHtml(displaySurname)}</h2>
+    <div class="body-text">
+      This certifies that the House of ${escapeHtml(displaySurname)}
+      bears the arms since ${escapeHtml(String(migrationYear))}.
+    </div>
+    <div class="motto-block">
+      ${mottoLatin ? `"${escapeHtml(mottoLatin)}"` : ""}
+      ${mottoEnglish ? `<div class="motto-en">— ${escapeHtml(mottoEnglish)}</div>` : ""}
+    </div>
   </div>
 </section>
 
