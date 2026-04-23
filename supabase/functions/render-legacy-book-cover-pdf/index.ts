@@ -112,34 +112,52 @@ function buildHtml(
       background: var(--page-bg);
       overflow: hidden;
     }
-    .panel {
+    /* Locked geometry:
+       Spread 464.4 x 325.4mm. Spine 6mm + 8mm joints each side.
+       Back panel:  201.2 x 285.4mm at (20, 20)    -> center x = 120.6mm
+       Front panel: 201.2 x 285.4mm at (243.2, 20) -> center x = 343.8mm
+    */
+    .back-panel {
+      position: absolute;
+      left: 20mm;
+      top: 20mm;
+      width: 201.2mm;
+      height: 285.4mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .spine {
       position: absolute;
       top: 0;
+      left: 229.2mm;
+      width: 6mm;
       height: 325.4mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       box-sizing: border-box;
       overflow: hidden;
     }
-    .back {
-      left: 0;
-      width: 229.2mm;
-      padding: 12mm 12mm 12mm 12mm;
-    }
-    .spine {
-      left: 229.2mm;
-      width: 22mm;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .front {
-      left: 251.2mm;
-      width: 229.2mm;
-      padding: 10mm 10mm 10mm 10mm;
+    .front-panel {
+      position: absolute;
+      left: 243.2mm;
+      top: 20mm;
+      width: 201.2mm;
+      height: 285.4mm;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       text-align: center;
+      box-sizing: border-box;
+    }
+    .front-panel > * {
+      margin-left: 0;
+      margin-right: 0;
     }
 
     /* Front cover */
