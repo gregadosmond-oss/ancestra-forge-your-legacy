@@ -36,15 +36,7 @@ function paragraphsWithDropCap(body: string): string {
   if (!text) return "";
   const paragraphs = text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
   if (paragraphs.length === 0) return "";
-  const first = escapeHtml(paragraphs[0]);
-  const firstChar = first.charAt(0);
-  const rest = first.slice(1);
-  const firstHtml = `<p class="first-para"><span class="drop-cap">${firstChar}</span>${rest}</p>`;
-  const restHtml = paragraphs
-    .slice(1)
-    .map((p) => `<p>${escapeHtml(p)}</p>`)
-    .join("\n");
-  return `${firstHtml}\n${restHtml}`;
+  return paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n");
 }
 
 type PaletteMode = "print" | "digital";
@@ -319,18 +311,26 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       text-align: justify;
       hyphens: auto;
     }
-    .drop-cap {
-      float: left;
-      font-family: 'Libre Caslon Display', serif;
-      font-size: 3.5em;
-      line-height: 1;
-      color: var(--dropcap);
-      margin-right: 0.1em;
-      margin-top: 0.05em;
-      font-style: italic;
-    }
-    .first-para {
+    .chapter-body > p:first-of-type {
+      text-indent: 0;
       margin-top: 0;
+    }
+    .chapter-body > p:first-of-type::first-letter {
+      font-family: 'Libre Caslon Display', serif;
+      font-size: 5.2em;
+      line-height: 0.82;
+      float: left;
+      margin: 0.05em 0.12em 0 0;
+      padding: 0;
+      color: var(--dropcap);
+      font-weight: 400;
+      vertical-align: top;
+    }
+    .chapter-body > p:first-of-type::after {
+      content: "";
+      display: block;
+      clear: left;
+      height: 0;
     }
 
     .certificate {
