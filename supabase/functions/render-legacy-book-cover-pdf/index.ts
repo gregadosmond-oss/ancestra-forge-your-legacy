@@ -134,7 +134,7 @@ function buildHtml(
     .front {
       left: 251.2mm;
       width: 229.2mm;
-      padding: 12mm 12mm 12mm 12mm;
+      padding: 0mm 12mm 12mm 12mm;
       text-align: center;
     }
 
