@@ -172,7 +172,7 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     ${paletteCss(mode)}
     @page {
       size: 210mm 280mm;
-      margin: 25mm 18mm 25mm 22mm;
+      margin: 28mm 25mm 28mm 28mm;
       background: var(--page-bg);
       @bottom-center {
         content: counter(page);
@@ -481,10 +481,10 @@ Deno.serve(async (req) => {
         landscape: false,
         format: "210mmx280mm",
         margin: {
-          top: "25mm",
-          bottom: "25mm",
-          left: "22mm",
-          right: "18mm",
+          top: "28mm",
+          bottom: "28mm",
+          left: "28mm",
+          right: "25mm",
         },
         sandbox: false,
       }),
