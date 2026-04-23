@@ -533,16 +533,27 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
 ${laterChaptersHtml}
 
 <section class="certificate">
-  <div class="certificate-frame">
-    <div class="eyebrow">Legacy Certificate</div>
-    <h2>House of ${escapeHtml(displaySurname)}</h2>
-    <div class="body-text">
-      This certifies that the House of ${escapeHtml(displaySurname)}
-      bears the arms since ${escapeHtml(String(migrationYear))}.
-    </div>
-    <div class="motto-block">
-      ${mottoLatin ? `"${escapeHtml(mottoLatin)}"` : ""}
-      ${mottoEnglish ? `<div class="motto-en">— ${escapeHtml(mottoEnglish)}</div>` : ""}
+  <div class="certificate-outer">
+    <div class="certificate-frame">
+      <div class="cert-main">
+        <div class="cert-label">Legacy Certificate</div>
+        <div class="cert-flourish">❦</div>
+        ${crestImageUrl ? `<img class="cert-crest" src="${escapeHtml(crestImageUrl)}" alt="" />` : ""}
+        <h2>House of ${escapeHtml(displaySurname)}</h2>
+        <hr class="cert-rule" />
+        <div class="body-text">
+          This certifies that the House of ${escapeHtml(displaySurname)}
+          bears the arms since ${escapeHtml(String(migrationYear))}.
+        </div>
+        ${mottoLatin ? `<div class="cert-motto-latin">"${escapeHtml(mottoLatin)}"</div>` : ""}
+        ${mottoEnglish ? `<div class="cert-motto-en">— ${escapeHtml(mottoEnglish)}</div>` : ""}
+        <hr class="cert-rule" />
+      </div>
+      <div class="cert-footer">
+        <div>Issued by AncestorsQR</div>
+        <div>Certificate № ${escapeHtml(certNumber)}</div>
+        <div>${escapeHtml(todayDate)}</div>
+      </div>
     </div>
   </div>
 </section>
