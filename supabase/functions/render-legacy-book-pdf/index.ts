@@ -821,7 +821,6 @@ Deno.serve(async (req) => {
       success: true,
       url: pub.publicUrl,
       bytes: pdfBytes.byteLength,
-      pageCount: 12,
     });
   } catch (err) {
     return fail("upload", (err as Error).message);
