@@ -194,6 +194,9 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     @page title-page {
       @bottom-center { content: ""; }
     }
+    @page dedication-page {
+      @bottom-center { content: ""; }
+    }
     html, body {
       margin: 0;
       padding: 0;
