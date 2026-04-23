@@ -712,7 +712,7 @@ ${laterChaptersHtml}
   <div class="colophon-flourish">❦</div>
 </section>
 
-<section class="certificate">
+<section class="certificate clean-page">
   <div class="certificate-outer">
     <div class="certificate-frame">
       <div class="cert-main">
