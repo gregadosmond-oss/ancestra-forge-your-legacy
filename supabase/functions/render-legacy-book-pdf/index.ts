@@ -47,7 +47,37 @@ function paragraphsWithDropCap(body: string): string {
   return `${firstHtml}\n${restHtml}`;
 }
 
-function buildHtml(fixture: any): string {
+type PaletteMode = "print" | "digital";
+
+const PALETTES: Record<PaletteMode, Record<string, string>> = {
+  print: {
+    "--page-bg": "#f5eedb",
+    "--body-text": "#2a1f15",
+    "--heading": "#b87a2a",
+    "--dropcap": "#d4a04a",
+    "--motto": "#6b4a22",
+    "--divider": "#c4a878",
+    "--chapter-label": "#8a6a3a",
+  },
+  digital: {
+    "--page-bg": "#0d0a07",
+    "--body-text": "#d0c4b4",
+    "--heading": "#e8b85c",
+    "--dropcap": "#d4a04a",
+    "--motto": "#e8ddd0",
+    "--divider": "#3d3020",
+    "--chapter-label": "#a07830",
+  },
+};
+
+function paletteCss(mode: PaletteMode): string {
+  const vars = PALETTES[mode];
+  return `:root {\n${Object.entries(vars)
+    .map(([k, v]) => `  ${k}: ${v};`)
+    .join("\n")}\n}`;
+}
+
+function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
   const facts = fixture?.facts ?? {};
   const story = fixture?.story ?? {};
   const chapters = fixture?.chapters ?? {};
