@@ -99,11 +99,13 @@ Deno.serve(async (req: Request) => {
 
   // Generate chapter bodies
   const userPrompt = `Family surname: "${surname}"
-Chapter 1 (already written): "${story.chapterOneTitle}"
-Chapters to write bodies for:
+Chapter 1 (already written, for continuity reference): "${story.chapterOneTitle}"
+${story.chapterOneBody}
+
+Chapters to write bodies for (continue the bloodline arc — each chapter must pick up a thread from the chapter immediately before it):
 ${story.teaserChapters.map((t, i) => `${i + 2}. ${t}`).join("\n")}
 
-Write ~150 words of cinematic prose for each of these ${expectedCount} chapters. Return exactly ${expectedCount} entries in chapterBodies, one per chapter title above, in the same order.`;
+Write 700 to 850 words of cinematic prose for EACH of these ${expectedCount} chapters. Three to four paragraphs per chapter, separated by blank lines. Sensory detail, at least one line of dialogue or inner voice, historical grounding, and continuity from the previous chapter in every body. Return exactly ${expectedCount} entries in chapterBodies, one per chapter title above, in the same order.`;
 
   let chapterBodies: string[];
   try {
@@ -111,7 +113,7 @@ Write ~150 words of cinematic prose for each of these ${expectedCount} chapters.
       apiKey,
       system: EXPAND_SYSTEM,
       user: userPrompt,
-      maxTokens: 8000,
+      maxTokens: 32000,
     });
     chapterBodies = result.chapterBodies;
   } catch (err) {
