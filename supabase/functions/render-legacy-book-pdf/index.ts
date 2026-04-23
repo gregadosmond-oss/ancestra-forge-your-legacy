@@ -188,17 +188,28 @@ ${chapterTitlePage(num, title)}
     ${paletteCss(mode)}
     @page {
       size: 210mm 280mm;
-      margin: 28mm 25mm 28mm 28mm;
+      margin: 28mm 25mm 18mm 28mm;
       background: var(--page-bg);
       @bottom-center {
         content: counter(page);
-        font-family: 'DM Sans', sans-serif;
+        font-family: 'Libre Caslon Text', serif;
+        font-style: italic;
         font-size: 9pt;
-        color: var(--chapter-label);
+        color: #b89553;
       }
     }
     @page :first {
       @bottom-center { content: ""; }
+      @top-center    { content: ""; }
+    }
+    @page clean {
+      @bottom-center { content: ""; }
+      @top-center    { content: ""; }
+    }
+    .clean-page {
+      page: clean;
+      break-before: page;
+      break-after: page;
     }
     @page title-page {
       @bottom-center { content: ""; }
