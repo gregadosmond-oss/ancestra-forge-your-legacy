@@ -362,6 +362,8 @@ ${chapterTitlePage(num, title)}
       font-size: 12pt;
       line-height: 1.78;
       margin-bottom: 0.9em;
+      orphans: 3;
+      widows: 3;
     }
     .chapter-flourish {
       text-align: center;
