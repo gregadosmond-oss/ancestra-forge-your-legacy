@@ -717,7 +717,7 @@ ${chapterTitlePage(num, title)}
   <div class="ct-flourish">✦ ❦ ✦</div>
 </section>
 
-<section class="chapter">
+<section class="chapter chapter-1-body">
   <div class="chapter-num">Chapter I</div>
   <h2 class="chapter-title">${escapeHtml(chapterOneTitle)}</h2>
   <div class="chapter-body">
