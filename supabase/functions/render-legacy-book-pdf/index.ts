@@ -36,7 +36,8 @@ function paragraphsWithDropCap(body: string): string {
   if (!text) return "";
   const paragraphs = text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
   if (paragraphs.length === 0) return "";
-  return paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n");
+  const paras = paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n");
+  return `${paras}\n<div class="chapter-flourish">✦ ✦ ✦</div>`;
 }
 
 type PaletteMode = "print" | "digital";
