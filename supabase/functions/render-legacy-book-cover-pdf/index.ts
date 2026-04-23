@@ -134,64 +134,81 @@ function buildHtml(
     .front {
       left: 251.2mm;
       width: 229.2mm;
-      padding: 0mm 12mm 12mm 12mm;
+      padding: 10mm 10mm 10mm 10mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       text-align: center;
     }
 
     /* Front cover */
     .front .eyebrow {
       font-family: 'DM Sans', sans-serif;
-      font-size: 12pt;
-      letter-spacing: 0.4em;
+      font-size: 9pt;
+      letter-spacing: 4.5px;
       text-transform: uppercase;
-      color: var(--chapter-label);
-      margin-top: 8mm;
-      text-align: center;
+      color: #8a7e6e;
+      margin: 0;
+      line-height: 1;
+    }
+    .front .eyebrow-rule {
+      width: 40mm;
+      height: 1px;
+      background: #3d3020;
+      border: 0;
+      margin: 8mm 0 0 0;
+    }
+    .front .crest-wrap {
+      margin: 10mm 0 0 0;
+      line-height: 0;
+    }
+    .front .crest {
+      width: 100mm;
+      height: auto;
+      display: inline-block;
     }
     .front .house-of {
-      font-family: 'Libre Caslon Display', serif;
+      font-family: 'Libre Caslon Text', serif;
       font-style: italic;
       font-weight: 400;
-      font-size: 36pt;
-      color: var(--heading);
-      margin-top: 40mm;
-      text-align: center;
+      font-size: 22pt;
+      color: #d0c4b4;
+      margin: 18mm 0 0 0;
       line-height: 1;
     }
     .front .surname {
       font-family: 'Libre Caslon Display', serif;
-      font-style: italic;
+      font-style: normal;
       font-weight: 400;
-      font-size: 72pt;
-      color: var(--heading);
-      margin-top: 6mm;
-      text-align: center;
+      font-size: 68pt;
+      color: #d4a04a;
+      margin: 4mm 0 0 0;
       line-height: 1;
     }
-    .front .crest-wrap {
-      margin-top: 20mm;
-      text-align: center;
-    }
-    .front .crest {
-      width: 110mm;
-      height: auto;
-      display: inline-block;
+    .front .flourish {
+      font-size: 16pt;
+      color: #3d3020;
+      margin: 18mm 0 0 0;
+      line-height: 1;
     }
     .front .motto-latin {
       font-family: 'Libre Caslon Text', serif;
       font-style: italic;
-      font-size: 20pt;
-      color: var(--heading);
-      margin-top: 24mm;
-      text-align: center;
+      font-size: 13pt;
+      color: #d4a04a;
+      margin: 8mm 0 0 0;
+      line-height: 1;
     }
     .front .motto-english {
-      font-family: 'Libre Caslon Text', serif;
-      font-style: italic;
-      font-size: 12pt;
-      color: var(--motto);
-      margin-top: 4mm;
-      text-align: center;
+      font-family: 'DM Sans', sans-serif;
+      font-style: normal;
+      font-size: 9pt;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #8a7e6e;
+      margin: 4mm 0 0 0;
+      line-height: 1;
     }
 
     /* Spine */
@@ -292,16 +309,18 @@ function buildHtml(
   </div>
 
   <div class="panel front">
+    <div class="eyebrow">A Family Legacy</div>
+    <hr class="eyebrow-rule" />
     ${
       crestImageUrl
-        ? `<div style="text-align:center; margin-bottom:14mm;"><img src="${escapeHtml(
+        ? `<div class="crest-wrap"><img class="crest" src="${escapeHtml(
             crestImageUrl,
-          )}" style="width:95mm; height:auto; display:inline-block;" /></div>`
+          )}" alt="" /></div>`
         : ""
     }
-    <div class="eyebrow">A Family Legacy</div>
     <div class="house-of">The House of</div>
     <div class="surname">${escapeHtml(displaySurname)}</div>
+    <div class="flourish">❦</div>
     ${
       mottoLatin
         ? `<div class="motto-latin">"${escapeHtml(mottoLatin)}"</div>`
