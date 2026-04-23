@@ -36,7 +36,8 @@ function paragraphsWithDropCap(body: string): string {
   if (!text) return "";
   const paragraphs = text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
   if (paragraphs.length === 0) return "";
-  return paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n");
+  const paras = paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n");
+  return `${paras}\n<div class="chapter-flourish">✦ ✦ ✦</div>`;
 }
 
 type PaletteMode = "print" | "digital";
@@ -310,6 +311,17 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     .chapter-body p {
       text-align: justify;
       hyphens: auto;
+      font-size: 12pt;
+      line-height: 1.78;
+      margin-bottom: 0.9em;
+    }
+    .chapter-flourish {
+      text-align: center;
+      margin-top: 2.5em;
+      margin-bottom: 0;
+      font-size: 14pt;
+      letter-spacing: 0.6em;
+      color: var(--divider);
     }
     .chapter-body > p:first-of-type {
       text-indent: 0;
