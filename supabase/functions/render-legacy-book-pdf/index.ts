@@ -169,14 +169,16 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     .join("\n");
 
   const css = `
+    ${paletteCss(mode)}
     @page {
       size: 210mm 280mm;
       margin: 25mm 18mm 25mm 22mm;
+      background: var(--page-bg);
       @bottom-center {
         content: counter(page);
         font-family: 'DM Sans', sans-serif;
         font-size: 9pt;
-        color: #8a7e6e;
+        color: var(--chapter-label);
       }
     }
     @page :first {
@@ -188,15 +190,15 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     html, body {
       margin: 0;
       padding: 0;
-      background: #0d0a07;
-      color: #d0c4b4;
+      background: var(--page-bg);
+      color: var(--body-text);
       font-family: 'DM Sans', sans-serif;
       font-size: 11pt;
       line-height: 1.6;
     }
     h1, h2, h3 {
       font-family: 'Libre Caslon Display', 'Libre Caslon Text', serif;
-      color: #e8b85c;
+      color: var(--heading);
       font-style: italic;
       font-weight: 400;
       margin: 0 0 0.6em 0;
@@ -219,17 +221,17 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       font-size: 10pt;
       letter-spacing: 0.4em;
       text-transform: uppercase;
-      color: #a07830;
+      color: var(--chapter-label);
       margin-bottom: 18mm;
     }
     .title-page h1 {
       font-size: 48pt;
-      color: #e8b85c;
+      color: var(--heading);
       margin: 0 0 14mm 0;
     }
     .title-page .display-surname {
       font-size: 64pt;
-      color: #d4a04a;
+      color: var(--heading);
       font-style: italic;
       margin: 0 0 18mm 0;
       font-family: 'Libre Caslon Display', serif;
@@ -238,14 +240,14 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       font-family: 'Libre Caslon Text', serif;
       font-style: italic;
       font-size: 18pt;
-      color: #e8b85c;
+      color: var(--heading);
       margin-bottom: 4mm;
     }
     .title-page .motto-english {
       font-family: 'Libre Caslon Text', serif;
       font-style: italic;
       font-size: 13pt;
-      color: #c4b8a6;
+      color: var(--motto);
       margin-bottom: 24mm;
     }
     .title-page .generated-date {
@@ -253,10 +255,10 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       font-size: 9pt;
       letter-spacing: 0.3em;
       text-transform: uppercase;
-      color: #8a7e6e;
+      color: var(--chapter-label);
     }
     .ornament {
-      color: #d4a04a;
+      color: var(--dropcap);
       font-size: 14pt;
       margin: 6mm 0;
     }
@@ -280,12 +282,12 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       align-items: baseline;
       font-family: 'Libre Caslon Text', serif;
       font-size: 13pt;
-      color: #d0c4b4;
+      color: var(--body-text);
       padding: 4mm 0;
-      border-bottom: 1px solid #2a2018;
+      border-bottom: 1px solid var(--divider);
     }
     .toc .toc-num {
-      color: #d4a04a;
+      color: var(--dropcap);
       font-style: italic;
       width: 18mm;
       flex-shrink: 0;
@@ -303,7 +305,7 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       font-size: 9pt;
       letter-spacing: 0.4em;
       text-transform: uppercase;
-      color: #a07830;
+      color: var(--chapter-label);
       margin-bottom: 4mm;
       text-align: center;
     }
@@ -311,7 +313,7 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       font-size: 26pt;
       text-align: center;
       margin-bottom: 12mm;
-      color: #e8b85c;
+      color: var(--heading);
     }
     .chapter-body p {
       text-align: justify;
@@ -322,7 +324,7 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       font-family: 'Libre Caslon Display', serif;
       font-size: 3.5em;
       line-height: 1;
-      color: #d4a04a;
+      color: var(--dropcap);
       margin-right: 0.1em;
       margin-top: 0.05em;
       font-style: italic;
@@ -339,7 +341,7 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       align-items: center;
       justify-content: center;
       text-align: center;
-      border: 2px solid #3d3020;
+      border: 2px solid var(--divider);
       padding: 20mm;
       box-sizing: border-box;
     }
@@ -348,7 +350,7 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       font-size: 10pt;
       letter-spacing: 0.4em;
       text-transform: uppercase;
-      color: #a07830;
+      color: var(--chapter-label);
       margin-bottom: 10mm;
     }
     .certificate h2 {
@@ -359,7 +361,7 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       font-family: 'Libre Caslon Text', serif;
       font-style: italic;
       font-size: 14pt;
-      color: #d0c4b4;
+      color: var(--body-text);
       max-width: 140mm;
       line-height: 1.7;
       margin-bottom: 14mm;
@@ -368,10 +370,10 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       font-family: 'Libre Caslon Text', serif;
       font-style: italic;
       font-size: 13pt;
-      color: #e8b85c;
+      color: var(--heading);
     }
     .certificate .motto-en {
-      color: #c4b8a6;
+      color: var(--motto);
       font-size: 11pt;
       margin-top: 2mm;
     }
