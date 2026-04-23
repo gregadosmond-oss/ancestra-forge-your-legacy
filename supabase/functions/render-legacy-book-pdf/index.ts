@@ -310,6 +310,17 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     .chapter-body p {
       text-align: justify;
       hyphens: auto;
+      font-size: 12pt;
+      line-height: 1.78;
+      margin-bottom: 0.9em;
+    }
+    .chapter-flourish {
+      text-align: center;
+      margin-top: 2.5em;
+      margin-bottom: 0;
+      font-size: 14pt;
+      letter-spacing: 0.6em;
+      color: var(--divider);
     }
     .chapter-body > p:first-of-type {
       text-indent: 0;
