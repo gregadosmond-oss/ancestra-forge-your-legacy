@@ -160,7 +160,7 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     .join("\n");
 
   const chapterTitlePage = (num: string, title: string) => `
-<section class="chapter-title-page">
+<section class="chapter-title-page clean-page">
   <div class="ct-eyebrow">Chapter</div>
   <div class="ct-numeral">${escapeHtml(num)}</div>
   <div class="ct-title">${escapeHtml(title)}</div>
