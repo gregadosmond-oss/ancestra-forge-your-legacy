@@ -61,7 +61,12 @@ function paletteCss(mode: PaletteMode): string {
     .join("\n")}\n}`;
 }
 
-function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
+function buildHtml(
+  fixture: any,
+  mode: PaletteMode = "print",
+  crestOverrideUrl: string | null = null,
+  qrUrl: string | null = null,
+): string {
   const facts = fixture?.facts ?? {};
 
   const displaySurname: string =
@@ -70,6 +75,7 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
   const mottoEnglish: string = facts.mottoEnglish || "";
 
   const crestImageUrl: string =
+    crestOverrideUrl ||
     facts.crestImageUrl ||
     facts.crestUrl ||
     fixture.crestImageUrl ||
@@ -128,7 +134,7 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     .front {
       left: 251.2mm;
       width: 229.2mm;
-      padding: 12mm 12mm 12mm 12mm;
+      padding: 0mm 12mm 12mm 12mm;
       text-align: center;
     }
 
@@ -267,6 +273,14 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     <div class="back-text">
       Every family has a story worth telling. This is the story of the House of ${escapeHtml(displaySurname)} — forged across centuries, carried forward by every generation that came before you, and now entrusted to you.
     </div>
+    ${
+      qrUrl
+        ? `<div style="text-align:center; margin-top:18mm; margin-bottom:14mm;">
+      <img src="${escapeHtml(qrUrl)}" style="width:40mm; height:40mm; display:inline-block; border:2px solid #3d3020; padding:4mm; background:#0d0a07;" />
+      <div style="font-family:'DM Sans',sans-serif; font-size:8pt; letter-spacing:3px; color:#8a7e6e; margin-top:6mm; text-transform:uppercase;">Scan to explore your House</div>
+    </div>`
+        : ""
+    }
     <div class="back-ornament">❦</div>
     <div class="wordmark">ANCESTORSQR.COM</div>
     <div class="cert">LEGACY № ${escapeHtml(certNumber)}</div>
@@ -278,16 +292,16 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
   </div>
 
   <div class="panel front">
+    ${
+      crestImageUrl
+        ? `<div style="text-align:center; margin-bottom:14mm;"><img src="${escapeHtml(
+            crestImageUrl,
+          )}" style="width:95mm; height:auto; display:inline-block;" /></div>`
+        : ""
+    }
     <div class="eyebrow">A Family Legacy</div>
     <div class="house-of">The House of</div>
     <div class="surname">${escapeHtml(displaySurname)}</div>
-    ${
-      crestImageUrl
-        ? `<div class="crest-wrap"><img class="crest" src="${escapeHtml(
-            crestImageUrl,
-          )}" alt="" /></div>`
-        : ""
-    }
     ${
       mottoLatin
         ? `<div class="motto-latin">"${escapeHtml(mottoLatin)}"</div>`
@@ -350,7 +364,36 @@ Deno.serve(async (req) => {
     }
   }
 
-  const html = buildHtml(fixture, mode);
+  const surnameForLookup = (
+    surnameOverride ||
+    fixture?.facts?.displaySurname ||
+    fixture?.facts?.surname ||
+    fixture?.surname ||
+    "osmond"
+  )
+    .toString()
+    .toLowerCase()
+    .trim();
+
+  let crestUrl: string | null = null;
+  try {
+    const lookupClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+    const { data: crestRow } = await lookupClient
+      .from("surname_crests")
+      .select("image_url")
+      .eq("surname", surnameForLookup)
+      .maybeSingle();
+    crestUrl = crestRow?.image_url ?? null;
+  } catch (_) {
+    crestUrl = null;
+  }
+
+  const qrTarget = encodeURIComponent(
+    `https://ancestorsqr.com/f/${surnameForLookup}`,
+  );
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&color=d4a04a&bgcolor=0d0a07&data=${qrTarget}`;
+
+  const html = buildHtml(fixture, mode, crestUrl, qrUrl);
 
   let pdfBytes: Uint8Array;
   try {
