@@ -273,6 +273,14 @@ function buildHtml(
     <div class="back-text">
       Every family has a story worth telling. This is the story of the House of ${escapeHtml(displaySurname)} — forged across centuries, carried forward by every generation that came before you, and now entrusted to you.
     </div>
+    ${
+      qrUrl
+        ? `<div style="text-align:center; margin-top:18mm; margin-bottom:14mm;">
+      <img src="${escapeHtml(qrUrl)}" style="width:40mm; height:40mm; display:inline-block; border:2px solid #3d3020; padding:4mm; background:#0d0a07;" />
+      <div style="font-family:'DM Sans',sans-serif; font-size:8pt; letter-spacing:3px; color:#8a7e6e; margin-top:6mm; text-transform:uppercase;">Scan to explore your House</div>
+    </div>`
+        : ""
+    }
     <div class="back-ornament">❦</div>
     <div class="wordmark">ANCESTORSQR.COM</div>
     <div class="cert">LEGACY № ${escapeHtml(certNumber)}</div>
@@ -284,16 +292,16 @@ function buildHtml(
   </div>
 
   <div class="panel front">
+    ${
+      crestImageUrl
+        ? `<div style="text-align:center; margin-bottom:14mm;"><img src="${escapeHtml(
+            crestImageUrl,
+          )}" style="width:95mm; height:auto; display:inline-block;" /></div>`
+        : ""
+    }
     <div class="eyebrow">A Family Legacy</div>
     <div class="house-of">The House of</div>
     <div class="surname">${escapeHtml(displaySurname)}</div>
-    ${
-      crestImageUrl
-        ? `<div class="crest-wrap"><img class="crest" src="${escapeHtml(
-            crestImageUrl,
-          )}" alt="" /></div>`
-        : ""
-    }
     ${
       mottoLatin
         ? `<div class="motto-latin">"${escapeHtml(mottoLatin)}"</div>`
