@@ -309,16 +309,18 @@ function buildHtml(
   </div>
 
   <div class="panel front">
+    <div class="eyebrow">A Family Legacy</div>
+    <hr class="eyebrow-rule" />
     ${
       crestImageUrl
-        ? `<div style="text-align:center; margin-bottom:14mm;"><img src="${escapeHtml(
+        ? `<div class="crest-wrap"><img class="crest" src="${escapeHtml(
             crestImageUrl,
-          )}" style="width:95mm; height:auto; display:inline-block;" /></div>`
+          )}" alt="" /></div>`
         : ""
     }
-    <div class="eyebrow">A Family Legacy</div>
     <div class="house-of">The House of</div>
     <div class="surname">${escapeHtml(displaySurname)}</div>
+    <div class="flourish">❦</div>
     ${
       mottoLatin
         ? `<div class="motto-latin">"${escapeHtml(mottoLatin)}"</div>`
