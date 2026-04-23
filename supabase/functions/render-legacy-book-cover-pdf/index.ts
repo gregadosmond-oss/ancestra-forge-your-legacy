@@ -178,13 +178,16 @@ function buildHtml(
       margin: 8mm 0 0 0;
     }
     .front .crest-wrap {
-      margin: 10mm 0 0 0;
+      margin: 10mm auto 0 auto;
       line-height: 0;
+      text-align: center;
     }
     .front .crest {
-      width: 100mm;
+      display: block;
+      margin: 0 auto;
+      width: 90mm;
+      max-width: 160mm;
       height: auto;
-      display: inline-block;
     }
     .front .house-of {
       font-family: 'Libre Caslon Text', serif;
