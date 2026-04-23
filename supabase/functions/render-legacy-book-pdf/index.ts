@@ -665,6 +665,13 @@ ${chapterTitlePage(num, title)}
   </ul>
 </section>
 
+<section class="chapter-title-page">
+  <div class="ct-eyebrow">Chapter</div>
+  <div class="ct-numeral">I</div>
+  <div class="ct-title">${escapeHtml(chapterOneTitle)}</div>
+  <div class="ct-flourish">✦ ❦ ✦</div>
+</section>
+
 <section class="chapter">
   <div class="chapter-num">Chapter I</div>
   <h2 class="chapter-title">${escapeHtml(chapterOneTitle)}</h2>
@@ -674,6 +681,23 @@ ${chapterTitlePage(num, title)}
 </section>
 
 ${laterChaptersHtml}
+
+<section class="afterword">
+  <h2>Afterword</h2>
+  <div class="afterword-body">
+    Every family leaves a trail. Some trails are carved in stone, others written in ledgers, and some — like the House of ${escapeHtml(displaySurname)} — are preserved in the cadence of stories passed from one breath to the next. This volume is one such breath. May you carry it forward.
+  </div>
+  ${mottoLatin ? `<div class="afterword-motto-latin">"${escapeHtml(mottoLatin)}"</div>` : ""}
+  ${mottoEnglish ? `<div class="afterword-motto-en">— ${escapeHtml(mottoEnglish)}</div>` : ""}
+</section>
+
+<section class="colophon">
+  <h2>Colophon</h2>
+  <div class="colophon-body">
+    This Legacy Book was forged by AncestorsQR for the House of ${escapeHtml(displaySurname)}. Typeset in Libre Caslon and DM Sans. Printed by Gelato on coated silk. Bound in matte laminated hardcover. Family Legacy № ${escapeHtml(certNumber)}.
+  </div>
+  <div class="colophon-flourish">❦</div>
+</section>
 
 <section class="certificate">
   <div class="certificate-outer">
