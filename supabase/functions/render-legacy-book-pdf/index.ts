@@ -114,8 +114,20 @@ function paragraphsWithDropCap(body: string): string {
   if (!text) return "";
   const paragraphs = text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
   if (paragraphs.length === 0) return "";
-  const paras = paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n");
-  return `${paras}\n<div class="chapter-flourish">✦ ✦ ✦</div>`;
+  return paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n");
+}
+
+function notesMemoriesPage(chapterIndex: number): string {
+  const ruledLines = Array.from({ length: 13 }, () => '<div class="notes-line"></div>').join("\n");
+  return `
+<section class="notes-page chapter-${chapterIndex}-notes">
+  <h3>Notes &amp; Memories</h3>
+  <div class="notes-rule"></div>
+  <div class="notes-lines">
+    ${ruledLines}
+  </div>
+  <div class="notes-instruction">Use these pages to record names, dates, memories, or quotes that matter to your family.</div>
+</section>`;
 }
 
 type PaletteMode = "print" | "digital";
@@ -251,13 +263,15 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       const body = chapterBodies[i] || "";
       const num = romanNumerals[i + 1];
       const chapterIndex = i + 2;
+      const chapterNotes = chapterIndex < 9 ? notesMemoriesPage(chapterIndex) : "";
       return `
 ${chapterTitlePage(num, title)}
 <section class="chapter chapter-${chapterIndex}-body">
   <div class="chapter-body">
     ${paragraphsWithDropCap(body)}
   </div>
-</section>`;
+</section>
+${chapterNotes}`;
     })
     .join("\n");
 
@@ -475,14 +489,6 @@ ${chapterTitlePage(num, title)}
       orphans: 3;
       widows: 3;
     }
-    .chapter-flourish {
-      text-align: center;
-      margin-top: 2.5em;
-      margin-bottom: 0;
-      font-size: 14pt;
-      letter-spacing: 0.6em;
-      color: var(--divider);
-    }
     .chapter-body > p:first-of-type {
       text-indent: 0;
       margin-top: 0;
@@ -503,6 +509,57 @@ ${chapterTitlePage(num, title)}
       display: block;
       clear: left;
       height: 0;
+    }
+
+    .notes-page {
+      page-break-before: always;
+      min-height: calc(280mm - 56mm);
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      padding-top: 6mm;
+    }
+    .chapter-1-notes { page: chapter-1; }
+    .chapter-2-notes { page: chapter-2; }
+    .chapter-3-notes { page: chapter-3; }
+    .chapter-4-notes { page: chapter-4; }
+    .chapter-5-notes { page: chapter-5; }
+    .chapter-6-notes { page: chapter-6; }
+    .chapter-7-notes { page: chapter-7; }
+    .chapter-8-notes { page: chapter-8; }
+    .notes-page h3 {
+      font-family: 'Libre Caslon Display', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 18pt;
+      color: #a07830;
+      text-align: center;
+      margin: 0 0 4mm 0;
+    }
+    .notes-rule {
+      width: 40mm;
+      height: 0.5pt;
+      background: #a07830;
+      margin: 0 auto 8mm auto;
+    }
+    .notes-lines {
+      display: grid;
+      grid-template-rows: repeat(13, 1fr);
+      gap: 0;
+      flex: 1;
+    }
+    .notes-line {
+      border-bottom: 0.5pt solid rgba(160, 120, 48, 0.4);
+      width: 100%;
+      align-self: end;
+    }
+    .notes-instruction {
+      font-family: 'Libre Caslon Text', serif;
+      font-style: italic;
+      font-size: 9pt;
+      color: rgba(42, 31, 21, 0.65);
+      text-align: center;
+      margin-top: 8mm;
     }
 
     .dedication {
@@ -800,6 +857,8 @@ ${chapterTitlePage(num, title)}
     ${paragraphsWithDropCap(chapterOneBody)}
   </div>
 </section>
+
+${notesMemoriesPage(1)}
 
 ${laterChaptersHtml}
 
