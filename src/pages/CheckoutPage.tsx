@@ -59,7 +59,7 @@ const CheckoutPage = () => {
         >
           {giftState.isGift && giftState.recipientEmail
             ? `A gift for ${giftState.recipientEmail} — delivered instantly after payment.`
-            : "Full story, high-res crest, family tree, and legacy certificate — yours forever."}
+            : "Full story, high-res crest, migration path, and legacy certificate — yours forever."}
         </motion.p>
 
         <motion.div

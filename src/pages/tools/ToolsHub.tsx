@@ -73,7 +73,7 @@ const tools = [
     to: "/journey",
     label: "Full Legacy Journey",
     tag: "BEGIN",
-    description: "The complete experience — crest, story, family tree, and gifts.",
+    description: "The complete experience — crest, story, migration path, and gifts.",
     cta: true,
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e8943a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

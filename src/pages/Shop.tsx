@@ -469,7 +469,7 @@ export default function Shop() {
           style={{ color: "#a09280", maxWidth: 460 }}
         >
           Begin your journey — enter your surname and we'll forge your unique coat of arms,
-          family story, and bloodline tree. Then choose any product to put your crest on it.
+          family story, and migration path. Then choose any product to put your crest on it.
           All physical products include the full digital Legacy Pack.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-4">

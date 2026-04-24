@@ -110,7 +110,7 @@ export default function Confirmation() {
             ? "We've sent your gift to the recipient's inbox. They'll receive a beautifully presented preview of their family legacy."
             : isPhysical
             ? "Your order has been sent to production. We'll email you tracking details once it ships — usually within 5–7 business days."
-            : "Your family story, crest, bloodline tree, and legacy certificate have been sent to your email."}
+            : "Your family story, crest, migration path, and legacy certificate have been sent to your email."}
         </motion.p>
 
         <WarmDivider />

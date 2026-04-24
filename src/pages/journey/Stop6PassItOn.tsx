@@ -186,7 +186,7 @@ const Stop6PassItOn = () => {
               <div className="mb-3 text-3xl">🛡</div>
               <h3 className="font-display text-base text-cream-warm">Legacy Pack</h3>
               <p className="mt-2 text-sm leading-relaxed" style={{ color: "#8a7e6e" }}>
-                Your full 9-chapter story, high-res crest, family tree &amp; legacy certificate.
+                Your full 9-chapter story, high-res crest, migration path &amp; legacy certificate.
               </p>
               <div className="mt-3 font-display text-2xl" style={{ color: "#e8b85c" }}>$19.99</div>
               <button

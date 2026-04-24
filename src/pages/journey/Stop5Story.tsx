@@ -432,11 +432,11 @@ const Stop5Story = () => {
                   8 more chapters await.
                 </p>
                 <p className="mt-2 font-serif text-sm italic text-text-dim">
-                  Your full crest, family story, bloodline tree &amp; legacy certificate — delivered to your inbox.
+                  Your full crest, family story, migration path &amp; legacy certificate — delivered to your inbox.
                 </p>
 
                 <ul className="mt-4 space-y-1.5">
-                  {["Custom high-res coat of arms (PNG & SVG)", "AI-written family story — all 9 chapters", "Visual bloodline tree", "Legacy certificate (frameable PDF)", "Ancestor chat — full access"].map(item => (
+                  {["Custom high-res coat of arms (PNG & SVG)", "AI-written family story — all 9 chapters", "Visual migration path", "Legacy certificate (frameable PDF)", "Ancestor chat — full access"].map(item => (
                     <li key={item} className="flex items-center gap-2 font-sans text-[12px]" style={{ color: "#c4b8a6" }}>
                       <span style={{ color: "#d4a04a", fontSize: 8 }}>✦</span>
                       {item}
