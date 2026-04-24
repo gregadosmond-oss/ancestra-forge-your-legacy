@@ -181,7 +181,7 @@ export default function HeirloomOrderPage() {
             className="mt-8"
           >
             <StripeEmbeddedCheckout
-              priceId="heirloom_mug_once"
+              priceId="heirloom_bundle_v1"
               customerEmail={user?.email ?? address.email}
               userId={user?.id}
               returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
