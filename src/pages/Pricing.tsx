@@ -21,7 +21,7 @@ const FREE_ITEMS = [
 const LEGACY_ITEMS = [
   "Full crest (high-res PNG)",
   "AI family story (9 chapters)",
-  "Visual family tree",
+  "Visual migration path",
   "Legacy certificate",
   "Family motto in Latin",
   "Ancestor chat unlocked",
@@ -39,7 +39,7 @@ const DEEP_LEGACY_ITEMS = [
 const FAQ = [
   {
     q: "What do I get with the Legacy Pack?",
-    a: "Your full 9-chapter family story written by AI using real historical records, a high-resolution coat of arms, a visual bloodline tree, and a legacy certificate — all delivered to your email as a PDF.",
+    a: "Your full 9-chapter family story written by AI using real historical records, a high-resolution coat of arms, a visual migration path, and a legacy certificate — all delivered to your email as a PDF.",
   },
   {
     q: "How fast do I receive it?",

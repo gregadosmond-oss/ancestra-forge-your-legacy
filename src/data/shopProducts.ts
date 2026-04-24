@@ -29,7 +29,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     name: "Legacy Pack",
     price: "$19.99",
     priceNote: "Instant delivery",
-    description: "Custom coat of arms (hi-res PNG & SVG), AI-written family story (9 chapters), visual bloodline tree, legacy certificate. Delivered to your inbox in minutes.",
+    description: "Custom coat of arms (hi-res PNG & SVG), AI-written family story (9 chapters), visual migration path, legacy certificate. Delivered to your inbox in minutes.",
     tag: "Most Popular",
     category: "digital",
   },

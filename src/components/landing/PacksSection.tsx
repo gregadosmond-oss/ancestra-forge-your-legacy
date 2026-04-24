@@ -20,7 +20,7 @@ const FREE_ITEMS = [
 const LEGACY_ITEMS = [
   "Custom coat of arms (hi-res)",
   "AI-written family story",
-  "Visual bloodline tree",
+  "Visual migration path",
   "Legacy certificate (PDF)",
   "Full ancestor chat access",
   "Shareable legacy page",

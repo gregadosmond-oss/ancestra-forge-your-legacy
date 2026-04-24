@@ -220,7 +220,7 @@ const FamilySharePage = () => {
           >
             <p className="font-display text-lg" style={{ color: "#f0e8da" }}>8 more chapters await.</p>
             <p className="mt-1 font-serif italic text-sm" style={{ color: "#8a7e6e" }}>
-              The full story, high-res crest, family tree &amp; legacy certificate.
+              The full story, high-res crest, migration path &amp; legacy certificate.
             </p>
           </motion.div>
         )}
