@@ -82,7 +82,7 @@ export default function GiftOccasionPage() {
 
         <motion.div {...stagger(3)} className="mt-10">
           <Link
-            to="/journey"
+            to="/journey/1"
             className="inline-block rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px]"
             style={{
               background: "linear-gradient(135deg, #e8943a, #c47828)",
@@ -212,7 +212,7 @@ export default function GiftOccasionPage() {
                 {product.description}
               </p>
               <Link
-                to="/journey"
+                to="/journey/1"
                 className="mt-5 self-start font-sans text-[11px] uppercase tracking-[1.5px]"
                 style={{
                   color: "#a07830",
@@ -282,7 +282,7 @@ export default function GiftOccasionPage() {
                 ))}
               </ul>
               <Link
-                to="/journey"
+                to="/journey/1"
                 className="mt-8 inline-block rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px]"
                 style={{
                   background: "linear-gradient(135deg, #e8943a, #c47828)",
@@ -335,7 +335,7 @@ export default function GiftOccasionPage() {
           minutes.
         </p>
         <Link
-          to="/journey"
+          to="/journey/1"
           className="mt-8 inline-block rounded-pill px-12 py-5 font-sans text-[13px] font-semibold uppercase tracking-[1.5px]"
           style={{
             background: "linear-gradient(135deg, #e8943a, #c47828)",

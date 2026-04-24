@@ -242,7 +242,7 @@ export default function MeetYourAncestor() {
           Want to discover your full bloodline — all the way back?
         </motion.p>
         <Link
-          to="/journey"
+          to="/journey/1"
           className="inline-block rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-[400ms] hover:-translate-y-0.5"
           style={{
             background: "rgba(232,148,58,0.06)",
