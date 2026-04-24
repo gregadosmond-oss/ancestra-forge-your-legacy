@@ -114,7 +114,7 @@ export default function Shop() {
         </motion.p>
         <motion.div {...stagger(3)} className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <Link
-            to="/journey"
+            to="/journey/1"
             className="inline-block rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px]"
             style={{
               background: "linear-gradient(135deg, #e8943a, #c47828)",
@@ -527,7 +527,7 @@ export default function Shop() {
           Enter any surname and we'll build their crest, story, and legacy in minutes.
         </p>
         <Link
-          to="/journey"
+          to="/journey/1"
           className="mt-8 inline-block rounded-pill px-12 py-5 font-sans text-[13px] font-semibold uppercase tracking-[1.5px]"
           style={{
             background: "linear-gradient(135deg, #e8943a, #c47828)",

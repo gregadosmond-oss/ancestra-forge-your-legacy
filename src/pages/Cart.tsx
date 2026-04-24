@@ -82,7 +82,7 @@ export default function Cart() {
 
             <div className="mt-10 flex flex-wrap justify-center gap-4">
               <Link
-                to="/journey"
+                to="/journey/1"
                 className="inline-block rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px]"
                 style={{
                   background: "linear-gradient(135deg, #e8943a, #c47828)",
