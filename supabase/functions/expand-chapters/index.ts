@@ -9,9 +9,9 @@ const CORS_HEADERS = {
 };
 
 const CHAPTER_MODEL = "claude-sonnet-4-5-20250929";
-const TARGET_MIN_WORDS = 700;
-const TARGET_MAX_WORDS = 850;
-const RETRY_MIN_WORDS = 500;
+const TARGET_MIN_WORDS = 1200;
+const TARGET_MAX_WORDS = 1500;
+const RETRY_MIN_WORDS = TARGET_MIN_WORDS;
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -28,12 +28,12 @@ const CHAPTER_SYSTEM = `You are AncestorsQR. You write cinematic chapter bodies 
 
 You write ONE chapter at a time. The chapter MUST be between ${TARGET_MIN_WORDS} and ${TARGET_MAX_WORDS} words — this is a hard floor, not a suggestion. Shorter than ${TARGET_MIN_WORDS} words is rejected and rewritten.
 
-Each chapter is cinematic, sensory prose in third person, set in the ancestral period. Every chapter must contain: three to four distinct paragraphs (not one block), sensory detail woven throughout (smells, weather, light, fabric, sound, texture), at least one line of dialogue or italicized inner voice, historical grounding consistent with the time period and region, and continuity that picks up from the previous chapter's ending.
+Each chapter is cinematic, sensory prose in third person, set in the ancestral period. Every chapter must contain: three to four distinct paragraphs (not one block), sensory detail woven throughout (smells, weather, light, fabric, sound, texture), at least one line of dialogue or italicized inner voice, historical grounding consistent with the time period and region, and continuity that picks up from the previous chapter's ending. The scene should feel fully developed and immersive, with richer scene-setting, deeper internal monologue, and more lived-in detail — never filler, never repetition.
 
 Return valid JSON ONLY:
 
 {
-  "chapterBody": "string — between ${TARGET_MIN_WORDS} and ${TARGET_MAX_WORDS} words for this ONE chapter, multiple paragraphs separated by \\n\\n, one extended scene with sensory detail, dialogue or inner voice, and historical grounding"
+  "chapterBody": "string — between ${TARGET_MIN_WORDS} and ${TARGET_MAX_WORDS} words for this ONE chapter, multiple paragraphs separated by \\n\\n, one extended richly developed scene with sensory detail, dialogue or inner voice, historical grounding, and deeper internal reflection"
 }
 
 Constraints:
@@ -164,7 +164,7 @@ Deno.serve(async (req: Request) => {
       );
       chapterBodies.push(chapterBody);
       previousEnding = chapterBody;
-      console.log(`expand-chapters wrote chapter ${i + 2}: ${wordCount(chapterBody)} words`);
+       console.log(`expand-chapters wrote chapter ${i + 2}: ${wordCount(chapterBody)} words`);
     } catch (err) {
       console.error(`expand-chapters chapter ${i + 2} error`, err);
       return json({
@@ -173,6 +173,10 @@ Deno.serve(async (req: Request) => {
       }, 500);
     }
   }
+
+  const totalWords = chapterBodies.reduce((sum, chapterBody) => sum + wordCount(chapterBody), 0);
+  const avgWords = chapterBodies.length > 0 ? Math.round(totalWords / chapterBodies.length) : 0;
+  console.log(`[expand-chapters] surname=${surname} chapters=${chapterBodies.length} avg_words=${avgWords}`);
 
   const updatedStory = { ...story, chapterBodies };
   const { error: writeErr } = await client
