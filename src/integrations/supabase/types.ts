@@ -334,6 +334,78 @@ export type Database = {
         }
         Relationships: []
       }
+      legacy_book_orders: {
+        Row: {
+          amount_total: number | null
+          buyer_email: string
+          cover_pdf_url: string | null
+          created_at: string
+          currency: string | null
+          display_surname: string
+          fulfillment_error: string | null
+          fulfillment_status: string
+          gelato_item_reference_id: string | null
+          gelato_order_id: string | null
+          gelato_order_reference_id: string | null
+          id: string
+          interior_pdf_url: string | null
+          notes: string | null
+          shipping_address: Json
+          stripe_payment_intent: string | null
+          stripe_session_id: string
+          surname: string
+          tracking_url: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_total?: number | null
+          buyer_email: string
+          cover_pdf_url?: string | null
+          created_at?: string
+          currency?: string | null
+          display_surname: string
+          fulfillment_error?: string | null
+          fulfillment_status?: string
+          gelato_item_reference_id?: string | null
+          gelato_order_id?: string | null
+          gelato_order_reference_id?: string | null
+          id?: string
+          interior_pdf_url?: string | null
+          notes?: string | null
+          shipping_address: Json
+          stripe_payment_intent?: string | null
+          stripe_session_id: string
+          surname: string
+          tracking_url?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_total?: number | null
+          buyer_email?: string
+          cover_pdf_url?: string | null
+          created_at?: string
+          currency?: string | null
+          display_surname?: string
+          fulfillment_error?: string | null
+          fulfillment_status?: string
+          gelato_item_reference_id?: string | null
+          gelato_order_id?: string | null
+          gelato_order_reference_id?: string | null
+          id?: string
+          interior_pdf_url?: string | null
+          notes?: string | null
+          shipping_address?: Json
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string
+          surname?: string
+          tracking_url?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           birth_year: number | null
