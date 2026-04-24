@@ -166,7 +166,7 @@ Deno.serve(async (req) => {
 
   // 2. Process auth_emails first (priority), then transactional_emails
   for (const queue of ['auth_emails', 'transactional_emails']) {
-    const { data: messages, error: readError } = await supabase.rpc('read_email_batch', {
+    const { data: rawMessages, error: readError } = await supabase.rpc('read_email_batch', {
       queue_name: queue,
       batch_size: batchSize,
       vt: 30,
@@ -177,7 +177,13 @@ Deno.serve(async (req) => {
       continue
     }
 
-    if (!messages?.length) continue
+    if (!rawMessages?.length) continue
+
+    // The pgmq read RPC returns rows with a Json `message` column. Producers
+    // always enqueue an EmailPayload-shaped object, so cast once here so the
+    // rest of the loop sees a fully-typed batch (and pgmq's enqueued_at field
+    // which the generated RPC return type omits).
+    const messages = rawMessages as unknown as QueueMessage[]
 
     // Retry budget is based on real send failures, not pgmq read_ct.
     // read_ct increments for every message in a claimed batch, including
