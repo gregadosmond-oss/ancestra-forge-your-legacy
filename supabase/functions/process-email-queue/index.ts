@@ -5,16 +5,17 @@ import type { Database } from '../../../src/integrations/supabase/types.ts'
 type DbClient = SupabaseClient<Database>
 
 // Shape of a message stored on a pgmq queue. The `message` JSON column is
-// always populated by our producers with an EmailPayload-shaped object.
+// always populated by our producers (auth-email-hook and
+// send-transactional-email) with an EmailSendRequest-shaped object.
 interface EmailPayload {
   message_id?: string
   label?: string
-  to?: string
-  from?: string
+  to: string
+  from: string
   sender_domain?: string
-  subject?: string
-  html?: string
-  text?: string
+  subject: string
+  html: string
+  text: string
   purpose?: string
   run_id?: string
   idempotency_key?: string
