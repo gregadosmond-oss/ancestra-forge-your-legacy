@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { toggleAmbientPlayback } from "@/lib/ambientAudio";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,8 +15,21 @@ const AppLayout = () => {
   const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(true);
   const [showAuthGate, setShowAuthGate] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const { user, loading } = useAuth();
   const { totalItems } = useCart();
+
+  const closeDrawer = () => setDrawerOpen(false);
+
+  const handleSignOutMobile = async () => {
+    closeDrawer();
+    await handleSignOut();
+  };
+
+  const handleSignInMobile = () => {
+    closeDrawer();
+    setShowAuthGate(true);
+  };
 
   const isLanding = location.pathname === "/";
   const journeyMatch = location.pathname.match(/^\/journey\/(\d+)$/);
