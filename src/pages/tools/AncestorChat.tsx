@@ -259,6 +259,7 @@ export default function AncestorChat() {
           >
             <input
               type="text"
+              aria-label="Your surname"
               value={surname}
               onChange={(e) => setSurname(e.target.value)}
               placeholder="Enter your surname"
@@ -552,6 +553,7 @@ export default function AncestorChat() {
               )}
               <input
                 type="text"
+                aria-label="Message your ancestor"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={listening ? "Listening…" : "Ask your ancestor something…"}

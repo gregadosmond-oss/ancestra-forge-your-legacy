@@ -122,6 +122,7 @@ export default function MottoGenerator() {
               </label>
               <input
                 type="text"
+                aria-label={labels[i]}
                 value={val}
                 onChange={(e) => updateValue(i, e.target.value)}
                 placeholder={placeholders[i]}

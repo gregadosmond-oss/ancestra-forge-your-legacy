@@ -119,6 +119,7 @@ export default function The1700sYou() {
         >
           <input
             type="text"
+            aria-label="Your surname"
             value={surname}
             onChange={(e) => setSurname(e.target.value)}
             placeholder="Enter your surname"
@@ -127,6 +128,7 @@ export default function The1700sYou() {
           />
           <input
             type="text"
+            aria-label="Country of origin (optional)"
             value={country}
             onChange={(e) => setCountry(e.target.value)}
             placeholder="Country of origin (optional)"
