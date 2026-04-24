@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { PDFArray, PDFDocument } from "https://esm.sh/pdf-lib@1.17.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,6 +10,9 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const PDFSHIFT_API_KEY = Deno.env.get("PDFSHIFT_API_KEY")!;
+const TARGET_INTERIOR_PAGES = 42;
+const INTERIOR_PAGE_WIDTH_POINTS = (210 / 25.4) * 72;
+const INTERIOR_PAGE_HEIGHT_POINTS = (280 / 25.4) * 72;
 
 const DEFAULT_FIXTURE_URL =
   "https://fjtkjbnvpobawqqkzrst.supabase.co/storage/v1/object/public/print-designs/fixtures/osmond-fixture.json";
@@ -21,6 +25,80 @@ const json = (status: number, body: unknown) =>
 
 const fail = (step: string, error: string) =>
   json(500, { success: false, step, error });
+
+function inferSurname(fixture: any): string {
+  return String(
+    fixture?.surname ?? fixture?.facts?.surname ?? fixture?.facts?.displaySurname ?? "osmond",
+  )
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "osmond";
+}
+
+function isTrimmableBlankPage(page: any): boolean {
+  const contents = page?.node?.normalizedEntries?.().Contents;
+
+  if (!contents) {
+    return true;
+  }
+
+  if (contents instanceof PDFArray) {
+    return contents.size() === 0;
+  }
+
+  return false;
+}
+
+async function adjustInteriorPageCount(pdfBytes: Uint8Array, surname: string) {
+  const pdf = await PDFDocument.load(pdfBytes);
+  const rawPages = pdf.getPageCount();
+  let padded = 0;
+  let trimmed = 0;
+
+  if (rawPages < TARGET_INTERIOR_PAGES) {
+    padded = TARGET_INTERIOR_PAGES - rawPages;
+    for (let i = 0; i < padded; i += 1) {
+      pdf.addPage([INTERIOR_PAGE_WIDTH_POINTS, INTERIOR_PAGE_HEIGHT_POINTS]);
+    }
+  } else if (rawPages > TARGET_INTERIOR_PAGES) {
+    console.warn(
+      `[render-legacy-book-pdf] WARN surname=${surname} raw_pages=${rawPages} exceeds target=${TARGET_INTERIOR_PAGES}`,
+    );
+
+    while (pdf.getPageCount() > TARGET_INTERIOR_PAGES) {
+      const lastIndex = pdf.getPageCount() - 1;
+      const lastPage = pdf.getPage(lastIndex);
+
+      if (!isTrimmableBlankPage(lastPage)) {
+        break;
+      }
+
+      pdf.removePage(lastIndex);
+      trimmed += 1;
+    }
+
+    if (pdf.getPageCount() > TARGET_INTERIOR_PAGES) {
+      throw new Error(
+        `Interior PDF exceeds target page count: ${pdf.getPageCount()} pages, expected <= 42. Content overflow — requires content trim.`,
+      );
+    }
+  }
+
+  const finalPages = pdf.getPageCount();
+
+  console.log(
+    `[render-legacy-book-pdf] surname=${surname} raw_pages=${rawPages} final_pages=${finalPages} padded=${padded} trimmed=${trimmed}`,
+  );
+
+  return {
+    pdfBytes: await pdf.save(),
+    rawPages,
+    finalPages,
+    padded,
+    trimmed,
+  };
+}
 
 function escapeHtml(s: string): string {
   return String(s ?? "")
@@ -807,6 +885,7 @@ Deno.serve(async (req) => {
   }
 
   const html = buildHtml(fixture, mode);
+  const surname = inferSurname(fixture);
 
   let pdfBytes: Uint8Array;
   try {
@@ -845,11 +924,22 @@ Deno.serve(async (req) => {
     return fail("pdfshift", (err as Error).message);
   }
 
+  let finalPageCount = 0;
+
   try {
+    if (mode === "print") {
+      const adjusted = await adjustInteriorPageCount(pdfBytes, surname);
+      pdfBytes = adjusted.pdfBytes;
+      finalPageCount = adjusted.finalPages;
+    } else {
+      const pdf = await PDFDocument.load(pdfBytes);
+      finalPageCount = pdf.getPageCount();
+    }
+
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
     const path = mode === "digital"
-      ? "books/osmond-book-interior-digital.pdf"
-      : "books/osmond-book-interior.pdf";
+      ? `books/${surname}-book-interior-digital.pdf`
+      : `books/${surname}-book-interior.pdf`;
     const { error: uploadErr } = await supabase.storage
       .from("print-designs")
       .upload(path, pdfBytes, {
@@ -868,6 +958,7 @@ Deno.serve(async (req) => {
       success: true,
       url: pub.publicUrl,
       bytes: pdfBytes.byteLength,
+      pageCount: finalPageCount,
     });
   } catch (err) {
     return fail("upload", (err as Error).message);
