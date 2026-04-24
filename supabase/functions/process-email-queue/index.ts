@@ -90,9 +90,9 @@ async function moveToDlq(
 ): Promise<void> {
   const payload = msg.message
   await supabase.from('email_send_log').insert({
-    message_id: payload.message_id,
-    template_name: (payload.label || queue) as string,
-    recipient_email: payload.to,
+    message_id: payload.message_id ?? null,
+    template_name: payload.label || queue,
+    recipient_email: payload.to ?? 'unknown',
     status: 'dlq',
     error_message: reason,
   })
@@ -100,7 +100,7 @@ async function moveToDlq(
     source_queue: queue,
     dlq_name: `${queue}_dlq`,
     message_id: msg.msg_id,
-    payload,
+    payload: payload as unknown as Record<string, unknown>,
   })
   if (error) {
     console.error('Failed to move message to DLQ', { queue, msg_id: msg.msg_id, reason, error })
