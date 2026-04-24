@@ -135,7 +135,7 @@ const AppLayout = () => {
             </button>
           )}
           <Link
-            to="/journey"
+            to="/journey/1"
             className="transition-colors duration-200 hover:opacity-80"
             style={{ color: "#e8943a" }}
           >

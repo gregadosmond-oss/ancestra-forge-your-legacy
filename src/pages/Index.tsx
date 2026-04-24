@@ -72,7 +72,7 @@ const Index = () => {
           </p>
 
           <Link
-            to="/journey"
+            to="/journey/1"
             className="mt-10 inline-block rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-400"
             style={{
               background: "linear-gradient(135deg, #e8943a, #c47828)",
