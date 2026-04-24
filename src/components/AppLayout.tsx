@@ -91,6 +91,14 @@ const AppLayout = () => {
             Pricing
           </NavLink>
           <NavLink
+            to="/shop"
+            className="transition-colors duration-200 hover:text-amber"
+            activeClassName="text-amber"
+            style={{ color: "#c4b8a6" }}
+          >
+            Shop
+          </NavLink>
+          <NavLink
             to="/about"
             className="transition-colors duration-200 hover:text-amber"
             activeClassName="text-amber"
