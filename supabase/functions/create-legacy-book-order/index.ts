@@ -139,9 +139,9 @@ serve(async (req) => {
     });
   }
 
-  let pageCount: number;
+  let interiorPdfPages: number;
   try {
-    pageCount = await getInteriorPdfPageCount(interiorUrl);
+    interiorPdfPages = await getInteriorPdfPageCount(interiorUrl);
   } catch (err) {
     return json(500, {
       success: false,
@@ -149,8 +149,22 @@ serve(async (req) => {
     });
   }
 
+  // Gelato validates hardcover books as: interior PDF pages + cover PDF pages =
+  // payload pageCount + 3. Since our cover is a separate single-page PDF, we must
+  // subtract the first and last interior pages from the payload because Gelato
+  // appears to treat them as implicit endpaper leaves rather than content pages.
+  if (interiorPdfPages <= 2) {
+    return json(500, {
+      success: false,
+      error:
+        `Interior PDF has ${interiorPdfPages} page(s); cannot derive a positive Gelato content pageCount after subtracting implicit endpapers.`,
+    });
+  }
+
+  const pageCount = interiorPdfPages - 2;
+
   console.log(
-    `[create-legacy-book-order] surname=${surname} interior_pdf_pages=${pageCount} using pageCount=${pageCount}`,
+    `[create-legacy-book-order] surname=${surname} interior_pdf_pages=${interiorPdfPages} payload_pageCount=${pageCount} (Gelato treats first/last interior pages as endpapers)`,
   );
 
   const orderReferenceId = `ancestorsqr-book-${normalizedSurname}-${Date.now()}`;
