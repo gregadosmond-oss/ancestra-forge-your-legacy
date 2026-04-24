@@ -50,20 +50,14 @@ async function writeOneChapter(
   chapterOneBody: string,
   allTitles: string[],
   currentIndex: number,
-  previousEnding: string | null,
 ): Promise<string> {
   const currentTitle = allTitles[currentIndex];
   const chapterNumber = currentIndex + 2;
 
-  const continuityBlock = previousEnding
-    ? `The previous chapter (Chapter ${chapterNumber - 1}) ended with:
-"${previousEnding.slice(-600)}"
-
-Pick up continuity from that ending.`
-    : `The story so far — Chapter 1 "${chapterOneTitle}":
+  const continuityBlock = `The story so far — Chapter 1 "${chapterOneTitle}":
 "${chapterOneBody}"
 
-Pick up continuity from Chapter 1's ending.`;
+Pick up continuity from Chapter 1's ending and remain consistent with the full outline.`;
 
   const userPrompt = `Family surname: "${surname}"
 
@@ -153,30 +147,46 @@ Deno.serve(async (req: Request) => {
   }
 
   const titles = story.teaserChapters;
-  const chapterBodies: string[] = [];
-  let previousEnding: string | null = null;
+  const startedAt = Date.now();
 
-  for (let i = 0; i < titles.length; i++) {
-    try {
-      const chapterBody = await writeOneChapter(
-        apiKey, surname, story.chapterOneTitle, story.chapterOneBody,
-        titles, i, previousEnding,
-      );
-      chapterBodies.push(chapterBody);
-      previousEnding = chapterBody;
-       console.log(`expand-chapters wrote chapter ${i + 2}: ${wordCount(chapterBody)} words`);
-    } catch (err) {
-      console.error(`expand-chapters chapter ${i + 2} error`, err);
-      return json({
-        error: `chapter ${i + 2} generation failed: ${(err as Error).message}`,
-        completedChapters: chapterBodies.length,
-      }, 500);
+  // Parallel by design: each chapter now derives from the shared outline +
+  // Chapter 1 foundation, so we can preserve order while avoiding edge timeouts.
+  const settledChapters = await Promise.allSettled(
+    titles.map((_, i) =>
+      writeOneChapter(
+        apiKey,
+        surname,
+        story.chapterOneTitle,
+        story.chapterOneBody,
+        titles,
+        i,
+      ),
+    ),
+  );
+
+  const chapterBodies = settledChapters.map((result, i) => {
+    if (result.status === "fulfilled") {
+      const chapterBody = result.value;
+      console.log(`expand-chapters wrote chapter ${i + 2}: ${wordCount(chapterBody)} words`);
+      return chapterBody;
     }
+
+    console.error(`expand-chapters chapter ${i + 2} error`, result.reason);
+    return "";
+  });
+
+  if (chapterBodies.every((chapterBody) => !chapterBody)) {
+    return json({
+      error: "all chapter generation attempts failed",
+      completedChapters: 0,
+    }, 500);
   }
 
   const totalWords = chapterBodies.reduce((sum, chapterBody) => sum + wordCount(chapterBody), 0);
-  const avgWords = chapterBodies.length > 0 ? Math.round(totalWords / chapterBodies.length) : 0;
-  console.log(`[expand-chapters] surname=${surname} chapters=${chapterBodies.length} avg_words=${avgWords}`);
+  const successfulChapters = chapterBodies.filter(Boolean).length;
+  const avgWords = successfulChapters > 0 ? Math.round(totalWords / successfulChapters) : 0;
+  const elapsedMs = Date.now() - startedAt;
+  console.log(`[expand-chapters] surname=${surname} chapters=${successfulChapters} avg_words=${avgWords} elapsed_ms=${elapsedMs}`);
 
   const updatedStory = { ...story, chapterBodies };
   const { error: writeErr } = await client
