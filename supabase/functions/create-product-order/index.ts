@@ -14,6 +14,12 @@ const PRODUCTS = {
   charcuterie:  { blueprintId: 2020, providerId: 261, defaultVariantId: 123101 },
 };
 
+type ProductType = keyof typeof PRODUCTS;
+
+function isProductType(value: string): value is ProductType {
+  return value in PRODUCTS;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -34,12 +40,13 @@ serve(async (req) => {
     });
   }
 
-  const config = PRODUCTS[productType];
-  if (!config) {
+  if (!isProductType(productType)) {
     return new Response(JSON.stringify({ error: `Unknown productType: ${productType}` }), {
       status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+
+  const config = PRODUCTS[productType];
 
   const resolvedVariantId = variantId ?? config.defaultVariantId;
 
