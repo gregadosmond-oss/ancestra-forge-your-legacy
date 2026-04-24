@@ -74,7 +74,7 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
       productType,
       surname,
       shippingAddress: JSON.parse(shippingAddressRaw),
-      buyerEmail,
+      buyerEmail: buyerEmail ?? undefined,
     });
   }
 
