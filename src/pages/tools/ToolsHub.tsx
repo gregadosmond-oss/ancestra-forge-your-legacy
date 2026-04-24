@@ -220,7 +220,7 @@ export default function ToolsHub() {
             Ready to discover your full legacy?
           </p>
           <Link
-            to="/journey"
+            to="/journey/1"
             className="mt-4 inline-block rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-[400ms] hover:-translate-y-0.5"
             style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
           >
