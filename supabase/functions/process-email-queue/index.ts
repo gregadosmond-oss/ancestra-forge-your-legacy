@@ -1,5 +1,34 @@
 import { sendLovableEmail } from 'npm:@lovable.dev/email-js'
-import { createClient } from 'npm:@supabase/supabase-js@2'
+import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2'
+import type { Database } from '../../../src/integrations/supabase/types.ts'
+
+type DbClient = SupabaseClient<Database>
+
+// Shape of a message stored on a pgmq queue. The `message` JSON column is
+// always populated by our producers with an EmailPayload-shaped object.
+interface EmailPayload {
+  message_id?: string
+  label?: string
+  to?: string
+  from?: string
+  sender_domain?: string
+  subject?: string
+  html?: string
+  text?: string
+  purpose?: string
+  run_id?: string
+  idempotency_key?: string
+  unsubscribe_token?: string
+  queued_at?: string
+  [key: string]: unknown
+}
+
+interface QueueMessage {
+  msg_id: number
+  read_ct: number
+  message: EmailPayload
+  enqueued_at?: string
+}
 
 const MAX_RETRIES = 5
 const DEFAULT_BATCH_SIZE = 10
