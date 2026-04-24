@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { toggleAmbientPlayback } from "@/lib/ambientAudio";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,8 +15,21 @@ const AppLayout = () => {
   const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(true);
   const [showAuthGate, setShowAuthGate] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const { user, loading } = useAuth();
   const { totalItems } = useCart();
+
+  const closeDrawer = () => setDrawerOpen(false);
+
+  const handleSignOutMobile = async () => {
+    closeDrawer();
+    await handleSignOut();
+  };
+
+  const handleSignInMobile = () => {
+    closeDrawer();
+    setShowAuthGate(true);
+  };
 
   const isLanding = location.pathname === "/";
   const journeyMatch = location.pathname.match(/^\/journey\/(\d+)$/);
@@ -47,15 +62,32 @@ const AppLayout = () => {
           WebkitBackdropFilter: "blur(12px)",
         }}
       >
-        {/* Step counter — top-right (journey only) */}
+        {/* Step counter — top-right (journey only). On mobile shifts left to make room for hamburger. */}
         {showStepCounter && (
           <div
-            className="absolute right-5 top-1/2 -translate-y-1/2 font-sans text-[10px] uppercase tracking-[3px]"
+            className="absolute right-16 md:right-5 top-1/2 -translate-y-1/2 font-sans text-[10px] uppercase tracking-[3px]"
             style={{ color: "#a07830" }}
           >
             {String(stepNumber).padStart(2, "0")} / 06
           </div>
         )}
+
+        {/* Hamburger — mobile only */}
+        <button
+          aria-label="Open menu"
+          onClick={() => setDrawerOpen(true)}
+          className="md:hidden absolute right-5 top-1/2 -translate-y-1/2 flex items-center justify-center"
+          style={{
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            background: "rgba(212,160,74,0.1)",
+            border: "1px solid rgba(212,160,74,0.25)",
+          }}
+        >
+          <Menu size={18} color="#d4a04a" strokeWidth={2} />
+        </button>
+
 
         {/* Logo */}
         <Link
@@ -66,9 +98,9 @@ const AppLayout = () => {
           AncestorsQR
         </Link>
 
-        {/* Links row */}
+        {/* Links row — desktop only */}
         <div
-          className="flex items-center justify-center gap-8 px-8 pb-3 pt-2 font-sans text-[10px] font-semibold uppercase"
+          className="hidden md:flex items-center justify-center gap-8 px-8 pb-3 pt-2 font-sans text-[10px] font-semibold uppercase"
           style={{
             letterSpacing: "2px",
             borderTop: "1px solid #2a2018",
@@ -168,6 +200,109 @@ const AppLayout = () => {
           </Link>
         </div>
       </nav>
+
+      {/* ── MOBILE DRAWER ── */}
+      <AnimatePresence>
+        {drawerOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.25 }}
+            className="md:hidden fixed inset-0 flex flex-col items-center justify-center gap-8"
+            style={{
+              zIndex: 60,
+              background: "rgba(13,10,7,0.98)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+            }}
+          >
+            <button
+              aria-label="Close menu"
+              onClick={closeDrawer}
+              className="absolute right-5 top-5 flex items-center justify-center"
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                background: "rgba(212,160,74,0.1)",
+                border: "1px solid rgba(212,160,74,0.25)",
+              }}
+            >
+              <X size={18} color="#d4a04a" strokeWidth={2} />
+            </button>
+
+            <NavLink
+              to="/tools"
+              onClick={closeDrawer}
+              className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+              style={{ color: "#e8b85c" }}
+            >
+              Free Tools
+            </NavLink>
+            <NavLink
+              to="/pricing"
+              onClick={closeDrawer}
+              className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+              style={{ color: "#e8b85c" }}
+            >
+              Pricing
+            </NavLink>
+            <NavLink
+              to="/shop"
+              onClick={closeDrawer}
+              className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+              style={{ color: "#e8b85c" }}
+            >
+              Shop
+            </NavLink>
+            <NavLink
+              to="/about"
+              onClick={closeDrawer}
+              className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+              style={{ color: "#e8b85c" }}
+            >
+              Our Story
+            </NavLink>
+            {loading ? null : user ? (
+              <>
+                <NavLink
+                  to="/my-legacy"
+                  onClick={closeDrawer}
+                  className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+                  style={{ color: "#e8b85c" }}
+                >
+                  My Legacy
+                </NavLink>
+                <button
+                  onClick={handleSignOutMobile}
+                  className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+                  style={{ color: "#e8b85c" }}
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleSignInMobile}
+                className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+                style={{ color: "#e8b85c" }}
+              >
+                Sign In
+              </button>
+            )}
+            <Link
+              to="/journey/1"
+              onClick={closeDrawer}
+              className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-opacity duration-200 hover:opacity-80"
+              style={{ color: "#e8943a" }}
+            >
+              Begin Journey →
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
 
       {/* ── BACK BUTTON — below navbar ── */}
       {showBack && (
