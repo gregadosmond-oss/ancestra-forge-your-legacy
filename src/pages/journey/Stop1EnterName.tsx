@@ -61,8 +61,8 @@ const Stop1EnterName = () => {
             variants={staggerItem}
             className="mt-6 font-serif text-sm italic text-amber-dim"
           >
-            We couldn&apos;t find that name in the archives. Try the surname as it
-            appears on a birth certificate.
+            We couldn&apos;t find that name in the archives. Try a different
+            spelling — most surnames are in there.
           </motion.p>
         )}
 
