@@ -93,7 +93,7 @@ async function moveToDlq(
   await supabase.from('email_send_log').insert({
     message_id: payload.message_id ?? null,
     template_name: payload.label || queue,
-    recipient_email: payload.to ?? 'unknown',
+    recipient_email: payload.to,
     status: 'dlq',
     error_message: reason,
   })
