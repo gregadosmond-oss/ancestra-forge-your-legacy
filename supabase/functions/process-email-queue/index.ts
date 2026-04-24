@@ -1,5 +1,35 @@
 import { sendLovableEmail } from 'npm:@lovable.dev/email-js'
-import { createClient } from 'npm:@supabase/supabase-js@2'
+import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2'
+import type { Database } from '../../../src/integrations/supabase/types.ts'
+
+type DbClient = SupabaseClient<Database>
+
+// Shape of a message stored on a pgmq queue. The `message` JSON column is
+// always populated by our producers (auth-email-hook and
+// send-transactional-email) with an EmailSendRequest-shaped object.
+interface EmailPayload {
+  message_id?: string
+  label?: string
+  to: string
+  from: string
+  sender_domain?: string
+  subject: string
+  html: string
+  text: string
+  purpose?: string
+  run_id?: string
+  idempotency_key?: string
+  unsubscribe_token?: string
+  queued_at?: string
+  [key: string]: unknown
+}
+
+interface QueueMessage {
+  msg_id: number
+  read_ct: number
+  message: EmailPayload
+  enqueued_at?: string
+}
 
 const MAX_RETRIES = 5
 const DEFAULT_BATCH_SIZE = 10
@@ -54,15 +84,15 @@ function parseJwtClaims(token: string): Record<string, unknown> | null {
 
 // Move a message to the dead letter queue and log the reason.
 async function moveToDlq(
-  supabase: ReturnType<typeof createClient>,
+  supabase: DbClient,
   queue: string,
-  msg: { msg_id: number; message: Record<string, unknown> },
+  msg: QueueMessage,
   reason: string
 ): Promise<void> {
   const payload = msg.message
   await supabase.from('email_send_log').insert({
-    message_id: payload.message_id,
-    template_name: (payload.label || queue) as string,
+    message_id: payload.message_id ?? null,
+    template_name: payload.label || queue,
     recipient_email: payload.to,
     status: 'dlq',
     error_message: reason,
@@ -71,7 +101,7 @@ async function moveToDlq(
     source_queue: queue,
     dlq_name: `${queue}_dlq`,
     message_id: msg.msg_id,
-    payload,
+    payload: payload as unknown as Database['public']['Tables']['email_send_log']['Row']['metadata'],
   })
   if (error) {
     console.error('Failed to move message to DLQ', { queue, msg_id: msg.msg_id, reason, error })
@@ -111,7 +141,7 @@ Deno.serve(async (req) => {
     )
   }
 
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  const supabase: DbClient = createClient<Database>(supabaseUrl, supabaseServiceKey)
 
   // 1. Check rate-limit cooldown and read queue config
   const { data: state } = await supabase
@@ -137,7 +167,7 @@ Deno.serve(async (req) => {
 
   // 2. Process auth_emails first (priority), then transactional_emails
   for (const queue of ['auth_emails', 'transactional_emails']) {
-    const { data: messages, error: readError } = await supabase.rpc('read_email_batch', {
+    const { data: rawMessages, error: readError } = await supabase.rpc('read_email_batch', {
       queue_name: queue,
       batch_size: batchSize,
       vt: 30,
@@ -148,7 +178,13 @@ Deno.serve(async (req) => {
       continue
     }
 
-    if (!messages?.length) continue
+    if (!rawMessages?.length) continue
+
+    // The pgmq read RPC returns rows with a Json `message` column. Producers
+    // always enqueue an EmailPayload-shaped object, so cast once here so the
+    // rest of the loop sees a fully-typed batch (and pgmq's enqueued_at field
+    // which the generated RPC return type omits).
+    const messages = rawMessages as unknown as QueueMessage[]
 
     // Retry budget is based on real send failures, not pgmq read_ct.
     // read_ct increments for every message in a claimed batch, including
