@@ -57,6 +57,18 @@ const FAQ = [
     q: "Is this a subscription?",
     a: "No. Everything is a one-time payment. No recurring charges.",
   },
+  {
+    q: "Is there a refund policy?",
+    a: "Digital Legacy Packs are non-refundable once delivered (you'll have the PDF within minutes). For physical heirlooms, we'll replace anything damaged or misprinted at no cost. Email gregadosmond@gmail.com if something's wrong.",
+  },
+  {
+    q: "What happens to my surname data?",
+    a: "Your surname is used only to generate your legacy. We cache each surname result so we don't regenerate from scratch — but we don't share, sell, or attach it to any marketing list. Your email is used only to deliver your order. Full details on our Privacy page.",
+  },
+  {
+    q: "Can I re-download my Legacy Pack later?",
+    a: "Yes. Sign in with the same email you used at checkout and your legacy lives at /my-legacy forever. You can also forward the delivery email to anyone.",
+  },
 ];
 
 const Pricing = () => (
@@ -98,7 +110,7 @@ const Pricing = () => (
           ))}
         </ul>
         <Link
-          to="/journey"
+          to="/journey/1"
           className="mt-8 block rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:opacity-80"
           style={{ background: "rgba(232,148,58,0.08)", border: "1px solid rgba(232,148,58,0.2)", color: "#d4a04a" }}
         >
@@ -129,7 +141,7 @@ const Pricing = () => (
           ))}
         </ul>
         <Link
-          to="/journey"
+          to="/journey/1"
           className="mt-8 block rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
           style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
         >
@@ -200,7 +212,7 @@ const Pricing = () => (
       <p className="font-display text-2xl text-cream-warm">Ready to discover your legacy?</p>
       <p className="mt-3 italic" style={{ color: "#8a7e6e" }}>It takes five minutes. Start free.</p>
       <Link
-        to="/journey"
+        to="/journey/1"
         className="mt-8 inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
         style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
       >
