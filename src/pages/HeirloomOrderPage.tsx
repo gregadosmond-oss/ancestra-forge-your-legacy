@@ -10,12 +10,46 @@ import { getStripeEnvironment } from "@/lib/stripe";
 
 type Step = "details" | "payment";
 
-const COUNTRIES = ["US", "CA", "GB", "AU", "NZ", "IE", "DE", "FR", "NL", "SE", "NO", "DK"];
+// ISO 3166-1 alpha-2 → country name. Sorted alphabetically by country name.
 const COUNTRY_LABELS: Record<string, string> = {
-  US: "United States", CA: "Canada", GB: "United Kingdom", AU: "Australia",
-  NZ: "New Zealand", IE: "Ireland", DE: "Germany", FR: "France",
-  NL: "Netherlands", SE: "Sweden", NO: "Norway", DK: "Denmark",
+  AL: "Albania", DZ: "Algeria", AD: "Andorra", AO: "Angola", AG: "Antigua and Barbuda",
+  AR: "Argentina", AM: "Armenia", AU: "Australia", AT: "Austria", AZ: "Azerbaijan",
+  BS: "Bahamas", BH: "Bahrain", BD: "Bangladesh", BB: "Barbados", BE: "Belgium",
+  BZ: "Belize", BJ: "Benin", BM: "Bermuda", BT: "Bhutan", BO: "Bolivia",
+  BA: "Bosnia and Herzegovina", BW: "Botswana", BR: "Brazil", BN: "Brunei", BG: "Bulgaria",
+  BF: "Burkina Faso", KH: "Cambodia", CM: "Cameroon", CA: "Canada", CV: "Cape Verde",
+  KY: "Cayman Islands", CL: "Chile", CN: "China", CO: "Colombia", CR: "Costa Rica",
+  HR: "Croatia", CY: "Cyprus", CZ: "Czech Republic", DK: "Denmark", DM: "Dominica",
+  DO: "Dominican Republic", EC: "Ecuador", EG: "Egypt", SV: "El Salvador", EE: "Estonia",
+  ET: "Ethiopia", FJ: "Fiji", FI: "Finland", FR: "France", GA: "Gabon",
+  GM: "Gambia", GE: "Georgia", DE: "Germany", GH: "Ghana", GI: "Gibraltar",
+  GR: "Greece", GL: "Greenland", GD: "Grenada", GT: "Guatemala", GY: "Guyana",
+  HT: "Haiti", HN: "Honduras", HK: "Hong Kong", HU: "Hungary", IS: "Iceland",
+  IN: "India", ID: "Indonesia", IE: "Ireland", IL: "Israel", IT: "Italy",
+  JM: "Jamaica", JP: "Japan", JO: "Jordan", KZ: "Kazakhstan", KE: "Kenya",
+  KW: "Kuwait", KG: "Kyrgyzstan", LA: "Laos", LV: "Latvia", LB: "Lebanon",
+  LS: "Lesotho", LI: "Liechtenstein", LT: "Lithuania", LU: "Luxembourg", MO: "Macau",
+  MK: "Macedonia", MG: "Madagascar", MW: "Malawi", MY: "Malaysia", MV: "Maldives",
+  MT: "Malta", MR: "Mauritania", MU: "Mauritius", MX: "Mexico", MD: "Moldova",
+  MC: "Monaco", MN: "Mongolia", ME: "Montenegro", MA: "Morocco", MZ: "Mozambique",
+  NA: "Namibia", NP: "Nepal", NL: "Netherlands", NZ: "New Zealand", NI: "Nicaragua",
+  NE: "Niger", NG: "Nigeria", NO: "Norway", OM: "Oman", PK: "Pakistan",
+  PA: "Panama", PG: "Papua New Guinea", PY: "Paraguay", PE: "Peru", PH: "Philippines",
+  PL: "Poland", PT: "Portugal", PR: "Puerto Rico", QA: "Qatar", RO: "Romania",
+  RW: "Rwanda", KN: "Saint Kitts and Nevis", LC: "Saint Lucia", VC: "Saint Vincent and the Grenadines",
+  WS: "Samoa", SM: "San Marino", SA: "Saudi Arabia", SN: "Senegal", RS: "Serbia",
+  SC: "Seychelles", SL: "Sierra Leone", SG: "Singapore", SK: "Slovakia", SI: "Slovenia",
+  ZA: "South Africa", KR: "South Korea", ES: "Spain", LK: "Sri Lanka", SR: "Suriname",
+  SZ: "Swaziland", SE: "Sweden", CH: "Switzerland", TW: "Taiwan", TJ: "Tajikistan",
+  TZ: "Tanzania", TH: "Thailand", TG: "Togo", TO: "Tonga", TT: "Trinidad and Tobago",
+  TN: "Tunisia", TR: "Turkey", TM: "Turkmenistan", UG: "Uganda", UA: "Ukraine",
+  AE: "United Arab Emirates", GB: "United Kingdom", US: "United States", UY: "Uruguay",
+  UZ: "Uzbekistan", VU: "Vanuatu", VE: "Venezuela", VN: "Vietnam", ZM: "Zambia",
+  ZW: "Zimbabwe",
 };
+const COUNTRIES = Object.keys(COUNTRY_LABELS).sort((a, b) =>
+  COUNTRY_LABELS[a].localeCompare(COUNTRY_LABELS[b])
+);
 
 interface ShippingAddress {
   [key: string]: string;
