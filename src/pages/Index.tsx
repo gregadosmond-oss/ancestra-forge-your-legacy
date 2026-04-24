@@ -121,54 +121,6 @@ const Index = () => {
         `}</style>
       </div>
 
-      {/* ── MUSIC BUTTON ── */}
-      <div className="relative z-10 flex w-full items-center justify-center py-4" style={{ background: "rgba(20,14,8,0.85)", borderBottom: "1px solid rgba(212,160,74,0.08)" }}>
-        <button
-          onClick={handleToggleMusic}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "9px",
-            padding: "10px 22px",
-            borderRadius: 60,
-            border: isPlaying
-              ? "1px solid rgba(232,148,58,0.55)"
-              : "1px solid rgba(212,160,74,0.3)",
-            background: isPlaying
-              ? "linear-gradient(135deg, rgba(232,148,58,0.18), rgba(196,120,40,0.12))"
-              : "rgba(212,160,74,0.06)",
-            color: isPlaying ? "#f0a848" : "#d4a04a",
-            fontFamily: "var(--font-sans, DM Sans, sans-serif)",
-            fontSize: "12px",
-            fontWeight: 600,
-            letterSpacing: "1.5px",
-            textTransform: "uppercase",
-            cursor: "pointer",
-            animation: isPlaying ? "musicPulse 2s ease-in-out infinite" : "musicPulseIdle 3s ease-in-out infinite",
-            transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px) scale(1.04)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.transform = "";
-          }}
-        >
-          {/* Icon */}
-          {isPlaying ? (
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="6" y="4" width="4" height="16" rx="1" />
-              <rect x="14" y="4" width="4" height="16" rx="1" />
-            </svg>
-          ) : (
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="5 3 19 12 5 21 5 3" />
-            </svg>
-          )}
-          {isPlaying ? "Pause Music" : "Play Music"}
-        </button>
-      </div>
-
       {/* ── LANDING SECTIONS ── */}
       <div className="relative z-10 w-full max-w-4xl px-6 pb-24">
         <WarmDivider />
