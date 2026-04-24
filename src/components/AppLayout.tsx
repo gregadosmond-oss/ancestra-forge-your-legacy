@@ -23,6 +23,7 @@ const AppLayout = () => {
 
   const showBack = !isLanding;
   const showStepCounter = !!stepNumber;
+  const hideFooter = location.pathname === "/checkout" || location.pathname === "/checkout/return";
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
