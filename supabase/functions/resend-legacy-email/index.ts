@@ -111,7 +111,7 @@ serve(async (req) => {
     <tr><td align="center">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
         <tr><td align="center" style="padding:8px 0 24px;">
-          <p style="margin:0;font-size:14px;letter-spacing:6px;color:#d4a04a;font-family:Arial,sans-serif;font-weight:700;">ANCESTRA</p>
+          <p style="margin:0;font-size:14px;letter-spacing:6px;color:#d4a04a;font-family:Arial,sans-serif;font-weight:700;">ANCESTORSQR</p>
         </td></tr>
         <tr><td style="padding:0 0 32px;">
           <div style="height:1px;background:linear-gradient(to right, transparent, #3d3020, transparent);"></div>
@@ -133,7 +133,7 @@ serve(async (req) => {
         </td></tr>
         <tr><td align="center" style="padding:24px 40px 8px;">
           <p style="margin:0 0 8px;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;letter-spacing:1px;">One-time purchase · Instant access · No subscription</p>
-          <p style="margin:0 0 8px;font-size:11px;color:#8a7e6e;font-family:Georgia,serif;font-style:italic;">© 2026 Ancestra — Every family has a story worth telling.</p>
+          <p style="margin:0 0 8px;font-size:11px;color:#8a7e6e;font-family:Georgia,serif;font-style:italic;">© 2026 AncestorsQR — Every family has a story worth telling.</p>
           <p style="margin:0;font-size:11px;color:#8a7e6e;font-family:Arial,sans-serif;">You're receiving this because you purchased a Legacy Pack.</p>
         </td></tr>
       </table>
