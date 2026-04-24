@@ -72,6 +72,8 @@ const Stop1EnterName = () => {
           className="mt-12 flex flex-col items-center gap-5"
         >
           <input
+            id="journey-surname"
+            aria-label="Enter your family surname"
             type="text"
             value={surname}
             onChange={(e) => setSurname(e.target.value)}

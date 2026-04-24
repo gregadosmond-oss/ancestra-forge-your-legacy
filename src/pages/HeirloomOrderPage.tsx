@@ -132,8 +132,9 @@ export default function HeirloomOrderPage() {
           >
             {/* Surname */}
             <div>
-              <label className={labelCls}>Family Surname</label>
+              <label htmlFor="heirloom-surname" className={labelCls}>Family Surname</label>
               <input
+                id="heirloom-surname"
                 value={inputSurname}
                 onChange={(e) => setInputSurname(e.target.value)}
                 placeholder="e.g. Murphy"
@@ -145,44 +146,44 @@ export default function HeirloomOrderPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={labelCls}>First Name</label>
-                <input value={address.first_name} onChange={set("first_name")} placeholder="John" required className={inputCls} />
+                <label htmlFor="heirloom-first-name" className={labelCls}>First Name</label>
+                <input id="heirloom-first-name" value={address.first_name} onChange={set("first_name")} placeholder="John" required className={inputCls} />
               </div>
               <div>
-                <label className={labelCls}>Last Name</label>
-                <input value={address.last_name} onChange={set("last_name")} placeholder="Murphy" required className={inputCls} />
+                <label htmlFor="heirloom-last-name" className={labelCls}>Last Name</label>
+                <input id="heirloom-last-name" value={address.last_name} onChange={set("last_name")} placeholder="Murphy" required className={inputCls} />
               </div>
             </div>
 
             <div>
-              <label className={labelCls}>Email</label>
-              <input type="email" value={address.email} onChange={set("email")} placeholder="you@email.com" required className={inputCls} />
+              <label htmlFor="heirloom-email" className={labelCls}>Email</label>
+              <input id="heirloom-email" type="email" value={address.email} onChange={set("email")} placeholder="you@email.com" required className={inputCls} />
             </div>
 
             <div>
-              <label className={labelCls}>Street Address</label>
-              <input value={address.address1} onChange={set("address1")} placeholder="123 Heritage Lane" required className={inputCls} />
+              <label htmlFor="heirloom-address1" className={labelCls}>Street Address</label>
+              <input id="heirloom-address1" value={address.address1} onChange={set("address1")} placeholder="123 Heritage Lane" required className={inputCls} />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={labelCls}>City</label>
-                <input value={address.city} onChange={set("city")} placeholder="Dublin" required className={inputCls} />
+                <label htmlFor="heirloom-city" className={labelCls}>City</label>
+                <input id="heirloom-city" value={address.city} onChange={set("city")} placeholder="Dublin" required className={inputCls} />
               </div>
               <div>
-                <label className={labelCls}>State / Province</label>
-                <input value={address.region} onChange={set("region")} placeholder="CA" required className={inputCls} />
+                <label htmlFor="heirloom-region" className={labelCls}>State / Province</label>
+                <input id="heirloom-region" value={address.region} onChange={set("region")} placeholder="CA" required className={inputCls} />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={labelCls}>Postal Code</label>
-                <input value={address.zip} onChange={set("zip")} placeholder="D01 AB23" required className={inputCls} />
+                <label htmlFor="heirloom-zip" className={labelCls}>Postal Code</label>
+                <input id="heirloom-zip" value={address.zip} onChange={set("zip")} placeholder="D01 AB23" required className={inputCls} />
               </div>
               <div>
-                <label className={labelCls}>Country</label>
-                <select value={address.country} onChange={set("country")} className={inputCls}>
+                <label htmlFor="heirloom-country" className={labelCls}>Country</label>
+                <select id="heirloom-country" value={address.country} onChange={set("country")} className={inputCls}>
                   {COUNTRIES.map((c) => (
                     <option key={c} value={c}>{COUNTRY_LABELS[c]}</option>
                   ))}
@@ -191,8 +192,8 @@ export default function HeirloomOrderPage() {
             </div>
 
             <div>
-              <label className={labelCls}>Phone (for shipping)</label>
-              <input type="tel" value={address.phone} onChange={set("phone")} placeholder="+1 555 000 0000" className={inputCls} />
+              <label htmlFor="heirloom-phone" className={labelCls}>Phone (for shipping)</label>
+              <input id="heirloom-phone" type="tel" value={address.phone} onChange={set("phone")} placeholder="+1 555 000 0000" className={inputCls} />
             </div>
 
             <button

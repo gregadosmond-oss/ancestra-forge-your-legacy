@@ -131,6 +131,7 @@ export default function SurnameLookup() {
         >
           <input
             type="text"
+            aria-label="Surname to look up"
             value={surname}
             onChange={(e) => setSurname(e.target.value)}
             placeholder="Enter a surname"
