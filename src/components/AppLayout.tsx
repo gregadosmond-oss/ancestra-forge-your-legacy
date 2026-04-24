@@ -62,15 +62,32 @@ const AppLayout = () => {
           WebkitBackdropFilter: "blur(12px)",
         }}
       >
-        {/* Step counter — top-right (journey only) */}
+        {/* Step counter — top-right (journey only). On mobile shifts left to make room for hamburger. */}
         {showStepCounter && (
           <div
-            className="absolute right-5 top-1/2 -translate-y-1/2 font-sans text-[10px] uppercase tracking-[3px]"
+            className="absolute right-16 md:right-5 top-1/2 -translate-y-1/2 font-sans text-[10px] uppercase tracking-[3px]"
             style={{ color: "#a07830" }}
           >
             {String(stepNumber).padStart(2, "0")} / 06
           </div>
         )}
+
+        {/* Hamburger — mobile only */}
+        <button
+          aria-label="Open menu"
+          onClick={() => setDrawerOpen(true)}
+          className="md:hidden absolute right-5 top-1/2 -translate-y-1/2 flex items-center justify-center"
+          style={{
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            background: "rgba(212,160,74,0.1)",
+            border: "1px solid rgba(212,160,74,0.25)",
+          }}
+        >
+          <Menu size={18} color="#d4a04a" strokeWidth={2} />
+        </button>
+
 
         {/* Logo */}
         <Link
