@@ -885,6 +885,7 @@ Deno.serve(async (req) => {
   }
 
   const html = buildHtml(fixture, mode);
+  const surname = inferSurname(fixture);
 
   let pdfBytes: Uint8Array;
   try {
@@ -923,11 +924,22 @@ Deno.serve(async (req) => {
     return fail("pdfshift", (err as Error).message);
   }
 
+  let finalPageCount = 0;
+
   try {
+    if (mode === "print") {
+      const adjusted = await adjustInteriorPageCount(pdfBytes, surname);
+      pdfBytes = adjusted.pdfBytes;
+      finalPageCount = adjusted.finalPages;
+    } else {
+      const pdf = await PDFDocument.load(pdfBytes);
+      finalPageCount = pdf.getPageCount();
+    }
+
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
     const path = mode === "digital"
-      ? "books/osmond-book-interior-digital.pdf"
-      : "books/osmond-book-interior.pdf";
+      ? `books/${surname}-book-interior-digital.pdf`
+      : `books/${surname}-book-interior.pdf`;
     const { error: uploadErr } = await supabase.storage
       .from("print-designs")
       .upload(path, pdfBytes, {
@@ -946,6 +958,7 @@ Deno.serve(async (req) => {
       success: true,
       url: pub.publicUrl,
       bytes: pdfBytes.byteLength,
+      pageCount: finalPageCount,
     });
   } catch (err) {
     return fail("upload", (err as Error).message);
