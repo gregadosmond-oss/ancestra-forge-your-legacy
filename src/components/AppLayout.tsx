@@ -201,6 +201,109 @@ const AppLayout = () => {
         </div>
       </nav>
 
+      {/* ── MOBILE DRAWER ── */}
+      <AnimatePresence>
+        {drawerOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.25 }}
+            className="md:hidden fixed inset-0 flex flex-col items-center justify-center gap-8"
+            style={{
+              zIndex: 60,
+              background: "rgba(13,10,7,0.98)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+            }}
+          >
+            <button
+              aria-label="Close menu"
+              onClick={closeDrawer}
+              className="absolute right-5 top-5 flex items-center justify-center"
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                background: "rgba(212,160,74,0.1)",
+                border: "1px solid rgba(212,160,74,0.25)",
+              }}
+            >
+              <X size={18} color="#d4a04a" strokeWidth={2} />
+            </button>
+
+            <NavLink
+              to="/tools"
+              onClick={closeDrawer}
+              className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+              style={{ color: "#e8b85c" }}
+            >
+              Free Tools
+            </NavLink>
+            <NavLink
+              to="/pricing"
+              onClick={closeDrawer}
+              className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+              style={{ color: "#e8b85c" }}
+            >
+              Pricing
+            </NavLink>
+            <NavLink
+              to="/shop"
+              onClick={closeDrawer}
+              className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+              style={{ color: "#e8b85c" }}
+            >
+              Shop
+            </NavLink>
+            <NavLink
+              to="/about"
+              onClick={closeDrawer}
+              className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+              style={{ color: "#e8b85c" }}
+            >
+              Our Story
+            </NavLink>
+            {loading ? null : user ? (
+              <>
+                <NavLink
+                  to="/my-legacy"
+                  onClick={closeDrawer}
+                  className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+                  style={{ color: "#e8b85c" }}
+                >
+                  My Legacy
+                </NavLink>
+                <button
+                  onClick={handleSignOutMobile}
+                  className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+                  style={{ color: "#e8b85c" }}
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleSignInMobile}
+                className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
+                style={{ color: "#e8b85c" }}
+              >
+                Sign In
+              </button>
+            )}
+            <Link
+              to="/journey/1"
+              onClick={closeDrawer}
+              className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-opacity duration-200 hover:opacity-80"
+              style={{ color: "#e8943a" }}
+            >
+              Begin Journey →
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
       {/* ── BACK BUTTON — below navbar ── */}
       {showBack && (
         <div className="relative z-40 px-5 pt-4">
