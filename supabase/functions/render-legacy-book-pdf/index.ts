@@ -254,8 +254,6 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       return `
 ${chapterTitlePage(num, title)}
 <section class="chapter chapter-${chapterIndex}-body">
-  <div class="chapter-num">Chapter ${escapeHtml(num)}</div>
-  <h2 class="chapter-title">${escapeHtml(title)}</h2>
   <div class="chapter-body">
     ${paragraphsWithDropCap(body)}
   </div>
@@ -798,8 +796,6 @@ ${chapterTitlePage(num, title)}
 </section>
 
 <section class="chapter chapter-1-body">
-  <div class="chapter-num">Chapter I</div>
-  <h2 class="chapter-title">${escapeHtml(chapterOneTitle)}</h2>
   <div class="chapter-body">
     ${paragraphsWithDropCap(chapterOneBody)}
   </div>
