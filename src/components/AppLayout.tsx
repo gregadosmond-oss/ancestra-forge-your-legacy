@@ -98,9 +98,9 @@ const AppLayout = () => {
           AncestorsQR
         </Link>
 
-        {/* Links row */}
+        {/* Links row — desktop only */}
         <div
-          className="flex items-center justify-center gap-8 px-8 pb-3 pt-2 font-sans text-[10px] font-semibold uppercase"
+          className="hidden md:flex items-center justify-center gap-8 px-8 pb-3 pt-2 font-sans text-[10px] font-semibold uppercase"
           style={{
             letterSpacing: "2px",
             borderTop: "1px solid #2a2018",
