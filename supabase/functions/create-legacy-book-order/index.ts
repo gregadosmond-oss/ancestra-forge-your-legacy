@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { PDFDocument } from "https://esm.sh/pdf-lib@1.17.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -38,6 +39,24 @@ interface RequestBody {
   dryRun?: boolean;
 }
 
+async function getInteriorPdfPageCount(interiorUrl: string): Promise<number> {
+  try {
+    const response = await fetch(interiorUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} when fetching ${interiorUrl}`);
+    }
+
+    const pdfBytes = new Uint8Array(await response.arrayBuffer());
+    const pdf = await PDFDocument.load(pdfBytes);
+    return pdf.getPageCount();
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Failed to determine interior PDF page count: ${reason}. Aborting order creation — cannot submit Gelato order with unknown page count.`,
+    );
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -65,7 +84,6 @@ serve(async (req) => {
   const normalizedSurname = surname.toLowerCase().trim();
   const orderType = body.orderType ?? "draft";
   const quantity = body.quantity ?? 1;
-  const pageCount = body.pageCount ?? 40;
   const productUid = body.productUid ?? DEFAULT_PRODUCT_UID;
   const interiorUrl = body.interiorUrl ??
     `${STORAGE_BASE}/${normalizedSurname}-book-interior.pdf`;
@@ -120,6 +138,20 @@ serve(async (req) => {
       detail: (err as Error).message,
     });
   }
+
+  let pageCount: number;
+  try {
+    pageCount = await getInteriorPdfPageCount(interiorUrl);
+  } catch (err) {
+    return json(500, {
+      success: false,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  }
+
+  console.log(
+    `[create-legacy-book-order] surname=${surname} interior_pdf_pages=${pageCount} using pageCount=${pageCount}`,
+  );
 
   const orderReferenceId = `ancestorsqr-book-${normalizedSurname}-${Date.now()}`;
   const customerReferenceId = `ancestorsqr-${shippingAddress.email}`;
