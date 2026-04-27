@@ -106,9 +106,12 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       if (surnameRef.current !== surname) return;
       const reason = (err as Error).message;
+      const friendlyReason = reason.includes("too long")
+        ? "Surnames must be 60 characters or fewer"
+        : reason;
       setState((s) => ({
         ...s,
-        facts: { data: null, status: "error", reason },
+        facts: { data: null, status: "error", reason: friendlyReason },
         story: { data: null, status: "error", reason: "skipped: network" },
       }));
     }

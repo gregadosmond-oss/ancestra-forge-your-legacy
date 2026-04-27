@@ -80,6 +80,7 @@ const Stop1EnterName = () => {
             placeholder="e.g. Osmond"
             autoFocus
             disabled={submitting}
+            maxLength={60}
             className="w-full rounded-pill border border-amber-dim/30 bg-input px-8 py-5 text-center font-display text-2xl text-cream-warm placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30 disabled:opacity-60"
           />
 

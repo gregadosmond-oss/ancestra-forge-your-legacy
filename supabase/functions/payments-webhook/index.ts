@@ -182,7 +182,11 @@ async function triggerPrintfulOrder({ productType, surname, shippingAddress, buy
   }
 
   const normalized = surname.trim().toLowerCase();
-  const legacySlug = normalized.replace(/\s+/g, "-");
+  const legacySlug = normalized
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")  // strip diacritics: ü → u
+    .replace(/[^a-z0-9]+/g, "-")      // non-alphanumeric → hyphen
+    .replace(/^-+|-+$/g, "");         // trim leading/trailing hyphens
   const legacyUrl = `https://ancestorsqr.com/f/${legacySlug}`;
 
   // Get crest URL from DB
