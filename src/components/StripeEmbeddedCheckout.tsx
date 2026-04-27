@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from "react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { getStripe, getStripeEnvironment, isStripeConfigured } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,7 +43,7 @@ const StripeEmbeddedCheckout = ({
     );
   }
 
-  const fetchClientSecret = async (): Promise<string> => {
+  const fetchClientSecret = useCallback(async (): Promise<string> => {
     const { data, error } = await supabase.functions.invoke("create-checkout", {
       body: { priceId, quantity, customerEmail, userId, returnUrl, environment: environment ?? getStripeEnvironment(), isGift, recipientEmail, surname, shippingAddress: shippingAddress ? JSON.stringify(shippingAddress) : undefined, productType },
     });
@@ -50,11 +51,14 @@ const StripeEmbeddedCheckout = ({
       throw new Error(error?.message || "Failed to create checkout session");
     }
     return data.clientSecret;
-  };
+  }, [priceId, quantity, customerEmail, userId, returnUrl, environment, isGift, recipientEmail, surname, shippingAddress, productType]);
+
+  const stripePromise = useMemo(() => getStripe(), []);
+  const options = useMemo(() => ({ fetchClientSecret }), [fetchClientSecret]);
 
   return (
     <div id="checkout">
-      <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
+      <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
         <EmbeddedCheckout />
       </EmbeddedCheckoutProvider>
     </div>
