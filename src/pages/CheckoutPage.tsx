@@ -48,7 +48,7 @@ const CheckoutPage = () => {
           transition={{ duration: 0.8 }}
           className="mt-6 text-center font-display text-3xl text-cream-warm sm:text-4xl"
         >
-          The {surname ? surname.charAt(0).toUpperCase() + surname.slice(1).toLowerCase() : ""} Legacy Pack
+          The {surname ? surname.charAt(0).toUpperCase() + surname.slice(1) : ""} Legacy Pack
         </motion.h1>
 
         <motion.p
