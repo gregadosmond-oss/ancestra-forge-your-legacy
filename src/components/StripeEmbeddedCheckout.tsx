@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from "react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { getStripe, getStripeEnvironment, isStripeConfigured } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
