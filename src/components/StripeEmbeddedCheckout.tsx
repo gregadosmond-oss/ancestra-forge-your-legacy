@@ -3,6 +3,9 @@ import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe
 import { getStripe, getStripeEnvironment, isStripeConfigured } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
 
+// Module-level singleton — initialized once, reused across all renders
+const stripePromise = getStripe();
+
 interface StripeEmbeddedCheckoutProps {
   priceId: string;
   quantity?: number;
@@ -53,7 +56,6 @@ const StripeEmbeddedCheckout = ({
     return data.clientSecret;
   }, [priceId, quantity, customerEmail, userId, returnUrl, environment, isGift, recipientEmail, surname, shippingAddress, productType]);
 
-  const stripePromise = useMemo(() => getStripe(), []);
   const options = useMemo(() => ({ fetchClientSecret }), [fetchClientSecret]);
 
   return (
