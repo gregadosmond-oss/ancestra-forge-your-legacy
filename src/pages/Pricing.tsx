@@ -129,7 +129,7 @@ const Pricing = () => (
         </p>
         <h2 className="font-display text-xl text-cream-warm">Your Full Story</h2>
         <div className="mt-3 font-display text-4xl" style={{ color: "#e8b85c" }}>
-          $19.99
+          $29.99
         </div>
         <p className="mt-1 font-sans text-[11px]" style={{ color: "#8a7e6e" }}>One-time · Instant delivery</p>
         <ul className="mt-6 flex-1 space-y-2">
