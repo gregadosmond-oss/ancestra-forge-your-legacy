@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
 import { useCart } from "@/contexts/CartContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
   SHOP_PRODUCTS,
   SHOP_BUNDLES,
@@ -35,6 +36,38 @@ export default function Shop() {
   const [activeCategory, setActiveCategory] = useState<ShopProduct["category"] | "all">("all");
   const { addItem } = useCart();
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+  const [notifyProduct, setNotifyProduct] = useState<ShopProduct | null>(null);
+  const [notifyEmail, setNotifyEmail] = useState("");
+  const [notifySurname, setNotifySurname] = useState("");
+  const [notifyStatus, setNotifyStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [notifyError, setNotifyError] = useState("");
+
+  const submitNotify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!notifyEmail.trim()) return;
+    setNotifyStatus("loading");
+    setNotifyError("");
+    try {
+      const { data, error } = await supabase.functions.invoke("book-waitlist-signup", {
+        body: { email: notifyEmail.trim(), surname: notifySurname.trim() || undefined },
+      });
+      if (error || data?.error) {
+        throw new Error(data?.error || error?.message || "Could not save your signup.");
+      }
+      setNotifyStatus("success");
+    } catch (err) {
+      setNotifyError((err as Error).message);
+      setNotifyStatus("error");
+    }
+  };
+
+  const closeNotify = () => {
+    setNotifyProduct(null);
+    setNotifyEmail("");
+    setNotifySurname("");
+    setNotifyStatus("idle");
+    setNotifyError("");
+  };
 
   const handleAddToCart = (product: ShopProduct) => {
     const numericPrice = parseFloat(product.price.replace(/[^0-9.]/g, ""));
