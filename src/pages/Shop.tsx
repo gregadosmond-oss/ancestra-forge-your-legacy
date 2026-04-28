@@ -382,6 +382,28 @@ export default function Shop() {
                       Begin your journey →
                     </Link>
                   )
+                ) : product.notify ? (
+                  <button
+                    onClick={() => setNotifyProduct(product)}
+                    className="mt-5 self-start rounded-pill font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300"
+                    style={{
+                      padding: "10px 22px",
+                      background: "linear-gradient(135deg, #e8943a, #c47828)",
+                      color: "#1a1208",
+                      cursor: "pointer",
+                      border: "none",
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-2px)";
+                      (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 12px 40px rgba(232,148,58,0.25)";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.transform = "";
+                      (e.currentTarget as HTMLButtonElement).style.boxShadow = "";
+                    }}
+                  >
+                    Notify Me When Ready
+                  </button>
                 ) : (
                   <p
                     className="mt-5 font-sans text-[11px] uppercase tracking-[1.5px]"
