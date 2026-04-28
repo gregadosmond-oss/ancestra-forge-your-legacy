@@ -46,7 +46,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "drinkware",
     live: true,
     href: "/product-order?type=heirloom",
-    image: "https://files.cdn.printful.com/files/efe/efe390879b96bcdb68cf3564c0afe4e3_preview.png",
+    image: "/mug-hero.png",
   },
 
   // Canvas
