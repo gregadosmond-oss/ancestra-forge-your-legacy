@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
+import { useStripePrice } from "@/hooks/useStripePrice";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },
@@ -71,7 +72,9 @@ const FAQ = [
   },
 ];
 
-const Pricing = () => (
+const Pricing = () => {
+  const legacyPrice = useStripePrice("legacy_pack_once", "$29.99");
+  return (
   <div className="relative min-h-screen bg-background">
     <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
   <div className="relative z-10 mx-auto max-w-5xl px-6 py-20">
@@ -129,7 +132,7 @@ const Pricing = () => (
         </p>
         <h2 className="font-display text-xl text-cream-warm">Your Full Story</h2>
         <div className="mt-3 font-display text-4xl" style={{ color: "#e8b85c" }}>
-          $29.99
+          {legacyPrice}
         </div>
         <p className="mt-1 font-sans text-[11px]" style={{ color: "#8a7e6e" }}>One-time · Instant delivery</p>
         <ul className="mt-6 flex-1 space-y-2">
@@ -254,6 +257,7 @@ const Pricing = () => (
     </motion.div>
   </div>
   </div>
-);
+  );
+};
 
 export default Pricing;
