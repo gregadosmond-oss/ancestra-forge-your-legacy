@@ -109,7 +109,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "keepsake",
     live: true,
     href: "/product-order?type=blanket-30x40",
-    image: "https://files.cdn.printful.com/files/3da/3daf86b8a3807aac2c064f01fc9c36d1_preview.png",
+    image: "/blanket-hero.png",
   },
 
   {
@@ -122,7 +122,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "keepsake",
     live: true,
     href: "/product-order?type=blanket-50x60",
-    image: "https://files.cdn.printful.com/files/3da/3daf86b8a3807aac2c064f01fc9c36d1_preview.png",
+    image: "/blanket-hero.png",
   },
 
   {
@@ -134,7 +134,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "keepsake",
     live: true,
     href: "/product-order?type=blanket-60x80",
-    image: "https://files.cdn.printful.com/files/3da/3daf86b8a3807aac2c064f01fc9c36d1_preview.png",
+    image: "/blanket-hero.png",
   },
 
   // Coaster
