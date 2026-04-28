@@ -65,6 +65,30 @@ export type Database = {
         }
         Relationships: []
       }
+      book_waitlist: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          source: string
+          surname: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          source?: string
+          surname?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          source?: string
+          surname?: string | null
+        }
+        Relationships: []
+      }
       crests: {
         Row: {
           created_at: string
