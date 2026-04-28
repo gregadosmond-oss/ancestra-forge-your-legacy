@@ -9,6 +9,7 @@ export type ShopProduct = {
   live?: boolean;
   href?: string;
   image?: string;
+  notify?: boolean;
 };
 
 export type ShopBundle = {
@@ -147,6 +148,21 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     live: true,
     href: "/product-order?type=coaster",
     image: "https://files.cdn.printful.com/files/90e/90e7c448edbc138f5529418d472b05cb_preview.png",
+  },
+
+  // Book
+  {
+    id: "legacy-book",
+    name: "The Legacy Book",
+    price: "$129",
+    priceNote: "Coming soon",
+    description:
+      "A hardcover heirloom of your full family story — your custom coat of arms, all 9 chapters, your visual bloodline tree, and your migration path. Bound in cream cloth with gold-foil detail. Printed and shipped worldwide.",
+    tag: "Coming Soon",
+    category: "book",
+    live: false,
+    notify: true,
+    image: "/legacy-book-hero.png",
   },
 ];
 
