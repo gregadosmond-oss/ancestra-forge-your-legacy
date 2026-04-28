@@ -147,7 +147,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "drinkware",
     live: true,
     href: "/product-order?type=coaster",
-    image: "https://files.cdn.printful.com/files/90e/90e7c448edbc138f5529418d472b05cb_preview.png",
+    image: "/cork-coaster-hero.png",
   },
 
   // Book
