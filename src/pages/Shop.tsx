@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useStripePrice } from "@/hooks/useStripePrice";
 import {
   SHOP_PRODUCTS,
   SHOP_BUNDLES,
@@ -41,6 +42,7 @@ export default function Shop() {
   const [notifySurname, setNotifySurname] = useState("");
   const [notifyStatus, setNotifyStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [notifyError, setNotifyError] = useState("");
+  const legacyPrice = useStripePrice("legacy_pack_once", "$29.99");
 
   const submitNotify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -309,7 +311,7 @@ export default function Shop() {
                   className="mt-1 font-display text-2xl"
                   style={{ color: isLive ? "#d4a04a" : "#5a4e3e" }}
                 >
-                  {product.price}
+                  {product.id === "legacy-pack" ? legacyPrice : product.price}
                   {product.priceNote && (
                     <span
                       className="ml-2 font-sans text-[11px] font-normal"

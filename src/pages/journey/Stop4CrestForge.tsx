@@ -4,10 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import FreeCrest from "@/components/FreeCrest";
 import { useJourney } from "@/contexts/JourneyContext";
+import { useStripePrice } from "@/hooks/useStripePrice";
 
 const Stop4CrestForge = () => {
   const navigate = useNavigate();
   const { unknownSurname, surname, facts } = useJourney();
+  const legacyPrice = useStripePrice("legacy_pack_once", "$29.99");
 
   useEffect(() => {
     if (unknownSurname) navigate("/journey/1", { replace: true });
@@ -139,7 +141,7 @@ const Stop4CrestForge = () => {
             Read Your Story
           </Link>
           <p className="mt-3 font-sans text-[12px] uppercase tracking-[1.5px]" style={{ color: "#e8b85c" }}>
-            Unlock the full Legacy Pack for $29.99 · One-time · Instant delivery
+            Unlock the full Legacy Pack for {legacyPrice} · One-time · Instant delivery
           </p>
         </motion.div>
       </motion.div>

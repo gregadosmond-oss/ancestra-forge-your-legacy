@@ -257,6 +257,7 @@ const Pricing = () => {
     </motion.div>
   </div>
   </div>
-);
+  );
+};
 
 export default Pricing;
