@@ -602,6 +602,151 @@ export default function Shop() {
           Begin Your Journey
         </Link>
       </motion.section>
+
+      {notifyProduct && (
+        <div
+          onClick={closeNotify}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 200,
+            background: "rgba(13,10,7,0.85)",
+            backdropFilter: "blur(6px)",
+            WebkitBackdropFilter: "blur(6px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#1a1510",
+              border: "1px solid rgba(232,148,58,0.25)",
+              borderRadius: 22,
+              padding: 36,
+              maxWidth: 460,
+              width: "100%",
+              position: "relative",
+            }}
+          >
+            <button
+              onClick={closeNotify}
+              aria-label="Close"
+              style={{
+                position: "absolute",
+                top: 14,
+                right: 16,
+                background: "transparent",
+                border: "none",
+                color: "#8a7e6e",
+                fontSize: 22,
+                cursor: "pointer",
+                lineHeight: 1,
+              }}
+            >
+              ×
+            </button>
+            {notifyStatus === "success" ? (
+              <>
+                <h3 className="font-display text-2xl" style={{ color: "#f0e8da", marginBottom: 12 }}>
+                  You're on the list.
+                </h3>
+                <p className="font-sans text-[14px]" style={{ color: "#c4b8a6", lineHeight: 1.6, marginBottom: 24 }}>
+                  We'll email you the moment the Legacy Book is ready to order. Check your inbox for confirmation.
+                </p>
+                <button
+                  onClick={closeNotify}
+                  className="rounded-pill font-sans text-[11px] font-semibold uppercase tracking-[1.5px]"
+                  style={{
+                    padding: "12px 28px",
+                    background: "linear-gradient(135deg, #e8943a, #c47828)",
+                    color: "#1a1208",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Done
+                </button>
+              </>
+            ) : (
+              <>
+                <p
+                  className="font-sans text-[10px] uppercase tracking-[3px]"
+                  style={{ color: "#a07830", marginBottom: 8 }}
+                >
+                  Notify Me
+                </p>
+                <h3 className="font-display text-2xl" style={{ color: "#f0e8da", marginBottom: 8 }}>
+                  {notifyProduct.name}
+                </h3>
+                <p className="font-sans text-[13px]" style={{ color: "#a09280", lineHeight: 1.6, marginBottom: 20 }}>
+                  We'll email you the moment it's ready to order. No spam, no other lists.
+                </p>
+                <form onSubmit={submitNotify}>
+                  <input
+                    type="email"
+                    required
+                    placeholder="you@email.com"
+                    value={notifyEmail}
+                    onChange={(e) => setNotifyEmail(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "14px 16px",
+                      background: "#161210",
+                      border: "1px solid rgba(61,48,32,1)",
+                      borderRadius: 14,
+                      color: "#d0c4b4",
+                      fontFamily: "DM Sans, sans-serif",
+                      fontSize: 14,
+                      marginBottom: 12,
+                    }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Surname (optional)"
+                    value={notifySurname}
+                    onChange={(e) => setNotifySurname(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "14px 16px",
+                      background: "#161210",
+                      border: "1px solid rgba(61,48,32,1)",
+                      borderRadius: 14,
+                      color: "#d0c4b4",
+                      fontFamily: "DM Sans, sans-serif",
+                      fontSize: 14,
+                      marginBottom: 16,
+                    }}
+                  />
+                  {notifyError && (
+                    <p className="font-sans text-[12px]" style={{ color: "#e87f5a", marginBottom: 12 }}>
+                      {notifyError}
+                    </p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={notifyStatus === "loading"}
+                    className="rounded-pill font-sans text-[11px] font-semibold uppercase tracking-[1.5px]"
+                    style={{
+                      width: "100%",
+                      padding: "14px 28px",
+                      background: "linear-gradient(135deg, #e8943a, #c47828)",
+                      color: "#1a1208",
+                      border: "none",
+                      cursor: notifyStatus === "loading" ? "wait" : "pointer",
+                      opacity: notifyStatus === "loading" ? 0.7 : 1,
+                    }}
+                  >
+                    {notifyStatus === "loading" ? "Saving…" : "Notify Me"}
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
