@@ -59,7 +59,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "print",
     live: true,
     href: "/product-order?type=canvas-8x10",
-    image: "https://files.cdn.printful.com/files/520/5209f95941909f05f7eca8ae285c4c9f_preview.png",
+    image: "/canvas-hero.png",
   },
 
   {
@@ -71,7 +71,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "print",
     live: true,
     href: "/product-order?type=canvas-12x16",
-    image: "https://files.cdn.printful.com/files/520/5209f95941909f05f7eca8ae285c4c9f_preview.png",
+    image: "/canvas-hero.png",
   },
 
   {
@@ -84,7 +84,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "print",
     live: true,
     href: "/product-order?type=canvas-18x24",
-    image: "https://files.cdn.printful.com/files/520/5209f95941909f05f7eca8ae285c4c9f_preview.png",
+    image: "/canvas-hero.png",
   },
 
   {
@@ -96,7 +96,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     category: "print",
     live: true,
     href: "/product-order?type=canvas-24x36",
-    image: "https://files.cdn.printful.com/files/520/5209f95941909f05f7eca8ae285c4c9f_preview.png",
+    image: "/canvas-hero.png",
   },
 
   // Blanket
