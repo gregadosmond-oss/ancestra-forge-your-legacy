@@ -50,14 +50,14 @@ serve(async (req) => {
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (resendKey && !isDuplicate) {
       try {
-        await fetch("https://api.resend.com/emails", {
+        const resendResponse = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${resendKey}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: "AncestorsQR <noreply@notify.ancestorsqr.com>",
+            from: "AncestorsQR <noreply@ancestorsqr.com>",
             to: cleanEmail,
             subject: "You're on the list — your Legacy Book is coming",
             html: `
@@ -72,8 +72,15 @@ serve(async (req) => {
             `,
           }),
         });
+
+        if (!resendResponse.ok) {
+          const errorBody = await resendResponse.text();
+          console.error("[book-waitlist-signup] resend rejected:", resendResponse.status, errorBody);
+        } else {
+          console.log("[book-waitlist-signup] confirmation email sent to", cleanEmail);
+        }
       } catch (emailError) {
-        console.error("[book-waitlist-signup] resend error (non-fatal):", emailError);
+        console.error("[book-waitlist-signup] resend network error (non-fatal):", emailError);
       }
     }
 
