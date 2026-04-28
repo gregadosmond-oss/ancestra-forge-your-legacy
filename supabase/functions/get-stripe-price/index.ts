@@ -27,7 +27,14 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ stripeId: prices.data[0].id }), {
+    const price = prices.data[0];
+    const unitAmount = price.unit_amount ?? 0;
+    const currency = price.currency.toUpperCase();
+    const formatted = currency === "USD"
+      ? `$${(unitAmount / 100).toFixed(2)}`
+      : `${(unitAmount / 100).toFixed(2)} ${currency}`;
+
+    return new Response(JSON.stringify({ stripeId: price.id, unitAmount, currency, formatted }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
