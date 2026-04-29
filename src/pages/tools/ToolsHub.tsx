@@ -104,6 +104,13 @@ export default function ToolsHub() {
 
       <FreeToolsEmailCTA />
 
+      {/* Scroll-down indicator anchored to first viewport */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-screen">
+        <div className="pointer-events-auto relative h-full">
+          <ScrollChevron />
+        </div>
+      </div>
+
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center px-6 pb-24 pt-16 text-center">
         <motion.p
