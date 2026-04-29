@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import RetryInline from "@/components/journey/RetryInline";
 import AuthGate from "@/components/AuthGate";
+import ScrollChevron from "@/components/ScrollChevron";
 import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
 import { stripMarkdown } from "@/lib/utils";
@@ -143,7 +144,7 @@ const Stop5Story = () => {
 
   if (showGate) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
+      <div className="relative flex min-h-[72vh] flex-col items-center justify-start px-6 pt-16 pb-32">
         <SectionLabel>YOUR STORY</SectionLabel>
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
@@ -249,7 +250,7 @@ const Stop5Story = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
+    <div className="relative flex min-h-[72vh] flex-col items-center justify-start px-6 pt-16 pb-32">
       <SectionLabel>YOUR STORY</SectionLabel>
 
       {story.status === "loading" && (
