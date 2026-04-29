@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import RetryInline from "@/components/journey/RetryInline";
 import AuthGate from "@/components/AuthGate";
