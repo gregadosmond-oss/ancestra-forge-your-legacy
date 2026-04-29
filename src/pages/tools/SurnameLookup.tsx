@@ -88,6 +88,8 @@ export default function SurnameLookup() {
     if (!surname.trim() || loading) return;
     requestProceed(() => { void runLookup(); });
   };
+
+  const handleCopy = async () => {
     if (!result) return;
     const shareText = `My surname ${result.surname} means ${result.meaning} first recorded ${result.dateFirstRecorded} in ${result.origin}. Ancestral role: ${result.ancestralRole} What's hiding in your name? ancestorsqr.com`;
     try {
