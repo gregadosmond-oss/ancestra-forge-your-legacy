@@ -146,6 +146,7 @@ const Stop4CrestForge = () => {
           </p>
         </motion.div>
       </motion.div>
+      <ScrollChevron />
     </div>
   );
 };
