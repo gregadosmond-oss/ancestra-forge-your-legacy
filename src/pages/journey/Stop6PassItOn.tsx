@@ -8,6 +8,7 @@ import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
 import AuthGate from "@/components/AuthGate";
 import ShareQRCode from "@/components/ShareQRCode";
 import SocialShare from "@/components/SocialShare";
+import ScrollChevron from "@/components/ScrollChevron";
 import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
 import { supabase } from "@/integrations/supabase/client";
@@ -84,7 +85,7 @@ const Stop6PassItOn = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center px-6 py-24">
+    <div className="relative flex min-h-[72vh] flex-col items-center px-6 pt-16 pb-32">
       <StaggerGroup className="w-full max-w-2xl">
         <motion.div variants={staggerItem} className="text-center">
           <SectionLabel>PASS IT ON</SectionLabel>
@@ -256,6 +257,7 @@ const Stop6PassItOn = () => {
           onClose={() => setShowUnlockAuth(false)}
         />
       )}
+      <ScrollChevron />
     </div>
   );
 };
