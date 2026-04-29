@@ -75,6 +75,18 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
         .invoke("sync-to-kit", { body: { email: trimmed, source } })
         .catch((err) => console.error("Kit sync failed:", err));
 
+      // Fire-and-forget welcome email — never block the user's flow.
+      console.log("[send-welcome-email] about to invoke for email:", trimmed);
+      supabase.functions
+        .invoke("send-welcome-email", {
+          body: { email: trimmed, first_name: null, source },
+        })
+        .then(({ data, error }) => {
+          if (error) console.error("[send-welcome-email] FAILED:", error);
+          else console.log("[send-welcome-email] success:", data);
+        })
+        .catch((err) => console.error("[send-welcome-email] threw:", err));
+
       try {
         sessionStorage.setItem("journey_email_captured", "true");
       } catch {

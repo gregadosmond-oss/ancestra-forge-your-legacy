@@ -66,6 +66,22 @@ const FreeToolsEmailCTA = () => {
         console.error("[sync-to-kit] outer catch:", kitErr);
       }
 
+      // Welcome email — non-blocking, parallel with Kit sync.
+      try {
+        console.log("[send-welcome-email] about to invoke for email:", trimmed);
+        supabase.functions
+          .invoke("send-welcome-email", {
+            body: { email: trimmed, first_name: null, source: "free-tools-gate" },
+          })
+          .then(({ data, error }) => {
+            if (error) console.error("[send-welcome-email] FAILED:", error);
+            else console.log("[send-welcome-email] success:", data);
+          })
+          .catch((err) => console.error("[send-welcome-email] threw:", err));
+      } catch (welcomeErr) {
+        console.error("[send-welcome-email] outer catch:", welcomeErr);
+      }
+
       try {
         sessionStorage.setItem(STORAGE_KEY, "true");
       } catch {
