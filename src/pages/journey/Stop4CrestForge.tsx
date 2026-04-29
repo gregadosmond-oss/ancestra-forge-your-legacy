@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import FreeCrest from "@/components/FreeCrest";
+import ScrollChevron from "@/components/ScrollChevron";
 import { useJourney } from "@/contexts/JourneyContext";
 import { useStripePrice } from "@/hooks/useStripePrice";
 
@@ -23,7 +24,7 @@ const Stop4CrestForge = () => {
   const displaySurname = facts.data?.displaySurname ?? surname;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
+    <div className="relative flex min-h-[72vh] flex-col items-center justify-start px-6 pt-16 pb-32">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -145,6 +146,7 @@ const Stop4CrestForge = () => {
           </p>
         </motion.div>
       </motion.div>
+      <ScrollChevron />
     </div>
   );
 };

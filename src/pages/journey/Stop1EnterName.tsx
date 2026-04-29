@@ -5,6 +5,7 @@ import SectionLabel from "@/components/journey/SectionLabel";
 import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
 import { useJourney } from "@/contexts/JourneyContext";
 import JourneyGate from "@/components/JourneyGate";
+import ScrollChevron from "@/components/ScrollChevron";
 
 const Stop1EnterName = () => {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ const Stop1EnterName = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6 py-24">
+    <div className="relative flex min-h-[72vh] items-start justify-center px-6 pt-20 pb-32">
       <JourneyGate
         open={gateOpen}
         surname={surname}
@@ -123,6 +124,7 @@ const Stop1EnterName = () => {
           </button>
         </motion.form>
       </StaggerGroup>
+      <ScrollChevron />
     </div>
   );
 };

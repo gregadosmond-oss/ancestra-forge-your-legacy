@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
 import FreeToolsEmailCTA from "@/components/FreeToolsEmailCTA";
+import ScrollChevron from "@/components/ScrollChevron";
 
 const tools = [
   {
@@ -102,6 +103,13 @@ export default function ToolsHub() {
       <div className="pointer-events-none fixed inset-0" style={{ background: "rgba(13,10,7,0.45)" }} />
 
       <FreeToolsEmailCTA />
+
+      {/* Scroll-down indicator anchored to first viewport */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-screen">
+        <div className="pointer-events-auto relative h-full">
+          <ScrollChevron />
+        </div>
+      </div>
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center px-6 pb-24 pt-16 text-center">

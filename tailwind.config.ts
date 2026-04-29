@@ -101,10 +101,15 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "chevron-pulse": {
+          "0%, 100%": { opacity: "0.35", transform: "translateY(0)" },
+          "50%": { opacity: "0.7", transform: "translateY(4px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "chevron-pulse": "chevron-pulse 2s ease-in-out infinite",
       },
     },
   },

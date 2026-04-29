@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import MigrationPath from "@/components/journey/MigrationPath";
 import RetryInline from "@/components/journey/RetryInline";
+import ScrollChevron from "@/components/ScrollChevron";
 import { useJourney } from "@/contexts/JourneyContext";
 
 const Stop3Bloodline = () => {
@@ -22,7 +23,7 @@ const Stop3Bloodline = () => {
   const totalReveal = waypoints.length * 0.18 + 0.5;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
+    <div className="relative flex min-h-[72vh] flex-col items-center justify-start px-6 pt-16 pb-32">
       <div className="mb-10 text-center">
         <SectionLabel>WHERE YOUR NAME TRAVELED</SectionLabel>
         <motion.h1
@@ -81,6 +82,7 @@ const Stop3Bloodline = () => {
           Forge Your Crest
         </Link>
       </motion.div>
+      <ScrollChevron />
     </div>
   );
 };
