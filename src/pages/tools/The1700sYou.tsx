@@ -41,10 +41,9 @@ export default function The1700sYou() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!surname.trim() || loading) return;
+  const { gateOpen, requestProceed, handleGateSuccess } = useEmailGate();
 
+  const runTool = async () => {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -65,6 +64,12 @@ export default function The1700sYou() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!surname.trim() || loading) return;
+    requestProceed(() => { void runTool(); });
   };
 
   const handleShare = async () => {
