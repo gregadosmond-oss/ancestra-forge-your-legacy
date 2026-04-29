@@ -45,10 +45,26 @@ const FreeToolsEmailCTA = () => {
 
       if (insertError && insertError.code !== "23505") throw insertError;
 
-      // Fire-and-forget Kit.com sync — never block the user.
-      supabase.functions
-        .invoke("sync-to-kit", { body: { email: trimmed, source: "free-tools-page" } })
-        .catch((err) => console.error("Kit sync failed:", err));
+      // Kit.com sync — non-blocking, but with full visibility.
+      try {
+        console.log("[sync-to-kit] about to invoke for email:", trimmed);
+        supabase.functions
+          .invoke("sync-to-kit", {
+            body: { email: trimmed, source: "free-tools-gate" },
+          })
+          .then(({ data: kitData, error: kitError }) => {
+            if (kitError) {
+              console.error("[sync-to-kit] FAILED:", kitError);
+            } else {
+              console.log("[sync-to-kit] success:", kitData);
+            }
+          })
+          .catch((err) => {
+            console.error("[sync-to-kit] threw:", err);
+          });
+      } catch (kitErr) {
+        console.error("[sync-to-kit] outer catch:", kitErr);
+      }
 
       try {
         sessionStorage.setItem(STORAGE_KEY, "true");
