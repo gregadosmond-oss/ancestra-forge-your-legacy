@@ -4,10 +4,12 @@ import * as React from 'npm:react@18.3.1'
 
 import {
   Body,
+  Button,
   Container,
   Head,
   Heading,
   Html,
+  Link,
   Preview,
   Section,
   Text,
@@ -19,28 +21,36 @@ interface MagicLinkEmailProps {
   token?: string
 }
 
-export const MagicLinkEmail = ({ token }: MagicLinkEmailProps) => {
-  const code = token ?? '——————'
+export const MagicLinkEmail = ({ confirmationUrl }: MagicLinkEmailProps) => {
+  const url = confirmationUrl ?? '#'
   return (
     <Html lang="en" dir="ltr">
       <Head />
-      <Preview>Your AncestorsQR code — {code}</Preview>
+      <Preview>Your AncestorsQR account is ready</Preview>
       <Body style={main}>
         <Container style={outer}>
           <Container style={container}>
             <Text style={brand}>ANCESTORSQR</Text>
-            <Heading style={h1}>Your code is ready.</Heading>
-            <Text style={subline}>
-              Enter this code to read your family story.
+            <Heading style={h1}>Your story begins here</Heading>
+            <Text style={body}>
+              Welcome to AncestorsQR. Click below to access your account, your
+              saved searches, and your family's heritage tools — anytime, from
+              any device.
             </Text>
-            <Section style={codeCard}>
-              <Text style={codeStyle}>{code}</Text>
+            <Section style={buttonWrap}>
+              <Button href={url} style={button}>
+                Begin Your Journey
+              </Button>
             </Section>
-            <Text style={expires}>This code expires in 10 minutes.</Text>
-            <Text style={footerItalic}>
-              Every family has a story worth telling.
+            <Text style={footerNote}>
+              If you didn't request this, you can safely ignore this email.
             </Text>
-            <Text style={footerSmall}>ANCESTORSQR — EST. 2026</Text>
+            <Text style={signoff}>
+              — AncestorsQR ·{' '}
+              <Link href="https://ancestorsqr.com" style={signoffLink}>
+                ancestorsqr.com
+              </Link>
+            </Text>
           </Container>
         </Container>
       </Body>
@@ -77,55 +87,52 @@ const brand = {
   textTransform: 'uppercase' as const,
 }
 const h1 = {
-  fontFamily: "'Libre Caslon Display', Georgia, serif",
-  fontSize: '30px',
-  fontWeight: 400 as const,
-  color: '#f0e8da',
-  lineHeight: 1.25,
-  margin: '0 0 14px',
-}
-const subline = {
   fontFamily: "'Libre Caslon Text', Georgia, serif",
   fontStyle: 'italic' as const,
+  fontSize: '30px',
+  fontWeight: 400 as const,
+  color: '#d4a04a',
+  lineHeight: 1.25,
+  margin: '0 0 18px',
+}
+const body = {
+  fontFamily: "'DM Sans', Arial, sans-serif",
   fontSize: '15px',
   color: '#c4b8a6',
-  lineHeight: 1.6,
-  margin: '0 0 28px',
+  lineHeight: 1.65,
+  margin: '0 0 32px',
 }
-const codeCard = {
-  backgroundColor: '#1a1510',
-  border: '1px solid rgba(212,160,74,0.15)',
-  borderRadius: '14px',
-  padding: '28px 16px',
-  margin: '0 auto 18px',
-}
-const codeStyle = {
-  fontFamily: "'DM Sans', Arial, sans-serif",
-  fontSize: '36px',
-  fontWeight: 700 as const,
-  color: '#d4a04a',
-  letterSpacing: '8px',
-  margin: 0,
+const buttonWrap = {
   textAlign: 'center' as const,
+  margin: '0 0 32px',
 }
-const expires = {
+const button = {
+  backgroundColor: '#d4a04a',
+  color: '#0d0a07',
+  fontFamily: "'DM Sans', Arial, sans-serif",
+  fontSize: '13px',
+  fontWeight: 600 as const,
+  letterSpacing: '1.5px',
+  textTransform: 'uppercase' as const,
+  textDecoration: 'none',
+  padding: '16px 40px',
+  borderRadius: '60px',
+  display: 'inline-block',
+}
+const footerNote = {
   fontFamily: "'DM Sans', Arial, sans-serif",
   fontSize: '12px',
   color: '#8a7e6e',
-  margin: '0 0 40px',
+  margin: '0 0 24px',
 }
-const footerItalic = {
+const signoff = {
   fontFamily: "'Libre Caslon Text', Georgia, serif",
   fontStyle: 'italic' as const,
-  fontSize: '11px',
+  fontSize: '12px',
   color: '#8a7e6e',
-  margin: '0 0 8px',
-}
-const footerSmall = {
-  fontFamily: "'DM Sans', Arial, sans-serif",
-  fontSize: '10px',
-  color: '#8a7e6e',
-  letterSpacing: '3px',
-  textTransform: 'uppercase' as const,
   margin: 0,
+}
+const signoffLink = {
+  color: '#d4a04a',
+  textDecoration: 'none',
 }
