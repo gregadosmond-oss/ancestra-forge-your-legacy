@@ -245,6 +245,7 @@ const Stop5Story = () => {
             </form>
           )}
         </motion.div>
+        <ScrollChevron />
       </div>
     );
   }
@@ -470,6 +471,7 @@ const Stop5Story = () => {
           onClose={() => setShowAuth(false)}
         />
       )}
+      <ScrollChevron />
     </div>
   );
 };
