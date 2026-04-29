@@ -11,12 +11,14 @@ import SocialShare from "@/components/SocialShare";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
+import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 import { supabase } from "@/integrations/supabase/client";
 
 const Stop6PassItOn = () => {
   const navigate = useNavigate();
   const { surname, facts, story, crest } = useJourney();
   const { user } = usePurchase();
+  const legacyPrice = useLegacyPackPrice();
 
   const [previewEmail, setPreviewEmail] = useState("");
   const [previewSending, setPreviewSending] = useState(false);
