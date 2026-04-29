@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
-import { useStripePrice } from "@/hooks/useStripePrice";
+import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },
@@ -73,7 +73,7 @@ const FAQ = [
 ];
 
 const Pricing = () => {
-  const legacyPrice = useStripePrice("legacy_pack_once", "$29.99");
+  const legacyPrice = useLegacyPackPrice();
   return (
   <div className="relative min-h-screen bg-background">
     <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />

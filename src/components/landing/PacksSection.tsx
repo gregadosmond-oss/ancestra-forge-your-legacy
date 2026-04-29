@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },
@@ -26,15 +27,19 @@ const LEGACY_ITEMS = [
   "Shareable legacy page",
 ];
 
-const HEIRLOOM_ITEMS = [
+const heirloomItems = (legacyPrice: string) => [
   "Custom crest mug — printed & shipped",
-  "Full Legacy Pack included ($29.99 value)",
+  `Full Legacy Pack included (${legacyPrice} value)`,
   "\"HOUSE OF [NAME]\" wrap-around design",
   "QR code linking to your legacy page",
   "Ships worldwide in 5–7 days",
 ];
 
-const PacksSection = () => (
+const PacksSection = () => {
+  const legacyPrice = useLegacyPackPrice();
+  const HEIRLOOM_ITEMS = heirloomItems(legacyPrice);
+
+  return (
   <motion.section {...reveal} className="py-16 text-center">
     <p className="mb-3 text-[10px] uppercase tracking-[4px] text-amber-dim">
       Choose Your Legacy
@@ -99,7 +104,7 @@ const PacksSection = () => (
         </div>
         <div className="mb-3 text-3xl">🛡</div>
         <h3 className="font-display text-lg text-cream-warm">Legacy Pack</h3>
-        <div className="mt-3 font-display text-3xl text-amber-light">$29.99</div>
+        <div className="mt-3 font-display text-3xl text-amber-light">{legacyPrice}</div>
         <p className="mt-1 text-[11px] text-text-dim">
           One-time · Instant delivery
         </p>
@@ -158,6 +163,7 @@ const PacksSection = () => (
 
     </div>
   </motion.section>
-);
+  );
+};
 
 export default PacksSection;

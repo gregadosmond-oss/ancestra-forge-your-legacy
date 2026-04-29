@@ -5,12 +5,12 @@ import SectionLabel from "@/components/journey/SectionLabel";
 import FreeCrest from "@/components/FreeCrest";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useJourney } from "@/contexts/JourneyContext";
-import { useStripePrice } from "@/hooks/useStripePrice";
+import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 
 const Stop4CrestForge = () => {
   const navigate = useNavigate();
   const { unknownSurname, surname, facts } = useJourney();
-  const legacyPrice = useStripePrice("legacy_pack_once", "$29.99");
+  const legacyPrice = useLegacyPackPrice();
 
   useEffect(() => {
     if (unknownSurname) navigate("/journey/1", { replace: true });
@@ -80,7 +80,7 @@ const Stop4CrestForge = () => {
           className="mt-4 font-serif text-sm italic text-center"
           style={{ color: "#d4a04a" }}
         >
-          ✦ Your personalised coat of arms is forged when you unlock the Legacy Pack — $29.99
+          ✦ Your personalised coat of arms is forged when you unlock the Legacy Pack — {legacyPrice}
         </motion.p>
 
         {/* Motto */}

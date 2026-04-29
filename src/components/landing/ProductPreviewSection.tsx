@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 
 const PRODUCTS = [
   {
@@ -30,7 +31,9 @@ const reveal = {
   transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
 };
 
-const ProductPreviewSection = () => (
+const ProductPreviewSection = () => {
+  const legacyPrice = useLegacyPackPrice();
+  return (
   <motion.section {...reveal} className="py-16 text-center">
     <p className="mb-3 text-[10px] uppercase tracking-[4px] text-amber-dim">
       What You Get
@@ -69,12 +72,13 @@ const ProductPreviewSection = () => (
         border: "1px solid rgba(232,148,58,0.18)",
       }}
     >
-      <span className="font-display text-4xl text-amber-light">$29.99</span>
+      <span className="font-display text-4xl text-amber-light">{legacyPrice}</span>
       <p className="mt-1 text-sm text-text-dim">
         One-time · Instant digital delivery · No subscription
       </p>
     </div>
   </motion.section>
-);
+  );
+};
 
 export default ProductPreviewSection;

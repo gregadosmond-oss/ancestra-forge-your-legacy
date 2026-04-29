@@ -11,12 +11,14 @@ import SocialShare from "@/components/SocialShare";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
+import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 import { supabase } from "@/integrations/supabase/client";
 
 const Stop6PassItOn = () => {
   const navigate = useNavigate();
   const { surname, facts, story, crest } = useJourney();
   const { user } = usePurchase();
+  const legacyPrice = useLegacyPackPrice();
 
   const [previewEmail, setPreviewEmail] = useState("");
   const [previewSending, setPreviewSending] = useState(false);
@@ -166,7 +168,7 @@ const Stop6PassItOn = () => {
               disabled={!giftEmail}
               className="rounded-pill border border-amber/40 bg-amber/[0.06] px-10 py-4 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-amber-light transition-colors hover:bg-amber/[0.12] disabled:opacity-50"
             >
-              Gift the Legacy · $29.99
+              Gift the Legacy · {legacyPrice}
             </button>
           </div>
         </motion.div>
@@ -189,7 +191,7 @@ const Stop6PassItOn = () => {
               <p className="mt-2 text-sm leading-relaxed" style={{ color: "#8a7e6e" }}>
                 Your full 9-chapter story, high-res crest, migration path &amp; legacy certificate.
               </p>
-              <div className="mt-3 font-display text-2xl" style={{ color: "#e8b85c" }}>$29.99</div>
+              <div className="mt-3 font-display text-2xl" style={{ color: "#e8b85c" }}>{legacyPrice}</div>
               <button
                 onClick={handleUnlockClick}
                 className="mt-5 rounded-pill py-3 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"

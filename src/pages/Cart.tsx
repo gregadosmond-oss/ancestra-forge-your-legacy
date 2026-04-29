@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
 import { useCart } from "@/contexts/CartContext";
+import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },
@@ -13,6 +14,7 @@ export default function Cart() {
   const navigate = useNavigate();
   const { items, removeItem, updateQuantity, totalItems, totalPrice } = useCart();
   const isEmpty = items.length === 0;
+  const legacyPrice = useLegacyPackPrice();
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -130,7 +132,7 @@ export default function Cart() {
               </p>
               <div className="grid gap-4 sm:grid-cols-3">
                 {[
-                  { name: "Legacy Pack", price: "$29.99", note: "Instant delivery", path: "/journey" },
+                  { name: "Legacy Pack", price: legacyPrice, note: "Instant delivery", path: "/journey" },
                   { name: "Framed Crest Print", price: "from $79", note: "Ships worldwide", path: "/shop" },
                   { name: "Legacy Book", price: "from $59", note: "Softcover or hardcover", path: "/shop" },
                 ].map((item) => (
