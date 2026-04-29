@@ -58,10 +58,9 @@ export default function SurnameLookup() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!surname.trim() || loading) return;
+  const { gateOpen, requestProceed, handleGateSuccess } = useEmailGate();
 
+  const runLookup = async () => {
     setLoading(true);
     setError(null);
     setResult(null);
