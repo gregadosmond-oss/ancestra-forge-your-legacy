@@ -25,20 +25,44 @@ const Stop1EnterName = () => {
     }
   }, [surname, unknownSurname, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (submitting || surname.trim().length === 0) return;
-    setSubmitting(true);
-
+  const proceedWithSurname = () => {
     // Fire in the background and navigate immediately — cinematic reveals
     // on Stops 2-5 absorb the latency.
     void startJourney(surname.trim());
     navigate("/journey/2");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (submitting || surname.trim().length === 0) return;
+
+    let captured = false;
+    try {
+      captured = sessionStorage.getItem("journey_email_captured") === "true";
+    } catch {
+      captured = false;
+    }
+
+    if (!captured) {
+      setGateOpen(true);
+      return;
+    }
+
+    setSubmitting(true);
+    proceedWithSurname();
     setSubmitting(false);
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-24">
+      <JourneyGate
+        open={gateOpen}
+        surname={surname}
+        onSuccess={() => {
+          setGateOpen(false);
+          proceedWithSurname();
+        }}
+      />
       <StaggerGroup className="w-full max-w-xl text-center">
         <motion.div variants={staggerItem}>
           <SectionLabel>BEGIN YOUR LEGACY</SectionLabel>
