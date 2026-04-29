@@ -4,12 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 interface JourneyGateProps {
   open: boolean;
   surname?: string;
+  source?: string;
   onSuccess: () => void;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const JourneyGate = ({ open, surname, onSuccess }: JourneyGateProps) => {
+const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: JourneyGateProps) => {
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
