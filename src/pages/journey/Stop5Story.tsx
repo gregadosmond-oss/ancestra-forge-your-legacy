@@ -15,6 +15,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 const Stop5Story = () => {
   const navigate = useNavigate();
   const { unknownSurname, surname, story } = useJourney();
+  const legacyPrice = useLegacyPackPrice();
   const { user, hasPurchased, loading: purchaseLoading } = usePurchase();
   const [showAuth, setShowAuth] = useState(false);
   const [speaking, setSpeaking] = useState(false);
@@ -455,7 +456,7 @@ const Stop5Story = () => {
                     color: "#1a1208",
                   }}
                 >
-                  Unlock My Full Legacy — $29.99
+                  Unlock My Full Legacy — {legacyPrice}
                 </button>
                 <p className="mt-3 font-sans text-[10px] text-text-dim">
                   One-time payment · Instant delivery · No subscription
