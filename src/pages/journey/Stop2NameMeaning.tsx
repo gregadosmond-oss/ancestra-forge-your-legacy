@@ -6,6 +6,7 @@ import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
 import WarmDivider from "@/components/journey/WarmDivider";
 import RetryInline from "@/components/journey/RetryInline";
 import ArchiveLoader from "@/components/journey/ArchiveLoader";
+import ScrollChevron from "@/components/ScrollChevron";
 import { useJourney } from "@/contexts/JourneyContext";
 
 const Stop2NameMeaning = () => {
@@ -20,7 +21,7 @@ const Stop2NameMeaning = () => {
   if (!surname) return null;
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6 py-24">
+    <div className="relative flex min-h-[72vh] items-start justify-center px-6 pt-20 pb-32">
       <StaggerGroup
         delay={0.3}
         stagger={0.4}
