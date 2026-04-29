@@ -358,6 +358,30 @@ export type Database = {
         }
         Relationships: []
       }
+      journey_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          source: string
+          surname_searched: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          source?: string
+          surname_searched?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          source?: string
+          surname_searched?: string | null
+        }
+        Relationships: []
+      }
       legacy_book_orders: {
         Row: {
           amount_total: number | null
