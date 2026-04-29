@@ -2,6 +2,7 @@ import { useParams, Link, Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { getOccasionBySlug } from "@/data/giftOccasions";
 import WarmDivider from "@/components/journey/WarmDivider";
+import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },
@@ -18,6 +19,7 @@ const stagger = (i: number) => ({
 export default function GiftOccasionPage() {
   const { occasion } = useParams<{ occasion: string }>();
   const config = getOccasionBySlug(occasion ?? "");
+  const legacyPrice = useLegacyPackPrice();
 
   if (!config) return <Navigate to="/" replace />;
 
@@ -203,7 +205,7 @@ export default function GiftOccasionPage() {
                 className="mt-1 font-sans text-[13px] font-semibold"
                 style={{ color: "#d4a04a" }}
               >
-                {product.price}
+                {product.name === "Legacy Pack" ? legacyPrice : product.price}
               </p>
               <p
                 className="mt-3 font-sans text-[14px] leading-relaxed"
