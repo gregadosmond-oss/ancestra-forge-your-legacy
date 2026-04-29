@@ -6,6 +6,7 @@ import RetryInline from "@/components/journey/RetryInline";
 import AuthGate from "@/components/AuthGate";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useJourney } from "@/contexts/JourneyContext";
+import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 import { usePurchase } from "@/hooks/usePurchase";
 import { stripMarkdown } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
