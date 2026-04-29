@@ -49,7 +49,23 @@ const FreeToolsEmailCTA = () => {
       } catch {
         /* sessionStorage unavailable */
       }
-      setVisible(false);
+
+      // Fire-and-forget magic link — never block the user.
+      supabase.auth
+        .signInWithOtp({
+          email: trimmed,
+          options: {
+            shouldCreateUser: true,
+            emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+          },
+        })
+        .then(({ error: otpError }) => {
+          if (otpError) console.warn("FreeToolsEmailCTA magic link skipped", otpError);
+        })
+        .catch((otpErr) => console.warn("FreeToolsEmailCTA magic link error", otpErr));
+
+      setMagicSent(true);
+      setTimeout(() => setVisible(false), 4500);
     } catch (err) {
       console.error("FreeToolsEmailCTA submit failed", err);
       setError("Something went wrong. Please try again.");
