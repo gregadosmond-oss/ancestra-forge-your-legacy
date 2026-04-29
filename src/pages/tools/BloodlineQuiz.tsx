@@ -165,7 +165,7 @@ export default function BloodlineQuiz() {
           <motion.button
             {...reveal}
             transition={{ ...reveal.transition, delay: 0.35 }}
-            onClick={() => setStep(1)}
+            onClick={() => requestProceed(() => setStep(1))}
             className="mt-10 rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
             style={{
               background: "linear-gradient(135deg, #e8943a, #c47828)",
