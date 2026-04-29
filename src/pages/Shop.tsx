@@ -170,26 +170,6 @@ export default function Shop() {
           >
             Begin Your Journey
           </Link>
-          <a
-            href="#bundles"
-            className="inline-block rounded-pill px-8 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px]"
-            style={{
-              background: "rgba(212,160,74,0.06)",
-              border: "1px solid rgba(212,160,74,0.2)",
-              color: "#d4a04a",
-              transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background =
-                "rgba(212,160,74,0.12)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background =
-                "rgba(212,160,74,0.06)";
-            }}
-          >
-            View Bundles ↓
-          </a>
         </motion.div>
         <ScrollChevron />
       </section>
