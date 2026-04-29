@@ -25,3 +25,5 @@ project_id = "fjtkjbnvpobawqqkzrst"
     verify_jwt = false
   [functions.render-legacy-book-cover-pdf]
     verify_jwt = false
+  [functions.sync-to-kit]
+    verify_jwt = false
