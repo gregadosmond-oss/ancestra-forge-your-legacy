@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import JourneyGate from "@/components/JourneyGate";
+import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { toast } from "sonner";
 
@@ -84,7 +85,7 @@ export default function MeetYourAncestor() {
       />
 
       {/* Hero */}
-      <section className="relative z-10 flex flex-col items-center px-4 pb-16 pt-24 text-center">
+      <section className="relative z-10 flex min-h-[72vh] flex-col items-center px-4 pb-16 pt-24 text-center">
         <motion.p
           {...reveal}
           className="mb-3 font-sans text-[10px] uppercase tracking-[4px] text-amber-dim"
@@ -152,6 +153,7 @@ export default function MeetYourAncestor() {
             {error}
           </motion.p>
         )}
+        <ScrollChevron />
       </section>
 
       {/* Results */}

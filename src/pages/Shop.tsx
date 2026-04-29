@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
+import ScrollChevron from "@/components/ScrollChevron";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
+import { useMugPrice } from "@/hooks/useMugPrice";
 import {
   SHOP_PRODUCTS,
   SHOP_BUNDLES,
@@ -43,6 +45,7 @@ export default function Shop() {
   const [notifyStatus, setNotifyStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [notifyError, setNotifyError] = useState("");
   const legacyPrice = useLegacyPackPrice();
+  const mugPrice = useMugPrice();
 
   const submitNotify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,7 +115,7 @@ export default function Shop() {
       </svg>
 
       {/* ── HERO ── */}
-      <section className="relative w-full px-6 py-20 text-center">
+      <section className="relative flex min-h-[72vh] w-full flex-col items-center justify-center px-6 py-20 text-center">
         <div
           className="pointer-events-none absolute inset-0"
           style={{
@@ -189,6 +192,7 @@ export default function Shop() {
             View Bundles ↓
           </a>
         </motion.div>
+        <ScrollChevron />
       </section>
 
       <WarmDivider />
@@ -311,7 +315,7 @@ export default function Shop() {
                   className="mt-1 font-display text-2xl"
                   style={{ color: isLive ? "#d4a04a" : "#5a4e3e" }}
                 >
-                  {product.id === "legacy-pack" ? legacyPrice : product.price}
+                  {product.id === "legacy-pack" ? legacyPrice : product.id === "heirloom-mug" ? mugPrice : product.price}
                   {product.priceNote && (
                     <span
                       className="ml-2 font-sans text-[11px] font-normal"

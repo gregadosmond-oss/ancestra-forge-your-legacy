@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, Volume2, VolumeX, Pause, Play } from "lucide-react";
 import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from "@/integrations/supabase/client";
 import JourneyGate from "@/components/JourneyGate";
+import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { pauseAmbient, resumeAmbient } from "@/lib/ambientAudio";
 
@@ -236,7 +237,7 @@ export default function AncestorChat() {
 
       {!started ? (
         /* ── START SCREEN ── */
-        <section className="relative z-10 flex flex-col items-center px-4 pb-16 pt-24 text-center">
+        <section className="relative z-10 flex min-h-[72vh] flex-col items-center px-4 pb-16 pt-24 text-center">
           <motion.p
             {...reveal}
             className="mb-3 font-sans text-[10px] uppercase tracking-[4px] text-amber-dim"
@@ -321,6 +322,7 @@ export default function AncestorChat() {
               ))}
             </div>
           </motion.div>
+          <ScrollChevron />
         </section>
       ) : (
         /* ── CHAT SCREEN ── */

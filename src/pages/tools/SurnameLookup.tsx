@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, MapPin, Calendar, Shield, ScrollText, User, Compass, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import JourneyGate from "@/components/JourneyGate";
+import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 
 type SurnameResult = {
@@ -108,7 +109,7 @@ export default function SurnameLookup() {
             <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       <div className="pointer-events-none fixed inset-0" style={{ background: "rgba(13,10,7,0.45)" }} />
       {/* Hero */}
-      <section className="relative z-10 flex flex-col items-center justify-center px-4 pt-24 pb-16 text-center">
+      <section className="relative z-10 flex min-h-[72vh] flex-col items-center justify-center px-4 pt-24 pb-16 text-center">
         <motion.p
           {...reveal}
           className="mb-3 text-[10px] uppercase tracking-[4px] text-amber-dim font-sans"
@@ -168,6 +169,7 @@ export default function SurnameLookup() {
             {error}
           </motion.p>
         )}
+        <ScrollChevron />
       </section>
 
       {/* Results */}

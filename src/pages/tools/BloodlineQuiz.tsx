@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import JourneyGate from "@/components/JourneyGate";
+import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { toast } from "sonner";
 
@@ -141,7 +142,7 @@ export default function BloodlineQuiz() {
 
       {/* Intro */}
       {step === 0 && (
-        <section className="flex min-h-[80vh] flex-col items-center justify-center px-4 text-center">
+        <section className="relative flex min-h-[72vh] flex-col items-center justify-center px-4 text-center">
           <motion.p
             {...reveal}
             className="mb-3 text-[10px] uppercase tracking-[4px] text-amber-dim font-sans"
@@ -174,6 +175,7 @@ export default function BloodlineQuiz() {
           >
             Begin the Quiz
           </motion.button>
+          <ScrollChevron />
         </section>
       )}
 
