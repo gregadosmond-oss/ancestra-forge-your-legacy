@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
+import FreeToolsEmailCTA from "@/components/FreeToolsEmailCTA";
 
 const tools = [
   {
