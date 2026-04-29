@@ -14,6 +14,13 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [magicSent, setMagicSent] = useState(false);
+
+  useEffect(() => {
+    if (!magicSent) return;
+    const t = setTimeout(() => setMagicSent(false), 4500);
+    return () => clearTimeout(t);
+  }, [magicSent]);
 
   if (!open) return null;
 
