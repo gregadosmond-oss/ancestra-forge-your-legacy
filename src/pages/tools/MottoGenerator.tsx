@@ -41,10 +41,9 @@ export default function MottoGenerator() {
 
   const canSubmit = values.every((v) => v.trim().length > 0) && !loading;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canSubmit) return;
+  const { gateOpen, requestProceed, handleGateSuccess } = useEmailGate();
 
+  const runGenerate = async () => {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -65,6 +64,12 @@ export default function MottoGenerator() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!canSubmit) return;
+    requestProceed(() => { void runGenerate(); });
   };
 
   const handleShare = async () => {
