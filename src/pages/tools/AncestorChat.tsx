@@ -133,9 +133,9 @@ export default function AncestorChat() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  const handleStart = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!surname.trim() || loading) return;
+  const { gateOpen, requestProceed, handleGateSuccess } = useEmailGate();
+
+  const runStart = async () => {
     unlockAudio();
     setLoading(true);
     setError(null);
@@ -159,6 +159,12 @@ export default function AncestorChat() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleStart = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!surname.trim() || loading) return;
+    requestProceed(() => { void runStart(); });
   };
 
   const toggleMic = () => {
