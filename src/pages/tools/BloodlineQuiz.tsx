@@ -128,8 +128,11 @@ export default function BloodlineQuiz() {
 
   const questionIndex = step - 1;
 
+  const { gateOpen, requestProceed, handleGateSuccess } = useEmailGate();
+
   return (
     <div className="relative min-h-screen bg-background">
+      <JourneyGate open={gateOpen} source="tool-bloodline-quiz" onSuccess={handleGateSuccess} />
       {/* Castle video background */}
             <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       <div className="pointer-events-none fixed inset-0" style={{ background: "rgba(13,10,7,0.45)" }} />
