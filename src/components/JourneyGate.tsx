@@ -22,6 +22,26 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
     return () => clearTimeout(t);
   }, [magicSent]);
 
+  // If the user is already authenticated, skip the gate entirely.
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (cancelled) return;
+      if (session?.user) {
+        try {
+          sessionStorage.setItem("journey_email_captured", "true");
+        } catch {
+          // ignore
+        }
+        onSuccess();
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, onSuccess]);
+
   if (!open) return null;
 
   const handleSubmit = async (e: FormEvent) => {
