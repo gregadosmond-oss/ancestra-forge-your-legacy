@@ -4,12 +4,14 @@ import { motion } from "framer-motion";
 import SectionLabel from "@/components/journey/SectionLabel";
 import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
 import { useJourney } from "@/contexts/JourneyContext";
+import JourneyGate from "@/components/JourneyGate";
 
 const Stop1EnterName = () => {
   const navigate = useNavigate();
   const { startJourney, unknownSurname, reset } = useJourney();
   const [surname, setSurname] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [gateOpen, setGateOpen] = useState(false);
 
   // Coming back to Stop 1 after an UNKNOWN bounce: clear provider state
   // so the error message only shows once and subsequent submits start clean.
