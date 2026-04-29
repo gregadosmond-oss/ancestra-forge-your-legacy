@@ -9,7 +9,6 @@ import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 import { useMugPrice } from "@/hooks/useMugPrice";
 import {
   SHOP_PRODUCTS,
-  SHOP_BUNDLES,
   CATEGORY_LABELS,
   type ShopProduct,
 } from "@/data/shopProducts";
