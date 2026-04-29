@@ -82,6 +82,7 @@ const Stop3Bloodline = () => {
           Forge Your Crest
         </Link>
       </motion.div>
+      <ScrollChevron />
     </div>
   );
 };
