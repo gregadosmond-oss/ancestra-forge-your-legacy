@@ -124,6 +124,7 @@ const Stop1EnterName = () => {
           </button>
         </motion.form>
       </StaggerGroup>
+      <ScrollChevron />
     </div>
   );
 };
