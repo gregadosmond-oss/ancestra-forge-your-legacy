@@ -11,6 +11,7 @@ const FreeToolsEmailCTA = () => {
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [magicSent, setMagicSent] = useState(false);
 
   useEffect(() => {
     let captured = false;
@@ -49,7 +50,23 @@ const FreeToolsEmailCTA = () => {
       } catch {
         /* sessionStorage unavailable */
       }
-      setVisible(false);
+
+      // Fire-and-forget magic link — never block the user.
+      supabase.auth
+        .signInWithOtp({
+          email: trimmed,
+          options: {
+            shouldCreateUser: true,
+            emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+          },
+        })
+        .then(({ error: otpError }) => {
+          if (otpError) console.warn("FreeToolsEmailCTA magic link skipped", otpError);
+        })
+        .catch((otpErr) => console.warn("FreeToolsEmailCTA magic link error", otpErr));
+
+      setMagicSent(true);
+      setTimeout(() => setVisible(false), 4500);
     } catch (err) {
       console.error("FreeToolsEmailCTA submit failed", err);
       setError("Something went wrong. Please try again.");
@@ -83,6 +100,24 @@ const FreeToolsEmailCTA = () => {
               tool — surname meanings, family crests, ancestor chats, and more.
               One email, full access.
             </p>
+
+            {magicSent && (
+              <div
+                role="status"
+                className="mx-auto mt-6 max-w-md rounded-2xl border px-5 py-4 text-center"
+                style={{
+                  borderColor: "hsl(var(--amber-dim) / 0.4)",
+                  backgroundColor: "hsl(var(--amber) / 0.08)",
+                }}
+              >
+                <p className="font-display text-lg italic text-amber-light">
+                  Check your inbox
+                </p>
+                <p className="mt-1 font-sans text-sm text-cream-soft">
+                  We've sent you a magic link to access your account anytime.
+                </p>
+              </div>
+            )}
 
             <form
               onSubmit={handleSubmit}

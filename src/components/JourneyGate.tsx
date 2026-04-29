@@ -1,4 +1,4 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface JourneyGateProps {
@@ -14,6 +14,13 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [magicSent, setMagicSent] = useState(false);
+
+  useEffect(() => {
+    if (!magicSent) return;
+    const t = setTimeout(() => setMagicSent(false), 4500);
+    return () => clearTimeout(t);
+  }, [magicSent]);
 
   if (!open) return null;
 
@@ -48,7 +55,23 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
       } catch {
         // sessionStorage may be unavailable; continue regardless.
       }
-      onSuccess();
+
+      // Fire-and-forget magic link — never block the user's flow.
+      supabase.auth
+        .signInWithOtp({
+          email: trimmed,
+          options: {
+            shouldCreateUser: true,
+            emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+          },
+        })
+        .then(({ error: otpError }) => {
+          if (otpError) console.warn("JourneyGate magic link skipped", otpError);
+        })
+        .catch((otpErr) => console.warn("JourneyGate magic link error", otpErr));
+
+      setMagicSent(true);
+      setTimeout(() => onSuccess(), 1200);
     } catch (err) {
       console.error("JourneyGate submit failed", err);
       setError("Something went wrong. Please try again.");
@@ -80,6 +103,24 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
         <p className="mt-3 text-center font-serif text-base italic text-cream-soft">
           Enter your email to discover your family's story
         </p>
+
+        {magicSent && (
+          <div
+            role="status"
+            className="mt-5 rounded-2xl border px-5 py-4 text-center"
+            style={{
+              borderColor: "hsl(var(--amber-dim) / 0.4)",
+              backgroundColor: "hsl(var(--amber) / 0.08)",
+            }}
+          >
+            <p className="font-display text-lg italic text-amber-light">
+              Check your inbox
+            </p>
+            <p className="mt-1 font-sans text-sm text-cream-soft">
+              We've sent you a magic link to access your account anytime.
+            </p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-4">
           <input
