@@ -1,4 +1,4 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface JourneyGateProps {
