@@ -59,40 +59,28 @@ const JourneyGate = ({ open, surname, onSuccess }: JourneyGateProps) => {
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center px-6"
-      style={{ backgroundColor: "rgba(13, 10, 7, 0.8)" }}
+      style={{ backgroundColor: "hsl(var(--background) / 0.8)" }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="journey-gate-title"
     >
       <div
-        className="w-full max-w-md rounded-2xl border p-8 shadow-2xl"
+        className="w-full max-w-md rounded-2xl border bg-card p-8 shadow-2xl"
         style={{
-          backgroundColor: "#065f58",
-          borderColor: "#14B8A6",
-          borderWidth: 1,
+          borderColor: "hsl(var(--amber-dim) / 0.4)",
         }}
       >
         <h2
           id="journey-gate-title"
-          className="text-center text-3xl italic"
-          style={{
-            fontFamily: "'Lora', serif",
-            color: "#d4a04a",
-          }}
+          className="text-center font-display text-3xl italic text-amber-light"
         >
           Begin Your Journey
         </h2>
-        <p
-          className="mt-3 text-center text-sm"
-          style={{
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-            color: "#ffffff",
-          }}
-        >
+        <p className="mt-3 text-center font-serif text-base italic text-cream-soft">
           Enter your email to discover your family's story
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3">
+        <form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-4">
           <input
             type="email"
             required
@@ -102,22 +90,12 @@ const JourneyGate = ({ open, surname, onSuccess }: JourneyGateProps) => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
             aria-label="Email address"
-            className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2"
-            style={{
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              backgroundColor: "rgba(13, 10, 7, 0.4)",
-              borderColor: "#14B8A6",
-              color: "#ffffff",
-            }}
+            className="w-full rounded-pill border border-amber-dim/30 bg-input px-6 py-4 text-center font-sans text-base text-cream-warm placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30 disabled:opacity-60"
           />
 
           {error && (
             <p
-              className="text-sm"
-              style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                color: "#ff6b6b",
-              }}
+              className="text-center font-sans text-sm text-destructive"
               role="alert"
             >
               {error}
@@ -127,11 +105,10 @@ const JourneyGate = ({ open, surname, onSuccess }: JourneyGateProps) => {
           <button
             type="submit"
             disabled={submitting}
-            className="mt-2 w-full rounded-lg px-6 py-3 font-semibold transition-opacity disabled:opacity-60"
+            className="mt-2 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-60"
             style={{
-              backgroundColor: "#E85D2C",
-              color: "#ffffff",
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              background: "linear-gradient(135deg, #e8943a, #c47828)",
+              transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
             }}
           >
             {submitting ? "Continuing..." : "Continue Journey"}
