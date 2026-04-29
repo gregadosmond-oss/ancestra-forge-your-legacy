@@ -1,5 +1,6 @@
 import { Mic, Search, BookOpen, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 
 const BG = "#0d0a07";
 const BG_CARD = "#1a1510";
@@ -100,6 +101,7 @@ function Cell({ value, highlight }: { value: string; highlight?: boolean }) {
 
 export default function DeepLegacy() {
   const navigate = useNavigate();
+  const legacyPrice = useLegacyPackPrice();
   const rows = [
     ["Surname meaning", "✓", "✓", "✓"],
     ["Family crest", "preview", "full", "full"],
@@ -244,7 +246,7 @@ export default function DeepLegacy() {
                   }}
                 >
                   Legacy Pack
-                  <div style={{ ...sansFont, fontSize: 13, color: TEXT_DIM, marginTop: 4 }}>$29.99</div>
+                  <div style={{ ...sansFont, fontSize: 13, color: TEXT_DIM, marginTop: 4 }}>{legacyPrice}</div>
                 </th>
                 <th
                   style={{
