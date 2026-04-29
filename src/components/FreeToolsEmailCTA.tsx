@@ -101,6 +101,24 @@ const FreeToolsEmailCTA = () => {
               One email, full access.
             </p>
 
+            {magicSent && (
+              <div
+                role="status"
+                className="mx-auto mt-6 max-w-md rounded-2xl border px-5 py-4 text-center"
+                style={{
+                  borderColor: "hsl(var(--amber-dim) / 0.4)",
+                  backgroundColor: "hsl(var(--amber) / 0.08)",
+                }}
+              >
+                <p className="font-display text-lg italic text-amber-light">
+                  Check your inbox
+                </p>
+                <p className="mt-1 font-sans text-sm text-cream-soft">
+                  We've sent you a magic link to access your account anytime.
+                </p>
+              </div>
+            )}
+
             <form
               onSubmit={handleSubmit}
               className="mx-auto mt-8 flex w-full max-w-md flex-col gap-4"
