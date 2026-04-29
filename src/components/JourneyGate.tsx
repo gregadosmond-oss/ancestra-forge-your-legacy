@@ -35,7 +35,7 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
         .insert({
           email: trimmed,
           surname_searched: surname?.trim() || null,
-          source: "journey-gate",
+          source,
         });
 
       // Treat duplicate email (23505) as success — they've already opted in.
