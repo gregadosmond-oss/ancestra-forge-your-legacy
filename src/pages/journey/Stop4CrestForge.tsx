@@ -80,7 +80,7 @@ const Stop4CrestForge = () => {
           className="mt-4 font-serif text-sm italic text-center"
           style={{ color: "#d4a04a" }}
         >
-          ✦ Your personalised coat of arms is forged when you unlock the Legacy Pack — $19.99
+          ✦ Your personalised coat of arms is forged when you unlock the Legacy Pack — $29.99
         </motion.p>
 
         {/* Motto */}
