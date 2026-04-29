@@ -104,6 +104,24 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
           Enter your email to discover your family's story
         </p>
 
+        {magicSent && (
+          <div
+            role="status"
+            className="mt-5 rounded-2xl border px-5 py-4 text-center"
+            style={{
+              borderColor: "hsl(var(--amber-dim) / 0.4)",
+              backgroundColor: "hsl(var(--amber) / 0.08)",
+            }}
+          >
+            <p className="font-display text-lg italic text-amber-light">
+              Check your inbox
+            </p>
+            <p className="mt-1 font-sans text-sm text-cream-soft">
+              We've sent you a magic link to access your account anytime.
+            </p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-4">
           <input
             type="email"
