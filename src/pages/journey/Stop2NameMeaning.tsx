@@ -98,6 +98,7 @@ const Stop2NameMeaning = () => {
           </Link>
         </motion.div>
       </StaggerGroup>
+      <ScrollChevron />
     </div>
   );
 };
