@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import JourneyGate from "@/components/JourneyGate";
+import { useEmailGate } from "@/hooks/useEmailGate";
 import { toast } from "sonner";
 
 type AncestorResult = {
@@ -29,10 +31,9 @@ export default function MeetYourAncestor() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!surname.trim() || loading) return;
+  const { gateOpen, requestProceed, handleGateSuccess } = useEmailGate();
 
+  const runMeet = async () => {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -55,6 +56,12 @@ export default function MeetYourAncestor() {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!surname.trim() || loading) return;
+    requestProceed(() => { void runMeet(); });
+  };
+
   const handleShare = async () => {
     if (!result) return;
     const text = `I just met my ancestor through AncestorsQR:\n\n${result.name}, ${result.birthYear}\n"${result.quote}"\n\nMeet yours → ancestorsqr.com/tools/ancestor`;
@@ -68,6 +75,7 @@ export default function MeetYourAncestor() {
 
   return (
     <div className="relative min-h-screen bg-background">
+      <JourneyGate open={gateOpen} source="tool-meet-ancestor" surname={surname} onSuccess={handleGateSuccess} />
       {/* Video background */}
             <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       <div

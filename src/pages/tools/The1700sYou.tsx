@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import JourneyGate from "@/components/JourneyGate";
+import { useEmailGate } from "@/hooks/useEmailGate";
 import { toast } from "sonner";
 
 type Life1700s = {
@@ -39,10 +41,9 @@ export default function The1700sYou() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!surname.trim() || loading) return;
+  const { gateOpen, requestProceed, handleGateSuccess } = useEmailGate();
 
+  const runTool = async () => {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -65,6 +66,12 @@ export default function The1700sYou() {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!surname.trim() || loading) return;
+    requestProceed(() => { void runTool(); });
+  };
+
   const handleShare = async () => {
     if (!result) return;
     const text = `AncestorsQR just showed me my life in the 1700s:\n\n${result.name} — ${result.occupation} in ${result.location}\n\n"${result.legacyLine}"\n\nDiscover yours → ancestorsqr.com/tools/1700s`;
@@ -78,6 +85,7 @@ export default function The1700sYou() {
 
   return (
     <div className="relative min-h-screen bg-background">
+      <JourneyGate open={gateOpen} source="tool-1700s-you" surname={surname} onSuccess={handleGateSuccess} />
       {/* Video background */}
             <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       <div

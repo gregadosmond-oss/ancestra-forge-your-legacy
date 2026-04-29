@@ -1,0 +1,42 @@
+import { useState, useCallback } from "react";
+
+const STORAGE_KEY = "journey_email_captured";
+
+/**
+ * Shared email-gate helper used by Stop1 and every Free Tool entry point.
+ * - `gateOpen` controls the JourneyGate modal visibility.
+ * - `requestProceed(fn)` runs `fn` immediately if email already captured,
+ *   otherwise opens the gate and stores `fn` to run after success.
+ * - `handleGateSuccess()` should be passed to JourneyGate's onSuccess.
+ */
+export function useEmailGate() {
+  const [gateOpen, setGateOpen] = useState(false);
+  const [pending, setPending] = useState<(() => void) | null>(null);
+
+  const isCaptured = () => {
+    try {
+      return sessionStorage.getItem(STORAGE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  };
+
+  const requestProceed = useCallback((fn: () => void) => {
+    if (isCaptured()) {
+      fn();
+      return;
+    }
+    setPending(() => fn);
+    setGateOpen(true);
+  }, []);
+
+  const handleGateSuccess = useCallback(() => {
+    setGateOpen(false);
+    if (pending) {
+      pending();
+      setPending(null);
+    }
+  }, [pending]);
+
+  return { gateOpen, requestProceed, handleGateSuccess };
+}

@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, Volume2, VolumeX, Pause, Play } from "lucide-react";
 import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from "@/integrations/supabase/client";
+import JourneyGate from "@/components/JourneyGate";
+import { useEmailGate } from "@/hooks/useEmailGate";
 import { pauseAmbient, resumeAmbient } from "@/lib/ambientAudio";
 
 type Message = {
@@ -131,9 +133,9 @@ export default function AncestorChat() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  const handleStart = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!surname.trim() || loading) return;
+  const { gateOpen, requestProceed, handleGateSuccess } = useEmailGate();
+
+  const runStart = async () => {
     unlockAudio();
     setLoading(true);
     setError(null);
@@ -157,6 +159,12 @@ export default function AncestorChat() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleStart = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!surname.trim() || loading) return;
+    requestProceed(() => { void runStart(); });
   };
 
   const toggleMic = () => {
@@ -218,6 +226,7 @@ export default function AncestorChat() {
 
   return (
     <div className="relative min-h-screen bg-background">
+      <JourneyGate open={gateOpen} source="tool-ancestor-chat" surname={surname} onSuccess={handleGateSuccess} />
       {/* Video background */}
             <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       <div

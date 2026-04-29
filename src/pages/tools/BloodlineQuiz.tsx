@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import JourneyGate from "@/components/JourneyGate";
+import { useEmailGate } from "@/hooks/useEmailGate";
 import { toast } from "sonner";
 
 type QuizResult = {
@@ -126,8 +128,11 @@ export default function BloodlineQuiz() {
 
   const questionIndex = step - 1;
 
+  const { gateOpen, requestProceed, handleGateSuccess } = useEmailGate();
+
   return (
     <div className="relative min-h-screen bg-background">
+      <JourneyGate open={gateOpen} source="tool-bloodline-quiz" onSuccess={handleGateSuccess} />
       {/* Castle video background */}
             <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       <div className="pointer-events-none fixed inset-0" style={{ background: "rgba(13,10,7,0.45)" }} />
@@ -160,7 +165,7 @@ export default function BloodlineQuiz() {
           <motion.button
             {...reveal}
             transition={{ ...reveal.transition, delay: 0.35 }}
-            onClick={() => setStep(1)}
+            onClick={() => requestProceed(() => setStep(1))}
             className="mt-10 rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
             style={{
               background: "linear-gradient(135deg, #e8943a, #c47828)",

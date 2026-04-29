@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, MapPin, Calendar, Shield, ScrollText, User, Compass, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import JourneyGate from "@/components/JourneyGate";
+import { useEmailGate } from "@/hooks/useEmailGate";
 
 type SurnameResult = {
   surname: string;
@@ -56,10 +58,9 @@ export default function SurnameLookup() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!surname.trim() || loading) return;
+  const { gateOpen, requestProceed, handleGateSuccess } = useEmailGate();
 
+  const runLookup = async () => {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -82,6 +83,12 @@ export default function SurnameLookup() {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!surname.trim() || loading) return;
+    requestProceed(() => { void runLookup(); });
+  };
+
   const handleCopy = async () => {
     if (!result) return;
     const shareText = `My surname ${result.surname} means ${result.meaning} first recorded ${result.dateFirstRecorded} in ${result.origin}. Ancestral role: ${result.ancestralRole} What's hiding in your name? ancestorsqr.com`;
@@ -96,6 +103,7 @@ export default function SurnameLookup() {
 
   return (
     <div className="relative min-h-screen bg-background">
+      <JourneyGate open={gateOpen} source="tool-surname-lookup" surname={surname} onSuccess={handleGateSuccess} />
       {/* Castle video background */}
             <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       <div className="pointer-events-none fixed inset-0" style={{ background: "rgba(13,10,7,0.45)" }} />

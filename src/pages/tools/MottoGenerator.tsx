@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import JourneyGate from "@/components/JourneyGate";
+import { useEmailGate } from "@/hooks/useEmailGate";
 import { toast } from "sonner";
 
 type BreakdownWord = { latin: string; english: string };
@@ -39,10 +41,9 @@ export default function MottoGenerator() {
 
   const canSubmit = values.every((v) => v.trim().length > 0) && !loading;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canSubmit) return;
+  const { gateOpen, requestProceed, handleGateSuccess } = useEmailGate();
 
+  const runGenerate = async () => {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -65,6 +66,12 @@ export default function MottoGenerator() {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!canSubmit) return;
+    requestProceed(() => { void runGenerate(); });
+  };
+
   const handleShare = async () => {
     if (!result) return;
     const text = `My family motto, forged by AncestorsQR:\n\n"${result.mottoLatin}"\n${result.mottoEnglish}\n\nDiscover yours → ancestorsqr.com/tools/motto`;
@@ -82,6 +89,7 @@ export default function MottoGenerator() {
 
   return (
     <div className="relative min-h-screen bg-background">
+      <JourneyGate open={gateOpen} source="tool-motto-generator" onSuccess={handleGateSuccess} />
       {/* Castle video background */}
             <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       <div className="pointer-events-none fixed inset-0" style={{ background: "rgba(13,10,7,0.45)" }} />
