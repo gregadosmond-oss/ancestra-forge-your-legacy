@@ -19,7 +19,7 @@ const corsHeaders = {
 const EMAIL_SUBJECTS: Record<string, (data: any) => string> = {
   signup: () => 'Your AncestorsQR code',
   invite: () => "You've been invited to AncestorsQR",
-  magiclink: (data) => `Your AncestorsQR code — ${data?.token ?? ''}`.trim(),
+  magiclink: () => 'Your AncestorsQR account is ready',
   recovery: () => 'Reset your AncestorsQR password',
   email_change: () => 'Confirm your new AncestorsQR email',
   reauthentication: () => 'Your AncestorsQR verification code',
