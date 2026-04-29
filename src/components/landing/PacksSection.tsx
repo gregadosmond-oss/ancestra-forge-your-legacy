@@ -104,7 +104,7 @@ const PacksSection = () => {
         </div>
         <div className="mb-3 text-3xl">🛡</div>
         <h3 className="font-display text-lg text-cream-warm">Legacy Pack</h3>
-        <div className="mt-3 font-display text-3xl text-amber-light">$29.99</div>
+        <div className="mt-3 font-display text-3xl text-amber-light">{legacyPrice}</div>
         <p className="mt-1 text-[11px] text-text-dim">
           One-time · Instant delivery
         </p>
@@ -163,6 +163,7 @@ const PacksSection = () => {
 
     </div>
   </motion.section>
-);
+  );
+};
 
 export default PacksSection;
