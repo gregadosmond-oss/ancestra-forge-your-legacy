@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, Volume2, VolumeX, Pause, Play } from "lucide-react";
 import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from "@/integrations/supabase/client";
+import JourneyGate from "@/components/JourneyGate";
+import { useEmailGate } from "@/hooks/useEmailGate";
 import { pauseAmbient, resumeAmbient } from "@/lib/ambientAudio";
 
 type Message = {
