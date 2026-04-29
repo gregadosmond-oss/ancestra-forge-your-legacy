@@ -457,16 +457,6 @@ export default function About() {
             Begin Your Journey
           </Link>
 
-          <p
-            className="mt-6 font-sans uppercase"
-            style={{
-              color: "#8a7e6e",
-              fontSize: "11px",
-              letterSpacing: "3px",
-            }}
-          >
-            Free to start · No account required
-          </p>
         </motion.section>
 
         <div className="h-16" />
