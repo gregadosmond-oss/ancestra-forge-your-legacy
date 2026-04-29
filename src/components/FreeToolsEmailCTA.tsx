@@ -45,6 +45,11 @@ const FreeToolsEmailCTA = () => {
 
       if (insertError && insertError.code !== "23505") throw insertError;
 
+      // Fire-and-forget Kit.com sync — never block the user.
+      supabase.functions
+        .invoke("sync-to-kit", { body: { email: trimmed, source: "free-tools-page" } })
+        .catch((err) => console.error("Kit sync failed:", err));
+
       try {
         sessionStorage.setItem(STORAGE_KEY, "true");
       } catch {
