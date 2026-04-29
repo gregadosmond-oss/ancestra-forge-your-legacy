@@ -186,39 +186,6 @@ const Pricing = () => {
 
     </motion.div>
 
-    {/* Deep Legacy promo — horizontal card */}
-    <motion.div {...reveal} className="mt-12">
-      <div
-        className="mx-auto max-w-4xl rounded-[22px] flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between"
-        style={{
-          border: "1px solid rgba(232,148,58,0.18)",
-          background: "linear-gradient(135deg, rgba(26,21,16,0.9), rgba(30,24,16,0.9))",
-          padding: "36px 40px",
-        }}
-      >
-        <div className="sm:flex-1">
-          <p className="font-sans text-[10px] uppercase tracking-[3px]" style={{ color: "#a07830" }}>
-            FOR THE DEEP ROOTS
-          </p>
-          <h3 className="mt-2 font-display text-2xl text-cream-warm">Deep Legacy Research</h3>
-          <p className="mt-3 text-sm leading-relaxed" style={{ color: "#c4b8a6" }}>
-            An extended research report powered by Perplexity + Claude — historical context, rare records, lineage deep-dives, and a 20+ page document built from multiple real-world sources. For when the standard Legacy Pack isn't enough.
-          </p>
-        </div>
-        <div className="flex flex-col items-start gap-3 sm:w-auto sm:items-end">
-          <div className="font-display text-4xl" style={{ color: "#e8b85c" }}>$79</div>
-          <p className="font-sans text-[11px]" style={{ color: "#8a7e6e" }}>One-time · Delivered in 24–48 hrs</p>
-          <Link
-            to="/deep-legacy"
-            className="rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
-            style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
-          >
-            Begin Research
-          </Link>
-        </div>
-      </div>
-    </motion.div>
-
     <WarmDivider />
 
     {/* FAQ */}
