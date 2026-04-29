@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import RetryInline from "@/components/journey/RetryInline";
 import AuthGate from "@/components/AuthGate";
@@ -464,6 +464,21 @@ const Stop5Story = () => {
           )}
         </>
       )}
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+        className="mt-12"
+      >
+        <Link
+          to="/journey/6"
+          className="inline-block rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 hover:-translate-y-0.5"
+          style={{ background: "linear-gradient(135deg, #e8943a, #c47828)" }}
+        >
+          Pass It On →
+        </Link>
+      </motion.div>
 
       {showAuth && (
         <AuthGate
