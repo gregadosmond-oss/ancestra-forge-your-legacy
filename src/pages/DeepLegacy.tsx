@@ -244,7 +244,7 @@ export default function DeepLegacy() {
                   }}
                 >
                   Legacy Pack
-                  <div style={{ ...sansFont, fontSize: 13, color: TEXT_DIM, marginTop: 4 }}>$19.99</div>
+                  <div style={{ ...sansFont, fontSize: 13, color: TEXT_DIM, marginTop: 4 }}>$29.99</div>
                 </th>
                 <th
                   style={{

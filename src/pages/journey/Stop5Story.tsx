@@ -454,7 +454,7 @@ const Stop5Story = () => {
                     color: "#1a1208",
                   }}
                 >
-                  Unlock My Full Legacy — $19.99
+                  Unlock My Full Legacy — $29.99
                 </button>
                 <p className="mt-3 font-sans text-[10px] text-text-dim">
                   One-time payment · Instant delivery · No subscription
