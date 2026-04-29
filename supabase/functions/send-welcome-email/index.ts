@@ -138,9 +138,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const firstName =
-      firstNameRaw && firstNameRaw.length > 0
-        ? firstNameRaw
-        : email.split("@")[0] || "friend";
+      firstNameRaw && firstNameRaw.length > 0 ? firstNameRaw : "friend";
 
     console.log("[send-welcome-email] received request for:", email, "source:", source);
 
