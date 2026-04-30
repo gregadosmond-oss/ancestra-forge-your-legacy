@@ -13,6 +13,7 @@ const JourneyLayout = () => {
 
   return (
     <JourneyProvider>
+      <JourneySEOInner />
       <div className="relative min-h-screen overflow-hidden bg-background">
         {/* Castle video background — fixed so it stays as user scrolls */}
               <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
