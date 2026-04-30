@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const reveal = {
   initial: { opacity: 0, y: 28 },

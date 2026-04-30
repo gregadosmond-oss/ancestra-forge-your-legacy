@@ -6,6 +6,7 @@ import { stripMarkdown } from "@/lib/utils";
 import ShareQRCode from "@/components/ShareQRCode";
 import SocialShare from "@/components/SocialShare";
 import type { LegacyFacts, LegacyStory } from "@/types/legacy";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 function OrnamentDivider() {
   return (

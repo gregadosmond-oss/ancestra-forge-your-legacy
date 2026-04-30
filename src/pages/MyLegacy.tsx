@@ -11,6 +11,7 @@ import { generateCertificate } from "@/lib/generateCertificate";
 import { fetchLegacy } from "@/lib/legacyClient";
 import FreeCrest from "@/components/FreeCrest";
 import type { LegacyFacts, LegacyStory } from "@/types/legacy";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 // ─── Data hook ────────────────────────────────────────────────────────────────
 

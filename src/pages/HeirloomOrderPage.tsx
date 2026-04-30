@@ -7,6 +7,7 @@ import AuthGate from "@/components/AuthGate";
 import MugMockup from "@/components/MugMockup";
 import { usePurchase } from "@/hooks/usePurchase";
 import { getStripeEnvironment } from "@/lib/stripe";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 type Step = "details" | "payment";
 

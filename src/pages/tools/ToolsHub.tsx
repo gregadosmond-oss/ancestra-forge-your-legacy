@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
 import FreeToolsEmailCTA from "@/components/FreeToolsEmailCTA";
 import ScrollChevron from "@/components/ScrollChevron";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const tools = [
   {

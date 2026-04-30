@@ -1,6 +1,7 @@
 import { Mic, Search, BookOpen, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const BG = "#0d0a07";
 const BG_CARD = "#1a1510";

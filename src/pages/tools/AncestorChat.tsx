@@ -7,6 +7,7 @@ import JourneyGate from "@/components/JourneyGate";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { pauseAmbient, resumeAmbient } from "@/lib/ambientAudio";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 type Message = {
   role: "user" | "ancestor";

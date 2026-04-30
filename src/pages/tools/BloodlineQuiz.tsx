@@ -7,6 +7,7 @@ import JourneyGate from "@/components/JourneyGate";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { toast } from "sonner";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 type QuizResult = {
   archetype: string;

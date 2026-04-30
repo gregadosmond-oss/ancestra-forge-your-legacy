@@ -14,8 +14,10 @@ import { usePurchase } from "@/hooks/usePurchase";
 import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 import { useMugPrice } from "@/hooks/useMugPrice";
 import { supabase } from "@/integrations/supabase/client";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const Stop6PassItOn = () => {
+  usePageMeta({ title: "Pass It On | AncestorsQR", description: "Share your family's legacy with the people it belongs to." });
   const navigate = useNavigate();
   const { surname, facts, story, crest } = useJourney();
   const { user } = usePurchase();

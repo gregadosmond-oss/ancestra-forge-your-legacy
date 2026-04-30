@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import josephOsmondPortrait from "@/assets/joseph-osmond-1827.jpeg";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const reveal = {
   initial: { opacity: 0, y: 28 },

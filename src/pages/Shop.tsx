@@ -12,6 +12,7 @@ import {
   CATEGORY_LABELS,
   type ShopProduct,
 } from "@/data/shopProducts";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },

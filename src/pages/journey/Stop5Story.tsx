@@ -10,10 +10,13 @@ import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 import { usePurchase } from "@/hooks/usePurchase";
 import { stripMarkdown } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const Stop5Story = () => {
   const navigate = useNavigate();
   const { unknownSurname, surname, story } = useJourney();
+  const cap = surname ? surname.charAt(0).toUpperCase() + surname.slice(1).toLowerCase() : "";
+  usePageMeta({ title: cap ? `The ${cap} Family Story | AncestorsQR` : "Your Family Story | AncestorsQR", description: "The full 9-chapter story of where you came from." });
   const legacyPrice = useLegacyPackPrice();
   const { user, hasPurchased, loading: purchaseLoading } = usePurchase();
   const [showAuth, setShowAuth] = useState(false);

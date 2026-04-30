@@ -10,6 +10,7 @@ import { useJourney } from "@/contexts/JourneyContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { initiateFamilySearchOAuth } from "@/lib/familySearchAuth";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 type Phase =
   | "idle"

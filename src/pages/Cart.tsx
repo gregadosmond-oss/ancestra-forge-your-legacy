@@ -5,6 +5,7 @@ import WarmDivider from "@/components/journey/WarmDivider";
 import { useCart } from "@/contexts/CartContext";
 import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
 import { supabase } from "@/integrations/supabase/client";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },

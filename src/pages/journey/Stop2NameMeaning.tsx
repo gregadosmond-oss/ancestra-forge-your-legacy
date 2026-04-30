@@ -8,8 +8,10 @@ import RetryInline from "@/components/journey/RetryInline";
 import ArchiveLoader from "@/components/journey/ArchiveLoader";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useJourney } from "@/contexts/JourneyContext";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const Stop2NameMeaning = () => {
+  usePageMeta({ title: "Your Name's Story | AncestorsQR", description: "Discover the meaning behind your surname — its origin, its role, its place in history." });
   const navigate = useNavigate();
   const { unknownSurname, surname, facts } = useJourney();
 
