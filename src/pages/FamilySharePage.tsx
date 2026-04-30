@@ -30,6 +30,13 @@ const FamilySharePage = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
+  usePageMeta({
+    title: cap ? `The ${cap} Family Story | AncestorsQR` : "AncestorsQR",
+    description: cap ? `Discover the meaning of ${cap} and the family that came before you. Forged on AncestorsQR.` : undefined,
+    image: crestUrl || undefined,
+    type: "article",
+  });
+
   useEffect(() => {
     if (!surname) { setNotFound(true); setLoading(false); return; }
 
