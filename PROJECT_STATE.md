@@ -201,7 +201,7 @@
 ## 9. Known Issues / TODOs
 
 - `Stop3Bloodline` — placeholder data; not wired to a real bloodline data source.
-- Crest legacy certificate copy says "House Osmond" instead of "House of Osmond" (per project knowledge).
+
 - `resvg-wasm` cannot render SVG `<text>` without embedded fonts → motto text on T-shirt back not rendered.
 - QR code can be cut off on canvas prints if placed within ~600px of the edge (Printify wrap zone).
 - `KIT_API_SECRET` still present in Lovable Cloud secrets despite Kit being fully removed from code — safe but should eventually be deleted.
