@@ -26,7 +26,16 @@ const Stop5Story = () => {
   const [gateEmail, setGateEmail] = useState("");
   const [gateLoading, setGateLoading] = useState(false);
   const [gateError, setGateError] = useState<string | null>(null);
-  const [hasEnteredEmail, setHasEnteredEmail] = useState(false);
+  // If the user already entered their email earlier in the journey (Stop 1 gate),
+  // skip the redundant gate here so we don't add friction right before the paywall.
+  const [hasEnteredEmail, setHasEnteredEmail] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return sessionStorage.getItem("journey_email_captured") === "true";
+    } catch {
+      return false;
+    }
+  });
 
   const unlockAudio = () => {
     if (!audioCtxRef.current) {
