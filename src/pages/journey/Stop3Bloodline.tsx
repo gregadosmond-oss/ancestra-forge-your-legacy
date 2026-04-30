@@ -323,8 +323,10 @@ const Stop3Bloodline = () => {
                   <button
                     type="button"
                     onClick={handleConnectFS}
-                    disabled={connecting}
-                    className="mt-5 inline-block rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 disabled:opacity-50"
+                    disabled={FS_COMING_SOON || connecting}
+                    aria-disabled={FS_COMING_SOON || connecting}
+                    title={FS_COMING_SOON ? "Coming soon" : undefined}
+                    className="mt-5 inline-block rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
                     style={{
                       background: "linear-gradient(135deg, #e8943a, #c47828)",
                     }}
