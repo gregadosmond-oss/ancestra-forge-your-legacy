@@ -17,7 +17,7 @@ interface ProductConfig {
 }
 
 const PRODUCT_CONFIG: Record<string, ProductConfig> = {
-  "heirloom":      { name: 'Family Crest Mug',           price: '$39.99', priceId: 'heirloom_mug_once',       emoji: '☕', desc: 'Custom ceramic mug with your family crest, name & QR code — ships worldwide. Includes the full digital Legacy Pack.' },
+  "heirloom":      { name: 'Family Crest Mug',           price: '$49.99', priceId: 'heirloom_mug_once',       emoji: '☕', desc: 'Custom ceramic mug with your family crest, name & QR code — ships worldwide. Includes the full digital Legacy Pack.' },
   "canvas-8x10":   { name: 'Canvas Print 8"×10"',         price: '$34.99', priceId: 'heirloom_canvas_8x10',    emoji: '🖼️', desc: 'Gallery-wrapped canvas of your family crest. Artwork that actually means something. Includes Legacy Pack.' },
   "canvas-12x16":  { name: 'Canvas Print 12"×16"',        price: '$42.99', priceId: 'heirloom_canvas_12x16',   emoji: '🖼️', desc: 'Gallery-wrapped canvas of your family crest. Includes Legacy Pack.' },
   "canvas-18x24":  { name: 'Canvas Print 18"×24"',        price: '$59.99', priceId: 'heirloom_canvas_18x24',   emoji: '🖼️', desc: 'A bold statement piece for the living room or study. Includes Legacy Pack.' },
