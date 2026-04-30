@@ -1,7 +1,9 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const NotFound = () => {
+  usePageMeta({ title: "Page Not Found | AncestorsQR" });
   const location = useLocation();
 
   useEffect(() => {

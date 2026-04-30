@@ -6,8 +6,10 @@ import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
 import { useJourney } from "@/contexts/JourneyContext";
 import JourneyGate from "@/components/JourneyGate";
 import ScrollChevron from "@/components/ScrollChevron";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const Stop1EnterName = () => {
+  usePageMeta({ title: "Begin Your Journey | AncestorsQR", description: "Enter your surname and discover the story your family has been waiting to tell." });
   const navigate = useNavigate();
   const { startJourney, unknownSurname, reset } = useJourney();
   const [surname, setSurname] = useState("");

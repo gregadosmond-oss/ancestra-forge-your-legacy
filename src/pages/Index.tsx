@@ -8,8 +8,10 @@ import FreeToolsSection from "@/components/landing/FreeToolsSection";
 
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
 import LandingCrest from "@/components/landing/LandingCrest";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const Index = () => {
+  usePageMeta({ title: "AncestorsQR — Every Family Has a Story Worth Telling" });
   const [isPlaying, setIsPlaying] = useState(false);
 
   const handleToggleMusic = () => {

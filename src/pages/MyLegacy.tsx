@@ -11,6 +11,7 @@ import { generateCertificate } from "@/lib/generateCertificate";
 import { fetchLegacy } from "@/lib/legacyClient";
 import FreeCrest from "@/components/FreeCrest";
 import type { LegacyFacts, LegacyStory } from "@/types/legacy";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 // ─── Data hook ────────────────────────────────────────────────────────────────
 
@@ -443,6 +444,7 @@ function DeepBookChapterCard({ chapter, tts }: { chapter: DeepChapter; tts: Retu
 // ─── Main component ────────────────────────────────────────────────────────────
 
 const MyLegacy = () => {
+  usePageMeta({ title: "My Legacy | AncestorsQR" });
   const navigate = useNavigate();
   const { user, hasPurchased, loading: purchaseLoading } = usePurchase();
   const { facts, story, crestUrl: initialCrestUrl, surname, deepLegacyResearch, deepChapters, loading, generating, error } = useLegacyData(

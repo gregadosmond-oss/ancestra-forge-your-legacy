@@ -1,6 +1,7 @@
 import { Mic, Search, BookOpen, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const BG = "#0d0a07";
 const BG_CARD = "#1a1510";
@@ -100,6 +101,7 @@ function Cell({ value, highlight }: { value: string; highlight?: boolean }) {
 }
 
 export default function DeepLegacy() {
+  usePageMeta({ title: "Deep Legacy — Premium Research | AncestorsQR", description: "A guided AI interview + deep historical research reveals 5 generations of your bloodline." });
   const navigate = useNavigate();
   const legacyPrice = useLegacyPackPrice();
   const rows = [

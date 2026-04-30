@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
 import FreeToolsEmailCTA from "@/components/FreeToolsEmailCTA";
 import ScrollChevron from "@/components/ScrollChevron";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const tools = [
   {
@@ -96,6 +97,7 @@ const item = {
 };
 
 export default function ToolsHub() {
+  usePageMeta({ title: "Free Tools | AncestorsQR", description: "Surname lookup, bloodline quiz, motto generator, ancestor chat — all free." });
   return (
     <div className="relative min-h-screen bg-background">
       {/* Castle video background */}

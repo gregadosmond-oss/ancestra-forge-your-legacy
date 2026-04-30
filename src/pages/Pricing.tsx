@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
 import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },
@@ -73,6 +74,7 @@ const FAQ = [
 ];
 
 const Pricing = () => {
+  usePageMeta({ title: "Pricing | AncestorsQR", description: "Start free. Unlock your full story for $29.99. Add an heirloom to make it last." });
   const legacyPrice = useLegacyPackPrice();
   return (
   <div className="relative min-h-screen bg-background">

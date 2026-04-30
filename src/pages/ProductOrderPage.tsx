@@ -5,6 +5,7 @@ import SectionLabel from "@/components/journey/SectionLabel";
 import StripeEmbeddedCheckout from "@/components/StripeEmbeddedCheckout";
 import AuthGate from "@/components/AuthGate";
 import { usePurchase } from "@/hooks/usePurchase";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 type Step = "details" | "payment";
 
@@ -54,6 +55,7 @@ const empty: ShippingAddress = {
 };
 
 export default function ProductOrderPage() {
+  usePageMeta({ title: "Order Your Heirloom | AncestorsQR" });
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type") ?? "heirloom";
   const config = PRODUCT_CONFIG[type];

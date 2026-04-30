@@ -6,6 +6,7 @@ import { stripMarkdown } from "@/lib/utils";
 import ShareQRCode from "@/components/ShareQRCode";
 import SocialShare from "@/components/SocialShare";
 import type { LegacyFacts, LegacyStory } from "@/types/legacy";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 function OrnamentDivider() {
   return (
@@ -21,12 +22,20 @@ const FamilySharePage = () => {
   const { surname: rawSurname } = useParams<{ surname: string }>();
   const navigate = useNavigate();
   const surname = rawSurname?.toLowerCase().trim() ?? "";
+  const cap = surname ? surname.charAt(0).toUpperCase() + surname.slice(1).toLowerCase() : "";
 
   const [facts, setFacts] = useState<LegacyFacts | null>(null);
   const [story, setStory] = useState<LegacyStory | null>(null);
   const [crestUrl, setCrestUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+
+  usePageMeta({
+    title: cap ? `The ${cap} Family Story | AncestorsQR` : "AncestorsQR",
+    description: cap ? `Discover the meaning of ${cap} and the family that came before you. Forged on AncestorsQR.` : undefined,
+    image: crestUrl || undefined,
+    type: "article",
+  });
 
   useEffect(() => {
     if (!surname) { setNotFound(true); setLoading(false); return; }

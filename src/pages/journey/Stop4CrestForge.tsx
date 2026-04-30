@@ -6,11 +6,14 @@ import FreeCrest from "@/components/FreeCrest";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useJourney } from "@/contexts/JourneyContext";
 import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const Stop4CrestForge = () => {
   const navigate = useNavigate();
   const { unknownSurname, surname, facts } = useJourney();
   const legacyPrice = useLegacyPackPrice();
+  const cap = surname ? surname.charAt(0).toUpperCase() + surname.slice(1).toLowerCase() : "";
+  usePageMeta({ title: cap ? `House of ${cap} — Your Crest | AncestorsQR` : "Your Crest | AncestorsQR", description: "Your family's coat of arms, motto, and symbolism — forged from history." });
 
   useEffect(() => {
     if (unknownSurname) navigate("/journey/1", { replace: true });

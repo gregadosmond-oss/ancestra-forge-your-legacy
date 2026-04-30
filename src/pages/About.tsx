@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import josephOsmondPortrait from "@/assets/joseph-osmond-1827.jpeg";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const reveal = {
   initial: { opacity: 0, y: 28 },
@@ -69,6 +70,7 @@ const PullQuote = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function About() {
+  usePageMeta({ title: "Our Story | AncestorsQR", description: "The Osmond family traced back to 1066 — and why every family deserves their story told." });
   return (
     <div className="relative min-h-screen" style={{ background: "#0d0a07" }}>
       {/* Subtle warm ambient glow */}

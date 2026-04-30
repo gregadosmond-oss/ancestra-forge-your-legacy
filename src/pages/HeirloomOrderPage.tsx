@@ -7,6 +7,7 @@ import AuthGate from "@/components/AuthGate";
 import MugMockup from "@/components/MugMockup";
 import { usePurchase } from "@/hooks/usePurchase";
 import { getStripeEnvironment } from "@/lib/stripe";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 type Step = "details" | "payment";
 
@@ -70,6 +71,7 @@ const empty: ShippingAddress = {
 };
 
 export default function HeirloomOrderPage() {
+  usePageMeta({ title: "Order Your Heirloom Mug | AncestorsQR", description: "Custom ceramic mug with your family crest — includes the full Legacy Pack." });
   const navigate = useNavigate();
   const surname = typeof window !== "undefined" ? sessionStorage.getItem("ancestra_journey_surname") : null;
   const { user } = usePurchase();

@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import JourneyGate from "@/components/JourneyGate";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 type SurnameResult = {
   surname: string;
@@ -53,6 +54,7 @@ function MottoDisplay({ value }: { value: string }) {
 }
 
 export default function SurnameLookup() {
+  usePageMeta({ title: "Surname Lookup | AncestorsQR", description: "Discover the meaning, origin, and history of any surname." });
   const [surname, setSurname] = useState("");
   const [result, setResult] = useState<SurnameResult | null>(null);
   const [loading, setLoading] = useState(false);

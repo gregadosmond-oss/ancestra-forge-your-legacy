@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const reveal = {
   initial: { opacity: 0, y: 28 },
@@ -22,6 +23,7 @@ const Divider = () => (
 );
 
 const Terms = () => {
+  usePageMeta({ title: "Terms of Service | AncestorsQR" });
   return (
     <main
       className="min-h-screen px-6 py-16 md:py-24"

@@ -7,6 +7,7 @@ import JourneyGate from "@/components/JourneyGate";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { pauseAmbient, resumeAmbient } from "@/lib/ambientAudio";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 type Message = {
   role: "user" | "ancestor";
@@ -35,6 +36,7 @@ declare global {
 }
 
 export default function AncestorChat() {
+  usePageMeta({ title: "Ancestor Chat | AncestorsQR", description: "Have a real conversation with someone from your bloodline." });
   const [surname, setSurname] = useState("");
   const [started, setStarted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);

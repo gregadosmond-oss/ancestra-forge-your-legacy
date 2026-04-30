@@ -12,6 +12,7 @@ import {
   CATEGORY_LABELS,
   type ShopProduct,
 } from "@/data/shopProducts";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },
@@ -35,6 +36,7 @@ const CATEGORIES: Array<{ value: ShopProduct["category"] | "all"; label: string 
 ];
 
 export default function Shop() {
+  usePageMeta({ title: "Heirloom Shop | AncestorsQR", description: "Mugs, canvas, blankets, and keepsakes — all forged with your family crest." });
   const [activeCategory, setActiveCategory] = useState<ShopProduct["category"] | "all">("all");
   const { addItem } = useCart();
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());

@@ -7,6 +7,7 @@ import JourneyGate from "@/components/JourneyGate";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { toast } from "sonner";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 type BreakdownWord = { latin: string; english: string };
 
@@ -27,6 +28,7 @@ const placeholders = ["Courage", "Family", "Loyalty"];
 const labels = ["First Value", "Second Value", "Third Value"];
 
 export default function MottoGenerator() {
+  usePageMeta({ title: "Motto Generator | AncestorsQR", description: "Three values become a Latin motto carved for your family." });
   const [values, setValues] = useState(["", "", ""]);
   const [result, setResult] = useState<MottoResult | null>(null);
   const [loading, setLoading] = useState(false);
