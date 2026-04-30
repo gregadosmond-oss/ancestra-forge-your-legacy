@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import WarmDivider from "@/components/journey/WarmDivider";
 import { useCart } from "@/contexts/CartContext";
 import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
+import { supabase } from "@/integrations/supabase/client";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },
@@ -15,6 +17,40 @@ export default function Cart() {
   const { items, removeItem, updateQuantity, totalItems, totalPrice } = useCart();
   const isEmpty = items.length === 0;
   const legacyPrice = useLegacyPackPrice();
+
+  // Legacy Book waitlist (mirrors /shop pattern)
+  const [notifyOpen, setNotifyOpen] = useState(false);
+  const [notifyEmail, setNotifyEmail] = useState("");
+  const [notifySurname, setNotifySurname] = useState("");
+  const [notifyStatus, setNotifyStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [notifyError, setNotifyError] = useState("");
+
+  const submitNotify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!notifyEmail.trim()) return;
+    setNotifyStatus("loading");
+    setNotifyError("");
+    try {
+      const { data, error } = await supabase.functions.invoke("book-waitlist-signup", {
+        body: { email: notifyEmail.trim(), surname: notifySurname.trim() || undefined },
+      });
+      if (error || data?.error) {
+        throw new Error(data?.error || error?.message || "Could not save your signup.");
+      }
+      setNotifyStatus("success");
+    } catch (err) {
+      setNotifyError((err as Error).message);
+      setNotifyStatus("error");
+    }
+  };
+
+  const closeNotify = () => {
+    setNotifyOpen(false);
+    setNotifyEmail("");
+    setNotifySurname("");
+    setNotifyStatus("idle");
+    setNotifyError("");
+  };
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -131,37 +167,72 @@ export default function Cart() {
                 Popular Gifts
               </p>
               <div className="grid gap-4 sm:grid-cols-3">
-                {[
-                  { name: "Legacy Pack", price: legacyPrice, note: "Instant delivery", path: "/journey" },
-                  { name: "Framed Crest Print", price: "from $79", note: "Ships worldwide", path: "/shop" },
-                  { name: "Legacy Book", price: "from $59", note: "Softcover or hardcover", path: "/shop" },
-                ].map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.path}
-                    className="flex flex-col rounded-[18px] p-5 text-left transition-all duration-300"
-                    style={{
-                      background: "rgba(26,21,14,0.9)",
-                      border: "1px solid rgba(212,160,74,0.08)",
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLAnchorElement).style.borderColor =
-                        "rgba(212,160,74,0.2)";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLAnchorElement).style.borderColor =
-                        "rgba(212,160,74,0.08)";
-                    }}
-                  >
-                    <p className="font-display text-base text-cream-warm">{item.name}</p>
-                    <p className="mt-1 font-display text-lg" style={{ color: "#d4a04a" }}>
-                      {item.price}
-                    </p>
-                    <p className="mt-1 font-sans text-[11px]" style={{ color: "#5a4e3e" }}>
-                      {item.note}
-                    </p>
-                  </Link>
-                ))}
+                {([
+                  { kind: "link" as const, name: "Legacy Pack", price: legacyPrice, note: "Instant delivery", path: "/journey" },
+                  { kind: "link" as const, name: "Family Crest Mug", price: "$49.99", note: "Ships in 5–7 days", path: "/product-order" },
+                  { kind: "waitlist" as const, name: "The Legacy Book", price: "$129", note: "Coming Soon" },
+                ]).map((item) => {
+                  const cardStyle: React.CSSProperties = {
+                    background: "rgba(26,21,14,0.9)",
+                    border: "1px solid rgba(212,160,74,0.08)",
+                  };
+                  const onEnter = (e: React.MouseEvent<HTMLElement>) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(212,160,74,0.2)";
+                  };
+                  const onLeave = (e: React.MouseEvent<HTMLElement>) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(212,160,74,0.08)";
+                  };
+                  const inner = (
+                    <>
+                      <p className="font-display text-base text-cream-warm">{item.name}</p>
+                      <p className="mt-1 font-display text-lg" style={{ color: "#d4a04a" }}>
+                        {item.price}
+                      </p>
+                      <p className="mt-1 font-sans text-[11px]" style={{ color: "#5a4e3e" }}>
+                        {item.note}
+                      </p>
+                      {item.kind === "waitlist" && (
+                        <span
+                          className="mt-3 inline-block self-start rounded-pill px-3 py-1 font-sans text-[10px] font-semibold uppercase tracking-[1.5px]"
+                          style={{
+                            background: "rgba(232,148,58,0.08)",
+                            border: "1px solid rgba(232,148,58,0.25)",
+                            color: "#e8943a",
+                          }}
+                        >
+                          Notify Me When Ready
+                        </span>
+                      )}
+                    </>
+                  );
+                  if (item.kind === "waitlist") {
+                    return (
+                      <button
+                        key={item.name}
+                        type="button"
+                        onClick={() => setNotifyOpen(true)}
+                        className="flex flex-col rounded-[18px] p-5 text-left transition-all duration-300"
+                        style={{ ...cardStyle, cursor: "pointer" }}
+                        onMouseEnter={onEnter}
+                        onMouseLeave={onLeave}
+                      >
+                        {inner}
+                      </button>
+                    );
+                  }
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.path}
+                      className="flex flex-col rounded-[18px] p-5 text-left transition-all duration-300"
+                      style={cardStyle}
+                      onMouseEnter={onEnter}
+                      onMouseLeave={onLeave}
+                    >
+                      {inner}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </motion.div>
@@ -316,6 +387,112 @@ export default function Cart() {
           </motion.div>
         )}
       </div>
+
+      {/* Legacy Book Notify Modal */}
+      {notifyOpen && (
+        <div
+          onClick={closeNotify}
+          className="fixed inset-0 z-[100] flex items-center justify-center px-6"
+          style={{ background: "rgba(8,5,3,0.85)", backdropFilter: "blur(6px)" }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-md rounded-[22px] p-8"
+            style={{
+              background: "#13100b",
+              border: "1px solid rgba(212,160,74,0.2)",
+            }}
+          >
+            <button
+              onClick={closeNotify}
+              aria-label="Close"
+              className="absolute right-4 top-4 font-sans text-[18px]"
+              style={{ background: "transparent", border: "none", color: "#a07830", cursor: "pointer" }}
+            >
+              ×
+            </button>
+            <p className="mb-2 font-sans text-[10px] uppercase tracking-[3px]" style={{ color: "#a07830" }}>
+              Coming Soon
+            </p>
+            <h3 className="font-display text-2xl text-cream-warm">The Legacy Book</h3>
+            <p className="mt-2 font-serif italic text-[14px] leading-relaxed" style={{ color: "#8a7e6e" }}>
+              Be the first to know when your family's hardcover is ready.
+            </p>
+
+            {notifyStatus === "success" ? (
+              <div className="mt-6 text-center">
+                <p className="font-display text-lg" style={{ color: "#d4a04a" }}>
+                  You're on the list.
+                </p>
+                <p className="mt-2 font-sans text-[12px]" style={{ color: "#8a7e6e" }}>
+                  We'll email you the moment The Legacy Book is ready.
+                </p>
+                <button
+                  onClick={closeNotify}
+                  className="mt-6 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
+                  style={{
+                    background: "linear-gradient(135deg, #e8943a, #c47828)",
+                    color: "#1a1208",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={submitNotify} className="mt-6 flex flex-col gap-3">
+                <input
+                  type="email"
+                  required
+                  placeholder="Your email"
+                  value={notifyEmail}
+                  onChange={(e) => setNotifyEmail(e.target.value)}
+                  className="rounded-[14px] px-4 py-3 font-sans text-[14px]"
+                  style={{
+                    background: "#161210",
+                    border: "1px solid rgba(212,160,74,0.18)",
+                    color: "#d0c4b4",
+                    outline: "none",
+                  }}
+                />
+                <input
+                  type="text"
+                  placeholder="Surname (optional)"
+                  value={notifySurname}
+                  onChange={(e) => setNotifySurname(e.target.value)}
+                  className="rounded-[14px] px-4 py-3 font-sans text-[14px]"
+                  style={{
+                    background: "#161210",
+                    border: "1px solid rgba(212,160,74,0.18)",
+                    color: "#d0c4b4",
+                    outline: "none",
+                  }}
+                />
+                {notifyStatus === "error" && (
+                  <p className="font-sans text-[12px]" style={{ color: "#c47070" }}>
+                    {notifyError || "Something went wrong. Please try again."}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={notifyStatus === "loading"}
+                  className="mt-2 rounded-pill py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
+                  style={{
+                    background: "linear-gradient(135deg, #e8943a, #c47828)",
+                    color: "#1a1208",
+                    border: "none",
+                    cursor: notifyStatus === "loading" ? "wait" : "pointer",
+                    opacity: notifyStatus === "loading" ? 0.7 : 1,
+                  }}
+                >
+                  {notifyStatus === "loading" ? "Saving…" : "Notify Me When Ready"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
