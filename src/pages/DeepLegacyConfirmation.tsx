@@ -110,7 +110,7 @@ export default function DeepLegacyConfirmation() {
             marginBottom: 16,
           }}
         >
-          House {displaySurname || "—"}
+          House of {displaySurname || "—"}
         </h1>
 
         {/* Italic subtext */}
