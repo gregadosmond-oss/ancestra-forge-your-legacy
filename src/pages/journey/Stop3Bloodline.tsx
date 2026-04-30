@@ -93,7 +93,23 @@ const Stop3Bloodline = () => {
   const closingLine = facts.data?.migration.closingLine;
   const totalReveal = waypoints.length * 0.18 + 0.5;
 
+  // FamilySearch integration is built but gated as "Coming Soon" until
+  // FamilySearch confirms our redirect URI registration. The original
+  // handlers are preserved below (handleSearchSubmit, pullTree, etc.) so
+  // we can flip the gate off in one place once approved.
+  const FS_COMING_SOON = true;
+
+  function notifyComingSoon() {
+    toast("Coming soon", {
+      description: "We'll email you when FamilySearch is live.",
+    });
+  }
+
   async function handleConnectFS() {
+    if (FS_COMING_SOON) {
+      notifyComingSoon();
+      return;
+    }
     try {
       setConnecting(true);
       await initiateFamilySearchOAuth();
@@ -107,6 +123,10 @@ const Stop3Bloodline = () => {
 
   async function handleSearchSubmit(e: FormEvent) {
     e.preventDefault();
+    if (FS_COMING_SOON) {
+      notifyComingSoon();
+      return;
+    }
     if (!firstName.trim()) {
       toast.error("First name is required");
       return;
@@ -249,11 +269,23 @@ const Stop3Bloodline = () => {
         className="mb-14 w-full max-w-3xl"
       >
         <div className="mb-6 text-center">
+          <div className="mb-4 flex justify-center">
+            <span
+              className="inline-flex items-center rounded-pill border border-amber/50 bg-bg-warm px-4 py-1.5 font-sans text-[10px] font-semibold uppercase tracking-[2px] text-amber"
+            >
+              ✦ Coming Soon
+            </span>
+          </div>
           <h2 className="font-display text-2xl text-cream-warm sm:text-3xl">
             Want to see your real ancestors?
           </h2>
           <p className="mt-2 font-serif text-base italic text-amber-light">
             Pull your real bloodline from FamilySearch — for free.
+          </p>
+          <p className="mx-auto mt-4 max-w-xl font-sans text-sm leading-relaxed text-text-dim">
+            We're partnering with FamilySearch to bring you real ancestor
+            records. Awaiting their final confirmation — expected within a few
+            weeks. For now, enjoy our AI-imagined heritage below.
           </p>
         </div>
 
@@ -291,8 +323,10 @@ const Stop3Bloodline = () => {
                   <button
                     type="button"
                     onClick={handleConnectFS}
-                    disabled={connecting}
-                    className="mt-5 inline-block rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 disabled:opacity-50"
+                    disabled={FS_COMING_SOON || connecting}
+                    aria-disabled={FS_COMING_SOON || connecting}
+                    title={FS_COMING_SOON ? "Coming soon" : undefined}
+                    className="mt-5 inline-block rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
                     style={{
                       background: "linear-gradient(135deg, #e8943a, #c47828)",
                     }}
@@ -319,36 +353,51 @@ const Stop3Bloodline = () => {
                       onChange={setFirstName}
                       placeholder="Ancestor's first name *"
                       required
+                      disabled={FS_COMING_SOON}
                     />
                     <FsInput
                       value={birthYear}
                       onChange={setBirthYear}
                       placeholder="Approx birth year"
                       type="number"
+                      disabled={FS_COMING_SOON}
                     />
                     <FsInput
                       value={birthPlace}
                       onChange={setBirthPlace}
                       placeholder="Birth city/region (e.g., Dorset, England)"
+                      disabled={FS_COMING_SOON}
                     />
                     <FsInput
                       value={fatherFirst}
                       onChange={setFatherFirst}
                       placeholder="Father's first name (optional)"
+                      disabled={FS_COMING_SOON}
                     />
                     <FsInput
                       value={motherFirst}
                       onChange={setMotherFirst}
                       placeholder="Mother's first name (optional)"
+                      disabled={FS_COMING_SOON}
                     />
                     <FsInput
                       value={motherMaiden}
                       onChange={setMotherMaiden}
                       placeholder="Mother's maiden name (optional)"
+                      disabled={FS_COMING_SOON}
                     />
                     <button
                       type="submit"
-                      className="mt-2 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300"
+                      disabled={FS_COMING_SOON}
+                      aria-disabled={FS_COMING_SOON}
+                      title={FS_COMING_SOON ? "Coming soon" : undefined}
+                      onClick={(e) => {
+                        if (FS_COMING_SOON) {
+                          e.preventDefault();
+                          notifyComingSoon();
+                        }
+                      }}
+                      className="mt-2 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
                       style={{
                         background: "linear-gradient(135deg, #e8943a, #c47828)",
                       }}
@@ -613,12 +662,14 @@ function FsInput({
   placeholder,
   type = "text",
   required = false,
+  disabled = false,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder: string;
   type?: string;
   required?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <input
@@ -627,7 +678,8 @@ function FsInput({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       required={required}
-      className="rounded-[10px] border border-amber-dim/20 bg-bg-input/80 px-4 py-2.5 font-sans text-sm text-cream-soft placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber/40"
+      disabled={disabled}
+      className="rounded-[10px] border border-amber-dim/20 bg-bg-input/80 px-4 py-2.5 font-sans text-sm text-cream-soft placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber/40 disabled:cursor-not-allowed disabled:opacity-50"
     />
   );
 }
