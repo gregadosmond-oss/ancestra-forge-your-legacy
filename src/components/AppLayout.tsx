@@ -9,6 +9,7 @@ import AuthGate from "@/components/AuthGate";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCart } from "@/contexts/CartContext";
+import SEO from "@/components/SEO";
 
 const AppLayout = () => {
   const location = useLocation();
