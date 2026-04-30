@@ -123,6 +123,10 @@ const Stop3Bloodline = () => {
 
   async function handleSearchSubmit(e: FormEvent) {
     e.preventDefault();
+    if (FS_COMING_SOON) {
+      notifyComingSoon();
+      return;
+    }
     if (!firstName.trim()) {
       toast.error("First name is required");
       return;
