@@ -37,3 +37,5 @@ project_id = "fjtkjbnvpobawqqkzrst"
     verify_jwt = false
   [functions.familysearch-search-records]
     verify_jwt = false
+  [functions.familysearch-pull-tree]
+    verify_jwt = false
