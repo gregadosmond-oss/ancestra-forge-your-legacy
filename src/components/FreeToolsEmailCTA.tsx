@@ -82,6 +82,22 @@ const FreeToolsEmailCTA = () => {
         console.error("[send-welcome-email] outer catch:", welcomeErr);
       }
 
+      // Resend Audience sync — non-blocking, parallel with Kit sync + welcome email.
+      try {
+        console.log("[sync-to-resend-audience] about to invoke for email:", trimmed);
+        supabase.functions
+          .invoke("sync-to-resend-audience", {
+            body: { email: trimmed, first_name: null, source: "free-tools-gate" },
+          })
+          .then(({ data, error }) => {
+            if (error) console.error("[sync-to-resend-audience] FAILED:", error);
+            else console.log("[sync-to-resend-audience] success:", data);
+          })
+          .catch((err) => console.error("[sync-to-resend-audience] threw:", err));
+      } catch (resendAudErr) {
+        console.error("[sync-to-resend-audience] outer catch:", resendAudErr);
+      }
+
       try {
         sessionStorage.setItem(STORAGE_KEY, "true");
       } catch {

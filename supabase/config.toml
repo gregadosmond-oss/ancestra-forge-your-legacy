@@ -29,3 +29,5 @@ project_id = "fjtkjbnvpobawqqkzrst"
     verify_jwt = false
   [functions.send-welcome-email]
     verify_jwt = false
+  [functions.sync-to-resend-audience]
+    verify_jwt = false

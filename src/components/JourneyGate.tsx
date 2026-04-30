@@ -87,6 +87,18 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
         })
         .catch((err) => console.error("[send-welcome-email] threw:", err));
 
+      // Fire-and-forget Resend Audience sync — never block the user's flow.
+      console.log("[sync-to-resend-audience] about to invoke for email:", trimmed);
+      supabase.functions
+        .invoke("sync-to-resend-audience", {
+          body: { email: trimmed, first_name: null, source },
+        })
+        .then(({ data, error }) => {
+          if (error) console.error("[sync-to-resend-audience] FAILED:", error);
+          else console.log("[sync-to-resend-audience] success:", data);
+        })
+        .catch((err) => console.error("[sync-to-resend-audience] threw:", err));
+
       try {
         sessionStorage.setItem("journey_email_captured", "true");
       } catch {
