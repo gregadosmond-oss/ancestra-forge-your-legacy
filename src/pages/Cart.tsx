@@ -18,6 +18,40 @@ export default function Cart() {
   const isEmpty = items.length === 0;
   const legacyPrice = useLegacyPackPrice();
 
+  // Legacy Book waitlist (mirrors /shop pattern)
+  const [notifyOpen, setNotifyOpen] = useState(false);
+  const [notifyEmail, setNotifyEmail] = useState("");
+  const [notifySurname, setNotifySurname] = useState("");
+  const [notifyStatus, setNotifyStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [notifyError, setNotifyError] = useState("");
+
+  const submitNotify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!notifyEmail.trim()) return;
+    setNotifyStatus("loading");
+    setNotifyError("");
+    try {
+      const { data, error } = await supabase.functions.invoke("book-waitlist-signup", {
+        body: { email: notifyEmail.trim(), surname: notifySurname.trim() || undefined },
+      });
+      if (error || data?.error) {
+        throw new Error(data?.error || error?.message || "Could not save your signup.");
+      }
+      setNotifyStatus("success");
+    } catch (err) {
+      setNotifyError((err as Error).message);
+      setNotifyStatus("error");
+    }
+  };
+
+  const closeNotify = () => {
+    setNotifyOpen(false);
+    setNotifyEmail("");
+    setNotifySurname("");
+    setNotifyStatus("idle");
+    setNotifyError("");
+  };
+
   return (
     <div className="relative min-h-screen bg-background">
       <img
