@@ -70,11 +70,6 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
         throw insertError;
       }
 
-      // Fire-and-forget Kit.com sync — never block the user's flow.
-      supabase.functions
-        .invoke("sync-to-kit", { body: { email: trimmed, source } })
-        .catch((err) => console.error("Kit sync failed:", err));
-
       // Fire-and-forget welcome email — never block the user's flow.
       console.log("[send-welcome-email] about to invoke for email:", trimmed);
       supabase.functions
