@@ -93,7 +93,23 @@ const Stop3Bloodline = () => {
   const closingLine = facts.data?.migration.closingLine;
   const totalReveal = waypoints.length * 0.18 + 0.5;
 
+  // FamilySearch integration is built but gated as "Coming Soon" until
+  // FamilySearch confirms our redirect URI registration. The original
+  // handlers are preserved below (handleSearchSubmit, pullTree, etc.) so
+  // we can flip the gate off in one place once approved.
+  const FS_COMING_SOON = true;
+
+  function notifyComingSoon() {
+    toast("Coming soon", {
+      description: "We'll email you when FamilySearch is live.",
+    });
+  }
+
   async function handleConnectFS() {
+    if (FS_COMING_SOON) {
+      notifyComingSoon();
+      return;
+    }
     try {
       setConnecting(true);
       await initiateFamilySearchOAuth();
