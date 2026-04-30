@@ -1,5 +1,8 @@
 // Send welcome email via Resend for AncestorsQR
 // Public endpoint — verify_jwt = false in supabase/config.toml
+// Server-side dedup via journey_subscribers.welcome_sent_at
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -127,6 +130,15 @@ Deno.serve(async (req: Request) => {
       return json(500, { success: false, error: "Email not configured" });
     }
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error(
+        "[send-welcome-email] FAILED: Supabase service-role env missing",
+      );
+      return json(500, { success: false, error: "Server not configured" });
+    }
+
     const body = await req.json().catch(() => ({}));
     const email = typeof body.email === "string" ? body.email.trim() : "";
     const firstNameRaw =
@@ -140,7 +152,47 @@ Deno.serve(async (req: Request) => {
     const firstName =
       firstNameRaw && firstNameRaw.length > 0 ? firstNameRaw : "friend";
 
-    console.log("[send-welcome-email] received request for:", email, "source:", source);
+    console.log(
+      "[send-welcome-email] received request for:",
+      email,
+      "source:",
+      source,
+    );
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    // Atomic claim: only proceed if welcome_sent_at is currently null.
+    const { data: claimed, error: claimError } = await supabase
+      .from("journey_subscribers")
+      .update({ welcome_sent_at: new Date().toISOString() })
+      .eq("email", email)
+      .is("welcome_sent_at", null)
+      .select();
+
+    if (claimError) {
+      console.error("[send-welcome-email] claim error:", claimError);
+      return json(500, {
+        success: false,
+        error: `Claim failed: ${claimError.message}`,
+      });
+    }
+
+    if (!claimed || claimed.length === 0) {
+      console.log(
+        "[send-welcome-email] skipped (already sent or no row):",
+        email,
+      );
+      return json(200, {
+        success: true,
+        skipped: true,
+        reason: "already_sent_or_no_row",
+      });
+    }
+
+    const claimedAt = (claimed[0] as { welcome_sent_at: string | null })
+      .welcome_sent_at;
 
     const resendRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -171,9 +223,20 @@ Deno.serve(async (req: Request) => {
         "[send-welcome-email] FAILED:",
         JSON.stringify({ status: resendRes.status, body: responseBody }),
       );
+      // Roll back the claim so a retry can succeed.
+      const { error: rollbackError } = await supabase
+        .from("journey_subscribers")
+        .update({ welcome_sent_at: null })
+        .eq("email", email);
+      if (rollbackError) {
+        console.error(
+          "[send-welcome-email] rollback failed:",
+          rollbackError,
+        );
+      }
       return json(502, {
         success: false,
-        error: `Resend error ${resendRes.status}: ${responseBody}`,
+        error: `Resend failed ${resendRes.status}: ${responseBody}`,
       });
     }
 
@@ -184,11 +247,18 @@ Deno.serve(async (req: Request) => {
       /* ignore */
     }
 
-    return json(200, { success: true, id: parsed.id ?? null });
+    return json(200, {
+      success: true,
+      id: parsed.id ?? null,
+      claimed_at: claimedAt,
+    });
   } catch (err) {
     console.error(
       "[send-welcome-email] FAILED:",
-      JSON.stringify({ message: (err as Error)?.message, stack: (err as Error)?.stack }),
+      JSON.stringify({
+        message: (err as Error)?.message,
+        stack: (err as Error)?.stack,
+      }),
     );
     return json(500, {
       success: false,
