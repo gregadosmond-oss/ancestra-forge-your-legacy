@@ -353,36 +353,51 @@ const Stop3Bloodline = () => {
                       onChange={setFirstName}
                       placeholder="Ancestor's first name *"
                       required
+                      disabled={FS_COMING_SOON}
                     />
                     <FsInput
                       value={birthYear}
                       onChange={setBirthYear}
                       placeholder="Approx birth year"
                       type="number"
+                      disabled={FS_COMING_SOON}
                     />
                     <FsInput
                       value={birthPlace}
                       onChange={setBirthPlace}
                       placeholder="Birth city/region (e.g., Dorset, England)"
+                      disabled={FS_COMING_SOON}
                     />
                     <FsInput
                       value={fatherFirst}
                       onChange={setFatherFirst}
                       placeholder="Father's first name (optional)"
+                      disabled={FS_COMING_SOON}
                     />
                     <FsInput
                       value={motherFirst}
                       onChange={setMotherFirst}
                       placeholder="Mother's first name (optional)"
+                      disabled={FS_COMING_SOON}
                     />
                     <FsInput
                       value={motherMaiden}
                       onChange={setMotherMaiden}
                       placeholder="Mother's maiden name (optional)"
+                      disabled={FS_COMING_SOON}
                     />
                     <button
                       type="submit"
-                      className="mt-2 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300"
+                      disabled={FS_COMING_SOON}
+                      aria-disabled={FS_COMING_SOON}
+                      title={FS_COMING_SOON ? "Coming soon" : undefined}
+                      onClick={(e) => {
+                        if (FS_COMING_SOON) {
+                          e.preventDefault();
+                          notifyComingSoon();
+                        }
+                      }}
+                      className="mt-2 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
                       style={{
                         background: "linear-gradient(135deg, #e8943a, #c47828)",
                       }}
