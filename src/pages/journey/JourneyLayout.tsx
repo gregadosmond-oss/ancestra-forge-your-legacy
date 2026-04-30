@@ -1,6 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Outlet, useLocation } from "react-router-dom";
-import { JourneyProvider } from "@/contexts/JourneyContext";
+import { JourneyProvider, useJourney } from "@/contexts/JourneyContext";
+import { JourneyDynamicSEO } from "@/components/SEO";
+
+const JourneySEOInner = () => {
+  const { surname } = useJourney();
+  return <JourneyDynamicSEO surname={surname} />;
+};
 
 const JourneyLayout = () => {
   const location = useLocation();
