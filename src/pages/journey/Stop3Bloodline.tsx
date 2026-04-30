@@ -645,12 +645,14 @@ function FsInput({
   placeholder,
   type = "text",
   required = false,
+  disabled = false,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder: string;
   type?: string;
   required?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <input
@@ -659,7 +661,8 @@ function FsInput({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       required={required}
-      className="rounded-[10px] border border-amber-dim/20 bg-bg-input/80 px-4 py-2.5 font-sans text-sm text-cream-soft placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber/40"
+      disabled={disabled}
+      className="rounded-[10px] border border-amber-dim/20 bg-bg-input/80 px-4 py-2.5 font-sans text-sm text-cream-soft placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber/40 disabled:cursor-not-allowed disabled:opacity-50"
     />
   );
 }
