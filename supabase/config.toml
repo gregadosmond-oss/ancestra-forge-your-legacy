@@ -35,3 +35,5 @@ project_id = "fjtkjbnvpobawqqkzrst"
     verify_jwt = false
   [functions.auth-familysearch-callback]
     verify_jwt = false
+  [functions.familysearch-search-records]
+    verify_jwt = false
