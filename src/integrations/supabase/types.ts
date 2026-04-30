@@ -283,6 +283,87 @@ export type Database = {
         }
         Relationships: []
       }
+      familysearch_search_inputs: {
+        Row: {
+          birth_place: string | null
+          birth_year_approx: number | null
+          created_at: string
+          email: string | null
+          father_first_name: string | null
+          first_name: string | null
+          id: string
+          mother_first_name: string | null
+          mother_maiden_name: string | null
+          session_id: string | null
+          surname: string
+          user_id: string | null
+        }
+        Insert: {
+          birth_place?: string | null
+          birth_year_approx?: number | null
+          created_at?: string
+          email?: string | null
+          father_first_name?: string | null
+          first_name?: string | null
+          id?: string
+          mother_first_name?: string | null
+          mother_maiden_name?: string | null
+          session_id?: string | null
+          surname: string
+          user_id?: string | null
+        }
+        Update: {
+          birth_place?: string | null
+          birth_year_approx?: number | null
+          created_at?: string
+          email?: string | null
+          father_first_name?: string | null
+          first_name?: string | null
+          id?: string
+          mother_first_name?: string | null
+          mother_maiden_name?: string | null
+          session_id?: string | null
+          surname?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      familysearch_sessions: {
+        Row: {
+          access_token: string
+          created_at: string
+          familysearch_person_id: string | null
+          id: string
+          last_used_at: string
+          refresh_token: string | null
+          token_expires_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          familysearch_person_id?: string | null
+          id?: string
+          last_used_at?: string
+          refresh_token?: string | null
+          token_expires_at: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          familysearch_person_id?: string | null
+          id?: string
+          last_used_at?: string
+          refresh_token?: string | null
+          token_expires_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       generation_logs: {
         Row: {
           cache_hit: boolean
