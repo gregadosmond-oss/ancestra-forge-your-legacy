@@ -9,6 +9,7 @@ import AuthGate from "@/components/AuthGate";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCart } from "@/contexts/CartContext";
+import SEO from "@/components/SEO";
 
 const AppLayout = () => {
   const location = useLocation();
@@ -52,6 +53,7 @@ const AppLayout = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <SEO />
       {/* ── GLOBAL NAVBAR ── */}
       <nav
         className="sticky top-0 z-50 w-full text-center"
