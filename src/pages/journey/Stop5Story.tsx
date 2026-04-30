@@ -106,20 +106,26 @@ const Stop5Story = () => {
     setGateLoading(true);
     setGateError(null);
 
-    // Save subscriber (treat duplicates as success).
+    const source = "stop-5-gate";
+
+    // Fire-and-forget subscriber insert (treat duplicates as success).
     try {
-      const { error: insertError } = await supabase
+      supabase
         .from("journey_subscribers")
         .insert({
           email,
           surname_searched: surname?.trim() || null,
-          source: "stop5-story",
+          source,
+        })
+        .then(({ error: insertError }) => {
+          if (insertError && insertError.code !== "23505") {
+            console.error("[journey_subscribers] FAILED:", insertError);
+          } else {
+            console.log("[journey_subscribers] success");
+          }
         });
-      if (insertError && insertError.code !== "23505") {
-        console.warn("[Stop5] journey_subscribers insert failed", insertError);
-      }
     } catch (err) {
-      console.warn("[Stop5] journey_subscribers threw", err);
+      console.error("[journey_subscribers] threw:", err);
     }
 
     // Fire-and-forget magic link — user can click it later for full account access.
@@ -137,22 +143,26 @@ const Stop5Story = () => {
       .catch((otpErr) => console.warn("[Stop5] magic link error", otpErr));
 
     // Fire-and-forget welcome email.
+    console.log("[send-welcome-email] about to invoke for email:", email);
     supabase.functions
       .invoke("send-welcome-email", {
-        body: { email, first_name: null, source: "stop5-story" },
+        body: { email, first_name: null, source },
       })
-      .then(({ error }) => {
+      .then(({ data, error }) => {
         if (error) console.error("[send-welcome-email] FAILED:", error);
+        else console.log("[send-welcome-email] success:", data);
       })
       .catch((err) => console.error("[send-welcome-email] threw:", err));
 
     // Fire-and-forget Resend audience sync.
+    console.log("[sync-to-resend-audience] about to invoke for email:", email);
     supabase.functions
       .invoke("sync-to-resend-audience", {
-        body: { email, first_name: null, source: "stop5-story" },
+        body: { email, first_name: null, source },
       })
-      .then(({ error }) => {
+      .then(({ data, error }) => {
         if (error) console.error("[sync-to-resend-audience] FAILED:", error);
+        else console.log("[sync-to-resend-audience] success:", data);
       })
       .catch((err) => console.error("[sync-to-resend-audience] threw:", err));
 
