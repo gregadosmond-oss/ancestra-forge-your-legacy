@@ -249,11 +249,23 @@ const Stop3Bloodline = () => {
         className="mb-14 w-full max-w-3xl"
       >
         <div className="mb-6 text-center">
+          <div className="mb-4 flex justify-center">
+            <span
+              className="inline-flex items-center rounded-pill border border-amber/50 bg-bg-warm px-4 py-1.5 font-sans text-[10px] font-semibold uppercase tracking-[2px] text-amber"
+            >
+              ✦ Coming Soon
+            </span>
+          </div>
           <h2 className="font-display text-2xl text-cream-warm sm:text-3xl">
             Want to see your real ancestors?
           </h2>
           <p className="mt-2 font-serif text-base italic text-amber-light">
             Pull your real bloodline from FamilySearch — for free.
+          </p>
+          <p className="mx-auto mt-4 max-w-xl font-sans text-sm leading-relaxed text-text-dim">
+            We're partnering with FamilySearch to bring you real ancestor
+            records. Awaiting their final confirmation — expected within a few
+            weeks. For now, enjoy our AI-imagined heritage below.
           </p>
         </div>
 
