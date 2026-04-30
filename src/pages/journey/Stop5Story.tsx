@@ -198,79 +198,38 @@ const Stop5Story = () => {
           transition={{ duration: 0.7, delay: 0.35 }}
           className="mt-10 w-full max-w-md"
         >
-          {gateStage === "email" ? (
-            <form onSubmit={handleSendCode} className="flex flex-col items-center gap-4">
-              <input
-                type="email"
-                value={gateEmail}
-                onChange={(e) => { setGateEmail(e.target.value); if (gateError) setGateError(null); }}
-                placeholder="your@email.com"
-                autoFocus
-                disabled={gateLoading}
-                maxLength={255}
-                className="w-full rounded-pill px-8 py-4 text-center font-sans text-base text-cream-warm placeholder:text-text-dim focus:outline-none disabled:opacity-60"
-                style={{
-                  background: "#161210",
-                  border: "1px solid rgba(212,160,74,0.15)",
-                }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(212,160,74,0.4)")}
-                onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(212,160,74,0.15)")}
-              />
-              {gateError && (
-                <p className="font-sans text-xs" style={{ color: "#c47070" }}>{gateError}</p>
-              )}
-              <button
-                type="submit"
-                disabled={gateLoading || gateEmail.trim().length === 0}
-                className="mt-2 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-60"
-                style={{
-                  background: "linear-gradient(135deg, #e8943a, #c47828)",
-                  color: "#1a1208",
-                }}
-              >
-                {gateLoading ? "Sending…" : "Send My Code"}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyCode} className="flex flex-col items-center gap-4">
-              <p className="font-serif text-sm italic text-text-dim text-center">
-                We sent an 8-digit code to <span className="text-amber-light not-italic">{gateEmail}</span>
-              </p>
-              <InputOTP
-                maxLength={8}
-                value={gateCode}
-                onChange={(value) => { setGateCode(value); if (gateError) setGateError(null); }}
-                disabled={gateLoading}
-              >
-                <InputOTPGroup>
-                  {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-                    <InputOTPSlot key={i} index={i} />
-                  ))}
-                </InputOTPGroup>
-              </InputOTP>
-              {gateError && (
-                <p className="font-sans text-xs" style={{ color: "#c47070" }}>{gateError}</p>
-              )}
-              <button
-                type="submit"
-                disabled={gateLoading || gateCode.length !== 8}
-                className="mt-2 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-60"
-                style={{
-                  background: "linear-gradient(135deg, #e8943a, #c47828)",
-                  color: "#1a1208",
-                }}
-              >
-                {gateLoading ? "Verifying…" : "Verify & Continue"}
-              </button>
-              <button
-                type="button"
-                onClick={() => { setGateStage("email"); setGateCode(""); setGateError(null); }}
-                className="font-sans text-xs text-text-dim hover:text-amber-dim transition-colors"
-              >
-                Use a different email
-              </button>
-            </form>
-          )}
+          <form onSubmit={handleSubmitEmail} className="flex flex-col items-center gap-4">
+            <input
+              type="email"
+              value={gateEmail}
+              onChange={(e) => { setGateEmail(e.target.value); if (gateError) setGateError(null); }}
+              placeholder="your@email.com"
+              autoFocus
+              disabled={gateLoading}
+              maxLength={255}
+              className="w-full rounded-pill px-8 py-4 text-center font-sans text-base text-cream-warm placeholder:text-text-dim focus:outline-none disabled:opacity-60"
+              style={{
+                background: "#161210",
+                border: "1px solid rgba(212,160,74,0.15)",
+              }}
+              onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(212,160,74,0.4)")}
+              onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(212,160,74,0.15)")}
+            />
+            {gateError && (
+              <p className="font-sans text-xs" style={{ color: "#c47070" }}>{gateError}</p>
+            )}
+            <button
+              type="submit"
+              disabled={gateLoading || gateEmail.trim().length === 0}
+              className="mt-2 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-60"
+              style={{
+                background: "linear-gradient(135deg, #e8943a, #c47828)",
+                color: "#1a1208",
+              }}
+            >
+              {gateLoading ? "Continuing…" : "Read My Story"}
+            </button>
+          </form>
         </motion.div>
         <ScrollChevron />
       </div>
