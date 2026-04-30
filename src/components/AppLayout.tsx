@@ -53,6 +53,7 @@ const AppLayout = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <SEO />
       {/* ── GLOBAL NAVBAR ── */}
       <nav
         className="sticky top-0 z-50 w-full text-center"
