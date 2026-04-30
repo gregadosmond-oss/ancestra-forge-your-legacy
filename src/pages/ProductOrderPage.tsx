@@ -55,6 +55,7 @@ const empty: ShippingAddress = {
 };
 
 export default function ProductOrderPage() {
+  usePageMeta({ title: "Order Your Heirloom | AncestorsQR" });
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type") ?? "heirloom";
   const config = PRODUCT_CONFIG[type];

@@ -36,6 +36,7 @@ declare global {
 }
 
 export default function AncestorChat() {
+  usePageMeta({ title: "Ancestor Chat | AncestorsQR", description: "Have a real conversation with someone from your bloodline." });
   const [surname, setSurname] = useState("");
   const [started, setStarted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);

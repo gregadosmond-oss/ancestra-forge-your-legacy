@@ -54,6 +54,7 @@ const cardBase =
   "rounded-[14px] border border-amber-dim/20 bg-card/60 p-5 backdrop-blur-sm transition-all duration-300 hover:border-amber/50 hover:bg-card/80";
 
 const Stop3Bloodline = () => {
+  usePageMeta({ title: "Your Bloodline | AncestorsQR", description: "The names, places, and journeys that shaped your family." });
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { unknownSurname, surname, facts } = useJourney();

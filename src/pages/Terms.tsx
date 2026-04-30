@@ -23,6 +23,7 @@ const Divider = () => (
 );
 
 const Terms = () => {
+  usePageMeta({ title: "Terms of Service | AncestorsQR" });
   return (
     <main
       className="min-h-screen px-6 py-16 md:py-24"

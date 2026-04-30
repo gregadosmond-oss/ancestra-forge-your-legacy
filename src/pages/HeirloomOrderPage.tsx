@@ -71,6 +71,7 @@ const empty: ShippingAddress = {
 };
 
 export default function HeirloomOrderPage() {
+  usePageMeta({ title: "Order Your Heirloom Mug | AncestorsQR", description: "Custom ceramic mug with your family crest — includes the full Legacy Pack." });
   const navigate = useNavigate();
   const surname = typeof window !== "undefined" ? sessionStorage.getItem("ancestra_journey_surname") : null;
   const { user } = usePurchase();

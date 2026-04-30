@@ -28,6 +28,7 @@ const placeholders = ["Courage", "Family", "Loyalty"];
 const labels = ["First Value", "Second Value", "Third Value"];
 
 export default function MottoGenerator() {
+  usePageMeta({ title: "Motto Generator | AncestorsQR", description: "Three values become a Latin motto carved for your family." });
   const [values, setValues] = useState(["", "", ""]);
   const [result, setResult] = useState<MottoResult | null>(null);
   const [loading, setLoading] = useState(false);

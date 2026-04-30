@@ -72,6 +72,7 @@ const reveal = {
 };
 
 export default function BloodlineQuiz() {
+  usePageMeta({ title: "Bloodline Quiz | AncestorsQR", description: "A 5-question quiz that reveals your family archetype." });
   const [step, setStep] = useState(0); // 0 = intro, 1-5 = questions, 6 = loading/result
   const [answers, setAnswers] = useState<string[]>([]);
   const [result, setResult] = useState<QuizResult | null>(null);

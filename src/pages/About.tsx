@@ -70,6 +70,7 @@ const PullQuote = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function About() {
+  usePageMeta({ title: "Our Story | AncestorsQR", description: "The Osmond family traced back to 1066 — and why every family deserves their story told." });
   return (
     <div className="relative min-h-screen" style={{ background: "#0d0a07" }}>
       {/* Subtle warm ambient glow */}

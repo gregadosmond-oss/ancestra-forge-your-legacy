@@ -23,6 +23,7 @@ const Divider = () => (
 );
 
 const PrivacyPolicy = () => {
+  usePageMeta({ title: "Privacy Policy | AncestorsQR" });
   return (
     <main
       className="min-h-screen px-6 py-16 md:py-24"

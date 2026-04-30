@@ -22,6 +22,7 @@ const FamilySharePage = () => {
   const { surname: rawSurname } = useParams<{ surname: string }>();
   const navigate = useNavigate();
   const surname = rawSurname?.toLowerCase().trim() ?? "";
+  const cap = surname ? surname.charAt(0).toUpperCase() + surname.slice(1).toLowerCase() : "";
 
   const [facts, setFacts] = useState<LegacyFacts | null>(null);
   const [story, setStory] = useState<LegacyStory | null>(null);

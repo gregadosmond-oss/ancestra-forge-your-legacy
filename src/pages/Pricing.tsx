@@ -74,6 +74,7 @@ const FAQ = [
 ];
 
 const Pricing = () => {
+  usePageMeta({ title: "Pricing | AncestorsQR", description: "Start free. Unlock your full story for $29.99. Add an heirloom to make it last." });
   const legacyPrice = useLegacyPackPrice();
   return (
   <div className="relative min-h-screen bg-background">

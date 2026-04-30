@@ -14,6 +14,7 @@ const reveal = {
 };
 
 export default function Cart() {
+  usePageMeta({ title: "Your Cart | AncestorsQR" });
   const navigate = useNavigate();
   const { items, removeItem, updateQuantity, totalItems, totalPrice } = useCart();
   const isEmpty = items.length === 0;
