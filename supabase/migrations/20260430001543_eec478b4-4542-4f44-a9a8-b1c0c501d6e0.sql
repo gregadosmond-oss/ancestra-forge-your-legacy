@@ -1,0 +1,1 @@
+ALTER TABLE public.journey_subscribers ADD COLUMN IF NOT EXISTS welcome_sent_at timestamptz;
