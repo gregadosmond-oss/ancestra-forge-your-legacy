@@ -107,25 +107,83 @@ Deno.serve(async (req) => {
       JSON.stringify(addBody),
     );
 
-    // Success
+    // Success — newly created contact
     if (addRes.status === 201 || addRes.ok) {
+      const contactId: string | null =
+        addBody?.id ?? addBody?.data?.id ?? null;
+
+      // Fire welcome automation event for NEW contacts only
+      let eventFired = false;
+      if (contactId) {
+        try {
+          console.log(
+            "[sync-to-resend-audience] firing welcome event for new contact_id:",
+            contactId,
+          );
+          const eventRes = await fetch("https://api.resend.com/events/send", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${RESEND_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              event: "ancestorsqr_welcome_started",
+              contact_id: contactId,
+              audience_id: audienceId,
+              payload: { email, source: payload.source ?? null },
+            }),
+          });
+          const eventBody = await eventRes.json().catch(() => ({}));
+          console.log(
+            "[sync-to-resend-audience] event response status:",
+            eventRes.status,
+            "body:",
+            JSON.stringify(eventBody),
+          );
+          eventFired = eventRes.ok || eventRes.status === 202;
+          if (!eventFired) {
+            console.error(
+              "[sync-to-resend-audience] event fire FAILED:",
+              JSON.stringify({ status: eventRes.status, body: eventBody }),
+            );
+          }
+        } catch (eventErr) {
+          console.error(
+            "[sync-to-resend-audience] event fire FAILED:",
+            JSON.stringify({ error: (eventErr as Error)?.message || String(eventErr) }),
+          );
+        }
+      } else {
+        console.error(
+          "[sync-to-resend-audience] event fire FAILED:",
+          JSON.stringify({ error: "no contact_id returned from create-contact" }),
+        );
+      }
+
       return json(200, {
         success: true,
         audience_id: audienceId,
-        contact_id: addBody?.id ?? addBody?.data?.id ?? null,
+        contact_id: contactId,
         email,
+        event_fired: eventFired,
       });
     }
 
-    // Idempotent: treat "already exists" as success
+    // Idempotent: treat "already exists" as success — do NOT fire welcome event
     const errMsg = (addBody?.message || addBody?.error || "").toString().toLowerCase();
     if (addRes.status === 409 || errMsg.includes("already exists") || errMsg.includes("already")) {
+      console.log(
+        "[sync-to-resend-audience] skipped event (existing contact):",
+        email,
+      );
       return json(200, {
         success: true,
         audience_id: audienceId,
         contact_id: null,
         email,
         already_exists: true,
+        event_fired: false,
+        event_skipped_reason: "existing_contact",
       });
     }
 
