@@ -111,7 +111,7 @@ export default function HeirloomOrderPage() {
           <div className="flex-1">
             <p className="font-display text-lg text-cream-warm">Family Crest Mug</p>
             <p className="mt-1 font-serif text-xs italic text-text-dim">
-              Custom ceramic mug with your family crest, name & QR code — ships worldwide
+              Custom ceramic mug with your family crest, name & QR code — ships worldwide. Includes the full digital Legacy Pack.
             </p>
           </div>
           <div className="font-display text-xl" style={{ color: "#e8b85c" }}>$49.99</div>
