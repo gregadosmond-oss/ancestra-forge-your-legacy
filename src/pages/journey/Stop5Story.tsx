@@ -22,12 +22,11 @@ const Stop5Story = () => {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
 
-  // OTP gate state
+  // Email gate state (magic-link-only — no OTP code verification)
   const [gateEmail, setGateEmail] = useState("");
-  const [gateCode, setGateCode] = useState("");
-  const [gateStage, setGateStage] = useState<"email" | "code">("email");
   const [gateLoading, setGateLoading] = useState(false);
   const [gateError, setGateError] = useState<string | null>(null);
+  const [hasEnteredEmail, setHasEnteredEmail] = useState(false);
 
   const unlockAudio = () => {
     if (!audioCtxRef.current) {
