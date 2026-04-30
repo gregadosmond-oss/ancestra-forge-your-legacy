@@ -167,37 +167,72 @@ export default function Cart() {
                 Popular Gifts
               </p>
               <div className="grid gap-4 sm:grid-cols-3">
-                {[
-                  { name: "Legacy Pack", price: legacyPrice, note: "Instant delivery", path: "/journey" },
-                  { name: "Framed Crest Print", price: "from $79", note: "Ships worldwide", path: "/shop" },
-                  { name: "Legacy Book", price: "from $59", note: "Softcover or hardcover", path: "/shop" },
-                ].map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.path}
-                    className="flex flex-col rounded-[18px] p-5 text-left transition-all duration-300"
-                    style={{
-                      background: "rgba(26,21,14,0.9)",
-                      border: "1px solid rgba(212,160,74,0.08)",
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLAnchorElement).style.borderColor =
-                        "rgba(212,160,74,0.2)";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLAnchorElement).style.borderColor =
-                        "rgba(212,160,74,0.08)";
-                    }}
-                  >
-                    <p className="font-display text-base text-cream-warm">{item.name}</p>
-                    <p className="mt-1 font-display text-lg" style={{ color: "#d4a04a" }}>
-                      {item.price}
-                    </p>
-                    <p className="mt-1 font-sans text-[11px]" style={{ color: "#5a4e3e" }}>
-                      {item.note}
-                    </p>
-                  </Link>
-                ))}
+                {([
+                  { kind: "link" as const, name: "Legacy Pack", price: legacyPrice, note: "Instant delivery", path: "/journey" },
+                  { kind: "link" as const, name: "Family Crest Mug", price: "$49.99", note: "Ships in 5–7 days", path: "/product-order" },
+                  { kind: "waitlist" as const, name: "The Legacy Book", price: "$129", note: "Coming Soon" },
+                ]).map((item) => {
+                  const cardStyle: React.CSSProperties = {
+                    background: "rgba(26,21,14,0.9)",
+                    border: "1px solid rgba(212,160,74,0.08)",
+                  };
+                  const onEnter = (e: React.MouseEvent<HTMLElement>) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(212,160,74,0.2)";
+                  };
+                  const onLeave = (e: React.MouseEvent<HTMLElement>) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(212,160,74,0.08)";
+                  };
+                  const inner = (
+                    <>
+                      <p className="font-display text-base text-cream-warm">{item.name}</p>
+                      <p className="mt-1 font-display text-lg" style={{ color: "#d4a04a" }}>
+                        {item.price}
+                      </p>
+                      <p className="mt-1 font-sans text-[11px]" style={{ color: "#5a4e3e" }}>
+                        {item.note}
+                      </p>
+                      {item.kind === "waitlist" && (
+                        <span
+                          className="mt-3 inline-block self-start rounded-pill px-3 py-1 font-sans text-[10px] font-semibold uppercase tracking-[1.5px]"
+                          style={{
+                            background: "rgba(232,148,58,0.08)",
+                            border: "1px solid rgba(232,148,58,0.25)",
+                            color: "#e8943a",
+                          }}
+                        >
+                          Notify Me When Ready
+                        </span>
+                      )}
+                    </>
+                  );
+                  if (item.kind === "waitlist") {
+                    return (
+                      <button
+                        key={item.name}
+                        type="button"
+                        onClick={() => setNotifyOpen(true)}
+                        className="flex flex-col rounded-[18px] p-5 text-left transition-all duration-300"
+                        style={{ ...cardStyle, cursor: "pointer" }}
+                        onMouseEnter={onEnter}
+                        onMouseLeave={onLeave}
+                      >
+                        {inner}
+                      </button>
+                    );
+                  }
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.path}
+                      className="flex flex-col rounded-[18px] p-5 text-left transition-all duration-300"
+                      style={cardStyle}
+                      onMouseEnter={onEnter}
+                      onMouseLeave={onLeave}
+                    >
+                      {inner}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </motion.div>
