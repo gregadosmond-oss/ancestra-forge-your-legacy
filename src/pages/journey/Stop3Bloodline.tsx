@@ -471,7 +471,7 @@ const Stop3Bloodline = () => {
                           className={`${cardBase} min-w-[180px] max-w-[220px] text-center`}
                         >
                           <p className="font-serif text-sm italic text-cream-warm">
-                            {p.name ??
+                            {p.name ||
                               [p.given_name, p.surname].filter(Boolean).join(" ") ||
                               "Unknown"}
                           </p>
