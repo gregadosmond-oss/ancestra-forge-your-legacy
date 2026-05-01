@@ -9,7 +9,7 @@ interface PageMeta {
 }
 
 const DEFAULT_DESCRIPTION = "Discover the meaning behind your family name. Forge your custom coat of arms, family story, and bloodline tree in minutes.";
-const DEFAULT_IMAGE = "https://ancestorsqr.com/og-default.png";
+const DEFAULT_IMAGE = "https://ancestorsqr.com/og-default.jpg";
 
 function setMeta(selector: string, attr: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(selector);
