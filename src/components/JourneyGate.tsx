@@ -103,7 +103,7 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
 
 
       setMagicSent(true);
-      setTimeout(() => onSuccess(), 1200);
+      setTimeout(() => onSuccess(), 2800);
     } catch (err) {
       console.error("JourneyGate submit failed", err);
       setError("Something went wrong. Please try again.");
