@@ -65,7 +65,7 @@ const AppLayout = () => {
         {/* Step counter — top-right (journey only). On mobile shifts left to make room for hamburger. */}
         {showStepCounter && (
           <div
-            className="absolute right-16 md:right-5 top-1/2 -translate-y-1/2 font-sans text-[10px] uppercase tracking-[3px]"
+            className="hidden md:block absolute md:right-5 top-1/2 -translate-y-1/2 font-sans text-[10px] uppercase tracking-[3px]"
             style={{ color: "#a07830" }}
           >
             {String(stepNumber).padStart(2, "0")} / 06
