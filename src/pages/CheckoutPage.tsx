@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import SectionLabel from "@/components/journey/SectionLabel";
 import PaymentTestModeBanner from "@/components/PaymentTestModeBanner";
 import StripeEmbeddedCheckout from "@/components/StripeEmbeddedCheckout";
+import AuthGate from "@/components/AuthGate";
 import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
 
@@ -21,16 +22,20 @@ const CheckoutPage = () => {
     if (!loading && hasPurchased) navigate("/my-legacy", { replace: true });
   }, [loading, hasPurchased, navigate]);
 
-  // If not logged in, redirect back to journey
-  useEffect(() => {
-    if (!loading && !user) navigate("/journey/5", { replace: true });
-  }, [loading, user, navigate]);
-
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="font-serif text-sm italic text-amber-dim">Preparing checkout…</p>
       </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <AuthGate
+        onAuthenticated={() => { /* user state updates via usePurchase hook, no-op */ }}
+        onClose={() => navigate("/journey/5")}
+      />
     );
   }
 
