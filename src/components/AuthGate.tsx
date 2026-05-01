@@ -36,6 +36,41 @@ const AuthGate = ({ onAuthenticated, onClose }: AuthGateProps) => {
         setSubmitting(false);
         return;
       }
+
+      // Fire-and-forget journey_subscribers insert + welcome email + audience sync.
+      // Only runs on signup (isSignUp), never on sign-in.
+      const trimmed = email.trim().toLowerCase();
+      const source = "auth-gate";
+      supabase
+        .from("journey_subscribers")
+        .insert({ email: trimmed, source })
+        .then(({ error: insertError }) => {
+          if (insertError && !insertError.message?.includes("duplicate")) {
+            console.error("[auth-gate journey_subscribers insert] FAILED:", insertError);
+            return;
+          }
+          // Fire welcome email
+          supabase.functions
+            .invoke("send-welcome-email", {
+              body: { email: trimmed, first_name: null, source },
+            })
+            .then(({ data, error }) => {
+              if (error) console.error("[send-welcome-email from auth-gate] FAILED:", error);
+              else console.log("[send-welcome-email from auth-gate] success:", data);
+            })
+            .catch((err) => console.error("[send-welcome-email from auth-gate] threw:", err));
+          // Fire Resend Audience sync (which also fires the drip automation event)
+          supabase.functions
+            .invoke("sync-to-resend-audience", {
+              body: { email: trimmed, first_name: null, source },
+            })
+            .then(({ data, error }) => {
+              if (error) console.error("[sync-to-resend-audience from auth-gate] FAILED:", error);
+              else console.log("[sync-to-resend-audience from auth-gate] success:", data);
+            })
+            .catch((err) => console.error("[sync-to-resend-audience from auth-gate] threw:", err));
+        });
+
       onAuthenticated();
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
