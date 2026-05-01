@@ -557,6 +557,19 @@ const MyLegacy = () => {
       <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       <div className="relative z-10 mx-auto max-w-2xl">
 
+        {user?.email && (
+          <div
+            className="mx-auto mb-8 max-w-xl rounded-full border px-5 py-2.5 text-center font-sans text-xs uppercase tracking-[2px]"
+            style={{
+              borderColor: "hsl(var(--amber-dim) / 0.4)",
+              backgroundColor: "hsl(var(--amber) / 0.06)",
+              color: "hsl(var(--amber-light))",
+            }}
+          >
+            ✦ Legacy Pack delivered to {user.email}
+          </div>
+        )}
+
         {/* ── Header ── */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
