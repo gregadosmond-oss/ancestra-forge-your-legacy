@@ -105,7 +105,7 @@ const buildHtml = (firstName: string) => {
         <div class="signoff-meta">ancestorsqr.com</div>
       </div>
       <div class="footer">
-        AncestorsQR · Playa del Carmen, Mexico<br/>
+        AncestorsQR · 551 Simcoe Street North, Oshawa, ON L1G 4V1, Canada<br/>
         You're receiving this because you signed up at ancestorsqr.com
       </div>
     </div>
