@@ -149,7 +149,7 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
               Check your inbox
             </p>
             <p className="mt-1 font-sans text-sm text-cream-soft">
-              Your story is waiting in your inbox.
+              A welcome from Greg is on its way. Continuing to your bloodline…
             </p>
           </div>
         )}
