@@ -9,7 +9,13 @@ interface AuthGateProps {
 }
 
 const AuthGate = ({ onAuthenticated, onClose }: AuthGateProps) => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => {
+    try {
+      return sessionStorage.getItem("journey_captured_email") || "";
+    } catch {
+      return "";
+    }
+  });
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(true);
   const [submitting, setSubmitting] = useState(false);

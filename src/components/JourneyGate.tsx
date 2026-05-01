@@ -96,6 +96,7 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
 
       try {
         sessionStorage.setItem("journey_email_captured", "true");
+        sessionStorage.setItem("journey_captured_email", trimmed);
       } catch {
         // sessionStorage may be unavailable; continue regardless.
       }
