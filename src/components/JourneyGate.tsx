@@ -100,19 +100,7 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
         // sessionStorage may be unavailable; continue regardless.
       }
 
-      // Fire-and-forget magic link — never block the user's flow.
-      supabase.auth
-        .signInWithOtp({
-          email: trimmed,
-          options: {
-            shouldCreateUser: true,
-            emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
-          },
-        })
-        .then(({ error: otpError }) => {
-          if (otpError) console.warn("JourneyGate magic link skipped", otpError);
-        })
-        .catch((otpErr) => console.warn("JourneyGate magic link error", otpErr));
+
 
       setMagicSent(true);
       setTimeout(() => onSuccess(), 1200);
@@ -161,7 +149,7 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
               Check your inbox
             </p>
             <p className="mt-1 font-sans text-sm text-cream-soft">
-              We've sent you a magic link to access your account anytime.
+              Your story is waiting in your inbox.
             </p>
           </div>
         )}
