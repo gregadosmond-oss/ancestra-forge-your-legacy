@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import JourneyGate from "@/components/JourneyGate";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
+import { usePageMeta } from "@/hooks/usePageMeta";
 import { toast } from "sonner";
 
 type AncestorResult = {
@@ -26,6 +27,7 @@ const reveal = {
 };
 
 export default function MeetYourAncestor() {
+  usePageMeta({ title: "Meet Your Ancestor | AncestorsQR", description: "AI generates a historically plausible ancestor — name, era, occupation, personality, and a quote from your bloodline." });
   const [surname, setSurname] = useState("");
   const [country, setCountry] = useState("");
   const [result, setResult] = useState<AncestorResult | null>(null);
