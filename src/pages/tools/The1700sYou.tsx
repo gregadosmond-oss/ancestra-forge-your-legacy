@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import JourneyGate from "@/components/JourneyGate";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
+import { usePageMeta } from "@/hooks/usePageMeta";
 import { toast } from "sonner";
 
 type Life1700s = {
@@ -36,6 +37,7 @@ const DETAIL_CARDS = [
 ];
 
 export default function The1700sYou() {
+  usePageMeta({ title: "The 1700s You | AncestorsQR", description: "What would your life look like 300 years ago based on your surname? Step back into history." });
   const [surname, setSurname] = useState("");
   const [country, setCountry] = useState("");
   const [result, setResult] = useState<Life1700s | null>(null);
