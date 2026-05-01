@@ -61,7 +61,7 @@ const FAQ = [
   },
   {
     q: "Is there a refund policy?",
-    a: "Digital Legacy Packs are non-refundable once delivered (you'll have the PDF within minutes). For physical heirlooms, we'll replace anything damaged or misprinted at no cost. Email gregadosmond@gmail.com if something's wrong.",
+    a: "Digital Legacy Packs are non-refundable once delivered (you'll have the PDF within minutes). For physical heirlooms, we'll replace anything damaged or misprinted at no cost. Email greg@ancestorsqr.com if something's wrong.",
   },
   {
     q: "What happens to my surname data?",

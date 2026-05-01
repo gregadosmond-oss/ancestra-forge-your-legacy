@@ -152,10 +152,10 @@ const Terms = () => {
             If you experience a technical issue that prevents delivery of
             your purchase, please contact us within 14 days at{" "}
             <a
-              href="mailto:gregadosmond@gmail.com"
+              href="mailto:greg@ancestorsqr.com"
               style={{ color: "#e8943a", textDecoration: "underline" }}
             >
-              gregadosmond@gmail.com
+              greg@ancestorsqr.com
             </a>{" "}
             and we will work with you to resolve it, including issuing a
             refund where appropriate.
@@ -249,10 +249,10 @@ const Terms = () => {
           <p>
             For questions about these Terms, please contact us at{" "}
             <a
-              href="mailto:gregadosmond@gmail.com"
+              href="mailto:greg@ancestorsqr.com"
               style={{ color: "#e8943a", textDecoration: "underline" }}
             >
-              gregadosmond@gmail.com
+              greg@ancestorsqr.com
             </a>
             .
           </p>

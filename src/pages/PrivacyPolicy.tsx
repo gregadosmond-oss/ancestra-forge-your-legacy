@@ -213,10 +213,10 @@ const PrivacyPolicy = () => {
             If you have any questions about this Privacy Policy, please
             contact us at{" "}
             <a
-              href="mailto:gregadosmond@gmail.com"
+              href="mailto:greg@ancestorsqr.com"
               style={{ color: "#e8943a", textDecoration: "underline" }}
             >
-              gregadosmond@gmail.com
+              greg@ancestorsqr.com
             </a>
             .
           </p>
