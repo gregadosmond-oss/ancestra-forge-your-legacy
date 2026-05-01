@@ -30,12 +30,6 @@ const PRODUCT_CONFIG: Record<string, ProductConfig> = {
   "coaster":       { name: 'Cork-Back Coaster',            price: '$34.99', priceId: 'heirloom_coaster',        emoji: '🪵', desc: 'Your family crest on a high-quality cork-back coaster. Elegant, personal, used every day. Includes Legacy Pack.' },
 };
 
-const COUNTRIES = ["US", "CA", "GB", "AU", "NZ", "IE", "DE", "FR", "NL", "SE", "NO", "DK"];
-const COUNTRY_LABELS: Record<string, string> = {
-  US: "United States", CA: "Canada", GB: "United Kingdom", AU: "Australia",
-  NZ: "New Zealand", IE: "Ireland", DE: "Germany", FR: "France",
-  NL: "Netherlands", SE: "Sweden", NO: "Norway", DK: "Denmark",
-};
 
 interface ShippingAddress {
   [key: string]: string;
