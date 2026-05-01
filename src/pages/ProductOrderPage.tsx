@@ -6,6 +6,7 @@ import StripeEmbeddedCheckout from "@/components/StripeEmbeddedCheckout";
 import AuthGate from "@/components/AuthGate";
 import { usePurchase } from "@/hooks/usePurchase";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { COUNTRIES, COUNTRY_LABELS } from "@/lib/countries";
 
 type Step = "details" | "payment";
 
