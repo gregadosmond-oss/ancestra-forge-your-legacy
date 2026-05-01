@@ -53,7 +53,7 @@ serve(async (req) => {
       });
     }
 
-    const env = (environment || 'sandbox') as StripeEnv;
+    const env = (environment || 'live') as StripeEnv;
     const stripe = getStripeClient(env);
 
     const prices = await stripe.prices.list({ lookup_keys: [priceId] });

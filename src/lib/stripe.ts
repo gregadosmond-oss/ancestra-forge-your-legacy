@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 const LIVE_PUBLISHABLE_KEY = "pk_live_51TMHXgDErt8rGG8mBlYN6qOxQGKdvpUAQopllZcqxn7cGH5Q8eU8Mfyg9lB60F3l1RdlmZaZ1MuDOVyy22MqwnjI00gMLPjX3y";
 const clientToken = import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN || LIVE_PUBLISHABLE_KEY;
 const environment = clientToken?.startsWith('pk_test_') ? 'sandbox' : 'live';
+// Default environment is 'live' — frontend uses live publishable key in production.
 
 let stripePromise: Promise<Stripe | null> | null = null;
 
