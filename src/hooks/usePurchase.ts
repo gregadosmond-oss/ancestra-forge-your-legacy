@@ -21,6 +21,7 @@ export function usePurchase() {
         .select("id")
         .eq("user_id", user.id)
         .eq("status", "paid")
+        .eq("environment", "live")
         .limit(1);
 
       setHasPurchased(!!data && data.length > 0);
