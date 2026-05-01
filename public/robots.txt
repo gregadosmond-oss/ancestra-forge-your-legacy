@@ -6,6 +6,7 @@ Disallow: /confirmation
 Disallow: /my-legacy
 Disallow: /cart
 Disallow: /heirloom-order
+Disallow: /product-order
 Disallow: /gift/
 
 Sitemap: https://ancestorsqr.com/sitemap.xml
