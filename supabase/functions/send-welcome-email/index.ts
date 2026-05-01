@@ -48,6 +48,12 @@ If you've already started — keep going. If you've finished — share your cres
 
 — Greg
 Founder, AncestorsQR
+
+—
+
+AncestorsQR · 551 Simcoe Street North, Oshawa, ON L1G 4V1, Canada
+
+You're receiving this because you signed up at ancestorsqr.com
 `;
 
 const buildHtml = (firstName: string) => {
