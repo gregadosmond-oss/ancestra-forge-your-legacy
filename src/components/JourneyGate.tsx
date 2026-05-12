@@ -75,7 +75,7 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
       console.log("[send-welcome-email] about to invoke for email:", trimmed);
       supabase.functions
         .invoke("send-welcome-email", {
-          body: { email: trimmed, first_name: null, source },
+          body: { email: trimmed, first_name: firstName.trim() || null, source },
         })
         .then(({ data, error }) => {
           if (error) console.error("[send-welcome-email] FAILED:", error);
