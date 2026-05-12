@@ -12,6 +12,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: JourneyGateProps) => {
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [magicSent, setMagicSent] = useState(false);
