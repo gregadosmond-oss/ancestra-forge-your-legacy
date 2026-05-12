@@ -173,6 +173,16 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
 
         <form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-4">
           <input
+            type="text"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="First name (optional)"
+            maxLength={50}
+            disabled={submitting}
+            aria-label="First name"
+            className="w-full rounded-pill border border-amber-dim/30 bg-input px-6 py-4 text-center font-sans text-base text-cream-warm placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30 disabled:opacity-60"
+          />
+          <input
             type="email"
             required
             autoFocus
