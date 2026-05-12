@@ -70,7 +70,7 @@ const AuthGate = ({ onAuthenticated, onClose }: AuthGateProps) => {
 
       supabase.functions
         .invoke("sync-to-resend-audience", {
-          body: { email: trimmed, first_name: null, source },
+          body: { email: trimmed, first_name: firstName.trim() || null, source },
         })
         .then(({ data, error }) => {
           if (error) console.error("[sync-to-resend-audience] FAILED:", error);
