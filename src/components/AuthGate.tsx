@@ -17,6 +17,7 @@ const AuthGate = ({ onAuthenticated, onClose }: AuthGateProps) => {
     }
   });
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [isSignUp, setIsSignUp] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
