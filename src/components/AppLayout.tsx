@@ -422,7 +422,7 @@ const AppLayout = () => {
               <div className="font-display uppercase" style={{ color: "#e8b85c", letterSpacing: "3px", fontSize: "16px" }}>
                 AncestorsQR
               </div>
-              <p className="mt-3 font-serif italic" style={{ color: "#8a7e6e", fontSize: "13px" }}>
+              <p className="mt-3 font-serif italic" style={{ color: "#c4b8a6", fontSize: "13px" }}>
                 Every family has a story worth telling.
               </p>
             </div>
