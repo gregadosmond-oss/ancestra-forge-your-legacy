@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -18,6 +18,45 @@ const AppLayout = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { user, loading } = useAuth();
   const { totalItems } = useCart();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event !== "SIGNED_IN") return;
+      const rawEmail = session?.user?.email;
+      if (!rawEmail) return;
+      const trimmed = rawEmail.trim().toLowerCase();
+
+      supabase
+        .from("journey_subscribers")
+        .insert({ email: trimmed, surname_searched: null, source: "oauth" })
+        .then(({ error: insertError }) => {
+          if (insertError) {
+            if (insertError.code !== "23505") {
+              console.error("[journey_subscribers insert from oauth] FAILED:", insertError);
+            }
+            return;
+          }
+
+          supabase.functions
+            .invoke("send-welcome-email", { body: { email: trimmed, first_name: null, source: "oauth" } })
+            .then(({ data, error }) => {
+              if (error) console.error("[send-welcome-email from oauth] FAILED:", error);
+              else console.log("[send-welcome-email from oauth] success:", data);
+            })
+            .catch((err) => console.error("[send-welcome-email from oauth] threw:", err));
+
+          supabase.functions
+            .invoke("sync-to-resend-audience", { body: { email: trimmed, first_name: null, source: "oauth" } })
+            .then(({ data, error }) => {
+              if (error) console.error("[sync-to-resend-audience from oauth] FAILED:", error);
+              else console.log("[sync-to-resend-audience from oauth] success:", data);
+            })
+            .catch((err) => console.error("[sync-to-resend-audience from oauth] threw:", err));
+        });
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const closeDrawer = () => setDrawerOpen(false);
 
