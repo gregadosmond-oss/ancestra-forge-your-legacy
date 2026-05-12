@@ -94,6 +94,21 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
         })
         .catch((err) => console.error("[sync-to-resend-audience] threw:", err));
 
+      // Fire-and-forget magic link — creates a real auth account so the user
+      // can sign in later without picking a password. Matches FreeToolsEmailCTA.
+      supabase.auth
+        .signInWithOtp({
+          email: trimmed,
+          options: {
+            shouldCreateUser: true,
+            emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+          },
+        })
+        .then(({ error: otpError }) => {
+          if (otpError) console.warn("[journey-gate magic link] skipped:", otpError);
+        })
+        .catch((otpErr) => console.warn("[journey-gate magic link] error:", otpErr));
+
       try {
         sessionStorage.setItem("journey_email_captured", "true");
         sessionStorage.setItem("journey_captured_email", trimmed);
@@ -150,7 +165,7 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
               Check your inbox
             </p>
             <p className="mt-1 font-sans text-sm text-cream-soft">
-              A welcome from Greg is on its way. Continuing to your bloodline…
+              A welcome from Greg + a magic link to sign in are on the way. Continuing to your bloodline…
             </p>
           </div>
         )}
