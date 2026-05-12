@@ -99,7 +99,7 @@ const Stop3Bloodline = () => {
   // FamilySearch confirms our redirect URI registration. The original
   // handlers are preserved below (handleSearchSubmit, pullTree, etc.) so
   // we can flip the gate off in one place once approved.
-  const FS_COMING_SOON = true;
+  const FS_COMING_SOON = false;
 
   function notifyComingSoon() {
     toast("Coming soon", {
