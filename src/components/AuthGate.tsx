@@ -60,7 +60,7 @@ const AuthGate = ({ onAuthenticated, onClose }: AuthGateProps) => {
 
       supabase.functions
         .invoke("send-welcome-email", {
-          body: { email: trimmed, first_name: null, source },
+          body: { email: trimmed, first_name: firstName.trim() || null, source },
         })
         .then(({ data, error }) => {
           if (error) console.error("[send-welcome-email] FAILED:", error);
