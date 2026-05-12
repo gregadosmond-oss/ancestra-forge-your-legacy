@@ -164,74 +164,116 @@ export default function ToolsHub() {
           variants={stagger}
           initial="hidden"
           animate="show"
-          className="mt-10 grid w-full max-w-4xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+          className="mt-10 grid w-full max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           {tools.map((tool) => (
             <motion.div key={tool.to} variants={item} className="h-full">
               <Link
                 to={tool.to}
-                className="group flex h-full flex-col items-start rounded-[22px] p-7 text-left transition-all duration-[400ms]"
+                className="group flex h-full flex-col rounded-[22px] p-9 text-center transition-all duration-[400ms] cursor-pointer"
                 style={{
-                  background: "#1a1510",
-                  border: tool.cta
-                    ? "1px solid rgba(232,148,58,0.32)"
-                    : "1px solid rgba(232,148,58,0.18)",
+                  background: "linear-gradient(180deg, #1e1810 0%, #1a1510 100%)",
+                  border: "1px solid rgba(212,160,74,0.32)",
+                  boxShadow: "0 0 0 rgba(232,148,58,0)",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#221c14";
-                  e.currentTarget.style.borderColor = tool.cta
-                    ? "rgba(232,148,58,0.5)"
-                    : "rgba(232,148,58,0.38)";
-                  e.currentTarget.style.transform = "translateY(-3px)";
+                  e.currentTarget.style.borderColor = "rgba(232,148,58,0.55)";
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.boxShadow = "0 12px 40px rgba(232,148,58,0.12)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#1a1510";
-                  e.currentTarget.style.borderColor = tool.cta
-                    ? "rgba(232,148,58,0.32)"
-                    : "rgba(232,148,58,0.18)";
+                  e.currentTarget.style.borderColor = "rgba(212,160,74,0.32)";
                   e.currentTarget.style.transform = "";
+                  e.currentTarget.style.boxShadow = "0 0 0 rgba(232,148,58,0)";
                 }}
               >
-                <div className="mb-4 flex w-full items-start justify-between">
+                <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full"
+                  style={{ background: "rgba(232,148,58,0.08)", border: "1px solid rgba(212,160,74,0.25)" }}>
                   {tool.icon}
-                  <span
-                    className="font-sans text-[9px] font-semibold uppercase tracking-[2.5px]"
-                    style={{
-                      color: tool.cta ? "#e8943a" : "#a07830",
-                      background: tool.cta
-                        ? "rgba(232,148,58,0.1)"
-                        : "rgba(212,160,74,0.08)",
-                      padding: "3px 8px",
-                      borderRadius: "60px",
-                    }}
-                  >
-                    {tool.tag}
-                  </span>
                 </div>
 
-                <h3
-                  className="font-display text-xl"
-                  style={{ color: tool.cta ? "#e8b85c" : "#e8ddd0" }}
-                >
+                <p className="mb-2 font-sans text-[10px] font-semibold uppercase tracking-[3px]" style={{ color: "#a07830" }}>
+                  {tool.tag}
+                </p>
+
+                <h3 className="font-display text-2xl text-cream-warm">
                   {tool.label}
                 </h3>
 
-                <p className="mt-2 font-sans text-sm leading-relaxed text-text-dim">
+                <p className="mt-3 font-serif italic text-sm leading-relaxed" style={{ color: "#c4b8a6" }}>
                   {tool.description}
                 </p>
 
+                <ul className="mt-5 flex-1 space-y-2 text-left">
+                  {tool.bullets.map((b) => (
+                    <li key={b} className="flex items-start gap-2 text-sm" style={{ color: "#c4b8a6" }}>
+                      <span className="mt-1 font-sans text-[8px]" style={{ color: "#d4a04a" }}>✦</span>
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+
                 <div
-                  className="mt-auto pt-5 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-opacity duration-200 group-hover:opacity-100"
-                  style={{
-                    color: tool.cta ? "#e8943a" : "#a07830",
-                    opacity: 0.7,
-                  }}
+                  className="mt-7 block rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 group-hover:-translate-y-0.5"
+                  style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
                 >
-                  {tool.cta ? "Begin →" : "Try it →"}
+                  {tool.ctaLabel}
                 </div>
               </Link>
             </motion.div>
           ))}
+
+          {/* Full Legacy Journey card — unchanged style */}
+          <motion.div variants={item} className="h-full">
+            <Link
+              to={journeyCard.to}
+              className="group flex h-full flex-col items-start rounded-[22px] p-7 text-left transition-all duration-[400ms]"
+              style={{
+                background: "#1a1510",
+                border: "1px solid rgba(232,148,58,0.32)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#221c14";
+                e.currentTarget.style.borderColor = "rgba(232,148,58,0.5)";
+                e.currentTarget.style.transform = "translateY(-3px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "#1a1510";
+                e.currentTarget.style.borderColor = "rgba(232,148,58,0.32)";
+                e.currentTarget.style.transform = "";
+              }}
+            >
+              <div className="mb-4 flex w-full items-start justify-between">
+                {journeyCard.icon}
+                <span
+                  className="font-sans text-[9px] font-semibold uppercase tracking-[2.5px]"
+                  style={{
+                    color: "#e8943a",
+                    background: "rgba(232,148,58,0.1)",
+                    padding: "3px 8px",
+                    borderRadius: "60px",
+                  }}
+                >
+                  {journeyCard.tag}
+                </span>
+              </div>
+
+              <h3 className="font-display text-xl" style={{ color: "#e8b85c" }}>
+                {journeyCard.label}
+              </h3>
+
+              <p className="mt-2 font-sans text-sm leading-relaxed text-text-dim">
+                {journeyCard.description}
+              </p>
+
+              <div
+                className="mt-auto pt-5 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-opacity duration-200 group-hover:opacity-100"
+                style={{ color: "#e8943a", opacity: 0.7 }}
+              >
+                Begin →
+              </div>
+            </Link>
+          </motion.div>
         </motion.div>
 
         {/* Bottom CTA */}
