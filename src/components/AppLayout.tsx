@@ -422,12 +422,12 @@ const AppLayout = () => {
               <div className="font-display uppercase" style={{ color: "#e8b85c", letterSpacing: "3px", fontSize: "16px" }}>
                 AncestorsQR
               </div>
-              <p className="mt-3 font-serif italic" style={{ color: "#8a7e6e", fontSize: "13px" }}>
+              <p className="mt-3 font-serif italic" style={{ color: "#c4b8a6", fontSize: "13px" }}>
                 Every family has a story worth telling.
               </p>
             </div>
             <div>
-              <h4 className="font-sans uppercase" style={{ color: "#a07830", fontSize: "10px", letterSpacing: "2px" }}>
+              <h4 className="font-sans uppercase" style={{ color: "#c9a86b", fontSize: "10px", letterSpacing: "2px" }}>
                 Explore
               </h4>
               <div className="mt-4 flex flex-col gap-y-2">
@@ -438,7 +438,7 @@ const AppLayout = () => {
               </div>
             </div>
             <div>
-              <h4 className="font-sans uppercase" style={{ color: "#a07830", fontSize: "10px", letterSpacing: "2px" }}>
+              <h4 className="font-sans uppercase" style={{ color: "#c9a86b", fontSize: "10px", letterSpacing: "2px" }}>
                 Company
               </h4>
               <div className="mt-4 flex flex-col gap-y-2">
@@ -448,7 +448,7 @@ const AppLayout = () => {
               </div>
             </div>
           </div>
-          <div className="mx-auto max-w-5xl pt-6 mt-8 text-center font-sans uppercase" style={{ borderTop: "1px solid #2a2018", color: "#8a7e6e", fontSize: "10px", letterSpacing: "1.5px" }}>
+          <div className="mx-auto max-w-5xl pt-6 mt-8 text-center font-sans uppercase" style={{ borderTop: "1px solid #2a2018", color: "#a07830", fontSize: "10px", letterSpacing: "1.5px" }}>
             © 2026 AncestorsQR. All rights reserved.
           </div>
         </footer>
