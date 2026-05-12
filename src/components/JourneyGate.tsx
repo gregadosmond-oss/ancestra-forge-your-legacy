@@ -87,7 +87,7 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
       console.log("[sync-to-resend-audience] about to invoke for email:", trimmed);
       supabase.functions
         .invoke("sync-to-resend-audience", {
-          body: { email: trimmed, first_name: null, source },
+          body: { email: trimmed, first_name: firstName.trim() || null, source },
         })
         .then(({ data, error }) => {
           if (error) console.error("[sync-to-resend-audience] FAILED:", error);
