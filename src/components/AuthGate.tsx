@@ -17,6 +17,7 @@ const AuthGate = ({ onAuthenticated, onClose }: AuthGateProps) => {
     }
   });
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [isSignUp, setIsSignUp] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -59,7 +60,7 @@ const AuthGate = ({ onAuthenticated, onClose }: AuthGateProps) => {
 
       supabase.functions
         .invoke("send-welcome-email", {
-          body: { email: trimmed, first_name: null, source },
+          body: { email: trimmed, first_name: firstName.trim() || null, source },
         })
         .then(({ data, error }) => {
           if (error) console.error("[send-welcome-email] FAILED:", error);
@@ -69,7 +70,7 @@ const AuthGate = ({ onAuthenticated, onClose }: AuthGateProps) => {
 
       supabase.functions
         .invoke("sync-to-resend-audience", {
-          body: { email: trimmed, first_name: null, source },
+          body: { email: trimmed, first_name: firstName.trim() || null, source },
         })
         .then(({ data, error }) => {
           if (error) console.error("[sync-to-resend-audience] FAILED:", error);
@@ -138,6 +139,16 @@ const AuthGate = ({ onAuthenticated, onClose }: AuthGateProps) => {
         </div>
 
         <form onSubmit={handleEmail} className="flex flex-col gap-3">
+          {isSignUp && (
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="First name (optional)"
+              maxLength={50}
+              className="rounded-[14px] border border-amber-dim/30 bg-input px-5 py-4 font-sans text-sm text-cream-warm placeholder:text-text-dim focus:border-amber focus:outline-none"
+            />
+          )}
           <input
             type="email"
             value={email}
