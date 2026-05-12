@@ -108,7 +108,7 @@ export default function ToolsHub() {
 
       {/* Scroll-down indicator anchored to first viewport */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-screen">
-        <div className="pointer-events-auto relative h-full">
+        <div className="pointer-events-none relative h-full">
           <ScrollChevron />
         </div>
       </div>
