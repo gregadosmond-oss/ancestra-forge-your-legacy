@@ -416,39 +416,39 @@ const AppLayout = () => {
 
       {/* ── GLOBAL FOOTER ── */}
       {!hideFooter && (
-        <footer style={{ background: "#0d0a07", borderTop: "1px solid #2a2018", padding: "40px 24px 32px" }}>
+        <footer className="relative z-10" style={{ background: "#0d0a07", borderTop: "1px solid #3d3020", padding: "40px 24px 32px" }}>
           <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 sm:grid-cols-3">
             <div>
-              <div className="font-display uppercase" style={{ color: "#e8b85c", letterSpacing: "3px", fontSize: "16px" }}>
+              <div className="font-display uppercase" style={{ color: "#f0c878", letterSpacing: "3px", fontSize: "16px" }}>
                 AncestorsQR
               </div>
-              <p className="mt-3 font-serif italic" style={{ color: "#c4b8a6", fontSize: "13px" }}>
+              <p className="mt-3 font-serif italic" style={{ color: "#e0d4c2", fontSize: "13px" }}>
                 Every family has a story worth telling.
               </p>
             </div>
             <div>
-              <h4 className="font-sans uppercase" style={{ color: "#c9a86b", fontSize: "10px", letterSpacing: "2px" }}>
+              <h4 className="font-sans uppercase" style={{ color: "#e8b85c", fontSize: "11px", letterSpacing: "2px", fontWeight: 600 }}>
                 Explore
               </h4>
               <div className="mt-4 flex flex-col gap-y-2">
-                <Link to="/journey/1" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#c4b8a6", fontSize: "12px" }}>Begin Journey</Link>
-                <Link to="/tools" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#c4b8a6", fontSize: "12px" }}>Free Tools</Link>
-                <Link to="/shop" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#c4b8a6", fontSize: "12px" }}>Shop</Link>
-                <Link to="/pricing" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#c4b8a6", fontSize: "12px" }}>Pricing</Link>
+                <Link to="/journey/1" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Begin Journey</Link>
+                <Link to="/tools" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Free Tools</Link>
+                <Link to="/shop" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Shop</Link>
+                <Link to="/pricing" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Pricing</Link>
               </div>
             </div>
             <div>
-              <h4 className="font-sans uppercase" style={{ color: "#c9a86b", fontSize: "10px", letterSpacing: "2px" }}>
+              <h4 className="font-sans uppercase" style={{ color: "#e8b85c", fontSize: "11px", letterSpacing: "2px", fontWeight: 600 }}>
                 Company
               </h4>
               <div className="mt-4 flex flex-col gap-y-2">
-                <Link to="/about" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#c4b8a6", fontSize: "12px" }}>Our Story</Link>
-                <Link to="/privacy-policy" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#c4b8a6", fontSize: "12px" }}>Privacy</Link>
-                <Link to="/terms" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#c4b8a6", fontSize: "12px" }}>Terms</Link>
+                <Link to="/about" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Our Story</Link>
+                <Link to="/privacy-policy" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Privacy</Link>
+                <Link to="/terms" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Terms</Link>
               </div>
             </div>
           </div>
-          <div className="mx-auto max-w-5xl pt-6 mt-8 text-center font-sans uppercase" style={{ borderTop: "1px solid #2a2018", color: "#a07830", fontSize: "10px", letterSpacing: "1.5px" }}>
+          <div className="mx-auto max-w-5xl pt-6 mt-8 text-center font-sans uppercase" style={{ borderTop: "1px solid #3d3020", color: "#c9a86b", fontSize: "10px", letterSpacing: "1.5px" }}>
             © 2026 AncestorsQR. All rights reserved.
           </div>
         </footer>
