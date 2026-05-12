@@ -12,6 +12,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: JourneyGateProps) => {
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [magicSent, setMagicSent] = useState(false);
@@ -74,7 +75,7 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
       console.log("[send-welcome-email] about to invoke for email:", trimmed);
       supabase.functions
         .invoke("send-welcome-email", {
-          body: { email: trimmed, first_name: null, source },
+          body: { email: trimmed, first_name: firstName.trim() || null, source },
         })
         .then(({ data, error }) => {
           if (error) console.error("[send-welcome-email] FAILED:", error);
@@ -86,7 +87,7 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
       console.log("[sync-to-resend-audience] about to invoke for email:", trimmed);
       supabase.functions
         .invoke("sync-to-resend-audience", {
-          body: { email: trimmed, first_name: null, source },
+          body: { email: trimmed, first_name: firstName.trim() || null, source },
         })
         .then(({ data, error }) => {
           if (error) console.error("[sync-to-resend-audience] FAILED:", error);
@@ -171,6 +172,16 @@ const JourneyGate = ({ open, surname, source = "journey-gate", onSuccess }: Jour
         )}
 
         <form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-4">
+          <input
+            type="text"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="First name (optional)"
+            maxLength={50}
+            disabled={submitting}
+            aria-label="First name"
+            className="w-full rounded-pill border border-amber-dim/30 bg-input px-6 py-4 text-center font-sans text-base text-cream-warm placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30 disabled:opacity-60"
+          />
           <input
             type="email"
             required
