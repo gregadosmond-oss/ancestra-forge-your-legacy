@@ -20,8 +20,29 @@ const FreeToolsEmailCTA = () => {
     } catch {
       captured = false;
     }
-    if (!captured) setVisible(true);
-    setMounted(true);
+    if (captured) {
+      setMounted(true);
+      return;
+    }
+    // Authenticated users should never see the email gate.
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        if (session?.user) {
+          try {
+            sessionStorage.setItem(STORAGE_KEY, "true");
+          } catch {
+            // ignore
+          }
+        } else {
+          setVisible(true);
+        }
+        setMounted(true);
+      })
+      .catch(() => {
+        setVisible(true);
+        setMounted(true);
+      });
   }, []);
 
   if (!mounted || !visible) return null;
