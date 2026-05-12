@@ -11,8 +11,10 @@ const tools = [
     label: "Surname Lookup",
     tag: "FREE",
     description: "Discover the meaning, origin, and history hiding in your family name.",
+    ctaLabel: "Try the Lookup",
+    bullets: ["Origin & meaning", "Historical role", "Era of first record"],
     icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
       </svg>
     ),
@@ -22,8 +24,10 @@ const tools = [
     label: "Bloodline Quiz",
     tag: "FREE",
     description: "5 questions. Centuries of instinct. Discover your ancestral archetype.",
+    ctaLabel: "Take the Quiz",
+    bullets: ["5 quick questions", "Your archetype revealed", "Shareable result"],
     icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
       </svg>
     ),
@@ -33,8 +37,10 @@ const tools = [
     label: "Motto Generator",
     tag: "FREE",
     description: "Enter three values and receive a Latin motto with full word breakdown.",
+    ctaLabel: "Generate Motto",
+    bullets: ["Three values in", "Latin motto out", "Word-by-word translation"],
     icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
       </svg>
     ),
@@ -44,8 +50,10 @@ const tools = [
     label: "Meet Your Ancestor",
     tag: "FREE",
     description: "A historically plausible ancestor from your bloodline — their life, their world, their words.",
+    ctaLabel: "Meet Them",
+    bullets: ["Name, era & occupation", "Personality sketch", "A line in their voice"],
     icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
       </svg>
     ),
@@ -55,8 +63,10 @@ const tools = [
     label: "The 1700s You",
     tag: "FREE",
     description: "What would your life look like 300 years ago? Step back into history.",
+    ctaLabel: "See Your 1700s Self",
+    bullets: ["Your 1700s trade", "Where you'd live", "How you'd be known"],
     icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
       </svg>
     ),
@@ -66,25 +76,27 @@ const tools = [
     label: "Ancestor Chat",
     tag: "FREE",
     description: "Chat live with an AI character based on your family history. Ask them anything.",
+    ctaLabel: "Start the Chat",
+    bullets: ["Live AI conversation", "Period-accurate voice", "Ask them anything"],
     icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
       </svg>
     ),
   },
-  {
-    to: "/journey",
-    label: "Full Legacy Journey",
-    tag: "BEGIN",
-    description: "The complete experience — crest, story, migration path, and gifts.",
-    cta: true,
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e8943a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
-      </svg>
-    ),
-  },
 ];
+
+const journeyCard = {
+  to: "/journey",
+  label: "Full Legacy Journey",
+  tag: "BEGIN",
+  description: "The complete experience — crest, story, migration path, and gifts.",
+  icon: (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e8943a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
+};
 
 const stagger = {
   hidden: {},
