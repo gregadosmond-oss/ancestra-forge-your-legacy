@@ -47,35 +47,35 @@ const AuthGate = ({ onAuthenticated, onClose }: AuthGateProps) => {
       // Only runs on signup (isSignUp), never on sign-in.
       const trimmed = email.trim().toLowerCase();
       const source = "auth-gate";
+
       supabase
         .from("journey_subscribers")
-        .insert({ email: trimmed, source })
+        .insert({ email: trimmed, surname_searched: null, source })
         .then(({ error: insertError }) => {
-          if (insertError && !insertError.message?.includes("duplicate")) {
+          if (insertError && insertError.code !== "23505") {
             console.error("[auth-gate journey_subscribers insert] FAILED:", insertError);
-            return;
           }
-          // Fire welcome email
-          supabase.functions
-            .invoke("send-welcome-email", {
-              body: { email: trimmed, first_name: null, source },
-            })
-            .then(({ data, error }) => {
-              if (error) console.error("[send-welcome-email from auth-gate] FAILED:", error);
-              else console.log("[send-welcome-email from auth-gate] success:", data);
-            })
-            .catch((err) => console.error("[send-welcome-email from auth-gate] threw:", err));
-          // Fire Resend Audience sync (which also fires the drip automation event)
-          supabase.functions
-            .invoke("sync-to-resend-audience", {
-              body: { email: trimmed, first_name: null, source },
-            })
-            .then(({ data, error }) => {
-              if (error) console.error("[sync-to-resend-audience from auth-gate] FAILED:", error);
-              else console.log("[sync-to-resend-audience from auth-gate] success:", data);
-            })
-            .catch((err) => console.error("[sync-to-resend-audience from auth-gate] threw:", err));
         });
+
+      supabase.functions
+        .invoke("send-welcome-email", {
+          body: { email: trimmed, first_name: null, source },
+        })
+        .then(({ data, error }) => {
+          if (error) console.error("[send-welcome-email] FAILED:", error);
+          else console.log("[send-welcome-email] success:", data);
+        })
+        .catch((err) => console.error("[send-welcome-email] threw:", err));
+
+      supabase.functions
+        .invoke("sync-to-resend-audience", {
+          body: { email: trimmed, first_name: null, source },
+        })
+        .then(({ data, error }) => {
+          if (error) console.error("[sync-to-resend-audience] FAILED:", error);
+          else console.log("[sync-to-resend-audience] success:", data);
+        })
+        .catch((err) => console.error("[sync-to-resend-audience] threw:", err));
 
       onAuthenticated();
     } else {
