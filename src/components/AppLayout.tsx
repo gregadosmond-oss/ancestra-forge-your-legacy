@@ -427,7 +427,7 @@ const AppLayout = () => {
               </p>
             </div>
             <div>
-              <h4 className="font-sans uppercase" style={{ color: "#a07830", fontSize: "10px", letterSpacing: "2px" }}>
+              <h4 className="font-sans uppercase" style={{ color: "#c9a86b", fontSize: "10px", letterSpacing: "2px" }}>
                 Explore
               </h4>
               <div className="mt-4 flex flex-col gap-y-2">
