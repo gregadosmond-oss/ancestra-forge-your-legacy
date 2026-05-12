@@ -448,7 +448,7 @@ const AppLayout = () => {
               </div>
             </div>
           </div>
-          <div className="mx-auto max-w-5xl pt-6 mt-8 text-center font-sans uppercase" style={{ borderTop: "1px solid #2a2018", color: "#8a7e6e", fontSize: "10px", letterSpacing: "1.5px" }}>
+          <div className="mx-auto max-w-5xl pt-6 mt-8 text-center font-sans uppercase" style={{ borderTop: "1px solid #2a2018", color: "#a07830", fontSize: "10px", letterSpacing: "1.5px" }}>
             © 2026 AncestorsQR. All rights reserved.
           </div>
         </footer>
