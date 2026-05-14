@@ -35,6 +35,27 @@ const CATEGORIES: Array<{ value: ShopProduct["category"] | "all"; label: string 
   { value: "book", label: "Legacy Books" },
 ];
 
+const SHOP_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  itemListElement: SHOP_PRODUCTS.map((p, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    item: {
+      "@type": "Product",
+      name: p.name,
+      description: p.description,
+      ...(p.image ? { image: `https://ancestorsqr.com${p.image}` } : {}),
+      offers: {
+        "@type": "Offer",
+        price: p.price.replace(/[^0-9.]/g, ""),
+        priceCurrency: "USD",
+        availability: p.live === false ? "https://schema.org/PreOrder" : "https://schema.org/InStock",
+      },
+    },
+  })),
+};
+
 export default function Shop() {
   usePageMeta({ title: "Heirloom Shop | AncestorsQR", description: "Mugs, canvas, blankets, and keepsakes — all forged with your family crest." });
   const [activeCategory, setActiveCategory] = useState<ShopProduct["category"] | "all">("all");
@@ -101,6 +122,7 @@ export default function Shop() {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-background">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SHOP_JSONLD) }} />
       <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       {/* Grain overlay */}
       <svg className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-[0.018]">
