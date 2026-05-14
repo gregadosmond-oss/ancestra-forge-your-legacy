@@ -9,6 +9,10 @@ export default function LandingCrest() {
       <img
         src="/crest.png"
         alt="AncestorsQR crest"
+        width={420}
+        height={420}
+        fetchPriority="high"
+        decoding="async"
         style={{
           width: "100%",
           height: "auto",
