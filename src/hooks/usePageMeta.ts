@@ -8,6 +8,7 @@ interface PageMeta {
   type?: "website" | "article";
 }
 
+const SITE_ORIGIN = "https://ancestorsqr.com";
 const DEFAULT_DESCRIPTION = "Discover the meaning behind your family name. Forge your custom coat of arms, family story, and bloodline tree in minutes.";
 const DEFAULT_IMAGE = "https://ancestorsqr.com/og-default.jpg";
 
@@ -22,11 +23,22 @@ function setMeta(selector: string, attr: string, content: string) {
   el.setAttribute(attr, content);
 }
 
+function setCanonical(href: string) {
+  let el = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (!el) {
+    el = document.createElement("link");
+    el.setAttribute("rel", "canonical");
+    document.head.appendChild(el);
+  }
+  el.setAttribute("href", href);
+}
+
 export function usePageMeta({ title, description = DEFAULT_DESCRIPTION, image = DEFAULT_IMAGE, url, type = "website" }: PageMeta) {
   useEffect(() => {
     const previousTitle = document.title;
     document.title = title;
-    const canonicalUrl = url || window.location.href;
+    const canonicalUrl = url || `${SITE_ORIGIN}${window.location.pathname}`;
+    setCanonical(canonicalUrl);
     setMeta('meta[name="description"]', "content", description);
     setMeta('meta[property="og:title"]', "content", title);
     setMeta('meta[property="og:description"]', "content", description);
