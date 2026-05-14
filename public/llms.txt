@@ -1,0 +1,26 @@
+# AncestorsQR
+
+> AI-powered family legacy platform. Enter your surname and get a custom coat of arms, AI-written family story, visual bloodline tree, and heirloom products that carry your family crest.
+
+Every family has a story worth telling. AncestorsQR turns your surname into an emotional identity discovery experience — not a genealogy database.
+
+## Pages
+
+- [Home](/): Landing page — discover what AncestorsQR does.
+- [Pricing](/pricing): Free tier, $29.99 Legacy Pack, and Deep Legacy plans.
+- [Begin the Journey](/journey/1): Six-stop guided experience that reveals your family's name, bloodline, crest, and story.
+- [Heirloom Shop](/shop): Mugs, canvas prints, blankets, coasters, and keepsakes forged with your family crest.
+- [Deep Legacy](/deep-legacy): Premium AI-researched genealogical history with verified historical sources.
+- [Free Tools](/tools): Six free tools to explore your heritage — no account needed.
+- [Surname Lookup](/tools/surname): Meaning, origin, and ancestral role for any surname.
+- [Bloodline Quiz](/tools/quiz): 5 questions reveal your family archetype.
+- [Motto Generator](/tools/motto): Latin family motto from three values.
+- [Meet Your Ancestor](/tools/ancestor): A historically plausible ancestor profile.
+- [The 1700s You](/tools/1700s): What your life would look like 300 years ago.
+- [Ancestor Chat](/tools/chat): Live chat with an AI ancestor character.
+- [About](/about): Founder story — Gregory Osmond and the Osmond bloodline since 1066.
+
+## Optional
+
+- [Privacy Policy](/privacy-policy): How we handle surname and email data.
+- [Terms](/terms): Terms of service.
