@@ -35,6 +35,27 @@ const CATEGORIES: Array<{ value: ShopProduct["category"] | "all"; label: string 
   { value: "book", label: "Legacy Books" },
 ];
 
+const SHOP_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  itemListElement: SHOP_PRODUCTS.map((p, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    item: {
+      "@type": "Product",
+      name: p.name,
+      description: p.description,
+      ...(p.image ? { image: `https://ancestorsqr.com${p.image}` } : {}),
+      offers: {
+        "@type": "Offer",
+        price: p.price.replace(/[^0-9.]/g, ""),
+        priceCurrency: "USD",
+        availability: p.live === false ? "https://schema.org/PreOrder" : "https://schema.org/InStock",
+      },
+    },
+  })),
+};
+
 export default function Shop() {
   usePageMeta({ title: "Heirloom Shop | AncestorsQR", description: "Mugs, canvas, blankets, and keepsakes — all forged with your family crest." });
   const [activeCategory, setActiveCategory] = useState<ShopProduct["category"] | "all">("all");
