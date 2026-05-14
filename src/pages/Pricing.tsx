@@ -73,11 +73,22 @@ const FAQ = [
   },
 ];
 
+const FAQ_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+};
+
 const Pricing = () => {
   usePageMeta({ title: "Pricing | AncestorsQR", description: "Start free. Unlock your full story for $29.99. Add an heirloom to make it last." });
   const legacyPrice = useLegacyPackPrice();
   return (
   <div className="relative min-h-screen bg-background">
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSONLD) }} />
     <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
   <div className="relative z-10 mx-auto max-w-5xl px-6 py-20">
     {/* Header */}
