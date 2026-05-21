@@ -172,7 +172,7 @@ export default function Cart() {
                 {([
                   { kind: "link" as const, name: "Legacy Pack", price: legacyPrice, note: "Instant delivery", path: "/journey" },
                   { kind: "link" as const, name: "Family Crest Mug", price: "$49.99", note: "Ships in 5–7 days", path: "/product-order" },
-                  { kind: "waitlist" as const, name: "The Legacy Book", price: "$129", note: "Coming Soon" },
+                  { kind: "link" as const, name: "The Legacy Book", price: "$129", note: "Ships in 7–10 days", path: "/legacy-book" },
                 ]).map((item) => {
                   const cardStyle: React.CSSProperties = {
                     background: "rgba(26,21,14,0.9)",
