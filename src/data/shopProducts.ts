@@ -155,13 +155,14 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     id: "legacy-book",
     name: "The Legacy Book",
     price: "$129",
-    priceNote: "Coming soon",
+    priceNote: "Ships in 7–10 days",
     description:
       "A hardcover heirloom of your full family story — your custom coat of arms, all 9 chapters, your visual bloodline tree, and your migration path. Bound in cream cloth with gold-foil detail. Printed and shipped worldwide.",
-    tag: "Coming Soon",
+    tag: "New",
     category: "book",
-    live: false,
-    notify: true,
+    live: true,
+    notify: false,
+    href: "/legacy-book",
     image: "/legacy-book-hero.png",
   },
 ];

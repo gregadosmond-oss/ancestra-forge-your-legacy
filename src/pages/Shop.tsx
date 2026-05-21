@@ -338,7 +338,7 @@ export default function Shop() {
 
                 {isLive ? (
                   product.live ? (
-                    product.href?.startsWith("/product-order") ? (
+                    (product.href?.startsWith("/product-order") || product.href === "/legacy-book") ? (
                       <Link
                         to={product.href}
                         className="mt-5 self-start rounded-pill font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
