@@ -18,6 +18,7 @@ import Stop5Story from "./pages/journey/Stop5Story.tsx";
 import Stop6PassItOn from "./pages/journey/Stop6PassItOn.tsx";
 import CheckoutPage from "./pages/CheckoutPage.tsx";
 import HeirloomOrderPage from "./pages/HeirloomOrderPage.tsx";
+import LegacyBookOrderPage from "./pages/LegacyBookOrderPage.tsx";
 import ProductOrderPage from "@/pages/ProductOrderPage";
 import CheckoutReturn from "./pages/CheckoutReturn.tsx";
 import MyLegacy from "./pages/MyLegacy.tsx";
@@ -82,6 +83,7 @@ const App = () => (
               </Route>
               <Route path="/heirloom-order" element={<HeirloomOrderPage />} />
               <Route path="/product-order" element={<ProductOrderPage />} />
+              <Route path="/legacy-book" element={<LegacyBookOrderPage />} />
               <Route path="/shop" element={<Shop />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/confirmation" element={<Confirmation />} />
