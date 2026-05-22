@@ -45,6 +45,7 @@ import DeepLegacyResults from "./pages/DeepLegacyResults.tsx";
 import DeepLegacyCheckout from "./pages/DeepLegacyCheckout.tsx";
 import DeepLegacyConfirmation from "./pages/DeepLegacyConfirmation.tsx";
 import FamilySearchCallback from "./pages/auth/FamilySearchCallback.tsx";
+import FamilySearchDemo from "./pages/FamilySearchDemo.tsx";
 
 const queryClient = new QueryClient();
 
@@ -101,6 +102,7 @@ const App = () => (
               <Route path="/deep-legacy/checkout" element={<DeepLegacyCheckout />} />
               <Route path="/deep-legacy/confirmation" element={<DeepLegacyConfirmation />} />
               <Route path="/auth/familysearch/callback" element={<FamilySearchCallback />} />
+              <Route path="/demo/familysearch" element={<FamilySearchDemo />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Route>
