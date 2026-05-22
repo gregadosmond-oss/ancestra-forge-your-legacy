@@ -365,7 +365,7 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  let fixtureUrl = DEFAULT_FIXTURE_URL;
+  let fixtureUrl: string | null = null;
   let mode: PaletteMode = "print";
   let surnameOverride: string | null = null;
   try {
@@ -385,11 +385,22 @@ Deno.serve(async (req) => {
 
   let fixture: any;
   try {
-    const res = await fetch(fixtureUrl);
-    if (!res.ok) {
-      return fail("fixture", `HTTP ${res.status} fetching fixture`);
+    if (fixtureUrl) {
+      const res = await fetch(fixtureUrl);
+      if (!res.ok) {
+        return fail("fixture", `HTTP ${res.status} fetching fixture`);
+      }
+      fixture = await res.json();
+    } else {
+      const fxClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+      const { data: fixtureBlob, error: fxErr } = await fxClient.storage
+        .from("print-designs")
+        .download("fixtures/osmond-fixture.json");
+      if (fxErr || !fixtureBlob) {
+        return fail("fixture", fxErr?.message || "Fixture not found");
+      }
+      fixture = JSON.parse(await fixtureBlob.text());
     }
-    fixture = await res.json();
   } catch (err) {
     return fail("fixture", (err as Error).message);
   }
