@@ -354,7 +354,8 @@ async function triggerLegacyBookOrder({
     await markFailed(err);
   }
 }
-}
+
+
 
 // ─── Crest generation trigger ────────────────────────────────────────────────
 
