@@ -37,7 +37,7 @@ const BOOK_ITEMS = [
 ];
 
 const BulletList = ({ items }: { items: string[] }) => (
-  <ul className="mt-5 w-full space-y-2 text-left">
+  <ul className="mt-5 w-full space-y-2 text-left" style={{ flex: 1 }}>
     {items.map((item) => (
       <li
         key={item}
@@ -52,6 +52,10 @@ const BulletList = ({ items }: { items: string[] }) => (
 );
 
 const cardBase: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  height: "100%",
+  position: "relative",
   background: "#1a1510",
   border: "1px solid #3d3020",
   borderRadius: 22,
