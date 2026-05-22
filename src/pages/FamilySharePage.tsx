@@ -43,7 +43,7 @@ const FamilySharePage = () => {
     const load = async () => {
       const [factsRes, crestRes] = await Promise.all([
         supabase.from("surname_facts").select("payload").eq("surname", surname).maybeSingle(),
-        supabase.from("surname_crests").select("image_url").eq("surname", surname).maybeSingle(),
+        supabase.from("surname_crests_public").select("image_url").eq("surname", surname).maybeSingle(),
       ]);
 
       const f = factsRes.data?.payload as LegacyFacts | null;

@@ -150,7 +150,7 @@ export default function MugMockup({ surname }: MugMockupProps) {
       try {
         const lookup = trimmed.toLowerCase();
         const { data: crest } = await supabase
-          .from("surname_crests")
+          .from("surname_crests_public")
           .select("image_url")
           .eq("surname", lookup)
           .maybeSingle();

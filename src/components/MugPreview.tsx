@@ -19,7 +19,7 @@ export default function MugPreview({ surname }: MugPreviewProps) {
     let cancelled = false;
     const lookup = trimmed.toLowerCase();
     supabase
-      .from("surname_crests")
+      .from("surname_crests_public")
       .select("image_url")
       .eq("surname", lookup)
       .maybeSingle()
