@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { Play } from "lucide-react";
+import { toggleAmbientPlayback } from "@/lib/ambientAudio";
 import SectionLabel from "@/components/journey/SectionLabel";
 import RetryInline from "@/components/journey/RetryInline";
 import AuthGate from "@/components/AuthGate";
