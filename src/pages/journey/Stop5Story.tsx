@@ -317,6 +317,7 @@ const Stop5Story = () => {
                   const title = stripMarkdown(story.data!.chapterOneTitle);
                   const body = stripMarkdown(story.data!.chapterOneBody);
                   speakStory(`${title}. ${body}`);
+                  if (!isAmbientPlaying()) toggleAmbientPlayback();
                 }}
                 className="flex items-center gap-2 rounded-full border px-5 py-2 font-sans text-xs font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
                 style={{ borderColor: "rgba(212,160,74,0.35)", color: "#d4a04a", background: "rgba(212,160,74,0.06)" }}
@@ -350,6 +351,8 @@ const Stop5Story = () => {
             )}
           </motion.div>
 
+          {/* LEGACY: replaced by auto-music-on-Listen May 22 2026 — DO NOT DELETE THE CODE */}
+          {false && (
           <AnimatePresence>
             {showAmbientCard && (
               <motion.div
@@ -446,6 +449,7 @@ const Stop5Story = () => {
               </motion.div>
             )}
           </AnimatePresence>
+          )}
 
           <motion.div
             initial={{ opacity: 0 }}
