@@ -317,27 +317,37 @@ const Stop5Story = () => {
                   const title = stripMarkdown(story.data!.chapterOneTitle);
                   const body = stripMarkdown(story.data!.chapterOneBody);
                   speakStory(`${title}. ${body}`);
-                  if (!isAmbientPlaying()) toggleAmbientPlayback();
+                  if (!isAmbientPlaying()) {
+                    const nowPlaying = toggleAmbientPlayback();
+                    setAmbientPlaying(nowPlaying);
+                  }
                 }}
                 className="flex items-center gap-2 rounded-full border px-5 py-2 font-sans text-xs font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
                 style={{ borderColor: "rgba(212,160,74,0.35)", color: "#d4a04a", background: "rgba(212,160,74,0.06)" }}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                Listen
+                <Play size={14} color="#d4a04a" fill="#d4a04a" />
+                Listen — with music
               </button>
             ) : (
               <>
                 <button
-                  onClick={togglePause}
+                  onClick={() => {
+                    const wasPaused = paused;
+                    togglePause();
+                    if (wasPaused && !isAmbientPlaying()) {
+                      const nowPlaying = toggleAmbientPlayback();
+                      setAmbientPlaying(nowPlaying);
+                    }
+                  }}
                   className="flex items-center gap-2 rounded-full border px-5 py-2 font-sans text-xs font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
                   style={{ borderColor: "rgba(212,160,74,0.35)", color: "#d4a04a", background: "rgba(212,160,74,0.06)" }}
                 >
                   {paused ? (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    <Play size={14} color="#d4a04a" fill="#d4a04a" />
                   ) : (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    <Pause size={14} color="#d4a04a" fill="#d4a04a" />
                   )}
-                  {paused ? "Resume" : "Pause"}
+                  {paused ? "Listen — with music" : "Pause"}
                 </button>
                 <button
                   onClick={stopAudio}
