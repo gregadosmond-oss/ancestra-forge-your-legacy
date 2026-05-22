@@ -94,7 +94,7 @@ const PacksSection = () => {
         </p>
       </div>
 
-      <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3" style={{ alignItems: "stretch" }}>
         {/* TIER 1 — Free Tools */}
         <div
           style={cardBase}
