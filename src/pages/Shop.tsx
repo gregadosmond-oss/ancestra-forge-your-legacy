@@ -202,7 +202,7 @@ export default function Shop() {
         </div>
       </section>
 
-      {/* ── D. SAMPLE SPREADS ── */}
+      {/* LEGACY: original sample spreads with og-default.jpg placeholders — removed May 22 2026
       <section className="relative z-10 w-full max-w-6xl px-6 py-16">
         <motion.p {...reveal} className="mb-8 text-center font-sans text-[11px] uppercase" style={{ color: "#a07830", letterSpacing: "4px" }}>
           Sample Spreads
@@ -220,6 +220,142 @@ export default function Shop() {
             </motion.div>
           ))}
         </div>
+      </section>
+      */}
+
+      {/* ── D. SAMPLE PAGES ── */}
+      <section className="relative z-10 w-full max-w-6xl px-6 py-16">
+        <motion.div {...reveal} className="text-center">
+          <p className="mb-3 font-sans text-[11px] font-semibold uppercase" style={{ color: "#a07830", letterSpacing: "4px" }}>
+            SAMPLE PAGES
+          </p>
+          <h2 className="font-display text-cream-warm" style={{ fontSize: 36, lineHeight: 1.1 }}>
+            From inside the book
+          </h2>
+          <p className="mx-auto mt-4 max-w-[600px] font-serif italic" style={{ color: "#c4b8a6", fontSize: 16, lineHeight: 1.5 }}>
+            Every Legacy Book is custom-written from your family's story. Here's a feel for the writing.
+          </p>
+        </motion.div>
+
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
+          {/* Card 1 */}
+          <motion.div
+            {...reveal}
+            transition={{ ...reveal.transition, delay: 0.08 }}
+            whileHover={{ rotate: -1 }}
+            className="flex flex-col overflow-hidden"
+            style={{
+              background: "#f0e8da",
+              border: "1px solid rgba(212, 160, 74, 0.2)",
+              borderRadius: 14,
+              padding: "36px 32px",
+              aspectRatio: "3 / 4",
+              boxShadow: "inset 0 8px 24px rgba(0,0,0,0.04)",
+            }}
+          >
+            <p className="font-sans text-[10px] uppercase" style={{ color: "#8a7e6e", letterSpacing: "3px" }}>
+              CHAPTER I · PAGE 7
+            </p>
+            <h3 className="mt-3 font-display" style={{ color: "#1a1208", fontSize: 22, lineHeight: 1.2 }}>
+              The First to Bear the Name
+            </h3>
+            <div className="my-4 h-px" style={{ background: "rgba(212, 160, 74, 0.4)", width: 40 }} />
+            <div className="flex-1" style={{ fontFamily: "'Libre Caslon Text', serif", color: "#3d3020", fontSize: 14, lineHeight: 1.7 }}>
+              <p>
+                <span style={{ float: "left", fontFamily: "'Libre Caslon Display', serif", fontSize: 40, color: "#8a4a1a", lineHeight: 0.9, margin: "4px 8px 0 0" }}>
+                  L
+                </span>
+                ong before the family knew its own name, there was a man who carried it. He worked the land, kept his word, and chose the syllables that would be repeated for a thousand years.
+              </p>
+              <p className="mt-3">
+                History records him only by trade and place. But every descendant since has carried what he set in motion — a name, a posture, a quiet refusal to disappear.
+              </p>
+              <p className="mt-3">
+                This is where it begins.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Card 2 */}
+          <motion.div
+            {...reveal}
+            transition={{ ...reveal.transition, delay: 0.16 }}
+            whileHover={{ rotate: 0 }}
+            className="flex flex-col overflow-hidden"
+            style={{
+              background: "#f0e8da",
+              border: "1px solid rgba(212, 160, 74, 0.2)",
+              borderRadius: 14,
+              padding: "36px 32px",
+              aspectRatio: "3 / 4",
+              boxShadow: "inset 0 8px 24px rgba(0,0,0,0.04)",
+            }}
+          >
+            <p className="font-sans text-[10px] uppercase" style={{ color: "#8a7e6e", letterSpacing: "3px" }}>
+              CHAPTER IV · PAGE 23
+            </p>
+            <h3 className="mt-3 font-display" style={{ color: "#1a1208", fontSize: 22, lineHeight: 1.2 }}>
+              The Crossing
+            </h3>
+            <div className="my-4 h-px" style={{ background: "rgba(212, 160, 74, 0.4)", width: 40 }} />
+            <div className="flex-1" style={{ fontFamily: "'Libre Caslon Text', serif", color: "#3d3020", fontSize: 14, lineHeight: 1.7 }}>
+              <p>
+                <span style={{ float: "left", fontFamily: "'Libre Caslon Display', serif", fontSize: 40, color: "#8a4a1a", lineHeight: 1.0, margin: "4px 8px 0 0" }}>
+                  T
+                </span>
+                hey sold what they could not carry. The crossing took eleven weeks. The youngest child did not speak for a month after they made land.
+              </p>
+              <p className="mt-3">
+                What they brought with them fit in a single trunk: a Bible, two wool blankets, a handful of seeds wrapped in linen, and the name. The name was the only thing the ocean could not weather.
+              </p>
+              <p className="mt-3">
+                Everything that came after was built on what survived the passage.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Card 3 */}
+          <motion.div
+            {...reveal}
+            transition={{ ...reveal.transition, delay: 0.24 }}
+            whileHover={{ rotate: 1 }}
+            className="flex flex-col overflow-hidden"
+            style={{
+              background: "#f0e8da",
+              border: "1px solid rgba(212, 160, 74, 0.2)",
+              borderRadius: 14,
+              padding: "36px 32px",
+              aspectRatio: "3 / 4",
+              boxShadow: "inset 0 8px 24px rgba(0,0,0,0.04)",
+            }}
+          >
+            <p className="font-sans text-[10px] uppercase" style={{ color: "#8a7e6e", letterSpacing: "3px" }}>
+              CHAPTER IX · PAGE 67
+            </p>
+            <h3 className="mt-3 font-display" style={{ color: "#1a1208", fontSize: 22, lineHeight: 1.2 }}>
+              What You Inherit
+            </h3>
+            <div className="my-4 h-px" style={{ background: "rgba(212, 160, 74, 0.4)", width: 40 }} />
+            <div className="flex-1" style={{ fontFamily: "'Libre Caslon Text', serif", color: "#3d3020", fontSize: 14, lineHeight: 1.7 }}>
+              <p>
+                <span style={{ float: "left", fontFamily: "'Libre Caslon Display', serif", fontSize: 40, color: "#8a4a1a", lineHeight: 0.9, margin: "4px 8px 0 0" }}>
+                  Y
+                </span>
+                ou are the result of every choice they made. Every harvest, every hardship, every refusal to give in. Their patience runs in your blood. Their stubbornness shows up when you least expect it.
+              </p>
+              <p className="mt-3">
+                Most families forget. That is the ordinary fate of a name. But you are reading this — which means yours does not have to.
+              </p>
+              <p className="mt-3">
+                The Legacy continues with you.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+
+        <p className="mx-auto mt-10 max-w-[500px] text-center font-sans italic" style={{ color: "#8a7e6e", fontSize: 13 }}>
+          Placeholder text shown above — your book is generated from your actual surname, lineage, and historical records.
+        </p>
       </section>
 
       <WarmDivider />
