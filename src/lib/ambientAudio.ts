@@ -5,7 +5,7 @@ export const startAmbientAudio = (): void => {
   if (audio) return;
   audio = new Audio("/candlelit-manor-tide.mp3");
   audio.loop = true;
-  audio.volume = 0.5;
+  audio.volume = 0.25;
   audio.play().catch(() => {/* autoplay blocked — silent fail */});
 };
 
@@ -14,7 +14,7 @@ export const toggleAmbientPlayback = (): boolean => {
     // First click — start audio and return playing state
     audio = new Audio("/candlelit-manor-tide.mp3");
     audio.loop = true;
-    audio.volume = 0.5;
+    audio.volume = 0.25;
     audio.play().catch(() => {});
     return true; // now playing
   }
