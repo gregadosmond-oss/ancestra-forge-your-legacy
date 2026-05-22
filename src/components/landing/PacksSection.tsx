@@ -166,8 +166,9 @@ const PacksSection = () => {
             <BulletList items={LEGACY_ITEMS} />
             <Link
               to="/journey/1"
-              className="mt-8 block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
+              className="block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
               style={{
+                marginTop: "auto",
                 background: "linear-gradient(135deg, #e8943a, #c47828)",
                 color: "#1a1208",
               }}
