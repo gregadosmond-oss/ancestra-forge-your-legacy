@@ -27,17 +27,17 @@ const LEGACY_ITEMS = [
   "Shareable legacy page",
 ];
 
-const heirloomItems = (legacyPrice: string) => [
-  "Custom crest mug — printed & shipped",
-  `Full Legacy Pack included (${legacyPrice} value)`,
-  "\"HOUSE OF [NAME]\" wrap-around design",
-  "QR code linking to your legacy page",
-  "Ships worldwide in 5–7 days",
+const BOOK_ITEMS = [
+  "Everything in the Legacy Pack",
+  "Hardcover heirloom — 12 chapters, 42 pages",
+  "Gold-foil family crest on cover",
+  "5-generation visual bloodline tree",
+  "Printed and shipped worldwide",
 ];
 
 const PacksSection = () => {
   const legacyPrice = useLegacyPackPrice();
-  const HEIRLOOM_ITEMS = heirloomItems(legacyPrice);
+  const HEIRLOOM_ITEMS = BOOK_ITEMS;
 
   return (
   <motion.section {...reveal} className="py-16 text-center">
@@ -134,12 +134,12 @@ const PacksSection = () => {
         transition={{ ...reveal.transition, delay: 0.16 }}
         className="flex flex-col items-center rounded-[22px] border border-gold-line bg-card p-7 text-center"
       >
-        <div className="mb-3 text-3xl">🎁</div>
-        <h3 className="font-display text-lg text-cream-warm">Heirloom Shop</h3>
-        <div className="mt-3 font-display text-3xl text-amber-light">$49.99</div>
-        <p className="mt-1 text-[11px] text-text-dim">Mug · Legacy Pack included · Ships worldwide</p>
+        <div className="mb-3 text-3xl">📖</div>
+        <h3 className="font-display text-lg text-cream-warm">Legacy Book</h3>
+        <div className="mt-3 font-display text-3xl text-amber-light">$129</div>
+        <p className="mt-1 text-[11px] text-text-dim">Hardcover heirloom · Ships worldwide</p>
         <p className="mt-3 font-serif text-xs italic text-text-dim">
-          Your family crest, name & QR code on a ceramic mug — plus the full digital Legacy Pack.
+          Your family's full story bound in heirloom hardcover — 12 chapters, gold-foil crest on the cover.
         </p>
         <ul className="mt-4 w-full space-y-1 text-left text-sm text-foreground">
           {HEIRLOOM_ITEMS.map((item) => (
@@ -150,14 +150,14 @@ const PacksSection = () => {
           ))}
         </ul>
         <Link
-          to="/heirloom-order"
+          to="/shop"
           className="mt-6 w-full rounded-pill py-3 text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-400"
           style={{
             background: "linear-gradient(135deg, #e8943a, #c47828)",
             color: "#1a1208",
           }}
         >
-          Order Now →
+          Order the Book →
         </Link>
       </motion.div>
 
