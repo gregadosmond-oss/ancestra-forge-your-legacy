@@ -117,9 +117,6 @@ const PacksSection = () => {
             className="block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
             style={{
               marginTop: "auto",
-              marginTopValue: undefined as never,
-            } as React.CSSProperties}
-            style={{
               background: "rgba(232,148,58,0.06)",
               border: "1px solid rgba(232,148,58,0.18)",
               color: "#d4a04a",
