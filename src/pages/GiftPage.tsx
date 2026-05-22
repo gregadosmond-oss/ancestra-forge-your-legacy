@@ -9,16 +9,16 @@ const GiftPage = () => {
   const { data: gift, isLoading: giftLoading, error: giftError } = useQuery({
     queryKey: ["gift", giftId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("gifts")
-        .select("surname, status")
-        .eq("id", giftId!)
-        .single();
+      const { data, error } = await supabase.functions.invoke("get-gift-by-id", {
+        body: { giftId },
+      });
       if (error) throw error;
-      return data;
+      if (!data || data.error) throw new Error(data?.error ?? "not_found");
+      return data as { surname: string; status: string };
     },
     enabled: !!giftId,
   });
+
 
   const { data: crest } = useQuery({
     queryKey: ["surname_crest", gift?.surname],
