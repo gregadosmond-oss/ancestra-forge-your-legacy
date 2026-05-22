@@ -312,6 +312,7 @@ const Stop5Story = () => {
                   const title = stripMarkdown(story.data!.chapterOneTitle);
                   const body = stripMarkdown(story.data!.chapterOneBody);
                   speakStory(`${title}. ${body}`);
+                  dismissAmbientCard();
                 }}
                 className="flex items-center gap-2 rounded-full border px-5 py-2 font-sans text-xs font-semibold uppercase tracking-[1.5px] transition-all hover:opacity-80"
                 style={{ borderColor: "rgba(212,160,74,0.35)", color: "#d4a04a", background: "rgba(212,160,74,0.06)" }}
