@@ -69,7 +69,7 @@ const inputStyle: React.CSSProperties = {
 export default function Shop() {
   usePageMeta({
     title: "The Legacy Book — Heirloom Edition | AncestorsQR",
-    description: "Your family's story, bound in heirloom hardcover. 12 chapters, custom coat of arms, 5-generation tree. Printed and shipped worldwide.",
+    description: "Your family's story, bound in heirloom hardcover. 9 chapters, custom coat of arms, 5-generation tree. Printed and shipped worldwide.",
   });
 
   const bookPrice = useStripePrice("legacy_book_once", "$129");
@@ -131,7 +131,7 @@ export default function Shop() {
               Your family's story, bound in heirloom hardcover.
             </p>
             <p className="mt-5 font-sans uppercase" style={{ color: "#8a7e6e", fontSize: 13, letterSpacing: "2px" }}>
-              12 CHAPTERS · 42 PAGES · 8×11 HARDCOVER
+              9 CHAPTERS · 42 PAGES · 8×11 HARDCOVER
             </p>
             <a
               href="#order"
@@ -372,6 +372,9 @@ export default function Shop() {
           </h2>
           <p className="mt-2 font-serif italic" style={{ color: "#c4b8a6", fontSize: 16 }}>
             Printed and shipped by Gelato. 7–10 business days.
+          </p>
+          <p className="mt-3 font-serif italic" style={{ color: "#c4b8a6", fontSize: 14 }}>
+            Includes a printable Legacy Certificate — bound as page 42 of your book and available digitally on your dashboard.
           </p>
 
           {!checkoutOpen ? (
