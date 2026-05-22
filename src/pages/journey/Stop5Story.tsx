@@ -351,6 +351,8 @@ const Stop5Story = () => {
             )}
           </motion.div>
 
+          {/* LEGACY: replaced by auto-music-on-Listen May 22 2026 — DO NOT DELETE THE CODE */}
+          {false && (
           <AnimatePresence>
             {showAmbientCard && (
               <motion.div
