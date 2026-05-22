@@ -449,6 +449,7 @@ const Stop5Story = () => {
               </motion.div>
             )}
           </AnimatePresence>
+          )}
 
           <motion.div
             initial={{ opacity: 0 }}
