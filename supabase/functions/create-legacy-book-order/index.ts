@@ -211,8 +211,8 @@ serve(async (req) => {
         pageCount,
         quantity,
         files: [
-          { type: "default", url: interiorUrl },
-          { type: "cover", url: coverUrl },
+          { type: "default", url: iSigned.signedUrl },
+          { type: "cover", url: cSigned.signedUrl },
         ],
       },
     ],
