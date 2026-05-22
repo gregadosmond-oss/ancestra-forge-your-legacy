@@ -346,6 +346,59 @@ const Stop5Story = () => {
             )}
           </motion.div>
 
+          <AnimatePresence>
+            {showAmbientCard && (
+              <motion.div
+                key="ambient-card"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="mt-10 w-full max-w-2xl"
+                style={{ marginBottom: 32 }}
+              >
+                <div
+                  className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"
+                  style={{
+                    background: "#1a1510",
+                    border: "1px solid #3d3020",
+                    borderRadius: 14,
+                    padding: "24px 32px",
+                  }}
+                >
+                  <div className="flex-1">
+                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, textTransform: "uppercase", letterSpacing: "3px", color: "#a07830" }}>
+                      AMBIANCE
+                    </div>
+                    <div className="mt-2 font-display" style={{ fontSize: 20, color: "#f0e8da", lineHeight: 1.2 }}>
+                      Want music while you read?
+                    </div>
+                    <div className="mt-1 font-serif italic" style={{ fontSize: 14, color: "#c4b8a6" }}>
+                      Press play for a quiet ambient score beneath the words.
+                    </div>
+                  </div>
+                  <div className="flex flex-row items-center" style={{ gap: 12 }}>
+                    <button
+                      onClick={handlePlayAmbient}
+                      className="inline-flex items-center gap-2 rounded-pill px-6 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                      style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
+                    >
+                      <Play size={14} color="#d4a04a" fill="#d4a04a" />
+                      Play music
+                    </button>
+                    <button
+                      onClick={dismissAmbientCard}
+                      className="rounded-pill px-6 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] transition-all"
+                      style={{ background: "rgba(232,148,58,0.06)", border: "1px solid rgba(232,148,58,0.18)", color: "#d4a04a" }}
+                    >
+                      No thanks
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
