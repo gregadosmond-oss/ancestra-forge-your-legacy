@@ -48,6 +48,7 @@ interface StripeCheckoutSession {
   amount_total?: number | null;
   currency?: string | null;
   payment_status?: string | null;
+  payment_intent?: string | null;
   metadata?: Record<string, string> | null;
 }
 
