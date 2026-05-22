@@ -37,7 +37,7 @@ const BOOK_ITEMS = [
 ];
 
 const BulletList = ({ items }: { items: string[] }) => (
-  <ul className="mt-5 w-full space-y-2 text-left">
+  <ul className="mt-5 w-full space-y-2 text-left" style={{ flex: 1 }}>
     {items.map((item) => (
       <li
         key={item}
@@ -52,6 +52,10 @@ const BulletList = ({ items }: { items: string[] }) => (
 );
 
 const cardBase: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  height: "100%",
+  position: "relative",
   background: "#1a1510",
   border: "1px solid #3d3020",
   borderRadius: 22,
@@ -90,7 +94,7 @@ const PacksSection = () => {
         </p>
       </div>
 
-      <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3" style={{ alignItems: "stretch" }}>
         {/* TIER 1 — Free Tools */}
         <div
           style={cardBase}
@@ -110,8 +114,9 @@ const PacksSection = () => {
           <BulletList items={FREE_ITEMS} />
           <Link
             to="/tools"
-            className="mt-8 block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
+            className="block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
             style={{
+              marginTop: "auto",
               background: "rgba(232,148,58,0.06)",
               border: "1px solid rgba(232,148,58,0.18)",
               color: "#d4a04a",
@@ -122,7 +127,7 @@ const PacksSection = () => {
         </div>
 
         {/* TIER 2 — Legacy Pack (featured) */}
-        <div className="relative md:col-span-2 lg:col-span-1">
+        <div className="relative h-full">
           <div
             className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-pill font-sans font-bold uppercase"
             style={{
@@ -161,8 +166,9 @@ const PacksSection = () => {
             <BulletList items={LEGACY_ITEMS} />
             <Link
               to="/journey/1"
-              className="mt-8 block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
+              className="block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
               style={{
+                marginTop: "auto",
                 background: "linear-gradient(135deg, #e8943a, #c47828)",
                 color: "#1a1208",
               }}
@@ -173,7 +179,7 @@ const PacksSection = () => {
         </div>
 
         {/* TIER 3 — Legacy Book */}
-        <div className="relative">
+        <div className="relative h-full">
           <div
             className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-pill font-sans uppercase"
             style={{
@@ -208,8 +214,9 @@ const PacksSection = () => {
             <BulletList items={BOOK_ITEMS} />
             <Link
               to="/shop"
-              className="mt-8 block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
+              className="block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
               style={{
+                marginTop: "auto",
                 background: "rgba(232,148,58,0.06)",
                 border: "1px solid rgba(232,148,58,0.18)",
                 color: "#d4a04a",
