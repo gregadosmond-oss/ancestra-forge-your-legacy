@@ -67,6 +67,24 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
 
   console.log("Parsed metadata — surname:", surname, "user_id:", userId, "email:", buyerEmail, "productType:", productType);
 
+  // Legacy Book order — print + ship hardcover via Gelato
+  if (productType === "legacy-book" && surname && shippingAddressRaw) {
+    console.log("[legacy-book] order detected — surname:", surname);
+    await triggerCrestGeneration(surname);
+    await triggerLegacyBookOrder({
+      surname,
+      shippingAddress: JSON.parse(shippingAddressRaw),
+      buyerEmail: buyerEmail ?? undefined,
+      sessionId: session.id,
+      paymentIntent: typeof (session as unknown as { payment_intent?: string }).payment_intent === "string"
+        ? (session as unknown as { payment_intent?: string }).payment_intent
+        : undefined,
+      amountTotal: session.amount_total ?? undefined,
+      currency: session.currency ?? undefined,
+      userId: userId || undefined,
+    });
+  }
+
   // Printful physical order — ensure crest exists, then trigger Printful fulfillment
   if (productType && PRINTFUL_VARIANT_MAP[productType] && surname && shippingAddressRaw) {
     console.log("Printful order detected — productType:", productType, "surname:", surname);
