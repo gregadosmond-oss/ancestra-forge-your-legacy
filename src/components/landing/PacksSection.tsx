@@ -179,7 +179,7 @@ const PacksSection = () => {
         </div>
 
         {/* TIER 3 — Legacy Book */}
-        <div className="relative">
+        <div className="relative h-full">
           <div
             className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-pill font-sans uppercase"
             style={{
