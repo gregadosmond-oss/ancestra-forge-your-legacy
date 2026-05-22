@@ -12,7 +12,7 @@ import ScrollChevron from "@/components/ScrollChevron";
 import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
 import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
-import { useMugPrice } from "@/hooks/useMugPrice";
+// LEGACY: removed during digital-first revamp May 22 2026 — useMugPrice import
 import { supabase } from "@/integrations/supabase/client";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
@@ -22,7 +22,7 @@ const Stop6PassItOn = () => {
   const { surname, facts, story, crest } = useJourney();
   const { user } = usePurchase();
   const legacyPrice = useLegacyPackPrice();
-  const mugPrice = useMugPrice();
+  // LEGACY: const mugPrice = useMugPrice();
 
   const [previewEmail, setPreviewEmail] = useState("");
   const [previewSending, setPreviewSending] = useState(false);
