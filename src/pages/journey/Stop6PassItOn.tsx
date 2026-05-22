@@ -205,22 +205,23 @@ const Stop6PassItOn = () => {
               </button>
             </div>
 
-            {/* Heirloom Shop */}
+            {/* Legacy Book heirloom */}
             <div className="flex flex-col rounded-[22px] border bg-card p-6 text-center" style={{ borderColor: "rgba(232,148,58,0.12)" }}>
-              <div className="mb-3 text-3xl">🎁</div>
-              <h3 className="font-display text-base text-cream-warm">Family Crest Mug</h3>
+              <div className="mb-3 text-3xl">📖</div>
+              <h3 className="font-display text-base text-cream-warm">Make it an heirloom</h3>
               <p className="mt-2 text-sm leading-relaxed" style={{ color: "#8a7e6e" }}>
-                Your family crest on a ceramic mug — every heirloom includes the Legacy Pack.
+                Order the Legacy Book — $129 hardcover, shipped to your door.
               </p>
-              <div className="mt-3 font-display text-2xl" style={{ color: "#e8b85c" }}>{mugPrice}</div>
+              <div className="mt-3 font-display text-2xl" style={{ color: "#e8b85c" }}>$129</div>
               <button
-                onClick={() => navigate("/heirloom-order")}
+                onClick={() => navigate("/shop")}
                 className="mt-5 rounded-pill py-3 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
                 style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
               >
-                Order Family Crest Mug
+                See the Book
               </button>
             </div>
+            {/* LEGACY: removed during digital-first revamp May 22 2026 — Family Crest Mug card */}
 
             {/* Pricing */}
             <div className="flex flex-col rounded-[22px] border bg-card p-6 text-center" style={{ borderColor: "rgba(232,148,58,0.12)" }}>
