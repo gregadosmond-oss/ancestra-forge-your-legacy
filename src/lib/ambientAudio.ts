@@ -28,6 +28,7 @@ export const toggleAmbientPlayback = (): boolean => {
 };
 
 export const isAmbientStarted = (): boolean => !!audio;
+export const isAmbientPlaying = (): boolean => !!audio && !audio.paused;
 
 export const pauseAmbient = (): void => { audio?.pause(); };
 export const resumeAmbient = (): void => { if (audio && audio.paused) audio.play().catch(() => {}); };
