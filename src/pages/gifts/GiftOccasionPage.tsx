@@ -1,5 +1,6 @@
 import { useParams, Link, Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Sparkles, Heart, Hourglass } from "lucide-react";
 import { getOccasionBySlug } from "@/data/giftOccasions";
 import WarmDivider from "@/components/journey/WarmDivider";
 import { useStripePrice } from "@/hooks/useStripePrice";
@@ -123,10 +124,10 @@ export default function GiftOccasionPage() {
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           {[
-            { icon: "✦", label: "Completely unique" },
-            { icon: "♡", label: "Deeply emotional" },
-            { icon: "◈", label: "Lasts forever" },
-          ].map(({ icon, label }) => (
+            { icon: Sparkles, label: "Completely unique" },
+            { icon: Heart, label: "Deeply emotional" },
+            { icon: Hourglass, label: "Lasts forever" },
+          ].map(({ icon: Icon, label }) => (
             <span
               key={label}
               className="flex items-center gap-2 rounded-pill font-sans text-[12px] uppercase tracking-[1.5px]"
@@ -137,7 +138,7 @@ export default function GiftOccasionPage() {
                 color: "#d4a04a",
               }}
             >
-              <span style={{ fontSize: 14 }}>{icon}</span>
+              <Icon size={14} color="#d4a04a" />
               {label}
             </span>
           ))}
@@ -254,7 +255,7 @@ export default function GiftOccasionPage() {
         </div>
       </section>
 
-      {/* ── BUNDLE SPOTLIGHT ── */}
+      {/* LEGACY: removed during digital-first revamp May 22 2026 — Dad Bundle physical product spotlight
       {config.bundle && (
         <>
           <WarmDivider />
@@ -322,6 +323,7 @@ export default function GiftOccasionPage() {
           </motion.section>
         </>
       )}
+      */}
 
       <WarmDivider />
 
