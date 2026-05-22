@@ -24,6 +24,18 @@ const Stop5Story = () => {
   const [showAuth, setShowAuth] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [showAmbientCard, setShowAmbientCard] = useState(() => {
+    if (typeof window === "undefined") return true;
+    try { return sessionStorage.getItem("stop5_ambient_dismissed") !== "true"; } catch { return true; }
+  });
+  const dismissAmbientCard = useCallback(() => {
+    try { sessionStorage.setItem("stop5_ambient_dismissed", "true"); } catch {}
+    setShowAmbientCard(false);
+  }, []);
+  const handlePlayAmbient = useCallback(() => {
+    toggleAmbientPlayback();
+    dismissAmbientCard();
+  }, [dismissAmbientCard]);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
 
