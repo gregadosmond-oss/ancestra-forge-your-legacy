@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
+import { useStripePrice } from "@/hooks/useStripePrice";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },
@@ -10,159 +10,231 @@ const reveal = {
 };
 
 const FREE_ITEMS = [
-  "Surname meaning & origin",
-  "Bloodline personality quiz",
+  "Surname lookup",
   "Motto generator",
+  "Bloodline quiz",
   "Meet your ancestor",
   "The 1700s you",
   "Ancestor chat",
 ];
 
 const LEGACY_ITEMS = [
-  "Custom coat of arms (hi-res)",
-  "AI-written family story",
-  "Visual migration path",
-  "Legacy certificate (PDF)",
-  "Full ancestor chat access",
-  "Shareable legacy page",
+  "Custom coat of arms (high-res)",
+  "9-chapter family story",
+  "Visual bloodline tree",
+  "Legacy certificate",
+  "Ancestor chat",
+  "Instant access — no shipping",
 ];
 
 const BOOK_ITEMS = [
-  "Everything in the Legacy Pack",
-  "Hardcover heirloom — 12 chapters, 42 pages",
-  "Gold-foil family crest on cover",
-  "5-generation visual bloodline tree",
-  "Printed and shipped worldwide",
+  "Everything in Legacy Pack",
+  "Heirloom hardcover, 8×11\"",
+  "12 chapters, 42 pages",
+  "5-generation visual tree",
+  "Matte-laminated cover",
+  "Printed and shipped by Gelato",
 ];
 
+const BulletList = ({ items }: { items: string[] }) => (
+  <ul className="mt-5 w-full space-y-2 text-left">
+    {items.map((item) => (
+      <li
+        key={item}
+        className="flex items-start gap-3 font-sans text-[14px]"
+        style={{ color: "#d0c4b4", lineHeight: 2 }}
+      >
+        <span style={{ color: "#d4a04a", lineHeight: 1.8 }}>·</span>
+        <span>{item}</span>
+      </li>
+    ))}
+  </ul>
+);
+
+const cardBase: React.CSSProperties = {
+  background: "#1a1510",
+  border: "1px solid #3d3020",
+  borderRadius: 22,
+  padding: 40,
+  transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
+};
+
+const hoverIn = (e: React.MouseEvent<HTMLDivElement>) => {
+  e.currentTarget.style.background = "#221c14";
+  e.currentTarget.style.transform = "translateY(-4px)";
+};
+const hoverOut = (e: React.MouseEvent<HTMLDivElement>, bg = "#1a1510") => {
+  e.currentTarget.style.background = bg;
+  e.currentTarget.style.transform = "";
+};
+
 const PacksSection = () => {
-  const legacyPrice = useLegacyPackPrice();
-  const HEIRLOOM_ITEMS = BOOK_ITEMS;
+  const legacyPrice = useStripePrice("legacy_pack_once", "$29.99");
+  const bookPrice = useStripePrice("legacy_book_once", "$129");
+
+  // Split $29.99 into dollars + cents
+  const [dollars, cents] = legacyPrice.split(".");
+  const bookDollars = bookPrice.split(".")[0];
 
   return (
-  <motion.section {...reveal} className="py-16 text-center">
-    <p className="mb-3 text-[10px] uppercase tracking-[4px] text-amber-dim">
-      Choose Your Legacy
-    </p>
-    <h2 className="font-display text-3xl text-cream-warm sm:text-4xl">
-      Pick the pack that's right for you
-    </h2>
-    <p className="mx-auto mt-4 max-w-md font-serif italic text-foreground">
-      Start free, or unlock your full family legacy today.
-    </p>
+    <motion.section {...reveal} className="py-16">
+      <div className="text-center">
+        <p className="mb-3 font-sans text-[10px] uppercase tracking-[4px]" style={{ color: "#a07830" }}>
+          Choose Your Legacy
+        </p>
+        <h2 className="font-display text-3xl text-cream-warm sm:text-4xl">
+          Pick the pack that's right for you
+        </h2>
+        <p className="mx-auto mt-4 max-w-md font-serif italic" style={{ color: "#c4b8a6" }}>
+          Start free, or unlock your full family legacy today.
+        </p>
+      </div>
 
-    <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-3">
-
-      {/* ── Free / Explorer ── */}
-      <motion.div
-        {...reveal}
-        transition={{ ...reveal.transition, delay: 0 }}
-        className="flex flex-col items-center rounded-[22px] border border-gold-line bg-card p-7 text-center"
-      >
-        <div className="mb-3 text-3xl">🔍</div>
-        <h3 className="font-display text-lg text-cream-warm">Explorer</h3>
-        <div className="mt-3 font-display text-3xl text-amber-light">Free</div>
-        <p className="mt-1 text-[11px] text-text-dim">No credit card needed</p>
-        <ul className="mt-5 w-full space-y-1 text-left text-sm text-foreground">
-          {FREE_ITEMS.map((item) => (
-            <li key={item} className="flex items-start gap-2">
-              <span className="mt-1 text-[8px] text-amber-dim">✦</span>
-              {item}
-            </li>
-          ))}
-        </ul>
-        <Link
-          to="/journey"
-          className="mt-6 w-full rounded-pill py-3 text-[12px] font-semibold uppercase tracking-[1.5px] text-amber transition-all duration-400"
-          style={{
-            background: "rgba(232,148,58,0.06)",
-            border: "1px solid rgba(232,148,58,0.18)",
-          }}
-        >
-          Start Free
-        </Link>
-      </motion.div>
-
-      {/* ── Legacy Pack (featured) ── */}
-      <motion.div
-        {...reveal}
-        transition={{ ...reveal.transition, delay: 0.08 }}
-        className="relative flex flex-col items-center rounded-[22px] p-7 text-center"
-        style={{
-          background: "#1e1810",
-          border: "1px solid rgba(232,148,58,0.35)",
-        }}
-      >
+      <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {/* TIER 1 — Free Tools */}
         <div
-          className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-pill px-4 py-1 text-[10px] font-bold uppercase tracking-[1.5px]"
-          style={{
-            background: "linear-gradient(135deg, #e8943a, #c47828)",
-            color: "#1a1208",
-          }}
+          style={cardBase}
+          onMouseEnter={hoverIn}
+          onMouseLeave={(e) => hoverOut(e)}
+          className="flex flex-col"
         >
-          Most Popular
+          <p className="font-sans text-[13px] uppercase" style={{ color: "#8a7e6e", letterSpacing: "2px" }}>
+            Always Free
+          </p>
+          <h3 className="mt-6 font-display" style={{ fontSize: 28, color: "#f0e8da" }}>
+            Free Tools
+          </h3>
+          <p className="mt-2 font-serif italic" style={{ fontSize: 15, color: "#c4b8a6" }}>
+            Start with curiosity.
+          </p>
+          <BulletList items={FREE_ITEMS} />
+          <Link
+            to="/tools"
+            className="mt-8 block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
+            style={{
+              background: "rgba(232,148,58,0.06)",
+              border: "1px solid rgba(232,148,58,0.18)",
+              color: "#d4a04a",
+            }}
+          >
+            Try Free
+          </Link>
         </div>
-        <div className="mb-3 text-3xl">🛡</div>
-        <h3 className="font-display text-lg text-cream-warm">Legacy Pack</h3>
-        <div className="mt-3 font-display text-3xl text-amber-light">{legacyPrice}</div>
-        <p className="mt-1 text-[11px] text-text-dim">
-          One-time · Instant delivery
-        </p>
-        <ul className="mt-5 w-full space-y-1 text-left text-sm text-foreground">
-          {LEGACY_ITEMS.map((item) => (
-            <li key={item} className="flex items-start gap-2">
-              <span className="mt-1 text-[8px] text-amber-dim">✦</span>
-              {item}
-            </li>
-          ))}
-        </ul>
-        <Link
-          to="/journey"
-          className="mt-6 w-full rounded-pill py-3 text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-400"
-          style={{
-            background: "linear-gradient(135deg, #e8943a, #c47828)",
-            color: "#1a1208",
-          }}
-        >
-          Unlock My Legacy
-        </Link>
-      </motion.div>
 
-      {/* ── Heirloom Shop ── */}
-      <motion.div
-        {...reveal}
-        transition={{ ...reveal.transition, delay: 0.16 }}
-        className="flex flex-col items-center rounded-[22px] border border-gold-line bg-card p-7 text-center"
-      >
-        <div className="mb-3 text-3xl">📖</div>
-        <h3 className="font-display text-lg text-cream-warm">Legacy Book</h3>
-        <div className="mt-3 font-display text-3xl text-amber-light">$129</div>
-        <p className="mt-1 text-[11px] text-text-dim">Hardcover heirloom · Ships worldwide</p>
-        <p className="mt-3 font-serif text-xs italic text-text-dim">
-          Your family's full story bound in heirloom hardcover — 12 chapters, gold-foil crest on the cover.
-        </p>
-        <ul className="mt-4 w-full space-y-1 text-left text-sm text-foreground">
-          {HEIRLOOM_ITEMS.map((item) => (
-            <li key={item} className="flex items-start gap-2">
-              <span className="mt-1 text-[8px] text-amber-dim">✦</span>
-              {item}
-            </li>
-          ))}
-        </ul>
-        <Link
-          to="/shop"
-          className="mt-6 w-full rounded-pill py-3 text-[12px] font-semibold uppercase tracking-[1.5px] transition-all duration-400"
-          style={{
-            background: "linear-gradient(135deg, #e8943a, #c47828)",
-            color: "#1a1208",
-          }}
-        >
-          Order the Book →
-        </Link>
-      </motion.div>
+        {/* TIER 2 — Legacy Pack (featured) */}
+        <div className="relative md:col-span-2 lg:col-span-1">
+          <div
+            className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-pill font-sans font-bold uppercase"
+            style={{
+              background: "#d4a04a",
+              color: "#1a1208",
+              fontSize: 11,
+              letterSpacing: "3px",
+              padding: "6px 18px",
+            }}
+          >
+            Most Popular
+          </div>
+          <div
+            style={{ ...cardBase, border: "1px solid #d4a04a" }}
+            onMouseEnter={hoverIn}
+            onMouseLeave={(e) => hoverOut(e)}
+            className="flex h-full flex-col"
+          >
+            <div className="font-display" style={{ fontSize: 48, color: "#e8b85c", lineHeight: 1 }}>
+              {dollars}
+              {cents && (
+                <span style={{ fontSize: "60%", verticalAlign: "0.4em", marginLeft: 2 }}>
+                  .{cents}
+                </span>
+              )}
+            </div>
+            <p className="mt-2 font-sans uppercase" style={{ fontSize: 12, letterSpacing: "2px", color: "#8a7e6e" }}>
+              One-Time
+            </p>
+            <h3 className="mt-6 font-display" style={{ fontSize: 28, color: "#f0e8da" }}>
+              Legacy Pack
+            </h3>
+            <p className="mt-2 font-serif italic" style={{ fontSize: 15, color: "#c4b8a6" }}>
+              Your full digital legacy.
+            </p>
+            <BulletList items={LEGACY_ITEMS} />
+            <Link
+              to="/journey/1"
+              className="mt-8 block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
+              style={{
+                background: "linear-gradient(135deg, #e8943a, #c47828)",
+                color: "#1a1208",
+              }}
+            >
+              Unlock Your Legacy
+            </Link>
+          </div>
+        </div>
 
-    </div>
-  </motion.section>
+        {/* TIER 3 — Legacy Book */}
+        <div className="relative">
+          <div
+            className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-pill font-sans uppercase"
+            style={{
+              background: "transparent",
+              border: "1px solid #d4a04a",
+              color: "#d4a04a",
+              fontSize: 11,
+              letterSpacing: "3px",
+              padding: "6px 18px",
+            }}
+          >
+            Heirloom
+          </div>
+          <div
+            style={cardBase}
+            onMouseEnter={hoverIn}
+            onMouseLeave={(e) => hoverOut(e)}
+            className="flex h-full flex-col"
+          >
+            <div className="font-display" style={{ fontSize: 48, color: "#e8b85c", lineHeight: 1 }}>
+              {bookDollars}
+            </div>
+            <p className="mt-2 font-sans uppercase" style={{ fontSize: 12, letterSpacing: "2px", color: "#8a7e6e" }}>
+              One-Time · Shipped Worldwide
+            </p>
+            <h3 className="mt-6 font-display" style={{ fontSize: 28, color: "#f0e8da" }}>
+              Legacy Book
+            </h3>
+            <p className="mt-2 font-serif italic" style={{ fontSize: 15, color: "#c4b8a6" }}>
+              Bound and shipped to your shelf.
+            </p>
+            <BulletList items={BOOK_ITEMS} />
+            <Link
+              to="/shop"
+              className="mt-8 block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
+              style={{
+                background: "rgba(232,148,58,0.06)",
+                border: "1px solid rgba(232,148,58,0.18)",
+                color: "#d4a04a",
+              }}
+            >
+              Order the Book
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto mt-10 max-w-[600px] text-center">
+        <p className="font-sans italic" style={{ fontSize: 13, color: "#8a7e6e" }}>
+          Looking for the premium tier? Our Deep Legacy research package includes a 15-question AI interview, deep historical records, and 24-hour turnaround.{" "}
+          <Link
+            to="/deep-legacy"
+            style={{ color: "#d4a04a", textDecoration: "none" }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.textDecoration = "underline")}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.textDecoration = "none")}
+          >
+            Learn about Deep Legacy →
+          </Link>
+        </p>
+      </div>
+    </motion.section>
   );
 };
 
