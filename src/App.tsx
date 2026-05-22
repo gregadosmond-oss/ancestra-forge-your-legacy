@@ -45,6 +45,7 @@ import DeepLegacyResults from "./pages/DeepLegacyResults.tsx";
 import DeepLegacyCheckout from "./pages/DeepLegacyCheckout.tsx";
 import DeepLegacyConfirmation from "./pages/DeepLegacyConfirmation.tsx";
 import FamilySearchCallback from "./pages/auth/FamilySearchCallback.tsx";
+import FamilySearchDemo from "./pages/FamilySearchDemo.tsx";
 
 const queryClient = new QueryClient();
 
