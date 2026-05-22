@@ -32,10 +32,15 @@ const Stop5Story = () => {
     try { sessionStorage.setItem("stop5_ambient_dismissed", "true"); } catch {}
     setShowAmbientCard(false);
   }, []);
-  const handlePlayAmbient = useCallback(() => {
-    toggleAmbientPlayback();
-    dismissAmbientCard();
-  }, [dismissAmbientCard]);
+  const [ambientPlaying, setAmbientPlaying] = useState(false);
+  useEffect(() => {
+    const id = setInterval(() => setAmbientPlaying(isAmbientPlaying()), 500);
+    return () => clearInterval(id);
+  }, []);
+  const handleToggleAmbient = useCallback(() => {
+    const nowPlaying = toggleAmbientPlayback();
+    setAmbientPlaying(nowPlaying);
+  }, []);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
 
