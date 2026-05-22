@@ -1,0 +1,1 @@
+ALTER VIEW public.surname_crests_public SET (security_invoker = off);
