@@ -1005,13 +1005,17 @@ Deno.serve(async (req) => {
       return fail("upload", uploadErr.message);
     }
 
-    const { data: pub } = supabase.storage
+    const { data: signed, error: signErr } = await supabase.storage
       .from("print-designs")
-      .getPublicUrl(path);
+      .createSignedUrl(path, 3600);
+    if (signErr || !signed?.signedUrl) {
+      return fail("sign", signErr?.message ?? "Failed to create signed URL");
+    }
 
     return json(200, {
       success: true,
-      url: pub.publicUrl,
+      url: signed.signedUrl,
+      path,
       bytes: pdfBytes.byteLength,
       pageCount: finalPageCount,
     });
