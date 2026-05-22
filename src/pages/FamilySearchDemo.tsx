@@ -672,9 +672,9 @@ const FamilySearchDemo = () => {
           <div style={{ marginTop: 24 }}>
             <BtnWarm
               as="a"
-              href="mailto:gregadosmond@gmail.com?subject=Re%3A%20AncestorsQR%20FamilySearch%20Integration%20Preview"
+              href="mailto:greg@ancestorsqr.com?subject=Re%3A%20AncestorsQR%20FamilySearch%20Integration%20Preview"
             >
-              Reply to Greg — gregadosmond@gmail.com
+              Reply to Greg — greg@ancestorsqr.com
             </BtnWarm>
           </div>
         </Section>
