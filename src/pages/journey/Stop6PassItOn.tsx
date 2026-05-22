@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Shield, BookOpen, Scroll } from "lucide-react";
 import SectionLabel from "@/components/journey/SectionLabel";
 import WarmDivider from "@/components/journey/WarmDivider";
 import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
@@ -190,7 +191,7 @@ const Stop6PassItOn = () => {
 
             {/* Legacy Pack */}
             <div className="flex flex-col rounded-[22px] p-6 text-center" style={{ background: "#1e1810", border: "1px solid rgba(232,148,58,0.35)" }}>
-              <div className="mb-3 text-3xl">🛡</div>
+            <div className="mb-3 flex justify-center"><Shield size={32} color="#d4a04a" /></div>
               <h3 className="font-display text-base text-cream-warm">Legacy Pack</h3>
               <p className="mt-2 text-sm leading-relaxed" style={{ color: "#8a7e6e" }}>
                 Your full 9-chapter story, high-res crest, migration path &amp; legacy certificate.
@@ -207,7 +208,7 @@ const Stop6PassItOn = () => {
 
             {/* Legacy Book heirloom */}
             <div className="flex flex-col rounded-[22px] border bg-card p-6 text-center" style={{ borderColor: "rgba(232,148,58,0.12)" }}>
-              <div className="mb-3 text-3xl">📖</div>
+              <div className="mb-3 flex justify-center"><BookOpen size={32} color="#d4a04a" /></div>
               <h3 className="font-display text-base text-cream-warm">Make it an heirloom</h3>
               <p className="mt-2 text-sm leading-relaxed" style={{ color: "#8a7e6e" }}>
                 Order the Legacy Book — $129 hardcover, shipped to your door.
@@ -225,7 +226,7 @@ const Stop6PassItOn = () => {
 
             {/* Pricing */}
             <div className="flex flex-col rounded-[22px] border bg-card p-6 text-center" style={{ borderColor: "rgba(232,148,58,0.12)" }}>
-              <div className="mb-3 text-3xl">📜</div>
+              <div className="mb-3 flex justify-center"><Scroll size={32} color="#d4a04a" /></div>
               <h3 className="font-display text-base text-cream-warm">See All Pricing</h3>
               <p className="mt-2 text-sm leading-relaxed" style={{ color: "#8a7e6e" }}>
                 Compare everything we offer and find the right pack for your family.
