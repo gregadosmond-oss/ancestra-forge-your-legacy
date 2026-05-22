@@ -115,10 +115,7 @@ export default function Shop() {
     }, 2000);
   };
 
-  const filtered =
-    activeCategory === "all"
-      ? SHOP_PRODUCTS
-      : SHOP_PRODUCTS.filter((p) => p.category === activeCategory);
+  const filtered = SHOP_PRODUCTS.filter((p) => p.id === "legacy-book");
 
   return (
     <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-background">
