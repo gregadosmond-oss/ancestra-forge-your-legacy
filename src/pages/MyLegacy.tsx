@@ -88,7 +88,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
             .eq("surname", surname)
             .maybeSingle(),
           supabase
-            .from("surname_crests")
+            .from("surname_crests_public")
             .select("image_url")
             .eq("surname", surname)
             .maybeSingle(),
@@ -133,7 +133,7 @@ function useLegacyData(userId: string | undefined): LegacyData {
                   .eq("surname", surname)
                   .maybeSingle(),
                 supabase
-                  .from("surname_crests")
+                  .from("surname_crests_public")
                   .select("image_url")
                   .eq("surname", surname)
                   .maybeSingle(),
@@ -184,7 +184,7 @@ function useCrestPoller(surname: string | null, initialCrestUrl: string | null) 
     const tick = async () => {
       if (stopped || Date.now() > deadline) return;
       const { data } = await supabase
-        .from("surname_crests")
+        .from("surname_crests_public")
         .select("image_url")
         .eq("surname", surname)
         .maybeSingle();

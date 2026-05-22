@@ -24,7 +24,7 @@ const GiftPage = () => {
     queryKey: ["surname_crest", gift?.surname],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("surname_crests")
+        .from("surname_crests_public")
         .select("image_url")
         .eq("surname", gift!.surname.toLowerCase())
         .order("created_at", { ascending: false })
