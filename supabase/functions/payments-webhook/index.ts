@@ -242,9 +242,11 @@ async function triggerPrintfulOrder({ productType, surname, shippingAddress, buy
     }
   } catch (err) {
     console.error("triggerPrintfulOrder threw:", (err as Error).message);
+  }
 }
 
 // ─── Legacy Book order trigger ───────────────────────────────────────────────
+
 
 async function triggerLegacyBookOrder({
   surname,
