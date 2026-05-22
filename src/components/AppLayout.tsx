@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Play, Pause } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { toggleAmbientPlayback } from "@/lib/ambientAudio";
 import { useAuth } from "@/hooks/useAuth";
@@ -383,26 +383,25 @@ const AppLayout = () => {
       {!isLanding && <button
         aria-label={isPlaying ? "Pause music" : "Play music"}
         onClick={() => setIsPlaying(toggleAmbientPlayback())}
-        className="fixed bottom-5 right-5 z-40 flex items-center justify-center transition-opacity duration-200 hover:opacity-70"
+        className="fixed bottom-5 right-5 z-40 flex items-center transition-opacity duration-200 hover:opacity-70"
         style={{
-          width: "36px",
-          height: "36px",
-          borderRadius: "50%",
+          gap: "8px",
+          padding: "8px 16px",
+          borderRadius: "60px",
           border: "1px solid rgba(212,160,74,0.25)",
           background: "rgba(13,10,7,0.7)",
         }}
       >
         {isPlaying ? (
-          // Pause icon
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#d4a04a">
-            <rect x="6" y="4" width="4" height="16" rx="1" />
-            <rect x="14" y="4" width="4" height="16" rx="1" />
-          </svg>
+          <>
+            <Pause size={14} color="#d4a04a" />
+            <span className="font-sans text-[11px] uppercase font-semibold" style={{ letterSpacing: "2px", color: "#d4a04a" }}>MUSIC</span>
+          </>
         ) : (
-          // Play icon
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#d4a04a">
-            <polygon points="5 3 19 12 5 21 5 3" />
-          </svg>
+          <>
+            <Play size={14} color="#d4a04a" />
+            <span className="font-sans text-[11px] uppercase font-semibold" style={{ letterSpacing: "2px", color: "#d4a04a" }}>PLAY MUSIC</span>
+          </>
         )}
       </button>}
 
