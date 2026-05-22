@@ -127,7 +127,7 @@ const PacksSection = () => {
         </div>
 
         {/* TIER 2 — Legacy Pack (featured) */}
-        <div className="relative md:col-span-2 lg:col-span-1">
+        <div className="relative h-full">
           <div
             className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-pill font-sans font-bold uppercase"
             style={{
