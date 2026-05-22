@@ -684,7 +684,24 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      surname_crests_public: {
+        Row: {
+          created_at: string | null
+          image_url: string | null
+          surname: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          image_url?: string | null
+          surname?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          image_url?: string | null
+          surname?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       delete_email: {
