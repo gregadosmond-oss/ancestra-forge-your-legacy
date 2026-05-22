@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { PDFDocument } from "https://esm.sh/pdf-lib@1.17.1";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -116,32 +117,60 @@ serve(async (req) => {
   }
 
   // Verify rendered PDFs exist before building the order
-  try {
-    const [interiorHead, coverHead] = await Promise.all([
-      fetch(interiorUrl, { method: "HEAD" }),
-      fetch(coverUrl, { method: "HEAD" }),
-    ]);
-    if (!interiorHead.ok || !coverHead.ok) {
-      return json(400, {
-        error:
-          `Missing rendered PDFs for surname ${surname}. Run render-legacy-book-pdf and render-legacy-book-cover-pdf first.`,
-        interiorStatus: interiorHead.status,
-        coverStatus: coverHead.status,
-        interiorUrl,
-        coverUrl,
-      });
-    }
-  } catch (err) {
-    return json(400, {
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+
+  const interiorPath = `books/${normalizedSurname}-book-interior.pdf`;
+  const coverPath = `books/${normalizedSurname}-book-cover.pdf`;
+
+  const missingResponse = () =>
+    json(400, {
       error:
         `Missing rendered PDFs for surname ${surname}. Run render-legacy-book-pdf and render-legacy-book-cover-pdf first.`,
-      detail: (err as Error).message,
+      interiorPath,
+      coverPath,
+    });
+
+  try {
+    const [interiorList, coverList] = await Promise.all([
+      supabase.storage
+        .from("print-designs")
+        .list("books", { search: `${normalizedSurname}-book-interior.pdf` }),
+      supabase.storage
+        .from("print-designs")
+        .list("books", { search: `${normalizedSurname}-book-cover.pdf` }),
+    ]);
+    if (
+      interiorList.error || coverList.error ||
+      !interiorList.data?.some((f) => f.name === `${normalizedSurname}-book-interior.pdf`) ||
+      !coverList.data?.some((f) => f.name === `${normalizedSurname}-book-cover.pdf`)
+    ) {
+      return missingResponse();
+    }
+  } catch (_err) {
+    return missingResponse();
+  }
+
+  const [iSignedRes, cSignedRes] = await Promise.all([
+    supabase.storage.from("print-designs").createSignedUrl(interiorPath, 86400),
+    supabase.storage.from("print-designs").createSignedUrl(coverPath, 86400),
+  ]);
+  const iSigned = iSignedRes.data;
+  const cSigned = cSignedRes.data;
+  if (!iSigned?.signedUrl || !cSigned?.signedUrl) {
+    return json(500, {
+      success: false,
+      error: "Failed to generate signed URLs for book PDFs",
+      interiorError: iSignedRes.error?.message,
+      coverError: cSignedRes.error?.message,
     });
   }
 
   let interiorPdfPages: number;
   try {
-    interiorPdfPages = await getInteriorPdfPageCount(interiorUrl);
+    interiorPdfPages = await getInteriorPdfPageCount(iSigned.signedUrl);
   } catch (err) {
     return json(500, {
       success: false,
@@ -182,8 +211,8 @@ serve(async (req) => {
         pageCount,
         quantity,
         files: [
-          { type: "default", url: interiorUrl },
-          { type: "cover", url: coverUrl },
+          { type: "default", url: iSigned.signedUrl },
+          { type: "cover", url: cSigned.signedUrl },
         ],
       },
     ],
