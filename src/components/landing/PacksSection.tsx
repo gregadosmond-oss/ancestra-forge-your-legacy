@@ -30,7 +30,8 @@ const LEGACY_ITEMS = [
 const BOOK_ITEMS = [
   "Everything in Legacy Pack",
   "Heirloom hardcover, 8×11\"",
-  "12 chapters, 42 pages",
+  "9 chapters, 42 pages",
+  "Legacy Certificate (bound + printable)",
   "5-generation visual tree",
   "Matte-laminated cover",
   "Printed and shipped by Gelato",

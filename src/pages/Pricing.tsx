@@ -18,7 +18,7 @@ const FAQ = [
   },
   {
     q: "What's the difference between the Legacy Pack and the Legacy Book?",
-    a: "The Legacy Pack is the full digital experience, delivered instantly. The Legacy Book is the same story bound as a hardcover heirloom — 12 chapters, 42 pages, matte-laminated cover — printed and shipped worldwide.",
+    a: "The Legacy Pack is the full digital experience, delivered instantly. The Legacy Book is the same story bound as a hardcover heirloom — 9 chapters, 42 pages, matte-laminated cover — printed and shipped worldwide.",
   },
   {
     q: "How fast is delivery?",
