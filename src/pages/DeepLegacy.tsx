@@ -107,7 +107,7 @@ export default function DeepLegacy() {
   const rows = [
     ["Surname meaning", "✓", "✓", "✓"],
     ["Family crest", "preview", "full", "full"],
-    ["Family story", "—", "3 chapters", "12 chapters"],
+    ["Family story", "—", "9 chapters", "9 chapters"],
     ["Family tree", "—", "3 generations", "5 generations"],
     ["AI Interview", "—", "—", "✓"],
     ["Historical research", "—", "—", "✓"],
@@ -191,7 +191,7 @@ export default function DeepLegacy() {
           <FeatureCard
             icon={<BookOpen size={28} />}
             title="Extended Legacy Pack"
-            body="12-chapter family story, 5-generation tree, premium certificate, high-res crest, all delivered digitally."
+            body="9-chapter family story, 5-generation tree, premium certificate, high-res crest, all delivered digitally."
           />
         </div>
       </section>
