@@ -2,7 +2,7 @@ import { useParams, Link, Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { getOccasionBySlug } from "@/data/giftOccasions";
 import WarmDivider from "@/components/journey/WarmDivider";
-import { useLegacyPackPrice } from "@/hooks/useLegacyPackPrice";
+import { useStripePrice } from "@/hooks/useStripePrice";
 
 const reveal = {
   initial: { opacity: 0, y: 24 },
@@ -19,7 +19,8 @@ const stagger = (i: number) => ({
 export default function GiftOccasionPage() {
   const { occasion } = useParams<{ occasion: string }>();
   const config = getOccasionBySlug(occasion ?? "");
-  const legacyPrice = useLegacyPackPrice();
+  const legacyPrice = useStripePrice("legacy_pack_once", "$29.99");
+  const bookPrice = useStripePrice("legacy_book_once", "$129");
 
   if (!config) return <Navigate to="/" replace />;
 
@@ -161,82 +162,95 @@ export default function GiftOccasionPage() {
           Choose your gift
         </motion.h2>
 
+        {/* LEGACY: removed during digital-first revamp May 22 2026
+            The full config.products grid (mug, canvas, coaster, blanket, t-shirt,
+            acrylic, charcuterie board, speaker) has been replaced with a 2-card
+            row showing only the Legacy Pack and the Legacy Book. */}
         <div className="grid gap-5 sm:grid-cols-2">
-          {config.products.map((product, i) => (
-            <motion.div
-              key={product.name}
-              {...stagger(i)}
-              className="relative flex flex-col rounded-[22px] p-6"
+          {/* Legacy Pack — digital gift */}
+          <motion.div
+            {...stagger(0)}
+            className="relative flex flex-col rounded-[22px] p-7"
+            style={{
+              background: "rgba(26,21,14,0.9)",
+              border: "1px solid rgba(232,148,58,0.35)",
+              transition: "all 0.3s ease",
+            }}
+          >
+            <span
+              className="mb-3 self-start rounded-pill font-sans text-[9px] uppercase tracking-[2px]"
               style={{
-                background: "rgba(26,21,14,0.9)",
-                border: "1px solid rgba(212,160,74,0.08)",
-                transition: "border-color 0.3s ease, background 0.3s ease",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.borderColor =
-                  "rgba(212,160,74,0.2)";
-                (e.currentTarget as HTMLDivElement).style.background =
-                  "rgba(34,28,20,0.95)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.borderColor =
-                  "rgba(212,160,74,0.08)";
-                (e.currentTarget as HTMLDivElement).style.background =
-                  "rgba(26,21,14,0.9)";
+                padding: "4px 12px",
+                background: "rgba(232,148,58,0.12)",
+                border: "1px solid rgba(232,148,58,0.3)",
+                color: "#e8943a",
               }}
             >
-              {product.tag && (
-                <span
-                  className="mb-3 self-start rounded-pill font-sans text-[9px] uppercase tracking-[2px]"
-                  style={{
-                    padding: "4px 12px",
-                    background: "rgba(232,148,58,0.12)",
-                    border: "1px solid rgba(232,148,58,0.3)",
-                    color: "#e8943a",
-                  }}
-                >
-                  {product.tag}
-                </span>
-              )}
-              <h3 className="font-display text-xl" style={{ color: "#f0e8da" }}>
-                {product.name}
-              </h3>
-              <p
-                className="mt-1 font-sans text-[13px] font-semibold"
-                style={{ color: "#d4a04a" }}
-              >
-                {product.name === "Legacy Pack" ? legacyPrice : product.price}
-              </p>
-              <p
-                className="mt-3 font-sans text-[14px] leading-relaxed"
-                style={{ color: "#a09280", flexGrow: 1 }}
-              >
-                {product.description}
-              </p>
-              <Link
-                to="/journey/1"
-                className="mt-5 self-start font-sans text-[11px] uppercase tracking-[1.5px]"
-                style={{
-                  color: "#a07830",
-                  textDecoration: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 5,
-                  transition: "color 0.2s",
-                }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.color =
-                    "#d4a04a")
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.color =
-                    "#a07830")
-                }
-              >
-                Begin your journey →
-              </Link>
-            </motion.div>
-          ))}
+              Instant Gift
+            </span>
+            <h3 className="font-display text-2xl" style={{ color: "#f0e8da" }}>
+              Legacy Pack
+            </h3>
+            <p className="mt-1 font-sans text-[14px] font-semibold" style={{ color: "#d4a04a" }}>
+              {legacyPrice}
+            </p>
+            <p className="mt-3 font-serif italic text-[14px] leading-relaxed" style={{ color: "#c4b8a6", flexGrow: 1 }}>
+              Their full digital legacy — coat of arms, 9-chapter family story, bloodline tree, and certificate. Delivered to their inbox within minutes.
+            </p>
+            <Link
+              to="/checkout?isGift=true&priceId=legacy_pack_once"
+              className="mt-6 self-start rounded-pill px-7 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
+              style={{
+                background: "linear-gradient(135deg, #e8943a, #c47828)",
+                color: "#1a1208",
+              }}
+            >
+              Gift the Legacy Pack
+            </Link>
+          </motion.div>
+
+          {/* Legacy Book — heirloom gift */}
+          <motion.div
+            {...stagger(1)}
+            className="relative flex flex-col rounded-[22px] p-7"
+            style={{
+              background: "rgba(26,21,14,0.9)",
+              border: "1px solid #3d3020",
+              transition: "all 0.3s ease",
+            }}
+          >
+            <span
+              className="mb-3 self-start rounded-pill font-sans text-[9px] uppercase tracking-[2px]"
+              style={{
+                padding: "4px 12px",
+                background: "transparent",
+                border: "1px solid #d4a04a",
+                color: "#d4a04a",
+              }}
+            >
+              Heirloom
+            </span>
+            <h3 className="font-display text-2xl" style={{ color: "#f0e8da" }}>
+              Legacy Book
+            </h3>
+            <p className="mt-1 font-sans text-[14px] font-semibold" style={{ color: "#d4a04a" }}>
+              {bookPrice}
+            </p>
+            <p className="mt-3 font-serif italic text-[14px] leading-relaxed" style={{ color: "#c4b8a6", flexGrow: 1 }}>
+              The same story bound as a hardcover heirloom — 12 chapters, 42 pages, matte-laminated cover. Printed and shipped worldwide.
+            </p>
+            <Link
+              to="/shop"
+              className="mt-6 self-start rounded-pill px-7 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
+              style={{
+                background: "rgba(232,148,58,0.06)",
+                border: "1px solid rgba(232,148,58,0.18)",
+                color: "#d4a04a",
+              }}
+            >
+              Gift the Legacy Book
+            </Link>
+          </motion.div>
         </div>
       </section>
 
