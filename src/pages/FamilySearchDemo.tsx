@@ -298,7 +298,8 @@ const FamilySearchDemo = () => {
           <H2>Where FamilySearch fits.</H2>
           <Body>
             AncestorsQR is a digital legacy product. Users enter a surname and receive an
-            AI-generated coat of arms, a family story (9 chapters digital, 12 chapters in the hardcover Legacy Book edition), and a visual bloodline tree.
+            AI-generated coat of arms, a 9-chapter family story, and a visual bloodline tree.
+            The hardcover Legacy Book edition prints the same 9 chapters as a keepsake.
             It's an emotional discovery experience, not a genealogy database.
           </Body>
           <Body>
