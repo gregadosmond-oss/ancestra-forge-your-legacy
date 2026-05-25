@@ -367,6 +367,29 @@ Deno.serve(async (req) => {
       );
     }
 
+    // DEBUG bypass — return raw FS response without parsing
+    if (body.debug) {
+      const fsResponseText = await fsResp.text();
+      const fsResponseHeaders = headersToObject(fsResp.headers);
+      return json(200, {
+        success: true,
+        debug: true,
+        personId_used: rootPersonId,
+        fs_endpoint_called: ancestryUrl,
+        fs_status: fsResp.status,
+        fs_response_body_raw: fsResponseText,
+        fs_response_headers: {
+          "content-type": fsResponseHeaders["content-type"] ?? null,
+          "content-length": fsResponseHeaders["content-length"] ?? null,
+          "x-processing-time": fsResponseHeaders["x-processing-time"] ?? null,
+          date: fsResponseHeaders["date"] ?? null,
+          etag: fsResponseHeaders["etag"] ?? null,
+          warning: fsResponseHeaders["warning"] ?? null,
+          "www-authenticate": fsResponseHeaders["www-authenticate"] ?? null,
+        },
+      });
+    }
+
     const data = await fsResp.json().catch(() => ({}));
     const rawPersons: any[] = Array.isArray(data?.persons) ? data.persons : [];
     const rawRelationships: any[] = Array.isArray(data?.relationships)
