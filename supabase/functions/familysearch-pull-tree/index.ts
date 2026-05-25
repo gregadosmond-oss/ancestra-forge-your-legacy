@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
       "https://identbeta.familysearch.org";
     const API_BASE =
       Deno.env.get("FAMILYSEARCH_API_BASE_URL") ||
-      "https://api-beta.familysearch.org";
+      "https://api-integ.familysearch.org";
 
     // STEP 2 — token freshness
     let access_token = session.access_token as string;
