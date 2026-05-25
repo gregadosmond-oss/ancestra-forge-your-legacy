@@ -230,23 +230,33 @@ const Stop3Bloodline = () => {
   }
 
   async function handleDisconnectFS() {
+    console.log("[FS Disconnect] Starting");
     setConnecting(true);
+
     try {
-      // 1. Delete stale FS session row server-side
-      await supabase.functions.invoke("familysearch-disconnect");
+      console.log("[FS Disconnect] Calling disconnect edge function");
+      const response = await supabase.functions.invoke("familysearch-disconnect");
+      console.log("[FS Disconnect] Edge function response:", response);
+    } catch (err) {
+      console.error("[FS Disconnect] Edge function failed, continuing anyway:", err);
+    }
 
-      // 2. Clear any local FS state
-      try {
-        Object.keys(localStorage)
-          .filter((k) => k.startsWith("fs_"))
-          .forEach((k) => localStorage.removeItem(k));
-      } catch {
-        // ignore
-      }
+    try {
+      console.log("[FS Disconnect] Clearing localStorage. Before:", Object.keys(localStorage));
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith("fs_"))
+        .forEach((k) => localStorage.removeItem(k));
+      console.log("[FS Disconnect] LocalStorage after clear:", Object.keys(localStorage));
+    } catch (err) {
+      console.error("[FS Disconnect] localStorage clear failed:", err);
+    }
 
-      // 3. Start fresh OAuth
+    try {
+      console.log("[FS Disconnect] Calling initiateFamilySearchOAuth");
       await initiateFamilySearchOAuth();
-    } catch {
+      console.log("[FS Disconnect] If you see this without redirect, OAuth didn't fire");
+    } catch (err) {
+      console.error("[FS Disconnect] initiateFamilySearchOAuth threw:", err);
       setConnecting(false);
     }
   }
