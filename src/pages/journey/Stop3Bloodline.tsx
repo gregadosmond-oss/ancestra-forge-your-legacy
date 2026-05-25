@@ -59,6 +59,7 @@ const Stop3Bloodline = () => {
   const [searchParams] = useSearchParams();
   const { unknownSurname, surname, facts } = useJourney();
   const { user, loading: authLoading } = useAuth();
+  const fsConnected = searchParams.get("fs_connected") === "true";
 
   const [phase, setPhase] = useState<Phase>("idle");
   const [matches, setMatches] = useState<Match[]>([]);
@@ -80,14 +81,14 @@ const Stop3Bloodline = () => {
     else if (!surname) navigate("/journey/1", { replace: true });
   }, [unknownSurname, surname, navigate]);
 
-  // Handle OAuth return: ?fs_connected=true → auto-pull tree
+  // Only auto-pull immediately after OAuth return.
   useEffect(() => {
-    if (searchParams.get("fs_connected") === "true" && user) {
+    if (fsConnected && user) {
       navigate("/journey/3", { replace: true });
       void pullTree(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, user]);
+  }, [fsConnected, user]);
 
   if (!surname) return null;
 
@@ -237,6 +238,10 @@ const Stop3Bloodline = () => {
     }
   }
 
+  async function handleRefreshTree() {
+    await pullTree(selectedPersonId);
+  }
+
   function resetFlow() {
     setPhase("idle");
     setMatches([]);
@@ -331,6 +336,15 @@ const Stop3Bloodline = () => {
                   >
                     {connecting ? "Redirecting…" : "Connect with FamilySearch"}
                   </button>
+                  {!fsConnected && (
+                    <button
+                      type="button"
+                      onClick={handleRefreshTree}
+                      className="mt-3 block font-sans text-[11px] uppercase tracking-[1.5px] text-text-dim transition-colors hover:text-amber"
+                    >
+                      Refresh tree
+                    </button>
+                  )}
                 </div>
 
                 {/* Option B — Form */}
@@ -537,6 +551,15 @@ const Stop3Bloodline = () => {
                   </div>
                 ))}
                 <div className="mt-4 text-center">
+                  <button
+                    type="button"
+                    className="rounded-pill border border-amber-dim/30 bg-amber/[0.06] px-5 py-2 font-sans text-[11px] uppercase tracking-[1.5px] text-amber transition-all hover:bg-amber/[0.12]"
+                    onClick={handleRefreshTree}
+                  >
+                    Refresh tree
+                  </button>
+                </div>
+                <div className="text-center">
                   <button
                     type="button"
                     className="font-sans text-[11px] uppercase tracking-[1.5px] text-text-dim hover:text-amber"
