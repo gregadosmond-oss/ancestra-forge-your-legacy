@@ -571,20 +571,32 @@ const Stop3Bloodline = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="rounded-[14px] border border-[#c47828]/50 bg-card/60 p-6 text-center"
+                className="rounded-[14px] border border-amber-dim/30 bg-card/60 p-6 text-center"
               >
-                <p className="font-sans text-sm text-text">
-                  {errorMessage || "Something went wrong."}
+                <p className="font-serif text-sm italic text-amber-dim">
+                  Connect to FamilySearch for your real bloodline.
                 </p>
                 <button
                   type="button"
-                  onClick={resetFlow}
-                  className="mt-4 rounded-pill border border-amber-dim/30 bg-amber/[0.06] px-6 py-2 font-sans text-[12px] uppercase tracking-[1.5px] text-amber"
+                  onClick={handleConnectFS}
+                  disabled={connecting}
+                  className="mt-4 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
+                  style={{
+                    background: "linear-gradient(135deg, #e8943a, #c47828)",
+                  }}
                 >
-                  Try again
+                  {connecting ? "Redirecting…" : "Connect to FamilySearch"}
+                </button>
+                <button
+                  type="button"
+                  onClick={resetFlow}
+                  className="mt-3 block w-full font-sans text-[11px] uppercase tracking-[1.5px] text-text-dim hover:text-amber"
+                >
+                  Back
                 </button>
               </motion.div>
             )}
+
           </AnimatePresence>
         )}
       </motion.section>
