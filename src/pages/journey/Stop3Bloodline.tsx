@@ -213,10 +213,22 @@ const Stop3Bloodline = () => {
       }
       const resp = data as {
         success: boolean;
+        status?: number;
         root_id?: string;
         persons?: TreePerson[];
         error?: string;
       };
+      // Not-connected state: pull-tree returns 200 with success:false + "Connect with FamilySearch first".
+      // Show the Connect button, NOT the misleading "session expired" error card.
+      if (
+        resp &&
+        resp.success === false &&
+        (resp.status === 412 ||
+          (resp.error ?? "").toLowerCase().includes("connect with familysearch"))
+      ) {
+        setPhase("no-fs-session");
+        return;
+      }
       if (!resp?.success || !resp.persons) {
         throw new Error(resp?.error ?? "Tree pull failed");
       }
