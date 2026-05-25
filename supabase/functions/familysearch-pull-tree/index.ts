@@ -105,6 +105,84 @@ Deno.serve(async (req) => {
 
     const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+    const API_BASE_EARLY =
+      Deno.env.get("FAMILYSEARCH_API_BASE_URL") ||
+      "https://api-integ.familysearch.org";
+
+    // ============================================================
+    // MINIMAL personId BRANCH — direct fetch, no short-circuits
+    // ============================================================
+    if (requestedPersonId) {
+      const { data: fsSession } = await admin
+        .from("familysearch_sessions")
+        .select("access_token")
+        .eq("user_id", user_id)
+        .maybeSingle();
+
+      if (!fsSession?.access_token) {
+        return json(200, {
+          success: false,
+          status: 401,
+          error: "No FamilySearch session",
+        });
+      }
+
+      const fsToken = fsSession.access_token as string;
+      const fsUrl = `${API_BASE_EARLY}/platform/tree/persons/${encodeURIComponent(
+        requestedPersonId,
+      )}/ancestry?generations=${generationsRequested}`;
+
+      console.log("[pull-tree] Calling FS:", fsUrl);
+
+      const fsResp = await fetch(fsUrl, {
+        headers: {
+          Authorization: `Bearer ${fsToken}`,
+          Accept: "application/x-fs-v1+json",
+          "Accept-Language": "en",
+          "User-Agent": "AncestorsQR/1.0 (https://ancestorsqr.com)",
+        },
+      });
+
+      const fsText = await fsResp.text();
+      console.log(
+        "[pull-tree] FS status:",
+        fsResp.status,
+        "body length:",
+        fsText.length,
+      );
+
+      if (body.debug) {
+        return json(200, {
+          success: true,
+          fs_status: fsResp.status,
+          fs_url: fsUrl,
+          fs_response_body_raw: fsText,
+          fs_response_headers: Object.fromEntries(fsResp.headers.entries()),
+        });
+      }
+
+      if (!fsResp.ok) {
+        return json(200, {
+          success: false,
+          status: fsResp.status,
+          fs_url: fsUrl,
+          error: fsText,
+          fs_response_headers: Object.fromEntries(fsResp.headers.entries()),
+        });
+      }
+
+      const fsJson = JSON.parse(fsText);
+      const persons = fsJson.persons || [];
+
+      return json(200, {
+        success: true,
+        root_id: requestedPersonId,
+        persons,
+        generation_count: persons.length > 0 ? generationsRequested : 0,
+        generations_requested: generationsRequested,
+      });
+    }
+
     // STEP 1 — load FS session
     const { data: session, error: sessionErr } = await admin
       .from("familysearch_sessions")
