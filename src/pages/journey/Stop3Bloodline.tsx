@@ -19,7 +19,9 @@ type Phase =
   | "tree-loading"
   | "tree-ready"
   | "error"
-  | "no-fs-session";
+  | "no-fs-session"
+  | "needs-person-id";
+
 
 type Match = {
   id: string | null;
@@ -67,6 +69,9 @@ const Stop3Bloodline = () => {
   const [tree, setTree] = useState<TreeResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [connecting, setConnecting] = useState(false);
+  const [personIdInput, setPersonIdInput] = useState("");
+  const [savingPersonId, setSavingPersonId] = useState(false);
+
 
   // Form state
   const [firstName, setFirstName] = useState("");
@@ -199,7 +204,7 @@ const Stop3Bloodline = () => {
       const { data, error } = await supabase.functions.invoke(
         "familysearch-pull-tree",
         {
-          body: { person_id: personId ?? undefined, generations: 4 },
+          body: { personId: personId ?? undefined, generations: 4 },
         },
       );
       if (error) {
@@ -217,9 +222,8 @@ const Stop3Bloodline = () => {
         root_id?: string;
         persons?: TreePerson[];
         error?: string;
+        needs_person_id?: boolean;
       };
-      // Not-connected state: pull-tree returns 200 with success:false + "Connect with FamilySearch first".
-      // Show the Connect button, NOT the misleading "session expired" error card.
       if (
         resp &&
         resp.success === false &&
@@ -227,6 +231,10 @@ const Stop3Bloodline = () => {
           (resp.error ?? "").toLowerCase().includes("connect with familysearch"))
       ) {
         setPhase("no-fs-session");
+        return;
+      }
+      if (resp && resp.success === false && resp.needs_person_id) {
+        setPhase("needs-person-id");
         return;
       }
       if (!resp?.success || !resp.persons) {
@@ -241,33 +249,52 @@ const Stop3Bloodline = () => {
     }
   }
 
+  async function handleSavePersonIdAndLoad() {
+    const pid = personIdInput.trim().toUpperCase();
+    if (!pid) {
+      toast.error("Enter your FamilySearch person ID");
+      return;
+    }
+    setSavingPersonId(true);
+    try {
+      if (user) {
+        const { error } = await supabase
+          .from("familysearch_sessions")
+          .update({ starting_person_id: pid })
+          .eq("user_id", user.id);
+        if (error) console.warn("[FS] starting_person_id update:", error.message);
+      }
+      await pullTree(pid);
+    } finally {
+      setSavingPersonId(false);
+    }
+  }
+
   async function handleDisconnectFS() {
     console.log("[FS Disconnect] Starting");
     setConnecting(true);
-
-    // [DEBUG] Disconnect edge function call temporarily disabled so the
-    // familysearch_sessions row survives across attempts for diagnosis.
-    console.log("[FS Disconnect] Skipping disconnect edge function (debug mode)");
-
     try {
-      console.log("[FS Disconnect] Clearing localStorage. Before:", Object.keys(localStorage));
+      const { error } = await supabase.functions.invoke("familysearch-disconnect");
+      if (error) console.error("[FS Disconnect] edge function error:", error);
+    } catch (err) {
+      console.error("[FS Disconnect] invoke threw:", err);
+    }
+    try {
       Object.keys(localStorage)
         .filter((k) => k.startsWith("fs_"))
         .forEach((k) => localStorage.removeItem(k));
-      console.log("[FS Disconnect] LocalStorage after clear:", Object.keys(localStorage));
     } catch (err) {
       console.error("[FS Disconnect] localStorage clear failed:", err);
     }
-
     try {
-      console.log("[FS Disconnect] Calling initiateFamilySearchOAuth");
       await initiateFamilySearchOAuth();
-      console.log("[FS Disconnect] If you see this without redirect, OAuth didn't fire");
     } catch (err) {
       console.error("[FS Disconnect] initiateFamilySearchOAuth threw:", err);
       setConnecting(false);
     }
   }
+
+
 
   async function handleRefreshTree() {
     await pullTree(selectedPersonId);
@@ -662,6 +689,47 @@ const Stop3Bloodline = () => {
                 </button>
               </motion.div>
             )}
+
+            {phase === "needs-person-id" && (
+              <motion.div
+                key="needs-person-id"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="rounded-[14px] border border-amber-dim/30 bg-card/60 p-6 text-center"
+              >
+                <h3 className="font-display text-lg text-cream-warm">
+                  One more step
+                </h3>
+                <p className="mt-2 font-sans text-sm text-text">
+                  To pull your bloodline, we need your FamilySearch person ID.
+                </p>
+                <p className="mt-1 font-sans text-xs text-text-dim">
+                  Find it on your FamilySearch profile — it's a code like BMZC-MBD.
+                </p>
+                <div className="mt-5 flex flex-col items-center gap-3">
+                  <input
+                    type="text"
+                    value={personIdInput}
+                    onChange={(e) => setPersonIdInput(e.target.value)}
+                    placeholder="Enter your FamilySearch person ID"
+                    className="w-full max-w-xs rounded-[10px] border border-amber-dim/20 bg-bg-input/80 px-4 py-2.5 text-center font-sans text-sm uppercase tracking-[2px] text-cream-soft placeholder:normal-case placeholder:tracking-normal placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber/40"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSavePersonIdAndLoad}
+                    disabled={savingPersonId}
+                    className="rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground disabled:opacity-50"
+                    style={{
+                      background: "linear-gradient(135deg, #e8943a, #c47828)",
+                    }}
+                  >
+                    {savingPersonId ? "Loading…" : "Save & load tree"}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
 
           </AnimatePresence>
         )}

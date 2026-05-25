@@ -47,8 +47,10 @@ const buildFamilySearchHeaders = (accessToken: string) => ({
 
 interface PullBody {
   person_id?: string;
+  personId?: string;
   generations?: number;
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -84,7 +86,8 @@ Deno.serve(async (req) => {
     const user_id = userData.user.id;
 
     const body = (await req.json().catch(() => ({}))) as PullBody;
-    const requestedPersonId = body.person_id?.trim() || undefined;
+    const requestedPersonId =
+      (body.personId ?? body.person_id)?.toString().trim() || undefined;
     const generationsRequested = Math.min(
       Math.max(typeof body.generations === "number" ? body.generations : 4, 1),
       8,
@@ -105,10 +108,11 @@ Deno.serve(async (req) => {
     const { data: session, error: sessionErr } = await admin
       .from("familysearch_sessions")
       .select(
-        "access_token, refresh_token, token_expires_at, familysearch_person_id",
+        "access_token, refresh_token, token_expires_at, familysearch_person_id, starting_person_id",
       )
       .eq("user_id", user_id)
       .maybeSingle();
+
 
     if (sessionErr) {
       console.error("[familysearch-pull-tree] session lookup failed:", sessionErr);
@@ -267,10 +271,14 @@ Deno.serve(async (req) => {
     };
 
     // STEP 3 — resolve root person id
+    // Prefer explicit param, then stored starting_person_id, then stored
+    // familysearch_person_id. Only fall back to /current-person as last resort.
     let rootPersonId: string | null = null;
 
     if (requestedPersonId) {
       rootPersonId = requestedPersonId;
+    } else if ((session as any).starting_person_id) {
+      rootPersonId = (session as any).starting_person_id as string;
     } else if (session.familysearch_person_id) {
       rootPersonId = session.familysearch_person_id as string;
     } else {
@@ -281,13 +289,26 @@ Deno.serve(async (req) => {
       );
 
       if (!currentResp.ok) {
-        return await fsErrorResponse(
-          currentResp,
-          sentHeaders,
-          currentUrl,
-          "current-person",
-        );
+        const txt = await currentResp.text();
+        const respHeaders = headersToObject(currentResp.headers);
+        console.error("[FS current-person failed]", {
+          url: currentUrl,
+          status: currentResp.status,
+          fs_response_body: txt,
+        });
+        return json(200, {
+          success: false,
+          status: 428,
+          endpoint: "current-person",
+          error:
+            "FamilySearch couldn't resolve your tree person. Enter your FamilySearch person ID (e.g. BMZC-MBD) to continue.",
+          needs_person_id: true,
+          fs_response_status: currentResp.status,
+          fs_response_body: txt,
+          fs_response_headers: respHeaders,
+        });
       }
+
 
       const currentData = await currentResp.json().catch(() => ({}));
       const persons = Array.isArray(currentData?.persons)

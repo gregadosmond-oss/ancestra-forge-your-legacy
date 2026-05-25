@@ -1,0 +1,1 @@
+ALTER TABLE public.familysearch_sessions ADD COLUMN IF NOT EXISTS starting_person_id text;
