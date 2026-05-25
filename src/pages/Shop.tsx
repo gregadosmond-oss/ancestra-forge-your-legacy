@@ -159,8 +159,8 @@ export default function Shop() {
       <section className="relative z-10 w-full max-w-6xl px-6 py-12">
         <motion.div
           {...reveal}
-          className="rounded-[22px]"
-          style={{ background: "#1a1510", padding: "64px 48px" }}
+          className="rounded-[22px] p-8 sm:p-12"
+          style={{ background: "#1a1510" }}
         >
           <p className="mb-3 text-center font-sans text-[11px] uppercase" style={{ color: "#a07830", letterSpacing: "4px" }}>
             What's Inside
@@ -243,13 +243,12 @@ export default function Shop() {
             {...reveal}
             transition={{ ...reveal.transition, delay: 0.08 }}
             whileHover={{ rotate: -1 }}
-            className="flex flex-col overflow-hidden"
+            className="flex flex-col overflow-hidden sm:aspect-[3/4]"
             style={{
               background: "#f0e8da",
               border: "1px solid rgba(212, 160, 74, 0.2)",
               borderRadius: 14,
               padding: "36px 32px",
-              aspectRatio: "3 / 4",
               boxShadow: "inset 0 8px 24px rgba(0,0,0,0.04)",
             }}
           >
@@ -281,13 +280,12 @@ export default function Shop() {
             {...reveal}
             transition={{ ...reveal.transition, delay: 0.16 }}
             whileHover={{ rotate: 0 }}
-            className="flex flex-col overflow-hidden"
+            className="flex flex-col overflow-hidden sm:aspect-[3/4]"
             style={{
               background: "#f0e8da",
               border: "1px solid rgba(212, 160, 74, 0.2)",
               borderRadius: 14,
               padding: "36px 32px",
-              aspectRatio: "3 / 4",
               boxShadow: "inset 0 8px 24px rgba(0,0,0,0.04)",
             }}
           >
@@ -319,13 +317,12 @@ export default function Shop() {
             {...reveal}
             transition={{ ...reveal.transition, delay: 0.24 }}
             whileHover={{ rotate: 1 }}
-            className="flex flex-col overflow-hidden"
+            className="flex flex-col overflow-hidden sm:aspect-[3/4]"
             style={{
               background: "#f0e8da",
               border: "1px solid rgba(212, 160, 74, 0.2)",
               borderRadius: 14,
               padding: "36px 32px",
-              aspectRatio: "3 / 4",
               boxShadow: "inset 0 8px 24px rgba(0,0,0,0.04)",
             }}
           >
@@ -364,8 +361,8 @@ export default function Shop() {
       <section id="order" className="relative z-10 w-full max-w-3xl px-6 py-16">
         <motion.div
           {...reveal}
-          className="rounded-[22px]"
-          style={{ background: "#1a1510", padding: 48 }}
+          className="rounded-[22px] p-6 sm:p-12"
+          style={{ background: "#1a1510" }}
         >
           <h2 className="font-display text-3xl text-cream-warm" style={{ fontSize: 32 }}>
             Order Your Legacy Book
