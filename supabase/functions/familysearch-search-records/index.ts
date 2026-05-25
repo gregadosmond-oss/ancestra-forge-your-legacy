@@ -246,9 +246,10 @@ Deno.serve(async (req) => {
       method: "GET",
       headers: {
         Authorization: `Bearer ${access_token}`,
-        Accept: "application/json",
+        Accept: "application/x-fs-v1+json",
       },
     });
+
 
     if (fsResp.status === 401) {
       await admin.from("familysearch_sessions").delete().eq("user_id", user_id);
