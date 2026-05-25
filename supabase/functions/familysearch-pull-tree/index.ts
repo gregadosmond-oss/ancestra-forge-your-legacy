@@ -47,8 +47,10 @@ const buildFamilySearchHeaders = (accessToken: string) => ({
 
 interface PullBody {
   person_id?: string;
+  personId?: string;
   generations?: number;
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
