@@ -232,6 +232,19 @@ const Stop3Bloodline = () => {
   async function handleDisconnectFS() {
     setConnecting(true);
     try {
+      // 1. Delete stale FS session row server-side
+      await supabase.functions.invoke("familysearch-disconnect");
+
+      // 2. Clear any local FS state
+      try {
+        Object.keys(localStorage)
+          .filter((k) => k.startsWith("fs_"))
+          .forEach((k) => localStorage.removeItem(k));
+      } catch {
+        // ignore
+      }
+
+      // 3. Start fresh OAuth
       await initiateFamilySearchOAuth();
     } catch {
       setConnecting(false);
