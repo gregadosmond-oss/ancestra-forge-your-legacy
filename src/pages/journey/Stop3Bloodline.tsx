@@ -245,13 +245,9 @@ const Stop3Bloodline = () => {
     console.log("[FS Disconnect] Starting");
     setConnecting(true);
 
-    try {
-      console.log("[FS Disconnect] Calling disconnect edge function");
-      const response = await supabase.functions.invoke("familysearch-disconnect");
-      console.log("[FS Disconnect] Edge function response:", response);
-    } catch (err) {
-      console.error("[FS Disconnect] Edge function failed, continuing anyway:", err);
-    }
+    // [DEBUG] Disconnect edge function call temporarily disabled so the
+    // familysearch_sessions row survives across attempts for diagnosis.
+    console.log("[FS Disconnect] Skipping disconnect edge function (debug mode)");
 
     try {
       console.log("[FS Disconnect] Clearing localStorage. Before:", Object.keys(localStorage));
