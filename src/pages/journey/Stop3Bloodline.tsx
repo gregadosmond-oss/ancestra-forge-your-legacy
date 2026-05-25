@@ -225,7 +225,15 @@ const Stop3Bloodline = () => {
       const msg = (err as Error).message;
       setErrorMessage(msg);
       setPhase("error");
-      toast.error("Couldn't load tree", { description: msg });
+    }
+  }
+
+  async function handleDisconnectFS() {
+    setConnecting(true);
+    try {
+      await initiateFamilySearchOAuth();
+    } catch {
+      setConnecting(false);
     }
   }
 
