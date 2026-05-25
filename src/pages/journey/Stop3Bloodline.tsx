@@ -582,8 +582,12 @@ const Stop3Bloodline = () => {
                 className="rounded-[14px] border border-amber-dim/30 bg-card/60 p-6 text-center"
               >
                 <p className="font-serif text-sm italic text-cream-soft">
-                  We couldn't pull your FamilySearch tree right now. Please try disconnecting and reconnecting, or contact support.
+                  FamilySearch returned: {errorMessage || "an unknown error"}
                 </p>
+                <p className="mt-2 font-sans text-xs text-text-dim">
+                  Try disconnecting and reconnecting your FamilySearch account.
+                </p>
+
                 <button
                   type="button"
                   onClick={handleDisconnectFS}
@@ -593,7 +597,7 @@ const Stop3Bloodline = () => {
                     background: "linear-gradient(135deg, #e8943a, #c47828)",
                   }}
                 >
-                  {connecting ? "Redirecting…" : "Disconnect FamilySearch"}
+                  {connecting ? "Redirecting…" : "Disconnect & try again"}
                 </button>
                 <button
                   type="button"
