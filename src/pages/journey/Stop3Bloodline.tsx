@@ -19,7 +19,9 @@ type Phase =
   | "tree-loading"
   | "tree-ready"
   | "error"
-  | "no-fs-session";
+  | "no-fs-session"
+  | "needs-person-id";
+
 
 type Match = {
   id: string | null;
