@@ -295,33 +295,6 @@ const Stop3Bloodline = () => {
   }
 
 
-  async function handleDisconnectFS() {
-    console.log("[FS Disconnect] Starting");
-    setConnecting(true);
-
-    // [DEBUG] Disconnect edge function call temporarily disabled so the
-    // familysearch_sessions row survives across attempts for diagnosis.
-    console.log("[FS Disconnect] Skipping disconnect edge function (debug mode)");
-
-    try {
-      console.log("[FS Disconnect] Clearing localStorage. Before:", Object.keys(localStorage));
-      Object.keys(localStorage)
-        .filter((k) => k.startsWith("fs_"))
-        .forEach((k) => localStorage.removeItem(k));
-      console.log("[FS Disconnect] LocalStorage after clear:", Object.keys(localStorage));
-    } catch (err) {
-      console.error("[FS Disconnect] localStorage clear failed:", err);
-    }
-
-    try {
-      console.log("[FS Disconnect] Calling initiateFamilySearchOAuth");
-      await initiateFamilySearchOAuth();
-      console.log("[FS Disconnect] If you see this without redirect, OAuth didn't fire");
-    } catch (err) {
-      console.error("[FS Disconnect] initiateFamilySearchOAuth threw:", err);
-      setConnecting(false);
-    }
-  }
 
   async function handleRefreshTree() {
     await pullTree(selectedPersonId);
