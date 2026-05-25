@@ -204,7 +204,7 @@ const Stop3Bloodline = () => {
       const { data, error } = await supabase.functions.invoke(
         "familysearch-pull-tree",
         {
-          body: { person_id: personId ?? undefined, generations: 4 },
+          body: { personId: personId ?? undefined, generations: 4 },
         },
       );
       if (error) {
@@ -222,9 +222,8 @@ const Stop3Bloodline = () => {
         root_id?: string;
         persons?: TreePerson[];
         error?: string;
+        needs_person_id?: boolean;
       };
-      // Not-connected state: pull-tree returns 200 with success:false + "Connect with FamilySearch first".
-      // Show the Connect button, NOT the misleading "session expired" error card.
       if (
         resp &&
         resp.success === false &&
@@ -232,6 +231,10 @@ const Stop3Bloodline = () => {
           (resp.error ?? "").toLowerCase().includes("connect with familysearch"))
       ) {
         setPhase("no-fs-session");
+        return;
+      }
+      if (resp && resp.success === false && resp.needs_person_id) {
+        setPhase("needs-person-id");
         return;
       }
       if (!resp?.success || !resp.persons) {
@@ -245,6 +248,52 @@ const Stop3Bloodline = () => {
       setPhase("error");
     }
   }
+
+  async function handleSavePersonIdAndLoad() {
+    const pid = personIdInput.trim().toUpperCase();
+    if (!pid) {
+      toast.error("Enter your FamilySearch person ID");
+      return;
+    }
+    setSavingPersonId(true);
+    try {
+      if (user) {
+        const { error } = await supabase
+          .from("familysearch_sessions")
+          .update({ starting_person_id: pid })
+          .eq("user_id", user.id);
+        if (error) console.warn("[FS] starting_person_id update:", error.message);
+      }
+      await pullTree(pid);
+    } finally {
+      setSavingPersonId(false);
+    }
+  }
+
+  async function handleDisconnectFS() {
+    console.log("[FS Disconnect] Starting");
+    setConnecting(true);
+    try {
+      const { error } = await supabase.functions.invoke("familysearch-disconnect");
+      if (error) console.error("[FS Disconnect] edge function error:", error);
+    } catch (err) {
+      console.error("[FS Disconnect] invoke threw:", err);
+    }
+    try {
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith("fs_"))
+        .forEach((k) => localStorage.removeItem(k));
+    } catch (err) {
+      console.error("[FS Disconnect] localStorage clear failed:", err);
+    }
+    try {
+      await initiateFamilySearchOAuth();
+    } catch (err) {
+      console.error("[FS Disconnect] initiateFamilySearchOAuth threw:", err);
+      setConnecting(false);
+    }
+  }
+
 
   async function handleDisconnectFS() {
     console.log("[FS Disconnect] Starting");
