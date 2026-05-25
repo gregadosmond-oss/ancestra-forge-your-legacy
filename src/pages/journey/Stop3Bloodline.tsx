@@ -225,7 +225,15 @@ const Stop3Bloodline = () => {
       const msg = (err as Error).message;
       setErrorMessage(msg);
       setPhase("error");
-      toast.error("Couldn't load tree", { description: msg });
+    }
+  }
+
+  async function handleDisconnectFS() {
+    setConnecting(true);
+    try {
+      await initiateFamilySearchOAuth();
+    } catch {
+      setConnecting(false);
     }
   }
 
@@ -573,19 +581,19 @@ const Stop3Bloodline = () => {
                 exit={{ opacity: 0 }}
                 className="rounded-[14px] border border-amber-dim/30 bg-card/60 p-6 text-center"
               >
-                <p className="font-serif text-sm italic text-amber-dim">
-                  Connect to FamilySearch for your real bloodline.
+                <p className="font-serif text-sm italic text-cream-soft">
+                  We couldn't pull your FamilySearch tree right now. Please try disconnecting and reconnecting, or contact support.
                 </p>
                 <button
                   type="button"
-                  onClick={handleConnectFS}
+                  onClick={handleDisconnectFS}
                   disabled={connecting}
-                  className="mt-4 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="mt-5 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
                   style={{
                     background: "linear-gradient(135deg, #e8943a, #c47828)",
                   }}
                 >
-                  {connecting ? "Redirecting…" : "Connect to FamilySearch"}
+                  {connecting ? "Redirecting…" : "Disconnect FamilySearch"}
                 </button>
                 <button
                   type="button"
