@@ -15,6 +15,45 @@ const json = (status: number, body: unknown) =>
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 
+const redactBearer = (value?: string | null) => {
+  if (!value) return null;
+  return value.startsWith("Bearer ") ? "Bearer [REDACTED]" : value;
+};
+
+const sanitizeSentHeaders = (headers?: Record<string, string> | null) => {
+  if (!headers) return null;
+  return {
+    ...headers,
+    Authorization: redactBearer(headers.Authorization),
+  };
+};
+
+const buildFamilySearchHeaders = (accessToken: string) => ({
+  Authorization: `Bearer ${accessToken}`,
+  Accept: "application/x-fs-v1+json",
+  "Accept-Language": "en",
+  "User-Agent": "AncestorsQR/1.0 (https://ancestorsqr.com)",
+});
+
+const familySearchError = ({
+  status,
+  error,
+  headersSent,
+  endpoint,
+}: {
+  status: number;
+  error: string;
+  headersSent?: Record<string, string> | null;
+  endpoint: string;
+}) =>
+  json(200, {
+    success: false,
+    status,
+    error,
+    endpoint,
+    headers_sent: sanitizeSentHeaders(headersSent),
+  });
+
 interface PullBody {
   person_id?: string;
   generations?: number;
@@ -88,9 +127,10 @@ Deno.serve(async (req) => {
       return json(500, { success: false, error: sessionErr.message });
     }
     if (!session) {
-      return json(412, {
-        success: false,
+      return familySearchError({
+        status: 412,
         error: "Connect with FamilySearch first",
+        endpoint: "session",
       });
     }
 
@@ -122,9 +162,10 @@ Deno.serve(async (req) => {
           .from("familysearch_sessions")
           .delete()
           .eq("user_id", user_id);
-        return json(412, {
-          success: false,
+        return familySearchError({
+          status: 412,
           error: "FamilySearch session expired, please reconnect",
+          endpoint: "refresh-token",
         });
       }
 
@@ -153,9 +194,10 @@ Deno.serve(async (req) => {
           .from("familysearch_sessions")
           .delete()
           .eq("user_id", user_id);
-        return json(412, {
-          success: false,
+        return familySearchError({
+          status: 412,
           error: "FamilySearch session expired, please reconnect",
+          endpoint: "refresh-token",
         });
       }
 
