@@ -284,7 +284,7 @@ const Stop3Bloodline = () => {
         {!authLoading && !user && (
           <div className="rounded-[14px] border border-amber-dim/30 bg-card/40 p-6 text-center">
             <p className="font-sans text-sm text-text">
-              Sign in with your email or Google to connect FamilySearch when it goes live.
+              Sign in with your email or Google to connect FamilySearch and pull your real bloodline.
             </p>
           </div>
         )}
