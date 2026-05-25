@@ -1,4 +1,6 @@
 // Pull a multi-generation ancestry pedigree from FamilySearch for an authenticated user.
+// [DEBUG MODE] We no longer delete the familysearch_sessions row on 401/refresh failure.
+// Instead we surface the full FS response so we can diagnose what FS is actually saying.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
@@ -28,31 +30,20 @@ const sanitizeSentHeaders = (headers?: Record<string, string> | null) => {
   };
 };
 
+const headersToObject = (h: Headers) => {
+  const out: Record<string, string> = {};
+  h.forEach((v, k) => {
+    out[k] = v;
+  });
+  return out;
+};
+
 const buildFamilySearchHeaders = (accessToken: string) => ({
   Authorization: `Bearer ${accessToken}`,
   Accept: "application/x-fs-v1+json",
   "Accept-Language": "en",
   "User-Agent": "AncestorsQR/1.0 (https://ancestorsqr.com)",
 });
-
-const familySearchError = ({
-  status,
-  error,
-  headersSent,
-  endpoint,
-}: {
-  status: number;
-  error: string;
-  headersSent?: Record<string, string> | null;
-  endpoint: string;
-}) =>
-  json(200, {
-    success: false,
-    status,
-    error,
-    endpoint,
-    headers_sent: sanitizeSentHeaders(headersSent),
-  });
 
 interface PullBody {
   person_id?: string;
@@ -120,14 +111,12 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (sessionErr) {
-      console.error(
-        "[familysearch-pull-tree] FAILED:",
-        JSON.stringify({ sessionErr }),
-      );
+      console.error("[familysearch-pull-tree] session lookup failed:", sessionErr);
       return json(500, { success: false, error: sessionErr.message });
     }
     if (!session) {
-      return familySearchError({
+      return json(200, {
+        success: false,
         status: 412,
         error: "Connect with FamilySearch first",
         endpoint: "session",
@@ -137,9 +126,7 @@ Deno.serve(async (req) => {
     const APP_KEY = Deno.env.get("FAMILYSEARCH_APP_KEY");
     const APP_SECRET = Deno.env.get("FAMILYSEARCH_APP_SECRET");
     if (!APP_KEY) {
-      console.error(
-        "[familysearch-pull-tree] FAILED: missing FAMILYSEARCH_APP_KEY",
-      );
+      console.error("[familysearch-pull-tree] missing FAMILYSEARCH_APP_KEY");
       return json(500, { success: false, error: "server misconfigured" });
     }
     const AUTH_BASE =
@@ -149,7 +136,7 @@ Deno.serve(async (req) => {
       Deno.env.get("FAMILYSEARCH_API_BASE_URL") ||
       "https://api-integ.familysearch.org";
 
-    // STEP 2 — token freshness
+    // STEP 2 — token freshness (refresh if needed, but DO NOT delete row on failure)
     let access_token = session.access_token as string;
     let refresh_token = session.refresh_token as string | null;
     const expiresAtMs = new Date(session.token_expires_at as string).getTime();
@@ -158,13 +145,10 @@ Deno.serve(async (req) => {
 
     if (needsRefresh) {
       if (!refresh_token) {
-        await admin
-          .from("familysearch_sessions")
-          .delete()
-          .eq("user_id", user_id);
-        return familySearchError({
+        return json(200, {
+          success: false,
           status: 412,
-          error: "FamilySearch session expired, please reconnect",
+          error: "FamilySearch session has no refresh_token",
           endpoint: "refresh-token",
         });
       }
@@ -175,7 +159,8 @@ Deno.serve(async (req) => {
       refreshForm.set("client_id", APP_KEY);
       if (APP_SECRET) refreshForm.set("client_secret", APP_SECRET);
 
-      const refreshResp = await fetch(`${AUTH_BASE}/cis-web/oauth2/v3/token`, {
+      const refreshUrl = `${AUTH_BASE}/cis-web/oauth2/v3/token`;
+      const refreshResp = await fetch(refreshUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -186,18 +171,21 @@ Deno.serve(async (req) => {
 
       if (!refreshResp.ok) {
         const txt = await refreshResp.text();
-        console.error(
-          "[familysearch-pull-tree] FAILED:",
-          JSON.stringify({ refreshStatus: refreshResp.status, body: txt }),
-        );
-        await admin
-          .from("familysearch_sessions")
-          .delete()
-          .eq("user_id", user_id);
-        return familySearchError({
-          status: 412,
-          error: "FamilySearch session expired, please reconnect",
+        const respHeaders = headersToObject(refreshResp.headers);
+        console.error("[FS refresh failed]", {
+          url: refreshUrl,
+          fs_response_status: refreshResp.status,
+          fs_response_body: txt,
+          fs_response_headers: respHeaders,
+        });
+        // [DEBUG] Do NOT delete the session row — preserve it for diagnosis.
+        return json(200, {
+          success: false,
+          status: refreshResp.status,
           endpoint: "refresh-token",
+          request_url: refreshUrl,
+          fs_response_body: txt,
+          fs_response_headers: respHeaders,
         });
       }
 
@@ -230,10 +218,53 @@ Deno.serve(async (req) => {
       didRefresh = true;
     }
 
-    console.log(
-      "[familysearch-pull-tree] token refresh applied:",
-      didRefresh,
-    );
+    console.log("[familysearch-pull-tree] token refresh applied:", didRefresh);
+
+    // Helper: call FS, return structured debug payload on non-2xx (no deletes).
+    const callFs = async (url: string, label: string) => {
+      const sentHeaders = buildFamilySearchHeaders(access_token);
+      console.log(`[familysearch-pull-tree] ${label} GET`, url, "headers:",
+        JSON.stringify(sanitizeSentHeaders(sentHeaders)));
+      const resp = await fetch(url, { method: "GET", headers: sentHeaders });
+      return { resp, sentHeaders };
+    };
+
+    const fsErrorResponse = async (
+      resp: Response,
+      sentHeaders: Record<string, string>,
+      url: string,
+      endpointLabel: string,
+    ) => {
+      const txt = await resp.text();
+      const respHeaders = headersToObject(resp.headers);
+      if (resp.status === 401) {
+        console.error("[FS 401]", {
+          url,
+          headers_sent: sanitizeSentHeaders(sentHeaders),
+          fs_response_status: 401,
+          fs_response_body: txt,
+          fs_response_headers: respHeaders,
+        });
+      } else {
+        console.error("[FS non-2xx]", {
+          url,
+          status: resp.status,
+          headers_sent: sanitizeSentHeaders(sentHeaders),
+          fs_response_body: txt,
+          fs_response_headers: respHeaders,
+        });
+      }
+      // [DEBUG] Do NOT delete the session row on 401 — preserve for diagnosis.
+      return json(200, {
+        success: false,
+        status: resp.status,
+        endpoint: endpointLabel,
+        request_url: url,
+        request_headers_sent: sanitizeSentHeaders(sentHeaders),
+        fs_response_body: txt,
+        fs_response_headers: respHeaders,
+      });
+    };
 
     // STEP 3 — resolve root person id
     let rootPersonId: string | null = null;
@@ -243,62 +274,36 @@ Deno.serve(async (req) => {
     } else if (session.familysearch_person_id) {
       rootPersonId = session.familysearch_person_id as string;
     } else {
-      const currentHeaders = buildFamilySearchHeaders(access_token);
-      console.log(
-        "[familysearch-pull-tree] current-person request headers:",
-        JSON.stringify(sanitizeSentHeaders(currentHeaders)),
-      );
-      const currentResp = await fetch(
-        `${API_BASE}/platform/tree/current-person`,
-        {
-          method: "GET",
-          headers: currentHeaders,
-        },
+      const currentUrl = `${API_BASE}/platform/tree/current-person`;
+      const { resp: currentResp, sentHeaders } = await callFs(
+        currentUrl,
+        "current-person",
       );
 
-      if (currentResp.status === 401) {
-        await admin
-          .from("familysearch_sessions")
-          .delete()
-          .eq("user_id", user_id);
-        return familySearchError({
-          status: 401,
-          error: "FamilySearch session expired, please reconnect",
-          headersSent: currentHeaders,
-          endpoint: "/platform/tree/current-person",
-        });
+      if (!currentResp.ok) {
+        return await fsErrorResponse(
+          currentResp,
+          sentHeaders,
+          currentUrl,
+          "current-person",
+        );
       }
 
-      if (currentResp.ok) {
-        const currentData = await currentResp.json().catch(() => ({}));
-        const persons = Array.isArray(currentData?.persons)
-          ? currentData.persons
-          : [];
-        rootPersonId = persons[0]?.id ?? null;
+      const currentData = await currentResp.json().catch(() => ({}));
+      const persons = Array.isArray(currentData?.persons)
+        ? currentData.persons
+        : [];
+      rootPersonId = persons[0]?.id ?? null;
 
-        if (rootPersonId) {
-          await admin
-            .from("familysearch_sessions")
-            .update({
-              familysearch_person_id: rootPersonId,
-              last_used_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            })
-            .eq("user_id", user_id);
-        }
-      } else {
-        const txt = await currentResp.text();
-        console.warn(
-          "[familysearch-pull-tree] current-person failed:",
-          currentResp.status,
-          txt,
-        );
-        return familySearchError({
-          status: currentResp.status,
-          error: txt || `FamilySearch returned ${currentResp.status}`,
-          headersSent: currentHeaders,
-          endpoint: "/platform/tree/current-person",
-        });
+      if (rootPersonId) {
+        await admin
+          .from("familysearch_sessions")
+          .update({
+            familysearch_person_id: rootPersonId,
+            last_used_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("user_id", user_id);
       }
     }
 
@@ -316,32 +321,13 @@ Deno.serve(async (req) => {
       rootPersonId,
     )}/ancestry?generations=${generationsRequested}`;
 
-    const ancestryHeaders = buildFamilySearchHeaders(access_token);
-    console.log(
-      "[familysearch-pull-tree] ancestry request headers:",
-      JSON.stringify(sanitizeSentHeaders(ancestryHeaders)),
+    const { resp: fsResp, sentHeaders: ancestryHeaders } = await callFs(
+      ancestryUrl,
+      "ancestry",
     );
-    const fsResp = await fetch(ancestryUrl, {
-      method: "GET",
-      headers: ancestryHeaders,
-    });
 
-    if (fsResp.status === 401) {
-      await admin
-        .from("familysearch_sessions")
-        .delete()
-        .eq("user_id", user_id);
-      return familySearchError({
-        status: 401,
-        error: "FamilySearch session expired, please reconnect",
-        headersSent: ancestryHeaders,
-        endpoint: ancestryUrl,
-      });
-    }
     if (fsResp.status === 404) {
-      console.log(
-        "[familysearch-pull-tree] persons returned: 0 gens: 0 (no tree)",
-      );
+      console.log("[familysearch-pull-tree] no tree (404)");
       return json(200, {
         success: true,
         root_id: rootPersonId,
@@ -351,19 +337,13 @@ Deno.serve(async (req) => {
       });
     }
     if (!fsResp.ok) {
-      const txt = await fsResp.text();
-      console.error(
-        "[familysearch-pull-tree] FAILED:",
-        JSON.stringify({ status: fsResp.status, body: txt }),
+      return await fsErrorResponse(
+        fsResp,
+        ancestryHeaders,
+        ancestryUrl,
+        "ancestry",
       );
-      return familySearchError({
-        status: fsResp.status,
-        error: txt || `FamilySearch returned ${fsResp.status}`,
-        headersSent: ancestryHeaders,
-        endpoint: ancestryUrl,
-      });
     }
-
 
     const data = await fsResp.json().catch(() => ({}));
     const rawPersons: any[] = Array.isArray(data?.persons) ? data.persons : [];
@@ -401,8 +381,6 @@ Deno.serve(async (req) => {
           (f.type ?? "").toLowerCase().includes("death"),
         );
 
-        // FS sets the ancestry display number on each person via the
-        // `display.ascendancyNumber` (Ahnentafel) — e.g. 1=root, 2=father, 3=mother…
         const ascNum =
           person?.display?.ascendancyNumber ??
           person?.display?.AscendancyNumber ??
@@ -432,13 +410,11 @@ Deno.serve(async (req) => {
       }
     }
 
-    // STEP 5b — wire parent_ids from relationships
     for (const rel of rawRelationships) {
       try {
         const type = (rel?.type ?? "") as string;
         if (!type.toLowerCase().includes("parentchild")) continue;
 
-        // GEDCOM-X: person1 = parent, person2 = child (resourceId or resource)
         const parentRef =
           rel?.person1?.resourceId ??
           (rel?.person1?.resource ?? "").replace(/^#/, "");
@@ -478,16 +454,12 @@ Deno.serve(async (req) => {
       refreshed: didRefresh,
     });
   } catch (err) {
-    console.error(
-      "[familysearch-pull-tree] FAILED:",
-      JSON.stringify({ message: (err as Error).message }),
-    );
+    console.error("[familysearch-pull-tree] FAILED:", (err as Error).message);
     return json(200, {
       success: false,
       status: 500,
       error: (err as Error).message,
       endpoint: "internal",
-      headers_sent: null,
     });
   }
 });
