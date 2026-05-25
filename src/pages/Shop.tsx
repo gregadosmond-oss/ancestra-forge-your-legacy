@@ -317,13 +317,12 @@ export default function Shop() {
             {...reveal}
             transition={{ ...reveal.transition, delay: 0.24 }}
             whileHover={{ rotate: 1 }}
-            className="flex flex-col overflow-hidden"
+            className="flex flex-col overflow-hidden sm:aspect-[3/4]"
             style={{
               background: "#f0e8da",
               border: "1px solid rgba(212, 160, 74, 0.2)",
               borderRadius: 14,
               padding: "36px 32px",
-              aspectRatio: "3 / 4",
               boxShadow: "inset 0 8px 24px rgba(0,0,0,0.04)",
             }}
           >
