@@ -69,6 +69,9 @@ const Stop3Bloodline = () => {
   const [tree, setTree] = useState<TreeResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [connecting, setConnecting] = useState(false);
+  const [personIdInput, setPersonIdInput] = useState("");
+  const [savingPersonId, setSavingPersonId] = useState(false);
+
 
   // Form state
   const [firstName, setFirstName] = useState("");
