@@ -336,6 +336,7 @@ export type Database = {
           id: string
           last_used_at: string
           refresh_token: string | null
+          starting_person_id: string | null
           token_expires_at: string
           updated_at: string
           user_id: string
@@ -347,6 +348,7 @@ export type Database = {
           id?: string
           last_used_at?: string
           refresh_token?: string | null
+          starting_person_id?: string | null
           token_expires_at: string
           updated_at?: string
           user_id: string
@@ -358,6 +360,7 @@ export type Database = {
           id?: string
           last_used_at?: string
           refresh_token?: string | null
+          starting_person_id?: string | null
           token_expires_at?: string
           updated_at?: string
           user_id?: string
