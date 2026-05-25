@@ -361,8 +361,8 @@ export default function Shop() {
       <section id="order" className="relative z-10 w-full max-w-3xl px-6 py-16">
         <motion.div
           {...reveal}
-          className="rounded-[22px]"
-          style={{ background: "#1a1510", padding: 48 }}
+          className="rounded-[22px] p-6 sm:p-12"
+          style={{ background: "#1a1510" }}
         >
           <h2 className="font-display text-3xl text-cream-warm" style={{ fontSize: 32 }}>
             Order Your Legacy Book
