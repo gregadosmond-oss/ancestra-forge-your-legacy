@@ -49,6 +49,7 @@ interface PullBody {
   person_id?: string;
   personId?: string;
   generations?: number;
+  debug?: boolean;
 }
 
 
