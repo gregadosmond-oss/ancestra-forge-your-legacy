@@ -1,6 +1,6 @@
 ═══════════════════════════════════════════════════════
 ANCESTORSQR — PROJECT BRIEF, CONTROLS & STATE
-Updated: April 2026
+Updated: May 12, 2026 (post FS-unlock + drip personalization session)
 ═══════════════════════════════════════════════════════
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -13,9 +13,9 @@ CLAUDE WORKING RULES (READ FIRST — ALWAYS FOLLOW)
 4. USE AGENTS for research, codebase exploration, and multi-file tasks.
 5. ALWAYS READ files before editing. Never assume file contents.
 6. FOR LOVABLE CHANGES — give Greg a copy-paste prompt, don't try to edit Lovable files directly.
-7. SUPABASE EDGE FUNCTIONS live at: /Users/hrcommb3/Desktop/ancestra/supabase/functions/
-8. LOCAL = Deno edge functions synced from Lovable. Deploy via: supabase functions deploy <name>
-9. MEMORY files live at: /Users/hrcommb3/.claude/projects/-Users-hrcommb3-Desktop-ancestra/memory/
+7. SUPABASE EDGE FUNCTIONS live at: /Users/hrcommb3/Documents/ancestra/supabase/functions/
+8. LOVABLE CLOUD — edge functions deploy via Lovable, NOT supabase CLI. Edit, then ask Lovable to deploy.
+9. MEMORY files live at: /Users/hrcommb3/.claude/projects/-Users-hrcommb3-Documents-ancestra/memory/
 10. NEVER use cold blue, cold gray, or pure white. Always warm palette (see design system below).
 11. PREFER inline execution for small plans (1–5 tasks). Use subagent-driven-development for large plans.
 12. COMMIT after each meaningful change. Keep commits small and focused.
@@ -29,10 +29,10 @@ DECISION GUIDE — WHAT TO DO WHEN GREG ASKS FOR X
 | If Greg asks to... | Do this |
 |---|---|
 | Change a page, component, copy, color, layout, animation (anything under src/) | Invoke `lovable-prompt` skill. Give him a copy-paste prompt. DO NOT Write/Edit src/ files. |
-| Edit or create a Supabase edge function | Invoke `deploy-edge-function` skill. Edit directly, then remind him to run `supabase functions deploy <name>`. |
+| Edit or create a Supabase edge function | Edit the file under supabase/functions/ directly OR give Greg a Lovable prompt for the same edit. Lovable Cloud handles deployment — never suggest `supabase functions deploy` CLI. |
 | Add/edit a Printify product (canvas, coaster, clock, t-shirt, blanket, etc.) | He does this manually at printify.com. Your job is only the design SVG/PNG (via generate-print-design). |
 | Change the dynamic mug | That's create-heirloom-order edge function. Treat like any edge function. |
-| Fix a 500 from an edge function | Check Supabase secrets FIRST, then logs: `supabase functions logs <name> --tail`. |
+| Fix a 500 from an edge function | Ask Lovable to pull edge function logs for the time window — never use supabase CLI. Or use Supabase MCP `get_logs` if available. |
 | Change database schema | He does it via Lovable Cloud / Supabase dashboard. Give him SQL or dashboard steps. |
 | Add a new Claude API tool (e.g. wire Motto Generator) | Write a new edge function under supabase/functions/, then a Lovable prompt to wire the frontend call. |
 | Plan a multi-step feature (3+ files or mixed frontend + edge) | Use a TaskCreate plan; execute inline if ≤5 tasks, subagent-driven-development if larger. |
@@ -57,45 +57,48 @@ KNOWN ERRORS & GOTCHAS — CHECK BEFORE DEBUGGING
 | Stripe webhook not firing | STRIPE_WEBHOOK_SECRET mismatch OR endpoint not registered | Re-copy the signing secret from Stripe dashboard into Supabase secrets. |
 | Crest generation slow on repeat surnames | Cache miss in surname_crests table | Confirm write path in generate-crest; surname should normalize (lowercase, trim). |
 | TTS audio cuts off mid-sentence | ElevenLabs char limit hit | Chunk story text and concatenate; don't send a full chapter in one call. |
+| Lovable claims a file change is "already done" but local file shows otherwise | Lovable's cloud filesystem is ahead of GitHub-synced local copy | Trust deployed behavior, not local file. Verify by triggering the live function with a test payload. |
+| User signs up but no welcome email | One of the 5 entry paths failed to fire | All 5 paths (JourneyGate, FreeToolsEmailCTA, AuthGate email+pwd, AuthGate Google, AppLayout safety net) now fire welcome as of May 12 2026. Check `[send-welcome-email]` and `[sync-to-resend-audience]` logs for that email. |
+| Social card preview shows broken image | og-default.jpg missing from /public/ | Confirm /public/og-default.jpg exists and serves 200 (not 404). It's the fallback for every page without a surname-specific crest. |
+| Google OAuth signup gets no welcome | (legacy gap) | FIXED May 12 2026. AppLayout.tsx now subscribes to supabase.auth.onAuthStateChange — on SIGNED_IN it inserts into journey_subscribers (23505 dedup), then fires welcome + audience sync. Catches Google OAuth + every future auth method. |
+| Local repo lags behind Lovable cloud | Lovable publishes to GitHub but local doesn't pull | `cd ~/Documents/ancestra && git pull origin main`. On May 12 the local was 108 commits behind. May need to `rm public/og-default.jpg` first if untracked-file conflict appears. |
+| Resend Publish button doesn't work in automation | Resend uses a slide-to-publish gesture | Greg has to do this manually with mouse. Cannot drive via Chrome MCP — requires real user-activation event. |
+| Drip email links return 404 | `/surname`, `/motto`, `/crest`, `/ancestor` are not real routes | Use `/tools/surname`, `/tools/motto`, `/journey/4` (for crest), `/tools/ancestor`. All 3 drip templates corrected May 12 2026. |
+| Drip email greeting says "Hi friend," for some users | They signed up before AuthGate first-name capture | Expected. The `{{{first_name}}}` merge tag falls back to "friend" when contact has no first_name. JourneyGate doesn't yet capture first_name (planned). |
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 KEY FILE PATHS — CENTRAL REFERENCE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Project root:
-  /Users/hrcommb3/Desktop/ancestra/
+  /Users/hrcommb3/Documents/ancestra/
 
 Instructions & memory:
-  /Users/hrcommb3/Desktop/ancestra/CLAUDE.md
-  /Users/hrcommb3/.claude/projects/-Users-hrcommb3-Desktop-ancestra/memory/MEMORY.md
-  /Users/hrcommb3/.claude/projects/-Users-hrcommb3-Desktop-ancestra/memory/     ← individual memory files
+  /Users/hrcommb3/Documents/ancestra/CLAUDE.md
+  /Users/hrcommb3/.claude/projects/-Users-hrcommb3-Documents-ancestra/memory/MEMORY.md
+  /Users/hrcommb3/.claude/projects/-Users-hrcommb3-Documents-ancestra/memory/     ← individual memory files
 
 Frontend (Lovable — DO NOT EDIT LOCALLY):
-  /Users/hrcommb3/Desktop/ancestra/src/                      ← all pages, components, types
-  /Users/hrcommb3/Desktop/ancestra/src/types/legacy.ts       ← React-side Legacy types (must mirror Deno)
+  /Users/hrcommb3/Documents/ancestra/src/                       ← all pages, components, types
+  /Users/hrcommb3/Documents/ancestra/src/types/legacy.ts        ← React-side Legacy types (must mirror Deno)
+  /Users/hrcommb3/Documents/ancestra/src/hooks/usePageMeta.ts   ← per-page SEO title/og-tag hook
 
-Edge functions (edit and deploy locally):
-  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-legacy/index.ts
-  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-legacy/types.ts   ← mirrors src/types/legacy.ts
-  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-crest/index.ts
-  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-crest/crest.ts
-  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-print-design/index.ts
-  /Users/hrcommb3/Desktop/ancestra/supabase/functions/create-heirloom-order/index.ts
-  /Users/hrcommb3/Desktop/ancestra/supabase/functions/ancestor-tts/index.ts
-  /Users/hrcommb3/Desktop/ancestra/supabase/functions/expand-chapters/index.ts
-  /Users/hrcommb3/Desktop/ancestra/supabase/functions/stripe-webhook/index.ts
-  /Users/hrcommb3/Desktop/ancestra/supabase/functions/send-legacy-email/index.ts
+Edge functions (Lovable Cloud — edit locally, Lovable deploys):
+  /Users/hrcommb3/Documents/ancestra/supabase/functions/      ← all edge functions live here
+
+Static assets:
+  /Users/hrcommb3/Documents/ancestra/public/og-default.jpg    ← 1200×630 OG image (used as og:image fallback)
+  /Users/hrcommb3/Documents/ancestra/public/sitemap.xml       ← public sitemap
+  /Users/hrcommb3/Documents/ancestra/public/robots.txt        ← crawler rules
 
 Custom skills (user-global, usable in any session):
   /Users/hrcommb3/.claude/skills/lovable-prompt/SKILL.md
   /Users/hrcommb3/.claude/skills/deploy-edge-function/SKILL.md
 
 Supabase config:
-  /Users/hrcommb3/Desktop/ancestra/supabase/config.toml
+  /Users/hrcommb3/Documents/ancestra/supabase/config.toml
 
-Deploy commands:
-  supabase functions deploy <name>         ← single function
-  supabase functions logs <name> --tail    ← live logs
+Project ID (Lovable Cloud Supabase): fjtkjbnvpobawqqkzrst
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 WHAT IS ANCESTORSQR
@@ -119,100 +122,223 @@ Founder: Gregory Angus Dean Osmond (GADO). Traced Osmond lineage to Dorset, Engl
 Family motto: "Ex Labore, Ascendimus" — From Labour, We Rise. Since 1688.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-WHAT'S BUILT (Current State — April 2026)
+WHAT'S BUILT (Current State — May 2026)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 FRONTEND (Lovable — Vite + React + Tailwind + Framer Motion)
 
+All pages have per-page SEO titles + Open Graph meta tags via the usePageMeta hook
+(src/hooks/usePageMeta.ts). Default og:image is /og-default.jpg (branded 1200×630 cover).
+
 Pages / Routes:
-  /                    → Landing page (hero, How It Works, Product Preview, Free Tools, Occasions, CTA)
+  /                    → Landing page (hero, free tools preview, pricing, How It Works, CTA)
   /journey/1           → Stop 1: Surname input
   /journey/2           → Stop 2: Name meaning reveal
-  /journey/3           → Stop 3: Family tree (visual bloodline — PLACEHOLDER, not real data yet)
-  /journey/4           → Stop 4: Crest forge reveal (REAL — DALL-E 3 generated, cached)
-  /journey/5           → Stop 5: Story preview + $29.99 Stripe paywall
-  /journey/6           → Stop 6: Pass It On (gift options)
-  /checkout            → Stripe checkout page
-  /my-legacy           → User dashboard (post-purchase)
+  /journey/3           → Stop 3: Bloodline + FULL FamilySearch UI (Connect button, manual ancestor search form, tree display, disconnect). FS_COMING_SOON = false as of May 12 2026. Blocked only on Gordon Clarke registering redirect URI server-side.
+  /journey/4           → Stop 4: Crest forge reveal (DALL-E 3 generated, cached) — dynamic title "House of [Surname]"
+  /journey/5           → Stop 5: Story Chapter I + $29.99 Stripe paywall — dynamic title "The [Surname] Family Story"
+  /journey/6           → Stop 6: Pass It On — share buttons, gift options, mug upsell
+  /pricing             → Pricing comparison: Free / Legacy Pack $29.99 / Deep Legacy $79
+  /shop                → Heirloom shop — Mug $49.99, Canvas (4 sizes), Throw Blanket (3 sizes), Cork Coaster, Legacy Book $129 Coming Soon
+  /heirloom-order      → Mug order form (dynamic per-order via create-heirloom-order)
+  /product-order       → Generic product order form (164-country dropdown)
+  /cart                → Cart page (Popular Gifts: Pack, Mug, Book Coming Soon)
+  /checkout            → Stripe checkout entry
+  /my-legacy           → User dashboard (post-purchase) — auth-gated, redirects to /journey/1 if not signed in
+  /deep-legacy         → Premium $79 tier landing
+  /deep-legacy/...     → Deep Legacy interview flow subpages
   /tools               → Free tools hub
-  /tools/quiz          → Bloodline Quiz (frontend only — NOT wired to Claude yet)
-  /tools/surname       → Surname Lookup (frontend only)
-  /tools/motto         → Motto Generator (frontend only — NOT wired to Claude yet)
-  /tools/chat          → Ancestor Chat (frontend only)
-  /shop                → NOT BUILT YET — needs Printify product fetch
+  /tools/surname       → Surname Lookup (wired to surname-lookup edge fn)
+  /tools/quiz          → Bloodline Quiz (wired to bloodline-quiz edge fn)
+  /tools/motto         → Motto Generator (wired to motto-generator edge fn)
+  /tools/ancestor      → Meet Your Ancestor (wired to meet-ancestor edge fn)
+  /tools/1700s         → The 1700s You (wired to the-1700s-you edge fn)
+  /tools/chat          → Ancestor Chat (wired to ancestor-chat edge fn)
   /about               → Founder story
+  /privacy-policy      → Privacy policy (contact: greg@ancestorsqr.com)
+  /terms               → Terms of service (contact: greg@ancestorsqr.com)
+  /f/:surname          → Public family share page — dynamic title + cached crest as og:image
+  /gift/:giftId        → Individual gift redemption page
+  /gifts/:occasion     → Gift occasion landing pages (Father's Day, Christmas, etc.)
+  /confirmation        → Post-purchase confirmation page
+  /auth/familysearch/callback → FamilySearch OAuth callback (validates state, calls auth-familysearch-callback edge fn, redirects to /journey/3?fs_connected=true)
+  /404                 → On-brand "branch of family tree doesn't exist" with Begin Journey CTA
 
-Components built:
-  - AppLayout (global navbar, back button, step counter)
-  - AuthGate (email/Google/Apple auth modal)
-  - JourneyContext (shared state across all stops)
-  - SectionLabel, RetryInline
-  - FreeCrest component (shows crest on free tier)
-  - Stop5Story (TTS audio playback via ancestor-tts edge function)
+Key components:
+  - AppLayout (global navbar, footer, step counter + onAuthStateChange listener as of May 12 2026 — catches every SIGNED_IN event, fires welcome + audience sync via 23505 dedup gate. Belt+suspenders against future auth gaps.)
+  - JourneyGate (Stop 1 email capture — inserts journey_subscribers, fires welcome + audience sync, AND magic-link OTP with shouldCreateUser=true. Creates a real Supabase auth account as of May 12 2026.)
+  - AuthGate (navbar Sign In modal — email+password OR Google OAuth. Optional first_name field as of May 12 2026 captures + pipes to send-welcome-email + sync-to-resend-audience. Welcome email greets "Hi <FirstName>," when set, falls back to "Hi friend,".)
+  - FreeToolsEmailCTA (giant gate on /tools — hides automatically for logged-in users as of May 12 2026)
+  - JourneyContext (shared state: surname, email, etc. across stops)
+  - useEmailGate hook (inline free tool email gate; checks auth session before showing JourneyGate)
+  - usePageMeta hook (per-page SEO + OG tags, wired into ~15 pages)
+  - Stop5Story (TTS playback via ancestor-tts)
+  - FreeCrest, ScrollChevron, RetryInline, SectionLabel
 
-BACKEND (Supabase Edge Functions — Deno)
+FamilySearch frontend:
+  - src/pages/auth/FamilySearchCallback.tsx → loading/success/error UI for OAuth return
+  - src/lib/familySearchAuth.ts → initiateFamilySearchOAuth() helper (generates state UUID, stores in localStorage, calls familysearch-build-auth-url, redirects to FS)
+  - Stop 3 has full FS UI behind FS_COMING_SOON flag (set to false May 12 2026)
 
-Deployed edge functions:
-  generate-legacy       → Claude API: generates LegacyFacts + LegacyStory for a surname
-  generate-crest        → DALL-E 3: generates coat of arms image, caches in surname_crests table
-  ancestor-tts          → ElevenLabs TTS: converts story text to audio (used in Stop 5)
-  generate-print-design → SVG/PNG design builder for Printify products (canvas, coaster, clock)
-  create-heirloom-order → Dynamic mug order: renders PNG via resvg-wasm, uploads to Supabase, sends to Printify
-  expand-chapters       → Claude API: expands teaserChapters into full chapter bodies (post-purchase)
-  stripe-webhook        → Handles Stripe payment → triggers legacy pack delivery
-  send-legacy-email     → Resend: delivers Legacy Pack files to customer email
+BACKEND (Supabase Edge Functions — Deno, deployed via Lovable Cloud)
 
-Local edge function files:
-  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-print-design/index.ts
-  /Users/hrcommb3/Desktop/ancestra/supabase/functions/create-heirloom-order/index.ts
-  /Users/hrcommb3/Desktop/ancestra/supabase/functions/generate-crest/crest.ts
+  Core legacy generation:
+    generate-legacy            → Claude API: LegacyFacts + LegacyStory for a surname (cached)
+    generate-legacy-fixture    → Test fixture (dev only)
+    generate-crest             → DALL-E 3: coat of arms PNG, cached in surname_crests
+    expand-chapters            → Claude: expands teaser chapters into full bodies (post-purchase)
 
-DATABASE (Supabase — Lovable Cloud, isolated project)
+  Free tools (all Claude-backed):
+    surname-lookup, bloodline-quiz, motto-generator, motto-english, motto-latin, meet-ancestor, the-1700s-you, ancestor-chat
+    (motto-generator was split into motto-english + motto-latin sub-functions for the two-language output)
+
+  Voice / TTS:
+    ancestor-tts               → ElevenLabs: story narration audio
+
+  Email & onboarding:
+    send-welcome-email         → Resend: branded HTML+plaintext welcome ("Your story is waiting"). Uses first_name when provided, falls back to "friend".
+    sync-to-resend-audience    → Adds contact to Resend Audience with first_name field + fires `ancestorsqr_welcome_started` drip automation event (only for new contacts, idempotent)
+    send-preview               → Sends free preview to recipient (viral loop)
+    resend-legacy-email        → Resend: re-sends Legacy Pack to customer
+    auth-email-hook            → Supabase auth email customizer (magic link template — sender "AncestorsQR" from noreply@notify.ancestorsqr.com)
+    auth-callback              → Supabase auth callback handler
+    auth-gate                  → Auth gate helper edge function
+    process-email-queue        → Background email queue worker
+
+  FamilySearch (all live as of May 12 2026):
+    auth-familysearch-callback → Token exchange (requires AncestorsQR auth, exchanges FS code for tokens, upserts familysearch_sessions table)
+    familysearch-build-auth-url → Builds OAuth URL server-side so AppKey never exposed to client; returns redirect URL
+    familysearch-pull-tree     → Pulls ancestor tree (4 generations default) from FS Tree API
+    familysearch-search-records → Searches FS records by surname + location + dates
+
+  Payments & orders:
+    create-checkout            → Creates Stripe checkout session
+    payments-webhook           → Stripe webhook → triggers Legacy Pack delivery + order fulfillment
+    get-stripe-price           → Fetches active Stripe Price for product
+    create-product-order       → Generic product order creation
+    create-heirloom-order      → Dynamic mug order: PNG via resvg-wasm → Printify
+    create-printful-order      → Printful order creation (legacy/fallback)
+    create-legacy-book-order   → Gelato book order
+    book-waitlist-signup       → Legacy Book waitlist (Coming Soon CTA)
+
+  Print design:
+    generate-print-design      → SVG builder for canvas/coaster/clock
+    generate-mug-mockup        → Printful mockup preview for mug
+
+  Deep Legacy ($79 premium tier):
+    deep-legacy-research       → Web research + ancestor records
+    deep-legacy-book           → Generates premium book content
+
+  Gelato (book printing):
+    gelato-list-catalogs, gelato-catalog-search, gelato-cover-dims, gelato-placeholder-pdfs
+    render-legacy-book-pdf     → Builds full legacy book PDF (interior)
+    render-legacy-book-cover-pdf → Builds book cover PDF
+
+  Other:
+    printify-proxy             → Printify API proxy
+    og-preview                 → Renders OG share image dynamically
+
+DATABASE (Supabase — Lovable Cloud, project_id: fjtkjbnvpobawqqkzrst)
 
 Tables:
-  surname_crests   → { surname, image_url, prompt } — cached DALL-E crest images
-  users            → Supabase auth (managed by Lovable)
-  orders           → product orders
-  purchases        → Legacy Pack purchases (used by usePurchase hook)
-  gifts            → gift sends and recipient tracking
+  surname_crests          → { surname, image_url, prompt } — cached DALL-E crests
+  users                   → Supabase auth (managed by Lovable)
+  journey_subscribers     → email + welcome_sent_at (atomic dedup) + source
+  purchases               → Legacy Pack purchases (used by usePurchase hook)
+  orders                  → physical product orders
+  gifts                   → gift sends + recipient tracking
+  book_waitlist           → Legacy Book Coming Soon waitlist
+  familysearch_sessions   → OAuth tokens per user (for FS integration when approved)
 
 Storage buckets:
-  crests           → Crest PNG files (generate-crest uploads here)
-  print-designs    → Printify design SVG/PNG files (generate-print-design uploads here)
+  crests                  → Crest PNG files
+  print-designs           → Printify SVG/PNG files
 
 STRIPE
-
-  Product: Legacy Pack — $29.99 one-time
-  Stripe webhook → stripe-webhook edge function → triggers Legacy Pack generation + email delivery
-  Checkout page: /checkout
+  Legacy Pack — $29.99 one-time
+  Deep Legacy — $79 one-time
+  Family Crest Mug — $49.99 (includes Legacy Pack)
+  Plus Canvas (4 sizes $34.99–$89.99), Throw Blanket (3 sizes $39.99–$59.99), Cork Coaster $34.99
+  payments-webhook handles Stripe events → triggers Legacy Pack delivery + order fulfillment
 
 PRINTIFY (Physical Products)
+  Connected via API. Shop ID + API key in env vars.
+  Products created/edited manually at printify.com (except dynamic mug — code-generated per order).
+  See PRODUCT CATALOG section below for the live list.
 
-  Connected via API store (not Shopify/Etsy)
-  Shop ID: stored in PRINTIFY_SHOP_ID env var
-  API Key: stored in PRINTIFY_API_KEY env var
+RESEND (Transactional + Marketing Email)
+  Sender domain: ancestorsqr.com
+  Welcome from: Greg Osmond <greg@ancestorsqr.com>
+  Magic link from: AncestorsQR <noreply@notify.ancestorsqr.com> (Supabase auth, sender-branded)
+  Resend Audience id: a1eceeb4-b885-4792-a4a2-24b50be60887 (single audience, all subscribers)
+  3-step drip automation triggered by custom event ancestorsqr_welcome_started
+    Day 3 → "Where did your name come from?"  → https://ancestorsqr.com/tools/surname (template: Surname Discovery)
+    Day 7 → "Your family deserves a coat of arms" → https://ancestorsqr.com/tools/motto + https://ancestorsqr.com/journey/1 (template: Family Crest Prompt)
+    Day 14 → "Someone in your bloodline left a story" → https://ancestorsqr.com/tools/ancestor (template: Ancestor Introduction)
+  All 3 drip templates use {{{first_name}}} merge tag with fallback "friend" (set up May 12 2026).
+  All emails CAN-SPAM compliant with Oshawa mailing address (HTML + plaintext).
+  Kit.com: deprecated for AncestorsQR (still used for RelocateIQ only).
+  Drip URL fix May 12 2026: previously linked to /surname, /motto, /crest (all 404). All corrected.
 
-  Products created in Printify (manual, not programmatic):
-    1. Satin Canvas 8×10 (Vertical) — Blueprint ~530, Provider ~99
-       Design: 1800×2100px SVG, crest centered upper, QR bottom center
-    2. Ceramic Coaster — Blueprint ~304
-       Design: 1169×1169px SVG, crest top 85%, QR centered below
-    3. Wall Clock — Blueprint ~various
-       Design: 3000×3000px SVG, crest large right, QR bottom center
-    4. Classic T-Shirt — crest on chest, blank back (motto text not rendered — no embedded fonts in resvg-wasm)
-    5. Charcuterie Board (CO2 laser engraving) — crest only, NO QR code (single color burn)
-    6. Acrylic Print — crest + QR code
-    7. Sherpa Blanket — crest + QR code
-    8. Java Speaker — crest + QR code
+SIGNUP FLOWS — FIVE ENTRY POINTS, ALL FIRE WELCOME + AUDIENCE SYNC (May 12 2026 unification)
 
-  Dynamic product (code-generated per order):
-    White 11oz Ceramic Mug — Blueprint 478, Provider 99
-    Created by create-heirloom-order edge function
-    Design: 2475×1155px PNG, "HOUSE OF [SURNAME]" text left, crest right, QR left
+  Every entry point now creates a real Supabase auth account AND fires welcome + drip enrollment.
+  No more "I gave you my email but can't sign in" conversion cliff.
 
-RESEND (Transactional Email)
-  Used by send-legacy-email for Legacy Pack delivery
-  API key in RESEND_API_KEY env var
+  Path A — JourneyGate (Stop 1 surname signup, also inline tool gate via useEmailGate):
+    - Inserts journey_subscribers row (source="journey-gate")
+    - Sends welcome email (Greg Osmond <greg@ancestorsqr.com>)
+    - Syncs to Resend Audience + fires drip automation event
+    - Magic-link OTP via signInWithOtp({shouldCreateUser: true}) → creates real auth account
+    - Total emails day-0: welcome + magic link = 2. Plus 3 drips = 5 over 14 days.
+
+  Path B1 — AuthGate email + password (navbar Sign In → Create Account):
+    - signUp with auto-confirm, then immediate signInWithPassword
+    - Inserts journey_subscribers row (source="auth-gate")
+    - Sends welcome email (uses first_name if captured)
+    - Syncs to Resend Audience with first_name field
+    - Total emails: 1 welcome + 3 drips = 4 over 14 days
+
+  Path B2 — AuthGate Google OAuth:
+    - lovable.auth.signInWithOAuth("google") → redirect to Google → redirect back
+    - AppLayout onAuthStateChange listener catches SIGNED_IN, fires welcome + audience sync via 23505 dedup
+    - Total emails: 1 welcome + 3 drips = 4 over 14 days (no separate magic link)
+
+  Path C — FreeToolsEmailCTA (giant gate on /tools, hides for logged-in users):
+    - Inserts journey_subscribers (source="free-tools-page")
+    - Sends welcome email
+    - Syncs to Resend Audience
+    - Magic-link OTP via signInWithOtp({shouldCreateUser: true})
+    - Total emails: 2 day-0 + 3 drips = 5
+
+  Path D — AppLayout onAuthStateChange listener (safety net for ALL auth methods):
+    - Fires on every SIGNED_IN event
+    - Attempts journey_subscribers insert with source="oauth"
+    - On 23505 dedup → already onboarded, skips silently
+    - On success → fires welcome + audience sync
+    - Catches Google OAuth, Apple OAuth, future auth methods. Belt+suspenders.
+
+FAMILYSEARCH (Beta — Mostly Live as of May 12 2026)
+  Beta AppKey: b00QWS0JL7HB1U0680D0 (received Apr 29 2026 from FS DevSupport)
+  Endpoint: https://identbeta.familysearch.org/cis-web/oauth2/v3/authorization
+  Redirect URI registered with us: https://ancestorsqr.com/auth/familysearch/callback
+  Realm: https://ancestorsqr.com
+  Env vars: FAMILYSEARCH_APP_KEY (set), FAMILYSEARCH_APP_SECRET (optional, not set), FAMILYSEARCH_AUTH_BASE_URL (defaults to beta)
+
+  Frontend (deployed):
+    Stop 3 has FS UI behind FS_COMING_SOON flag — flipped to false May 12 2026
+    src/pages/auth/FamilySearchCallback.tsx — OAuth return handler with loading/success/error states
+    src/lib/familySearchAuth.ts — initiateFamilySearchOAuth() helper
+
+  Edge functions (deployed):
+    auth-familysearch-callback — token exchange + familysearch_sessions upsert
+    familysearch-build-auth-url — server-side URL builder (keeps AppKey hidden)
+    familysearch-pull-tree — pulls 4-gen ancestor tree
+    familysearch-search-records — surname/location/date record search
+
+  BLOCKED ON FS: redirect URI NOT yet registered on their side. Test on May 12 returns "Invalid Oauth2 Request — unable to find client id".
+  Contact: Gordon Clarke <Gordon@familysearch.org> (warm partner, not devsupport queue)
+  Action: reply to existing thread "Re: Signature requested on SolutionsAgreementandTermsNov2020B" asking Gordon to confirm activation. Draft email exists in May 12 chat session.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 IMPORTANT TECHNICAL NOTES
@@ -252,26 +378,47 @@ TYPES (keep in sync — Deno and React cannot share source):
 PENDING / NOT YET BUILT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-HIGH PRIORITY:
-  - /shop page — fetch products from Printify API, display with add-to-cart
-  - Stop 3 family tree — real visual bloodline tree (currently placeholder)
-  - Wire Bloodline Quiz → Claude API (frontend exists, no backend)
-  - Wire Motto Generator → Claude API (frontend exists, no backend)
-  - Wire Surname Lookup → generate-legacy function
-  - Fix legacy certificate: "House Osmond" → "House of Osmond"
+BLOCKED — WAITING ON EXTERNAL:
+  - FamilySearch redirect URI registration → Gordon Clarke needs to register
+    https://ancestorsqr.com/auth/familysearch/callback on FS side. Code is fully built and deployed.
+    Test on May 12 returned "Invalid Oauth2 Request — unable to find client id" → AppKey not yet
+    activated for OAuth in their system.
+  - Production AppKey from FamilySearch (currently on beta — OK for now).
 
-MEDIUM PRIORITY:
-  - Family Anthem (Suno API) — AI-generated song per family
-  - /my-legacy dashboard improvements
-  - n8n automations: FamilySearch API, Kit.com email flows
-  - T-shirt back: add motto text (needs font embedding solution)
-  - Gift delivery flow (/gifts, /gift/[gift-id])
+OPERATIONAL — DO NEXT:
+  - Send the drafted Gordon Clarke reply email to unblock FS OAuth (draft in May 12 chat).
+  - First broadcast email to Resend Audience (CAN-SPAM compliant, all systems ready).
+  - Blotato social automation kickoff (video kit ready, n8n workflow exists per memory).
+  - Add first_name capture to JourneyGate so Path A users also get personalized drips
+    (currently only AuthGate captures first_name; Path A users fall back to "Hi friend,").
+  - Verify Day 14 drip lands for gregadosmond+stop5test1@gmail.com on May 14 2026
+    (Day 3 and Day 7 already verified May 3 + May 7).
+
+DONE — RECENT (May 12 2026):
+  - Unified signup → all 5 entry paths create real auth accounts
+  - Fixed AuthGate email leak (was silently bypassing welcome on password signup)
+  - Fixed Google OAuth welcome gap (AppLayout listener)
+  - Pulled 108 commits from Lovable to local repo
+  - Fixed broken drip URLs (/surname → /tools/surname, /motto → /tools/motto, /crest → /journey/1, /ancestor → /tools/ancestor)
+  - First-name capture on AuthGate (optional field) piped through to welcome + drips
+  - All 3 drip templates personalized with {{{first_name}}} merge tag + "friend" fallback
+  - FreeToolsEmailCTA now hides for logged-in users
+  - FamilySearch FS_COMING_SOON flag flipped to false (UI fully live, awaiting FS-side activation)
+  - All drip templates renamed: Surname Discovery / Family Crest Prompt / Ancestor Introduction
+
+NICE-TO-HAVE:
+  - Drip emails branded HTML wrapper → currently plain body text. Welcome is fully branded HTML.
+    Improve in Resend templates before any major broadcast push.
+  - Stop 3 placeholder tree (era timeline) → replace with real FS tree data once Gordon Clarke activates the redirect URI.
 
 FUTURE:
-  - Premium tier ($99+): deep research, hardcover book
-  - Family Circle: collaborative multi-user family trees
-  - Etsy shop: AncestraShop / AncestraHeritage
-  - Social automation: Blotato + n8n
+  - Family Anthem (Suno API) — AI-generated song per family
+  - /my-legacy dashboard improvements (post-purchase user portal)
+  - T-shirt back: add motto text (needs font embedding solution for resvg-wasm)
+  - Gift delivery flow polish (/gifts, /gift/[gift-id])
+  - Family Circle — collaborative multi-user family trees
+  - Etsy shop spinoff
+  - Premium tier extensions beyond Deep Legacy
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 DESIGN SYSTEM — "FIRESIDE LUXURY"
@@ -469,7 +616,7 @@ GREG'S WORKING STYLE & PREFERENCES
 - Prefers merging locally over creating PRs.
 - Uses Lovable for frontend changes — Claude provides copy-paste Lovable prompts.
 - Uses Higgsfield for video content.
-- Deploys edge functions via Supabase CLI: supabase functions deploy <name>
+- Edge functions deploy via Lovable Cloud — no CLI needed. Lovable handles deployment.
 - Reviews Blotato social queue weekly (15-min sprint).
 - Email: gregadosmond@gmail.com
 
@@ -482,53 +629,53 @@ Lovable prompt format Greg uses:
 PRODUCT CATALOG (PHYSICAL — PRINTIFY)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Mugs:
-  White 11oz Ceramic Mug     $27.99    Dynamic per-order via create-heirloom-order
-  White 15oz Ceramic Mug     TBD       Future
-  Whiskey Glass              TBD       Future
+All physical products INCLUDE the Legacy Pack ($29.99 value) at no extra cost.
 
-Canvas & Prints:
-  Satin Canvas 8×10          $47.99    Created in Printify
-  Satin Canvas 11×14         TBD       Future
-  Acrylic Print              TBD       Created in Printify
+Drinkware:
+  Family Crest Mug 11oz       $49.99    Dynamic per-order via create-heirloom-order
+  Cork-Back Coaster           $34.99    Created in Printify
 
-Coasters:
-  Ceramic Coaster            TBD       Created in Printify
+Prints & Wall Art:
+  Satin Canvas 8"×10"         $34.99    Created in Printify
+  Satin Canvas 12"×16"        $42.99    Created in Printify
+  Satin Canvas 18"×24"        $59.99    Best Seller
+  Satin Canvas 24"×36"        $89.99    Largest format
+  Acrylic Print               TBD       Created in Printify (planned)
 
-Clocks:
-  Wall Clock                 TBD       Created in Printify
+Keepsakes:
+  Throw Blanket 30"×40"       $39.99    Sublimation throw
+  Throw Blanket 50"×60"       $49.99    Most Popular
+  Throw Blanket 60"×80"       $59.99    Largest
 
-Apparel:
-  Classic T-Shirt            TBD       Created in Printify (crest front, blank back)
+Legacy Books:
+  The Legacy Book             $129      Coming Soon — book_waitlist signup CTA
 
-Kitchen:
-  Charcuterie Board          TBD       Laser engraved — crest only, NO QR
-
-Lifestyle:
-  Sherpa Blanket             TBD       Created in Printify
-  Java Speaker               TBD       Created in Printify
+Future / Not Yet Listed:
+  T-Shirt                     TBD       Crest front, blank back (motto pending font solution)
+  Charcuterie Board           TBD       Laser engraved, crest only (no QR — single color burn)
+  Java Speaker                TBD       Crest + QR
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 PRODUCT CATALOG (DIGITAL)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Legacy Pack (core product)    $29.99    9-chapter family story + crest + tree + certificate
-Custom Crest Download         $19       High-res PNG/SVG
-Legacy Certificate            $49       Frameable PDF
-Combined Wedding Crest        $79       24–48hr delivery
+Legacy Pack             $29.99   9-chapter family story + crest + bloodline + certificate
+Deep Legacy             $79      Everything in Legacy Pack + 15-question AI interview + deep
+                                 historical research + 12 chapters + 5-generation tree + premium
+                                 certificate. 24-hour delivery.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FREE TOOLS (All Claude API — mostly frontend-only right now)
+FREE TOOLS (All Claude-wired, all live as of May 2026)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. Bloodline Quiz      → 5 questions → archetype (Warrior/Builder/Explorer/Healer/Scholar)
-2. Surname Lookup      → meaning, origin, date, role for any surname
-3. Motto Generator     → 3 values → Latin motto with English translation
-4. Meet Your Ancestor  → AI ancestor profile (name, year, occupation, personality)
-5. The 1700s You       → what your life would look like 300 years ago
-6. Ancestor Chat       → live chat with AI ancestor character
+1. Surname Lookup      → meaning, origin, date, role for any surname → surname-lookup edge fn
+2. Bloodline Quiz      → 5 questions → archetype (Warrior/Builder/Explorer/Healer/Scholar) → bloodline-quiz
+3. Motto Generator     → 3 values → Latin motto with English translation → motto-generator
+4. Meet Your Ancestor  → AI ancestor profile (name, year, occupation, personality) → meet-ancestor
+5. The 1700s You       → what your life would look like 300 years ago → the-1700s-you
+6. Ancestor Chat       → live chat with AI ancestor character → ancestor-chat
 
-All tools end with: "Want to discover your full legacy? → Begin Your Journey"
+All tools end with a CTA back into the journey funnel.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FOUNDER STORY
@@ -552,19 +699,29 @@ ROUTES / PAGES REFERENCE
 /                    Landing page
 /journey/1           Stop 1: Enter surname
 /journey/2           Stop 2: Name meaning
-/journey/3           Stop 3: Family tree
+/journey/3           Stop 3: Bloodline timeline + FS Coming Soon banner
 /journey/4           Stop 4: Crest forge
 /journey/5           Stop 5: Story preview + paywall
 /journey/6           Stop 6: Pass it on
+/pricing             Free / $29.99 / $79 comparison
+/shop                Heirloom shop (live)
+/heirloom-order      Mug order form
+/product-order       Generic product order form
+/cart                Cart page
 /checkout            Stripe checkout
-/my-legacy           User dashboard (post-purchase)
+/my-legacy           User dashboard (auth-gated)
+/deep-legacy         $79 premium tier landing
+/deep-legacy/...     Deep Legacy interview subpages
 /tools               Free tools hub
-/tools/quiz          Bloodline Quiz
-/tools/surname       Surname Lookup
-/tools/motto         Motto Generator
-/tools/chat          Ancestor Chat
-/shop                Product catalog (NOT BUILT)
-/shop/[product-id]   Product detail (NOT BUILT)
-/gifts               Gift guide by occasion (NOT BUILT)
+/tools/surname       Surname Lookup (Claude-wired)
+/tools/quiz          Bloodline Quiz (Claude-wired)
+/tools/motto         Motto Generator (Claude-wired)
+/tools/ancestor      Meet Your Ancestor (Claude-wired)
+/tools/1700s         The 1700s You (Claude-wired)
+/tools/chat          Ancestor Chat (Claude-wired)
 /about               Founder story
-/gift/[gift-id]      Gift recipient landing (NOT BUILT)
+/privacy-policy      Privacy policy
+/terms               Terms of service
+/f/:surname          Public family share page (dynamic OG)
+/auth/familysearch/callback  OAuth callback (built but UI-hidden via FS_COMING_SOON flag)
+/404                 On-brand "branch doesn't exist" → Begin Journey CTA
