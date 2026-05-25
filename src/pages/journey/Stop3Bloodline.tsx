@@ -690,6 +690,47 @@ const Stop3Bloodline = () => {
               </motion.div>
             )}
 
+            {phase === "needs-person-id" && (
+              <motion.div
+                key="needs-person-id"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="rounded-[14px] border border-amber-dim/30 bg-card/60 p-6 text-center"
+              >
+                <h3 className="font-display text-lg text-cream-warm">
+                  One more step
+                </h3>
+                <p className="mt-2 font-sans text-sm text-text">
+                  To pull your bloodline, we need your FamilySearch person ID.
+                </p>
+                <p className="mt-1 font-sans text-xs text-text-dim">
+                  Find it on your FamilySearch profile — it's a code like BMZC-MBD.
+                </p>
+                <div className="mt-5 flex flex-col items-center gap-3">
+                  <input
+                    type="text"
+                    value={personIdInput}
+                    onChange={(e) => setPersonIdInput(e.target.value)}
+                    placeholder="Enter your FamilySearch person ID"
+                    className="w-full max-w-xs rounded-[10px] border border-amber-dim/20 bg-bg-input/80 px-4 py-2.5 text-center font-sans text-sm uppercase tracking-[2px] text-cream-soft placeholder:normal-case placeholder:tracking-normal placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber/40"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSavePersonIdAndLoad}
+                    disabled={savingPersonId}
+                    className="rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground disabled:opacity-50"
+                    style={{
+                      background: "linear-gradient(135deg, #e8943a, #c47828)",
+                    }}
+                  >
+                    {savingPersonId ? "Loading…" : "Save & load tree"}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+
           </AnimatePresence>
         )}
       </motion.section>
