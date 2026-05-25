@@ -86,7 +86,8 @@ Deno.serve(async (req) => {
     const user_id = userData.user.id;
 
     const body = (await req.json().catch(() => ({}))) as PullBody;
-    const requestedPersonId = body.person_id?.trim() || undefined;
+    const requestedPersonId =
+      (body.personId ?? body.person_id)?.toString().trim() || undefined;
     const generationsRequested = Math.min(
       Math.max(typeof body.generations === "number" ? body.generations : 4, 1),
       8,
@@ -107,10 +108,11 @@ Deno.serve(async (req) => {
     const { data: session, error: sessionErr } = await admin
       .from("familysearch_sessions")
       .select(
-        "access_token, refresh_token, token_expires_at, familysearch_person_id",
+        "access_token, refresh_token, token_expires_at, familysearch_person_id, starting_person_id",
       )
       .eq("user_id", user_id)
       .maybeSingle();
+
 
     if (sessionErr) {
       console.error("[familysearch-pull-tree] session lookup failed:", sessionErr);
