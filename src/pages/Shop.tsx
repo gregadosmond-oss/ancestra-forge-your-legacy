@@ -159,8 +159,8 @@ export default function Shop() {
       <section className="relative z-10 w-full max-w-6xl px-6 py-12">
         <motion.div
           {...reveal}
-          className="rounded-[22px]"
-          style={{ background: "#1a1510", padding: "64px 48px" }}
+          className="rounded-[22px] p-8 sm:p-12"
+          style={{ background: "#1a1510" }}
         >
           <p className="mb-3 text-center font-sans text-[11px] uppercase" style={{ color: "#a07830", letterSpacing: "4px" }}>
             What's Inside
