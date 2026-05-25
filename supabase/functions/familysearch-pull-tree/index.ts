@@ -15,6 +15,45 @@ const json = (status: number, body: unknown) =>
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 
+const redactBearer = (value?: string | null) => {
+  if (!value) return null;
+  return value.startsWith("Bearer ") ? "Bearer [REDACTED]" : value;
+};
+
+const sanitizeSentHeaders = (headers?: Record<string, string> | null) => {
+  if (!headers) return null;
+  return {
+    ...headers,
+    Authorization: redactBearer(headers.Authorization),
+  };
+};
+
+const buildFamilySearchHeaders = (accessToken: string) => ({
+  Authorization: `Bearer ${accessToken}`,
+  Accept: "application/x-fs-v1+json",
+  "Accept-Language": "en",
+  "User-Agent": "AncestorsQR/1.0 (https://ancestorsqr.com)",
+});
+
+const familySearchError = ({
+  status,
+  error,
+  headersSent,
+  endpoint,
+}: {
+  status: number;
+  error: string;
+  headersSent?: Record<string, string> | null;
+  endpoint: string;
+}) =>
+  json(200, {
+    success: false,
+    status,
+    error,
+    endpoint,
+    headers_sent: sanitizeSentHeaders(headersSent),
+  });
+
 interface PullBody {
   person_id?: string;
   generations?: number;
@@ -88,9 +127,10 @@ Deno.serve(async (req) => {
       return json(500, { success: false, error: sessionErr.message });
     }
     if (!session) {
-      return json(412, {
-        success: false,
+      return familySearchError({
+        status: 412,
         error: "Connect with FamilySearch first",
+        endpoint: "session",
       });
     }
 
@@ -122,9 +162,10 @@ Deno.serve(async (req) => {
           .from("familysearch_sessions")
           .delete()
           .eq("user_id", user_id);
-        return json(412, {
-          success: false,
+        return familySearchError({
+          status: 412,
           error: "FamilySearch session expired, please reconnect",
+          endpoint: "refresh-token",
         });
       }
 
@@ -153,9 +194,10 @@ Deno.serve(async (req) => {
           .from("familysearch_sessions")
           .delete()
           .eq("user_id", user_id);
-        return json(412, {
-          success: false,
+        return familySearchError({
+          status: 412,
           error: "FamilySearch session expired, please reconnect",
+          endpoint: "refresh-token",
         });
       }
 
@@ -201,26 +243,29 @@ Deno.serve(async (req) => {
     } else if (session.familysearch_person_id) {
       rootPersonId = session.familysearch_person_id as string;
     } else {
+      const currentHeaders = buildFamilySearchHeaders(access_token);
+      console.log(
+        "[familysearch-pull-tree] current-person request headers:",
+        JSON.stringify(sanitizeSentHeaders(currentHeaders)),
+      );
       const currentResp = await fetch(
         `${API_BASE}/platform/tree/current-person`,
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-            Accept: "application/x-fs-v1+json",
-          },
+          headers: currentHeaders,
         },
       );
-
 
       if (currentResp.status === 401) {
         await admin
           .from("familysearch_sessions")
           .delete()
           .eq("user_id", user_id);
-        return json(412, {
-          success: false,
+        return familySearchError({
+          status: 401,
           error: "FamilySearch session expired, please reconnect",
+          headersSent: currentHeaders,
+          endpoint: "/platform/tree/current-person",
         });
       }
 
@@ -248,6 +293,12 @@ Deno.serve(async (req) => {
           currentResp.status,
           txt,
         );
+        return familySearchError({
+          status: currentResp.status,
+          error: txt || `FamilySearch returned ${currentResp.status}`,
+          headersSent: currentHeaders,
+          endpoint: "/platform/tree/current-person",
+        });
       }
     }
 
@@ -265,12 +316,14 @@ Deno.serve(async (req) => {
       rootPersonId,
     )}/ancestry?generations=${generationsRequested}`;
 
+    const ancestryHeaders = buildFamilySearchHeaders(access_token);
+    console.log(
+      "[familysearch-pull-tree] ancestry request headers:",
+      JSON.stringify(sanitizeSentHeaders(ancestryHeaders)),
+    );
     const fsResp = await fetch(ancestryUrl, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-        Accept: "application/x-fs-v1+json",
-      },
+      headers: ancestryHeaders,
     });
 
     if (fsResp.status === 401) {
@@ -278,10 +331,11 @@ Deno.serve(async (req) => {
         .from("familysearch_sessions")
         .delete()
         .eq("user_id", user_id);
-      return json(200, {
-        success: false,
+      return familySearchError({
         status: 401,
         error: "FamilySearch session expired, please reconnect",
+        headersSent: ancestryHeaders,
+        endpoint: ancestryUrl,
       });
     }
     if (fsResp.status === 404) {
@@ -302,10 +356,11 @@ Deno.serve(async (req) => {
         "[familysearch-pull-tree] FAILED:",
         JSON.stringify({ status: fsResp.status, body: txt }),
       );
-      return json(200, {
-        success: false,
+      return familySearchError({
         status: fsResp.status,
         error: txt || `FamilySearch returned ${fsResp.status}`,
+        headersSent: ancestryHeaders,
+        endpoint: ancestryUrl,
       });
     }
 
@@ -427,6 +482,12 @@ Deno.serve(async (req) => {
       "[familysearch-pull-tree] FAILED:",
       JSON.stringify({ message: (err as Error).message }),
     );
-    return json(500, { success: false, error: (err as Error).message });
+    return json(200, {
+      success: false,
+      status: 500,
+      error: (err as Error).message,
+      endpoint: "internal",
+      headers_sent: null,
+    });
   }
 });
