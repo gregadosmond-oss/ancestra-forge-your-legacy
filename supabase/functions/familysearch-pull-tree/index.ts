@@ -207,10 +207,11 @@ Deno.serve(async (req) => {
           method: "GET",
           headers: {
             Authorization: `Bearer ${access_token}`,
-            Accept: "application/json",
+            Accept: "application/x-fs-v1+json",
           },
         },
       );
+
 
       if (currentResp.status === 401) {
         await admin
@@ -268,7 +269,7 @@ Deno.serve(async (req) => {
       method: "GET",
       headers: {
         Authorization: `Bearer ${access_token}`,
-        Accept: "application/json",
+        Accept: "application/x-fs-v1+json",
       },
     });
 
@@ -277,20 +278,10 @@ Deno.serve(async (req) => {
         .from("familysearch_sessions")
         .delete()
         .eq("user_id", user_id);
-      return json(412, {
+      return json(200, {
         success: false,
+        status: 401,
         error: "FamilySearch session expired, please reconnect",
-      });
-    }
-    if (fsResp.status === 403) {
-      const txt = await fsResp.text();
-      console.error(
-        "[familysearch-pull-tree] FAILED:",
-        JSON.stringify({ status: 403, body: txt }),
-      );
-      return json(502, {
-        success: false,
-        error: "FamilySearch declined the request: insufficient permissions",
       });
     }
     if (fsResp.status === 404) {
@@ -305,28 +296,19 @@ Deno.serve(async (req) => {
         generations_requested: generationsRequested,
       });
     }
-    if (fsResp.status >= 500) {
-      const txt = await fsResp.text();
-      console.error(
-        "[familysearch-pull-tree] FAILED:",
-        JSON.stringify({ status: fsResp.status, body: txt }),
-      );
-      return json(502, {
-        success: false,
-        error: "FamilySearch upstream error",
-      });
-    }
     if (!fsResp.ok) {
       const txt = await fsResp.text();
       console.error(
         "[familysearch-pull-tree] FAILED:",
         JSON.stringify({ status: fsResp.status, body: txt }),
       );
-      return json(502, {
+      return json(200, {
         success: false,
-        error: `FamilySearch error: ${txt}`,
+        status: fsResp.status,
+        error: txt || `FamilySearch returned ${fsResp.status}`,
       });
     }
+
 
     const data = await fsResp.json().catch(() => ({}));
     const rawPersons: any[] = Array.isArray(data?.persons) ? data.persons : [];
