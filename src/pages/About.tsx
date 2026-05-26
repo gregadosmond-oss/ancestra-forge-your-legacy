@@ -70,7 +70,7 @@ const PullQuote = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function About() {
-  usePageMeta({ title: "Our Story | AncestorsQR", description: "The Osmond family traced back to 1066 — and why every family deserves their story told." });
+  usePageMeta({ title: "Our Story | AncestorsQR", description: "The Osmond family traced back to 1086 — fourteen generations, surfaced by AncestorsQR so your family doesn't have to wait decades." });
   return (
     <div className="relative min-h-screen" style={{ background: "#0d0a07" }}>
       {/* Subtle warm ambient glow */}
@@ -109,7 +109,7 @@ export default function About() {
             className="mt-6 font-serif italic"
             style={{ color: "#e8b85c", fontSize: "18px" }}
           >
-            Mine took 960 years to find.
+            Mine took 14 generations to find.
           </motion.p>
         </section>
 
@@ -125,13 +125,14 @@ export default function About() {
               before me.
             </Body>
             <Body>
-              Then I found the Domesday Book entry. 1066. Three lines of Latin, recorded
-              by Norman surveyors sent by William the Conqueror.
+              Then I found the Domesday Book entry. 1086. Three lines of Latin, recorded
+              by Norman surveyors sent by William the Conqueror twenty years after he
+              took England.
             </Body>
             <Body>
               <em style={{ color: "#d8cdbf" }}>
-                Osmond the Baker. Holding land in Gallion, Woodstock, and Melbourne.
-                County of Dorset.
+                Osmund the Baker. Holding land in Galton, Woodstreet, and Milborne —
+                three small landholdings in the County of Dorset.
               </em>
             </Body>
             <Body>
@@ -140,14 +141,14 @@ export default function About() {
               even meant what it means today.
             </Body>
           </div>
-          <PullQuote>"Osmond the Baker. Dorset, England. 1066."</PullQuote>
+          <PullQuote>"Osmund the Baker. Dorset, England. 1086."</PullQuote>
         </motion.section>
 
         <OrnamentalDivider />
 
         {/* ── SECTION 2: The roots in Dorset ── */}
         <motion.section {...reveal}>
-          <SectionLabel>Holnest · Hermitage · Piddletrenthide</SectionLabel>
+          <SectionLabel>Holnest · Hermitage · Long Burton</SectionLabel>
           <h2
             className="mt-6 text-center font-display"
             style={{
@@ -160,26 +161,30 @@ export default function About() {
           </h2>
           <div className="mt-10">
             <Body>
-              The earliest confirmed ancestor I can name is Edmund Osmond, born around
-              1600, in the parish of Holnest, North Dorset. He married Elizabeth Mabry on
-              the 10th of November, 1628 — a small entry in a church register that almost
+              The earliest confirmed ancestor I can name by date is Edmund Osmond, born
+              around 1600, in the parish of Holnest, North Dorset. He married Edeth Maber
+              on November 16, 1628 — a small entry in a church register that almost
               didn't survive.
             </Body>
             <Body>
-              His son Giles became a carpenter and church warden in Hermitage. His
-              grandson Giles married Mary Harbin in 1685 — a clandestine marriage,
-              performed against the wishes of the landowner, and later brought before the
-              local Vicar.
+              His son Giles Osmond (b. 1634) was christened at Holnest and became a
+              carpenter and church warden in Hermitage. The wood he worked still holds up
+              the roof of his parish church. He was buried October 25, 1719.
             </Body>
             <Body>
-              In 1795, James Osmond of Glanville Wooton signed his Last Will and
-              Testament. I have a copy of that document. His actual signature. Witnessed
-              by Ann Wiltshire and James Wiltshire, on the 25th of May, 1795.
+              His grandson Giles Osmond (b. 1667) married Mary Harbin in 1683 — a
+              clandestine marriage, performed by an excommunicated minister, brought
+              before the Bishop's court and recorded in his own hand.
+            </Body>
+            <Body>
+              Three generations later, Ralph Osmond married Martha Clarke on August 18,
+              1725, at Long Burton. Their fourth child — baptized April 28, 1728 — was
+              named David.
             </Body>
             <Body>
               These weren't powerful people. They were carpenters, shepherds, church
               wardens, bakers. They worked the land. They raised children in stone
-              parishes that are still standing today.
+              parishes still standing today.
             </Body>
           </div>
           <PullQuote>"They weren't born wealthy. They earned everything."</PullQuote>
@@ -197,7 +202,7 @@ export default function About() {
             boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
           }}
         >
-          <SectionLabel>Newfoundland · 1753</SectionLabel>
+          <SectionLabel>Newfoundland · 1757</SectionLabel>
           <h2
             className="mt-6 text-center font-display"
             style={{
@@ -209,21 +214,21 @@ export default function About() {
             The crossing
           </h2>
           <div className="mt-10">
-            <Body>Around 1753, one man changed everything.</Body>
             <Body>
-              David Osmond, born in Dorset in 1728, left everything he knew and crossed
-              the Atlantic. He settled at Hearts Content, Newfoundland — a fishing
-              village at the edge of the known world.
+              In the spring of 1757, David Osmond — 29 years old — left everything he
+              knew and crossed the Atlantic. He settled at Heart's Content, Newfoundland,
+              a fishing village at the edge of the known world. Trinity Court records
+              appointed him police constable that same year.
             </Body>
             <Body>
-              He died there in 1783, aged 57, buried at Forrest Road Anglican Churchyard
-              in St James. He had six children.
+              He married Eleanor (surname Nicholson, by family tradition). His sons
+              fished the same waters he did.
             </Body>
             <Body>
-              One of them was Joseph Osmond, born 1802 at Moreton's Harbour. Joseph built
-              a fishing operation from nothing. His sons Mark and Ambrose grew it into
-              one of the largest shipping businesses in Newfoundland — trading across
-              the West Indies and Caribbean for over 100 years.
+              A century later, Joseph Osmond (1802–1868) built a fishing operation from
+              nothing at Moreton's Harbour. His sons Mark and Ambrose grew it into one of
+              the largest shipping businesses in Newfoundland — trading across the West
+              Indies and Caribbean for over 100 years.
             </Body>
             <Body>
               From a baker holding 30 acres in Dorset. To a merchant fleet crossing the
@@ -231,11 +236,11 @@ export default function About() {
             </Body>
           </div>
 
-          {/* Portrait — Joseph Osmond c.1827 */}
+          {/* Portrait — Joseph Osmond (1802–1868) */}
           <figure className="mx-auto mt-10" style={{ maxWidth: "380px" }}>
             <img
               src={josephOsmondPortrait}
-              alt="Portrait of Joseph Osmond, c.1827, Moreton's Harbour, Newfoundland"
+              alt="Portrait of Joseph Osmond (1802–1868), Moreton's Harbour, Newfoundland"
               className="w-full"
               style={{
                 borderRadius: "14px",
@@ -248,14 +253,86 @@ export default function About() {
               className="mt-4 text-center font-serif italic"
               style={{ color: "#8a7e6e", fontSize: "14px" }}
             >
-              Joseph Osmond, c.1827 — Moreton's Harbour, Newfoundland
+              Joseph Osmond (1802–1868) — Moreton's Harbour, Newfoundland
             </figcaption>
           </figure>
         </motion.section>
 
         <OrnamentalDivider />
 
-        {/* ── SECTION 4: The crest ── */}
+        {/* ── SECTION 4: The chain to me ── */}
+        <motion.section {...reveal}>
+          <SectionLabel>The Chain to Me</SectionLabel>
+          <h2
+            className="mt-6 text-center font-display"
+            style={{
+              color: "#e8ddd0",
+              fontSize: "clamp(28px, 4vw, 38px)",
+              lineHeight: 1.2,
+            }}
+          >
+            The chain to me
+          </h2>
+          <div className="mt-10">
+            <Body>
+              Joseph's line continued through the smallest harbours of Notre Dame Bay:
+            </Body>
+
+            <ul
+              className="my-10 font-serif"
+              style={{
+                color: "#d8cdbf",
+                fontSize: "17px",
+                lineHeight: 1.85,
+                listStyle: "none",
+                paddingLeft: 0,
+                borderLeft: "1px solid #3d3020",
+              }}
+            >
+              {[
+                "James Osmond + Martha Canning (Martha, b. 1822 d. 1912, daughter of Andrew Canning of Barr'd Islands)",
+                "Basil Osmond + Martha Ann Peyton",
+                "James Henry Osmond (b. March 31, 1881) — drowned at Birchy Bay in 1912, age 31, leaving a wife and six children",
+                "Arthur Samuel Osmond",
+                "Edgar Osmond (my grandfather)",
+                "Dean Osmond (my father, b. 1958)",
+                "Gregory Angus Dean Osmond — born March 13, 1978, Toronto",
+              ].map((line, i) => (
+                <li
+                  key={i}
+                  style={{
+                    paddingLeft: "20px",
+                    paddingTop: "6px",
+                    paddingBottom: "6px",
+                    position: "relative",
+                  }}
+                >
+                  <span
+                    style={{
+                      position: "absolute",
+                      left: "6px",
+                      top: "16px",
+                      width: "6px",
+                      height: "6px",
+                      borderRadius: "50%",
+                      background: "#a07830",
+                    }}
+                  />
+                  {line}
+                </li>
+              ))}
+            </ul>
+
+            <Body>
+              Fourteen generations. From a baker in Dorset in 1086 to a child in Toronto
+              in 1978. Every one of them carried the name forward.
+            </Body>
+          </div>
+        </motion.section>
+
+        <OrnamentalDivider />
+
+        {/* ── SECTION 5: The crest ── */}
         <motion.section {...reveal}>
           <SectionLabel>The Osmond Coat of Arms · Since 1688</SectionLabel>
           <h2
@@ -270,9 +347,9 @@ export default function About() {
           </h2>
           <div className="mt-10">
             <Body>
-              Somewhere along the way, the Osmond family registered a Coat of Arms.
+              Somewhere in the seventeenth century the family registered a coat of arms.
+              The motto, in Latin:
             </Body>
-            <Body>The date on the record is 1688. The motto is Latin:</Body>
           </div>
 
           <div className="my-12 text-center">
@@ -287,11 +364,10 @@ export default function About() {
               Ex Labore, Ascendimus
             </p>
             <p
-              className="mt-4 font-sans uppercase"
+              className="mt-4 font-serif italic"
               style={{
-                color: "#8a7e6e",
-                fontSize: "11px",
-                letterSpacing: "3px",
+                color: "#d8cdbf",
+                fontSize: "16px",
               }}
             >
               From Labour, We Rise
@@ -304,8 +380,8 @@ export default function About() {
               I stopped.
             </Body>
             <Body>
-              From Labour, We Rise. That's not a quote someone invented for a logo.
-              That's 300 years of Osmonds — carpenters, shepherds, fishermen, merchants —
+              From Labour, We Rise. That's not a quote invented for a logo. That's three
+              centuries of Osmonds — carpenters, shepherds, fishermen, merchants —
               distilled into four words.
             </Body>
           </div>
@@ -313,9 +389,9 @@ export default function About() {
 
         <OrnamentalDivider />
 
-        {/* ── SECTION 5: Why I built AncestorsQR ── */}
+        {/* ── SECTION 6: How I found it ── */}
         <motion.section {...reveal}>
-          <SectionLabel>The Reason</SectionLabel>
+          <SectionLabel>How I Found It</SectionLabel>
           <h2
             className="mt-6 text-center font-display"
             style={{
@@ -324,7 +400,57 @@ export default function About() {
               lineHeight: 1.2,
             }}
           >
-            Why I built AncestorsQR
+            How I found it
+          </h2>
+          <div className="mt-10">
+            <Body>
+              I didn't do this alone. Two relatives spent decades chasing the same names
+              through different archives:
+            </Body>
+            <Body>
+              <strong style={{ color: "#e8b85c", fontWeight: 600 }}>
+                Charles Sankey (Dorset side)
+              </strong>{" "}
+              — a relative-in-law who became the first Osmond descendant to return to
+              Holnest in May 1990. He stood inside the same church where David Osmond was
+              baptized in 1728. He walked Osmonds Farm. He wrote it all into a research
+              book that I have now scanned cover-to-cover.
+            </Body>
+            <Body>
+              <strong style={{ color: "#e8b85c", fontWeight: 600 }}>
+                Kevin Osmond (Newfoundland side)
+              </strong>{" "}
+              — built a numbered descendant chart tracing every Osmond born in
+              Newfoundland back to David. His book is how I traced my line to Edgar.
+            </Body>
+            <Body>
+              Between them: 80+ historical documents. Wills from the 1700s. Church
+              records from Piddletrenthide. Domesday entries from 1086. Letters to a
+              sitting Marquess. Photographs of people who died before anyone alive today
+              was born.
+            </Body>
+            <Body>
+              I scanned 184 pages from those books in a single afternoon. AI helped me
+              extract every name, every date, every place — but the work was done by
+              people who cared, decades before I was born.
+            </Body>
+          </div>
+        </motion.section>
+
+        <OrnamentalDivider />
+
+        {/* ── SECTION 7: What I built ── */}
+        <motion.section {...reveal}>
+          <SectionLabel>What I Built</SectionLabel>
+          <h2
+            className="mt-6 text-center font-display"
+            style={{
+              color: "#e8ddd0",
+              fontSize: "clamp(28px, 4vw, 38px)",
+              lineHeight: 1.2,
+            }}
+          >
+            What I built
           </h2>
           <div className="mt-10">
             <p
@@ -336,7 +462,8 @@ export default function About() {
                 marginBottom: "1.5rem",
               }}
             >
-              Most people don't know where they come from.
+              Most people don't know where they come from. Not because the records don't
+              exist. Because nobody ever took the time to find them.
             </p>
             <p
               className="font-serif"
@@ -347,8 +474,7 @@ export default function About() {
                 marginBottom: "1.5rem",
               }}
             >
-              Not because the records don't exist. Because nobody ever took the time to
-              find them.
+              AncestorsQR exists so you don't have to spend forty years to get what I got.
             </p>
             <p
               className="font-serif"
@@ -359,9 +485,11 @@ export default function About() {
                 marginBottom: "1.5rem",
               }}
             >
-              I spent years tracing my family — through wills, church records, census
-              documents, Domesday entries, letters to a sitting Marquess, photographs of
-              people who died before anyone alive today was born.
+              You enter your surname. We search WikiTree's free database of 32M+
+              community-verified family records. When you connect with FamilySearch, we
+              search 1.5 billion more. AI helps you make sense of what comes back —
+              turning records into a story, names into a coat of arms, a tree into a
+              hardcover book on your shelf.
             </p>
             <p
               className="font-serif"
@@ -372,32 +500,8 @@ export default function About() {
                 marginBottom: "1.5rem",
               }}
             >
-              What I found changed how I see myself. It changed what I think is possible.
-              When you know you come from people who crossed oceans and built things from
-              nothing — that lives in you differently.
-            </p>
-            <p
-              className="font-serif"
-              style={{
-                color: "#d8cdbf",
-                fontSize: "18px",
-                lineHeight: 1.95,
-                marginBottom: "1.5rem",
-              }}
-            >
-              AncestorsQR exists so you don't have to spend five years to get what I got.
-            </p>
-            <p
-              className="font-serif"
-              style={{
-                color: "#d8cdbf",
-                fontSize: "18px",
-                lineHeight: 1.95,
-                marginBottom: "1.5rem",
-              }}
-            >
-              You enter your surname. In five minutes, you have a crest, a story, and a
-              lineage — rooted in real history, built for your family.
+              It's not magic. It's the work other people already did, surfaced for you in
+              minutes.
             </p>
             <p
               className="font-serif italic"
