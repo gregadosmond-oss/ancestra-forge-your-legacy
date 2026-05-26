@@ -57,6 +57,17 @@ const Stop1EnterName = () => {
     proceedWithSurname();
     setSubmitting(false);
   };
+  // Auto-submit when surname is prefilled via ?surname= (e.g. from /tiktok landing)
+  useEffect(() => {
+    if (autoSubmittedRef.current) return;
+    const prefilled = searchParams.get("surname")?.trim();
+    if (prefilled && prefilled.length > 0) {
+      autoSubmittedRef.current = true;
+      handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   return (
     <div className="relative flex min-h-[72vh] items-start justify-center px-6 pt-20 pb-32">
