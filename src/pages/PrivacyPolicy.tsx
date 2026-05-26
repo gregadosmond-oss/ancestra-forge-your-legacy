@@ -23,7 +23,10 @@ const Divider = () => (
 );
 
 const PrivacyPolicy = () => {
-  usePageMeta({ title: "Privacy Policy | AncestorsQR" });
+  usePageMeta({
+    title: "Privacy Policy | AncestorsQR",
+    description: "How AncestorsQR collects, stores and protects your surname, family details and account data. Read our full privacy commitments and your rights.",
+  });
   return (
     <main
       className="min-h-screen px-6 py-16 md:py-24"
