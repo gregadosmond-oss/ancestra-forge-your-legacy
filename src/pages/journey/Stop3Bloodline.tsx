@@ -122,6 +122,7 @@ const Stop3Bloodline = () => {
     }
     try {
       setConnecting(true);
+      setSearchError(null);
       await initiateFamilySearchOAuth();
     } catch (err) {
       setConnecting(false);
