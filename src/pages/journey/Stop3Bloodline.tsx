@@ -562,9 +562,22 @@ const Stop3Bloodline = () => {
                     </button>
                   </form>
                   {searchPhase === "claude-loading" && (
-                    <p ref={resultsRef} className="mt-4 rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-serif text-sm italic text-amber-light">
-                      Searching deeper with AI…
-                    </p>
+                    <div
+                      ref={resultsRef}
+                      className="mt-4 flex flex-col items-center gap-2 rounded-[8px] border border-amber-dim/30 bg-card/40 px-4 py-5 text-center animate-pulse"
+                    >
+                      <p className="font-serif text-sm italic text-amber-light">
+                        Searching deeper with AI…
+                      </p>
+                      <p className="font-sans text-[11px] uppercase tracking-[1.5px] text-text-dim">
+                        Scanning historical records · usually 5–10 seconds
+                      </p>
+                      <div className="mt-1 flex gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber/70" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber/40" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber/20" />
+                      </div>
+                    </div>
                   )}
 
                   {searchPhase === "done" && wikitreeResults !== null && (
@@ -906,9 +919,22 @@ const Stop3Bloodline = () => {
                     </button>
                   </form>
                   {searchPhase === "claude-loading" && (
-                    <p ref={resultsRef} className="mt-4 rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-serif text-sm italic text-amber-light">
-                      Searching deeper with AI…
-                    </p>
+                    <div
+                      ref={resultsRef}
+                      className="mt-4 flex flex-col items-center gap-2 rounded-[8px] border border-amber-dim/30 bg-card/40 px-4 py-5 text-center animate-pulse"
+                    >
+                      <p className="font-serif text-sm italic text-amber-light">
+                        Searching deeper with AI…
+                      </p>
+                      <p className="font-sans text-[11px] uppercase tracking-[1.5px] text-text-dim">
+                        Scanning historical records · usually 5–10 seconds
+                      </p>
+                      <div className="mt-1 flex gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber/70" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber/40" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber/20" />
+                      </div>
+                    </div>
                   )}
 
                   {searchPhase === "done" && wikitreeResults !== null && (
