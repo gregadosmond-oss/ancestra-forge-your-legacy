@@ -35,6 +35,19 @@ type Match = {
   score?: number | null;
 };
 
+type WikitreeResult = {
+  id: string;
+  source: "wikitree";
+  name: string;
+  birthDate: string | null;
+  birthPlace: string | null;
+  deathDate: string | null;
+  deathPlace: string | null;
+  fatherName: string | null;
+  motherName: string | null;
+  profileUrl: string | null;
+};
+
 type TreePerson = {
   id: string;
   name?: string | null;
