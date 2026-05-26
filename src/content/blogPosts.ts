@@ -181,6 +181,165 @@ export const blogPosts: BlogPost[] = [
       href: "/tools/surname",
     },
   },
+  {
+    slug: "how-to-build-a-family-tree",
+    title: "How to Build a Family Tree (Free, Step-by-Step for Beginners)",
+    metaTitle: "How to Build a Family Tree — Free Beginner's Guide",
+    metaDescription:
+      "Start your family tree today. A simple, step-by-step guide for beginners — what to collect, where to find records, and how to grow it five generations deep.",
+    excerpt:
+      "You don't need a subscription or a genealogist to start. Here is the simplest path from a blank page to a five-generation family tree you can actually trust.",
+    publishedAt: "2026-05-26",
+    readMinutes: 8,
+    bodyHtml: `
+<p>Most people put off building a family tree because it sounds like a years-long project. It isn't. The first three generations usually take an afternoon. Everything after that is just patient detective work, one ancestor at a time.</p>
+<p>Here is the simplest path from a blank page to a real, sourced family tree — without paying for anything you don't have to.</p>
+
+<h2>Step 1: Start with yourself, not your ancestors</h2>
+<p>Every solid tree is built from the present backwards. Write down your own full name, date of birth, and place of birth. Then your parents. Then your grandparents. Don't skip ahead. Don't guess. If you don't know a date, leave it blank — a blank is honest, a guess is a future error.</p>
+
+<h2>Step 2: Interview the oldest person in your family</h2>
+<p>This is the single highest-leverage move in genealogy. Call your oldest living relative this week. Ask them:</p>
+<ul>
+  <li>Full names of their parents and grandparents, including maiden names</li>
+  <li>Where each was born and where they died</li>
+  <li>What they did for a living</li>
+  <li>Where the family came from before that</li>
+  <li>Any photos, letters, or documents stored in a drawer somewhere</li>
+</ul>
+<p>Record the conversation if they'll let you. Memories don't get younger.</p>
+
+<h2>Step 3: Collect the paper you already own</h2>
+<p>Before searching any database, raid your own house. Birth certificates, marriage licences, old passports, military discharge papers, the back of framed photos. Most families already own three generations of evidence — it's just scattered.</p>
+
+<h2>Step 4: Use free public records</h2>
+<p>You do not need a paid subscription to get started. The biggest free sources:</p>
+<ul>
+  <li><strong>FamilySearch</strong> — the largest free genealogy database in the world, run by a non-profit. Billions of records, no paywall.</li>
+  <li><strong>National Archives</strong> — every country with a working civil service keeps census, military, and immigration records public.</li>
+  <li><strong>Find a Grave</strong> — free, volunteer-maintained, surprisingly accurate for dates and family links.</li>
+  <li><strong>Local parish and church registers</strong> — for anything pre-1850, this is where the trail usually lives.</li>
+</ul>
+
+<h2>Step 5: Walk it back, one generation at a time</h2>
+<p>The rhythm is always the same: confirm a person's parents, then treat each parent as a new problem. Use at least two independent sources before you write a name in ink. Census + birth record. Marriage register + headstone. Two records that agree on a date are a fact. One record is a clue.</p>
+
+<h2>Step 6: Watch for the four classic mistakes</h2>
+<ol>
+  <li><strong>Copying someone else's tree without checking.</strong> Public trees on big sites are riddled with errors. Use them as leads, never as proof.</li>
+  <li><strong>Assuming spellings stayed constant.</strong> Your great-grandfather's surname may appear five different ways in five records. They are usually the same man.</li>
+  <li><strong>Confusing two people with the same name.</strong> Common in small villages where naming a son after the father was tradition. Always cross-check dates and locations.</li>
+  <li><strong>Ignoring the women.</strong> Maiden names are the bridge to a whole other half of your tree. Lose them and you lose 50% of your ancestry every generation.</li>
+</ol>
+
+<h2>Step 7: Decide how deep you want to go</h2>
+<p>Five generations is the natural sweet spot. That's roughly 62 direct ancestors and takes most people back to the early 1800s. Beyond that, the records thin out and the work doubles per generation. Most families find five generations is enough to feel the shape of their bloodline.</p>
+
+<h2>The shortcut for impatient people</h2>
+<p>If the research itself sounds like more work than you want, start with your surname. The meaning, origin, and historical role of your last name will tell you in minutes what a paper trail would take months to reveal — and it's a much better starting point than a blank chart.</p>
+`,
+    cta: {
+      label: "Start with my surname free",
+      href: "/tools/surname",
+    },
+  },
+  {
+    slug: "what-is-my-family-crest",
+    title: "What Is My Family Crest? How to Find (or Forge) Yours",
+    metaTitle: "What Is My Family Crest? How to Find or Create Yours",
+    metaDescription:
+      "Does your family have a coat of arms? Learn how family crests work, how to find a historical one tied to your surname, and how to design your own.",
+    excerpt:
+      "Almost everyone asking this question expects a yes-or-no answer. The truth is more interesting — and more in your hands than you think.",
+    publishedAt: "2026-05-26",
+    readMinutes: 6,
+    bodyHtml: `
+<p>"What is my family crest?" is one of the most-Googled genealogy questions in the world. People expect a simple answer — either their family has one or it doesn't. The truth is more interesting, and the answer is more in your hands than you think.</p>
+
+<h2>The short version</h2>
+<p>Coats of arms were never granted to surnames. They were granted to <em>individuals</em>, usually a single ancestor centuries ago, and then inherited down a specific male line. That means two strangers with the same last name today may have entirely different heraldic histories — or none at all.</p>
+<p>So when a souvenir shop sells you "the official Murphy crest," that's marketing. Heraldically, there is no such thing.</p>
+
+<h2>How crests actually worked</h2>
+<p>In medieval Europe, a knight needed to be recognisable on a battlefield while wearing a full helmet. A unique painted shield solved that problem. Heraldic authorities — the College of Arms in England, the Court of the Lord Lyon in Scotland, equivalents across the continent — recorded each design so no two knights would carry the same one.</p>
+<p>That registered design passed, intact, to the eldest son. Younger sons received <em>differenced</em> versions (small variations) so they could be told apart. Daughters' families used different rules again. Over centuries, a single original coat of arms produced dozens of related variants — all legitimate, all distinct.</p>
+
+<h2>Does my family have an inherited coat of arms?</h2>
+<p>There are really only three ways to know:</p>
+<ol>
+  <li><strong>You can trace your direct male line to a documented armiger</strong> — an ancestor who was officially granted arms. This requires a verifiable genealogy back to that person, usually several centuries deep.</li>
+  <li><strong>You find a family Bible, signet ring, or portrait</strong> showing arms in use by your direct ancestors. Physical evidence still counts.</li>
+  <li><strong>Your surname's region of origin had a famous House of the same name</strong> — but unless your line connects, you can admire that House's arms; you can't claim them.</li>
+</ol>
+
+<h2>What most families discover</h2>
+<p>Most families learn that no specific medieval coat of arms was ever granted to their bloodline. That's the normal case worldwide. Only a tiny percentage of European families were ever formally armigerous.</p>
+<p>And here is the part people miss: <strong>that doesn't mean your family doesn't deserve one.</strong> It means no one has made one yet.</p>
+
+<h2>Forging your own (legitimately)</h2>
+<p>You are allowed to design and use a coat of arms for your family. Heraldic authorities exist in some countries (notably Scotland and Canada) to officially register new arms for modern families — it is not a privilege locked in the Middle Ages.</p>
+<p>Even without official registration, a thoughtfully composed family crest — built on traditional heraldic rules, with meaningful colours, a chosen charge, and a real motto — is exactly what your great-great-grandchildren will recognise as "our family crest" in eighty years. Every armigerous family started with a first person who designed theirs. Yours can start with you.</p>
+
+<h2>What makes a crest meaningful</h2>
+<ul>
+  <li>It uses traditional heraldic colour rules (not random Pantone swatches).</li>
+  <li>It includes a single, clear central charge — an animal, object, or symbol that says something true about your family.</li>
+  <li>It carries a motto that is short, real, and worth being quoted at a funeral.</li>
+  <li>It is rendered cleanly enough to hang on a wall for fifty years without looking dated.</li>
+</ul>
+
+<h2>The simplest place to start</h2>
+<p>Begin with the meaning of your surname. The trade, region, or root meaning behind your last name is the most honest seed for a family crest — it makes the design about <em>your</em> ancestors, not someone else's.</p>
+`,
+    cta: {
+      label: "Forge my family crest free",
+      href: "/journey/1",
+    },
+  },
+  {
+    slug: "what-your-surname-says-about-your-ancestors",
+    title: "What Your Surname Says About Your Ancestors (More Than You Think)",
+    metaTitle: "What Your Surname Reveals About Your Ancestors",
+    metaDescription:
+      "Your last name carries more history than your birth certificate. Here is what surnames reveal about your ancestors' trade, region, status, and bloodline.",
+    excerpt:
+      "Your surname is a 600-year-old job description, address, or nickname — usually still readable if you know how to look. Here is what it actually says.",
+    publishedAt: "2026-05-26",
+    readMinutes: 6,
+    bodyHtml: `
+<p>Your surname is older than your birth certificate, older than your country in its current form, and very often older than the language you speak it in. It is the single oldest piece of evidence about your ancestors that you carry around every day — and most people never read it.</p>
+<p>Here is what your last name can actually tell you about the people who came before you.</p>
+
+<h2>Their trade</h2>
+<p>If your surname is occupational, you are walking around with your ancestor's job title. <strong>Smith</strong>, <strong>Wright</strong>, <strong>Cooper</strong>, <strong>Mason</strong>, <strong>Taylor</strong>, <strong>Fletcher</strong>, <strong>Chandler</strong>, <strong>Fowler</strong>, <strong>Hayward</strong>, <strong>Shepherd</strong>. Every one of these is a medieval job description that stuck so hard it became a family identity. If your name is on that list, an ancestor of yours did that work, in a specific village, in a specific century — and the village remembered him for it.</p>
+
+<h2>Their village</h2>
+<p>Locational surnames tell you where your family came from. <strong>Hill</strong>, <strong>Brooks</strong>, <strong>Wood</strong>, <strong>Lancaster</strong>, <strong>Lincoln</strong>, <strong>York</strong>, <strong>Sutton</strong>. Sometimes the place is generic (a hill, a wood). Sometimes it is so specific you can put a pin on a map. Either way, your name is a postcode from 600 years ago.</p>
+
+<h2>Their father</h2>
+<p>Patronymic surnames record an ancestor's father's name. <strong>Johnson</strong> = son of John. <strong>O'Brien</strong> = descendant of Brien. <strong>MacDonald</strong> = son of Donald. <strong>Andersen</strong>, <strong>Petrov</strong>, <strong>Fitzgerald</strong>, <strong>Ivanov</strong> — different languages, same idea. Your name is a quiet acknowledgement that, at some moment, one specific man mattered enough to be carried forward by every one of his descendants.</p>
+
+<h2>Their appearance or personality</h2>
+<p>Descriptive surnames are blunt. <strong>Short</strong>, <strong>Long</strong>, <strong>Brown</strong>, <strong>Reid</strong> (red-haired), <strong>Armstrong</strong>, <strong>Swift</strong>, <strong>Cruikshank</strong> (bent leg). One ancestor was vivid enough that the whole village named the family after a single physical trait. That ancestor may have been six hundred years ago and you are still introducing yourself with his nickname.</p>
+
+<h2>Their social standing</h2>
+<p>Some surnames betray status. A <strong>Hayward</strong> was a trusted villager — he managed the common land and the hedges; that's a job given to a man the village trusted. A <strong>Reeve</strong> oversaw the lord's estate. A <strong>Marshal</strong> commanded horses, which meant commanding men. Even <strong>Knight</strong> usually meant "in the service of one," not actually titled — but it still meant something.</p>
+<p>Other names point the other way. <strong>Cottar</strong>, <strong>Bond</strong>, <strong>Carter</strong>, <strong>Walker</strong> (a fuller of cloth, dirty work). Every village had a hierarchy, and surnames are the receipts.</p>
+
+<h2>Their region of origin</h2>
+<p>Even before you look at meaning, the <em>language</em> of your surname tells you where your family came from. A name ending in <strong>-ski</strong> points to Poland. <strong>-escu</strong> to Romania. <strong>-akis</strong> to Crete. <strong>Mc-</strong> or <strong>Mac-</strong> to Scotland or Ireland. <strong>Van-</strong> to the Netherlands. Even before genealogy, the shape of your name is a passport stamp.</p>
+
+<h2>Their resilience</h2>
+<p>The fact that you carry the name at all is evidence of survival. Every famine, war, plague, migration, and pogrom your family lived through left them still able to pass the name down one more generation. The name in your inbox today is a 25-generation chain that did not break. That is not nothing.</p>
+
+<h2>How to actually read yours</h2>
+<p>If you have never looked up the meaning of your surname, you are missing the most accessible piece of family history you own. It takes about thirty seconds, costs nothing, and almost always tells you something you didn't know about the people whose blood you carry.</p>
+`,
+    cta: {
+      label: "Look up my surname free",
+      href: "/tools/surname",
+    },
+  },
 ];
 
 export function getBlogPost(slug: string): BlogPost | undefined {
