@@ -148,77 +148,53 @@ const Stop3Bloodline = () => {
 
   async function handleSearchSubmit(e: FormEvent) {
     e.preventDefault();
-    if (FS_COMING_SOON) {
-      notifyComingSoon();
-      return;
-    }
     if (!firstName.trim()) {
       toast.error("First name is required");
       return;
     }
     setIsSearching(true);
     setSearchError(null);
-    setPhase("searching");
-    setErrorMessage("");
+    setWikitreeResults(null);
     try {
       const { data, error } = await supabase.functions.invoke(
-        "familysearch-search-records",
+        "wikitree-search",
         {
           body: {
             surname,
-            first_name: firstName.trim(),
-            birth_year_approx: birthYear ? Number(birthYear) : undefined,
-            birth_place: birthPlace.trim() || undefined,
-            father_first_name: fatherFirst.trim() || undefined,
-            mother_first_name: motherFirst.trim() || undefined,
-            mother_maiden_name: motherMaiden.trim() || undefined,
+            givenName: firstName.trim(),
+            birthYear: birthYear || undefined,
+            birthPlace: birthPlace.trim() || undefined,
+            fatherName: fatherFirst.trim() || undefined,
+            motherName: motherFirst.trim() || undefined,
+            motherMaidenName: motherMaiden.trim() || undefined,
           },
         },
       );
 
-      // Edge function returned non-2xx — supabase-js surfaces as error
       if (error) {
-        // Try to extract status code from FunctionsHttpError context
-        const ctx = (error as unknown as { context?: Response }).context;
-        if (ctx && ctx.status === 412) {
-          setSearchError(
-            "To search records, please connect with FamilySearch first using the button to the left. →",
-          );
-          setPhase("no-fs-session");
-          return;
-        }
         const msg = (data as { error?: string } | null)?.error ?? error.message;
         throw new Error(msg);
       }
 
       const resp = data as {
         success: boolean;
-        matches?: Match[];
+        results?: WikitreeResult[];
         error?: string;
       };
       if (!resp?.success) {
-        if (resp?.error?.toLowerCase().includes("connect")) {
-          setSearchError(
-            "To search records, please connect with FamilySearch first using the button to the left. →",
-          );
-          setPhase("no-fs-session");
-          return;
-        }
         throw new Error(resp?.error ?? "Search failed");
       }
 
-      setMatches(resp.matches ?? []);
-      setPhase("matches");
+      setWikitreeResults(resp.results ?? []);
     } catch (err) {
       const msg = (err as Error).message;
       setSearchError(msg);
-      setErrorMessage(msg);
-      setPhase("error");
       toast.error("Search failed", { description: msg });
     } finally {
       setIsSearching(false);
     }
   }
+
 
   async function handleMatchPick(personId: string) {
     setSelectedPersonId(personId);
