@@ -35,6 +35,19 @@ type Match = {
   score?: number | null;
 };
 
+type WikitreeResult = {
+  id: string;
+  source: "wikitree";
+  name: string;
+  birthDate: string | null;
+  birthPlace: string | null;
+  deathDate: string | null;
+  deathPlace: string | null;
+  fatherName: string | null;
+  motherName: string | null;
+  profileUrl: string | null;
+};
+
 type TreePerson = {
   id: string;
   name?: string | null;
@@ -75,6 +88,7 @@ const Stop3Bloodline = () => {
   // Form state
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [wikitreeResults, setWikitreeResults] = useState<WikitreeResult[] | null>(null);
 
   const [firstName, setFirstName] = useState("");
   const [birthYear, setBirthYear] = useState("");
@@ -134,77 +148,53 @@ const Stop3Bloodline = () => {
 
   async function handleSearchSubmit(e: FormEvent) {
     e.preventDefault();
-    if (FS_COMING_SOON) {
-      notifyComingSoon();
-      return;
-    }
     if (!firstName.trim()) {
       toast.error("First name is required");
       return;
     }
     setIsSearching(true);
     setSearchError(null);
-    setPhase("searching");
-    setErrorMessage("");
+    setWikitreeResults(null);
     try {
       const { data, error } = await supabase.functions.invoke(
-        "familysearch-search-records",
+        "wikitree-search",
         {
           body: {
             surname,
-            first_name: firstName.trim(),
-            birth_year_approx: birthYear ? Number(birthYear) : undefined,
-            birth_place: birthPlace.trim() || undefined,
-            father_first_name: fatherFirst.trim() || undefined,
-            mother_first_name: motherFirst.trim() || undefined,
-            mother_maiden_name: motherMaiden.trim() || undefined,
+            givenName: firstName.trim(),
+            birthYear: birthYear || undefined,
+            birthPlace: birthPlace.trim() || undefined,
+            fatherName: fatherFirst.trim() || undefined,
+            motherName: motherFirst.trim() || undefined,
+            motherMaidenName: motherMaiden.trim() || undefined,
           },
         },
       );
 
-      // Edge function returned non-2xx — supabase-js surfaces as error
       if (error) {
-        // Try to extract status code from FunctionsHttpError context
-        const ctx = (error as unknown as { context?: Response }).context;
-        if (ctx && ctx.status === 412) {
-          setSearchError(
-            "To search records, please connect with FamilySearch first using the button to the left. →",
-          );
-          setPhase("no-fs-session");
-          return;
-        }
         const msg = (data as { error?: string } | null)?.error ?? error.message;
         throw new Error(msg);
       }
 
       const resp = data as {
         success: boolean;
-        matches?: Match[];
+        results?: WikitreeResult[];
         error?: string;
       };
       if (!resp?.success) {
-        if (resp?.error?.toLowerCase().includes("connect")) {
-          setSearchError(
-            "To search records, please connect with FamilySearch first using the button to the left. →",
-          );
-          setPhase("no-fs-session");
-          return;
-        }
         throw new Error(resp?.error ?? "Search failed");
       }
 
-      setMatches(resp.matches ?? []);
-      setPhase("matches");
+      setWikitreeResults(resp.results ?? []);
     } catch (err) {
       const msg = (err as Error).message;
       setSearchError(msg);
-      setErrorMessage(msg);
-      setPhase("error");
       toast.error("Search failed", { description: msg });
     } finally {
       setIsSearching(false);
     }
   }
+
 
   async function handleMatchPick(personId: string) {
     setSelectedPersonId(personId);
@@ -426,8 +416,9 @@ const Stop3Bloodline = () => {
                     Don't have FamilySearch? Tell us about your ancestor
                   </h3>
                   <p className="mt-2 font-sans text-sm text-text-dim">
-                    Provide a few details and we'll search billions of
-                    historical records.
+                    Provide a few details and we'll search WikiTree's free
+                    database of 32M+ community-verified family records.
+                    Connect with FamilySearch for deeper search.
                   </p>
                   <form
                     onSubmit={handleSearchSubmit}
@@ -495,6 +486,41 @@ const Stop3Bloodline = () => {
                       {isSearching ? "Searching…" : "Search records"}
                     </button>
                   </form>
+                  {wikitreeResults !== null && (
+                    <div className="mt-4 flex flex-col gap-3">
+                      {wikitreeResults.length === 0 ? (
+                        <p className="rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-sans text-sm text-cream-soft">
+                          No matches found. Try fewer details, or connect with FamilySearch for deeper search.
+                        </p>
+                      ) : (
+                        wikitreeResults.map((r) => (
+                          <div key={r.id} className="rounded-[14px] border border-amber-dim/30 bg-card/60 p-4">
+                            <div className="font-display text-base text-cream-warm">{r.name}</div>
+                            {(r.birthDate || r.birthPlace) && (
+                              <div className="mt-1 font-sans text-xs text-text-dim">
+                                Born {r.birthDate ?? "—"}{r.birthPlace ? ` · ${r.birthPlace}` : ""}
+                              </div>
+                            )}
+                            {(r.deathDate || r.deathPlace) && (
+                              <div className="font-sans text-xs text-text-dim">
+                                Died {r.deathDate ?? "—"}{r.deathPlace ? ` · ${r.deathPlace}` : ""}
+                              </div>
+                            )}
+                            {r.profileUrl && (
+                              <a
+                                href={r.profileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-2 inline-block font-sans text-xs uppercase tracking-[1.5px] text-amber hover:text-amber-light"
+                              >
+                                View on WikiTree →
+                              </a>
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -684,8 +710,9 @@ const Stop3Bloodline = () => {
                     Don't have FamilySearch? Tell us about your ancestor
                   </h3>
                   <p className="mt-2 font-sans text-sm text-text-dim">
-                    Provide a few details and we'll search billions of
-                    historical records.
+                    Provide a few details and we'll search WikiTree's free
+                    database of 32M+ community-verified family records.
+                    Connect with FamilySearch for deeper search.
                   </p>
                   <form
                     onSubmit={handleSearchSubmit}
@@ -739,6 +766,41 @@ const Stop3Bloodline = () => {
                       {isSearching ? "Searching…" : "Search records"}
                     </button>
                   </form>
+                  {wikitreeResults !== null && (
+                    <div className="mt-4 flex flex-col gap-3">
+                      {wikitreeResults.length === 0 ? (
+                        <p className="rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-sans text-sm text-cream-soft">
+                          No matches found. Try fewer details, or connect with FamilySearch for deeper search.
+                        </p>
+                      ) : (
+                        wikitreeResults.map((r) => (
+                          <div key={r.id} className="rounded-[14px] border border-amber-dim/30 bg-card/60 p-4">
+                            <div className="font-display text-base text-cream-warm">{r.name}</div>
+                            {(r.birthDate || r.birthPlace) && (
+                              <div className="mt-1 font-sans text-xs text-text-dim">
+                                Born {r.birthDate ?? "—"}{r.birthPlace ? ` · ${r.birthPlace}` : ""}
+                              </div>
+                            )}
+                            {(r.deathDate || r.deathPlace) && (
+                              <div className="font-sans text-xs text-text-dim">
+                                Died {r.deathDate ?? "—"}{r.deathPlace ? ` · ${r.deathPlace}` : ""}
+                              </div>
+                            )}
+                            {r.profileUrl && (
+                              <a
+                                href={r.profileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-2 inline-block font-sans text-xs uppercase tracking-[1.5px] text-amber hover:text-amber-light"
+                              >
+                                View on WikiTree →
+                              </a>
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
