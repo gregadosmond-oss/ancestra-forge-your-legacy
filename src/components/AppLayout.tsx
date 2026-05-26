@@ -442,6 +442,7 @@ const AppLayout = () => {
               </h4>
               <div className="mt-4 flex flex-col gap-y-2">
                 <Link to="/about" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Our Story</Link>
+                <Link to="/blog" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Journal</Link>
                 <Link to="/privacy-policy" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Privacy</Link>
                 <Link to="/terms" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Terms</Link>
               </div>
