@@ -48,6 +48,23 @@ type WikitreeResult = {
   profileUrl: string | null;
 };
 
+type ClaudeResult = {
+  id: string;
+  source: "claude-web";
+  name: string;
+  birthDate: string | null;
+  birthPlace: string | null;
+  deathDate: string | null;
+  deathPlace: string | null;
+  fatherName: string | null;
+  motherName: string | null;
+  summary: string | null;
+  profileUrl: string | null;
+  confidence: "high" | "medium" | "low";
+};
+
+type SearchPhase = "idle" | "wikitree-loading" | "claude-loading" | "done";
+
 type TreePerson = {
   id: string;
   name?: string | null;
