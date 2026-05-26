@@ -104,8 +104,10 @@ const Stop3Bloodline = () => {
 
   // Form state
   const [isSearching, setIsSearching] = useState(false);
+  const [searchPhase, setSearchPhase] = useState<SearchPhase>("idle");
   const [searchError, setSearchError] = useState<string | null>(null);
   const [wikitreeResults, setWikitreeResults] = useState<WikitreeResult[] | null>(null);
+  const [claudeResults, setClaudeResults] = useState<ClaudeResult[] | null>(null);
 
   const [firstName, setFirstName] = useState("");
   const [birthYear, setBirthYear] = useState("");
