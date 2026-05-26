@@ -416,8 +416,9 @@ const Stop3Bloodline = () => {
                     Don't have FamilySearch? Tell us about your ancestor
                   </h3>
                   <p className="mt-2 font-sans text-sm text-text-dim">
-                    Provide a few details and we'll search billions of
-                    historical records.
+                    Provide a few details and we'll search WikiTree's free
+                    database of 32M+ community-verified family records.
+                    Connect with FamilySearch for deeper search.
                   </p>
                   <form
                     onSubmit={handleSearchSubmit}
