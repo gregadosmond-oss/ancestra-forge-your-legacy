@@ -72,8 +72,10 @@ const Stop3Bloodline = () => {
   const [personIdInput, setPersonIdInput] = useState("");
   const [savingPersonId, setSavingPersonId] = useState(false);
 
-
   // Form state
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+
   const [firstName, setFirstName] = useState("");
   const [birthYear, setBirthYear] = useState("");
   const [birthPlace, setBirthPlace] = useState("");
