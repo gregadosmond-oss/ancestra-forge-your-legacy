@@ -486,6 +486,41 @@ const Stop3Bloodline = () => {
                       {isSearching ? "Searching…" : "Search records"}
                     </button>
                   </form>
+                  {wikitreeResults !== null && (
+                    <div className="mt-4 flex flex-col gap-3">
+                      {wikitreeResults.length === 0 ? (
+                        <p className="rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-sans text-sm text-cream-soft">
+                          No matches found. Try fewer details, or connect with FamilySearch for deeper search.
+                        </p>
+                      ) : (
+                        wikitreeResults.map((r) => (
+                          <div key={r.id} className="rounded-[14px] border border-amber-dim/30 bg-card/60 p-4">
+                            <div className="font-display text-base text-cream-warm">{r.name}</div>
+                            {(r.birthDate || r.birthPlace) && (
+                              <div className="mt-1 font-sans text-xs text-text-dim">
+                                Born {r.birthDate ?? "—"}{r.birthPlace ? ` · ${r.birthPlace}` : ""}
+                              </div>
+                            )}
+                            {(r.deathDate || r.deathPlace) && (
+                              <div className="font-sans text-xs text-text-dim">
+                                Died {r.deathDate ?? "—"}{r.deathPlace ? ` · ${r.deathPlace}` : ""}
+                              </div>
+                            )}
+                            {r.profileUrl && (
+                              <a
+                                href={r.profileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-2 inline-block font-sans text-xs uppercase tracking-[1.5px] text-amber hover:text-amber-light"
+                              >
+                                View on WikiTree →
+                              </a>
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
