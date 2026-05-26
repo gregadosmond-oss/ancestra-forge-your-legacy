@@ -72,8 +72,10 @@ const Stop3Bloodline = () => {
   const [personIdInput, setPersonIdInput] = useState("");
   const [savingPersonId, setSavingPersonId] = useState(false);
 
-
   // Form state
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+
   const [firstName, setFirstName] = useState("");
   const [birthYear, setBirthYear] = useState("");
   const [birthPlace, setBirthPlace] = useState("");
@@ -120,6 +122,7 @@ const Stop3Bloodline = () => {
     }
     try {
       setConnecting(true);
+      setSearchError(null);
       await initiateFamilySearchOAuth();
     } catch (err) {
       setConnecting(false);
@@ -139,6 +142,8 @@ const Stop3Bloodline = () => {
       toast.error("First name is required");
       return;
     }
+    setIsSearching(true);
+    setSearchError(null);
     setPhase("searching");
     setErrorMessage("");
     try {
@@ -162,6 +167,9 @@ const Stop3Bloodline = () => {
         // Try to extract status code from FunctionsHttpError context
         const ctx = (error as unknown as { context?: Response }).context;
         if (ctx && ctx.status === 412) {
+          setSearchError(
+            "To search records, please connect with FamilySearch first using the button to the left. →",
+          );
           setPhase("no-fs-session");
           return;
         }
@@ -176,6 +184,9 @@ const Stop3Bloodline = () => {
       };
       if (!resp?.success) {
         if (resp?.error?.toLowerCase().includes("connect")) {
+          setSearchError(
+            "To search records, please connect with FamilySearch first using the button to the left. →",
+          );
           setPhase("no-fs-session");
           return;
         }
@@ -186,9 +197,12 @@ const Stop3Bloodline = () => {
       setPhase("matches");
     } catch (err) {
       const msg = (err as Error).message;
+      setSearchError(msg);
       setErrorMessage(msg);
       setPhase("error");
       toast.error("Search failed", { description: msg });
+    } finally {
+      setIsSearching(false);
     }
   }
 
@@ -306,6 +320,7 @@ const Stop3Bloodline = () => {
     setSelectedPersonId(null);
     setTree(null);
     setErrorMessage("");
+    setSearchError(null);
   }
 
   // Group tree persons by generation
@@ -456,10 +471,15 @@ const Stop3Bloodline = () => {
                       placeholder="Mother's maiden name (optional)"
                       disabled={FS_COMING_SOON}
                     />
+                    {searchError && (
+                      <p className="mb-1 rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-2 font-sans text-sm text-cream-soft">
+                        {searchError}
+                      </p>
+                    )}
                     <button
                       type="submit"
-                      disabled={FS_COMING_SOON}
-                      aria-disabled={FS_COMING_SOON}
+                      disabled={FS_COMING_SOON || isSearching}
+                      aria-disabled={FS_COMING_SOON || isSearching}
                       title={FS_COMING_SOON ? "Coming soon" : undefined}
                       onClick={(e) => {
                         if (FS_COMING_SOON) {
@@ -472,7 +492,7 @@ const Stop3Bloodline = () => {
                         background: "linear-gradient(135deg, #e8943a, #c47828)",
                       }}
                     >
-                      Search records
+                      {isSearching ? "Searching…" : "Search records"}
                     </button>
                   </form>
                 </div>
@@ -703,14 +723,20 @@ const Stop3Bloodline = () => {
                       onChange={setMotherMaiden}
                       placeholder="Mother's maiden name (optional)"
                     />
+                    {searchError && (
+                      <p className="mb-1 rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-2 font-sans text-sm text-cream-soft">
+                        {searchError}
+                      </p>
+                    )}
                     <button
                       type="submit"
-                      className="mt-2 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300"
+                      disabled={isSearching}
+                      className="mt-2 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
                       style={{
                         background: "linear-gradient(135deg, #e8943a, #c47828)",
                       }}
                     >
-                      Search records
+                      {isSearching ? "Searching…" : "Search records"}
                     </button>
                   </form>
                 </div>
