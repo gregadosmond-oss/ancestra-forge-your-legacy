@@ -471,10 +471,15 @@ const Stop3Bloodline = () => {
                       placeholder="Mother's maiden name (optional)"
                       disabled={FS_COMING_SOON}
                     />
+                    {searchError && (
+                      <p className="mb-1 rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-2 font-sans text-sm text-cream-soft">
+                        {searchError}
+                      </p>
+                    )}
                     <button
                       type="submit"
-                      disabled={FS_COMING_SOON}
-                      aria-disabled={FS_COMING_SOON}
+                      disabled={FS_COMING_SOON || isSearching}
+                      aria-disabled={FS_COMING_SOON || isSearching}
                       title={FS_COMING_SOON ? "Coming soon" : undefined}
                       onClick={(e) => {
                         if (FS_COMING_SOON) {
@@ -487,7 +492,7 @@ const Stop3Bloodline = () => {
                         background: "linear-gradient(135deg, #e8943a, #c47828)",
                       }}
                     >
-                      Search records
+                      {isSearching ? "Searching…" : "Search records"}
                     </button>
                   </form>
                 </div>
