@@ -723,14 +723,20 @@ const Stop3Bloodline = () => {
                       onChange={setMotherMaiden}
                       placeholder="Mother's maiden name (optional)"
                     />
+                    {searchError && (
+                      <p className="mb-1 rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-2 font-sans text-sm text-cream-soft">
+                        {searchError}
+                      </p>
+                    )}
                     <button
                       type="submit"
-                      className="mt-2 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300"
+                      disabled={isSearching}
+                      className="mt-2 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
                       style={{
                         background: "linear-gradient(135deg, #e8943a, #c47828)",
                       }}
                     >
-                      Search records
+                      {isSearching ? "Searching…" : "Search records"}
                     </button>
                   </form>
                 </div>
