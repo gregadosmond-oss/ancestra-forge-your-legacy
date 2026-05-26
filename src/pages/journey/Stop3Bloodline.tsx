@@ -635,22 +635,85 @@ const Stop3Bloodline = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="rounded-[14px] border border-amber-dim/30 bg-card/60 p-6 text-center"
+                className="grid gap-4 md:grid-cols-2"
               >
-                <p className="font-sans text-sm text-text">
-                  Connect with FamilySearch first to pull your bloodline.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleConnectFS}
-                  disabled={connecting}
-                  className="mt-4 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground disabled:opacity-50"
-                  style={{
-                    background: "linear-gradient(135deg, #e8943a, #c47828)",
-                  }}
-                >
-                  {connecting ? "Redirecting…" : "Connect with FamilySearch"}
-                </button>
+                {/* Option A — OAuth */}
+                <div className={cardBase}>
+                  <h3 className="font-display text-lg text-cream-warm">
+                    I have a FamilySearch account
+                  </h3>
+                  <p className="mt-2 font-sans text-sm text-text-dim">
+                    Connect in one click and we'll pull your tree for you.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleConnectFS}
+                    disabled={connecting}
+                    className="mt-5 inline-block rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
+                    style={{
+                      background: "linear-gradient(135deg, #e8943a, #c47828)",
+                    }}
+                  >
+                    {connecting ? "Redirecting…" : "Connect with FamilySearch"}
+                  </button>
+                </div>
+
+                {/* Option B — Form */}
+                <div className={cardBase}>
+                  <h3 className="font-display text-lg text-cream-warm">
+                    Don't have FamilySearch? Tell us about your ancestor
+                  </h3>
+                  <p className="mt-2 font-sans text-sm text-text-dim">
+                    Provide a few details and we'll search billions of
+                    historical records.
+                  </p>
+                  <form
+                    onSubmit={handleSearchSubmit}
+                    className="mt-4 flex flex-col gap-3"
+                  >
+                    <FsInput
+                      value={firstName}
+                      onChange={setFirstName}
+                      placeholder="Ancestor's first name *"
+                      required
+                    />
+                    <FsInput
+                      value={birthYear}
+                      onChange={setBirthYear}
+                      placeholder="Approx birth year"
+                      type="number"
+                    />
+                    <FsInput
+                      value={birthPlace}
+                      onChange={setBirthPlace}
+                      placeholder="Birth city/region (e.g., Dorset, England)"
+                    />
+                    <FsInput
+                      value={fatherFirst}
+                      onChange={setFatherFirst}
+                      placeholder="Father's first name (optional)"
+                    />
+                    <FsInput
+                      value={motherFirst}
+                      onChange={setMotherFirst}
+                      placeholder="Mother's first name (optional)"
+                    />
+                    <FsInput
+                      value={motherMaiden}
+                      onChange={setMotherMaiden}
+                      placeholder="Mother's maiden name (optional)"
+                    />
+                    <button
+                      type="submit"
+                      className="mt-2 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300"
+                      style={{
+                        background: "linear-gradient(135deg, #e8943a, #c47828)",
+                      }}
+                    >
+                      Search records
+                    </button>
+                  </form>
+                </div>
               </motion.div>
             )}
 
