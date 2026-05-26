@@ -14,7 +14,10 @@ const reveal = {
 };
 
 export default function Cart() {
-  usePageMeta({ title: "Your Cart | AncestorsQR" });
+  usePageMeta({
+    title: "Your Cart | AncestorsQR",
+    description: "Review your Legacy Pack and heirloom selections before checkout. Crest mugs, canvas prints, blankets and the full $29.99 family story — ready to ship.",
+  });
   const navigate = useNavigate();
   const { items, removeItem, updateQuantity, totalItems, totalPrice } = useCart();
   const isEmpty = items.length === 0;

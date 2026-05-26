@@ -23,7 +23,10 @@ const Divider = () => (
 );
 
 const Terms = () => {
-  usePageMeta({ title: "Terms of Service | AncestorsQR" });
+  usePageMeta({
+    title: "Terms of Service | AncestorsQR",
+    description: "The terms governing use of AncestorsQR — Legacy Pack purchases, heirloom orders, refunds, content ownership and account responsibilities.",
+  });
   return (
     <main
       className="min-h-screen px-6 py-16 md:py-24"
