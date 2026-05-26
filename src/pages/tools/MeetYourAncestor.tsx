@@ -27,7 +27,7 @@ const reveal = {
 };
 
 export default function MeetYourAncestor() {
-  usePageMeta({ title: "Meet Your Ancestor | AncestorsQR", description: "AI generates a historically plausible ancestor — name, era, occupation, personality, and a quote from your bloodline." });
+  usePageMeta({ title: "Meet Your Ancestor — Free AI Ancestor Generator", description: "Meet a historically plausible ancestor from your bloodline. Free AI tool reveals their name, era, occupation, personality, and a quote across the centuries." });
   const [surname, setSurname] = useState("");
   const [country, setCountry] = useState("");
   const [result, setResult] = useState<AncestorResult | null>(null);
