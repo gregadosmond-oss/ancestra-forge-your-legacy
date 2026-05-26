@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -115,11 +115,24 @@ const Stop3Bloodline = () => {
   const [fatherFirst, setFatherFirst] = useState("");
   const [motherFirst, setMotherFirst] = useState("");
   const [motherMaiden, setMotherMaiden] = useState("");
+  const resultsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (unknownSurname) navigate("/journey/1", { replace: true });
     else if (!surname) navigate("/journey/1", { replace: true });
   }, [unknownSurname, surname, navigate]);
+
+  useEffect(() => {
+    if (searchPhase === "done" || searchPhase === "claude-loading") {
+      const t = setTimeout(() => {
+        resultsRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, 100);
+      return () => clearTimeout(t);
+    }
+  }, [searchPhase]);
 
   // Only auto-pull immediately after OAuth return.
   useEffect(() => {
@@ -549,13 +562,13 @@ const Stop3Bloodline = () => {
                     </button>
                   </form>
                   {searchPhase === "claude-loading" && (
-                    <p className="mt-4 rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-serif text-sm italic text-amber-light">
+                    <p ref={resultsRef} className="mt-4 rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-serif text-sm italic text-amber-light">
                       Searching deeper with AI…
                     </p>
                   )}
 
                   {searchPhase === "done" && wikitreeResults !== null && (
-                    <div className="mt-4 flex flex-col gap-3">
+                    <div ref={resultsRef} className="mt-4 flex flex-col gap-3">
                       {wikitreeResults.length === 0 && (claudeResults?.length ?? 0) === 0 ? (
                         <p className="rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-sans text-sm text-cream-soft">
                           No matches found in WikiTree or AI-assisted search. Try fewer details, different spelling, or connect with FamilySearch for deeper records.
@@ -893,13 +906,13 @@ const Stop3Bloodline = () => {
                     </button>
                   </form>
                   {searchPhase === "claude-loading" && (
-                    <p className="mt-4 rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-serif text-sm italic text-amber-light">
+                    <p ref={resultsRef} className="mt-4 rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-serif text-sm italic text-amber-light">
                       Searching deeper with AI…
                     </p>
                   )}
 
                   {searchPhase === "done" && wikitreeResults !== null && (
-                    <div className="mt-4 flex flex-col gap-3">
+                    <div ref={resultsRef} className="mt-4 flex flex-col gap-3">
                       {wikitreeResults.length === 0 && (claudeResults?.length ?? 0) === 0 ? (
                         <p className="rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-sans text-sm text-cream-soft">
                           No matches found in WikiTree or AI-assisted search. Try fewer details, different spelling, or connect with FamilySearch for deeper records.
