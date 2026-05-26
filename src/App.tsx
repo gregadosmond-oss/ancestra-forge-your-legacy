@@ -48,6 +48,7 @@ import FamilySearchCallback from "./pages/auth/FamilySearchCallback.tsx";
 import FamilySearchDemo from "./pages/FamilySearchDemo.tsx";
 import Blog from "./pages/Blog.tsx";
 import BlogPost from "./pages/BlogPost.tsx";
+import TikTokLanding from "./pages/TikTokLanding.tsx";
 
 const queryClient = new QueryClient();
 
