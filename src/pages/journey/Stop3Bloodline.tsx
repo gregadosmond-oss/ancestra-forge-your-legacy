@@ -320,6 +320,7 @@ const Stop3Bloodline = () => {
     setSelectedPersonId(null);
     setTree(null);
     setErrorMessage("");
+    setSearchError(null);
   }
 
   // Group tree persons by generation
