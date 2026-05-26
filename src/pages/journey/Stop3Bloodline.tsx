@@ -180,6 +180,7 @@ const Stop3Bloodline = () => {
       motherName: motherFirst.trim() || undefined,
       motherMaidenName: motherMaiden.trim() || undefined,
     };
+    console.log("[search] submit", searchBody, "current phase:", phase);
 
     setIsSearching(true);
     setSearchError(null);
@@ -188,10 +189,12 @@ const Stop3Bloodline = () => {
     setSearchPhase("wikitree-loading");
 
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const wikitreeResponse = await supabase.functions.invoke(
         "wikitree-search",
         { body: searchBody },
       );
+      const { data, error } = wikitreeResponse;
+      console.log("[search] wikitree response", wikitreeResponse);
 
       if (error) {
         const msg = (data as { error?: string } | null)?.error ?? error.message;
@@ -208,16 +211,22 @@ const Stop3Bloodline = () => {
       }
 
       const wt = resp.results ?? [];
+      console.log("[search] wikitreeResults state set to", wt);
       setWikitreeResults(wt);
 
       // Fallback to Claude AI search if WikiTree returned nothing
-      if (wt.length === 0) {
+      const willCallClaude = wt.length === 0;
+      console.log("[search] claude triggered?", willCallClaude);
+      if (willCallClaude) {
         setSearchPhase("claude-loading");
+        console.log("[search] phase transitioned to", "claude-loading");
         try {
-          const { data: cData, error: cError } = await supabase.functions.invoke(
+          const claudeResponse = await supabase.functions.invoke(
             "claude-ancestor-search",
             { body: searchBody },
           );
+          console.log("[search] claude response", claudeResponse);
+          const { data: cData, error: cError } = claudeResponse;
           if (cError) {
             const msg = (cData as { error?: string } | null)?.error ?? cError.message;
             console.warn("[claude-ancestor-search] error:", msg);
@@ -236,8 +245,10 @@ const Stop3Bloodline = () => {
         }
       }
       setSearchPhase("done");
+      console.log("[search] phase transitioned to", "done");
     } catch (err) {
       const msg = (err as Error).message;
+      console.error("[search] caught error", msg);
       setSearchError(msg);
       setSearchPhase("done");
       toast.error("Search failed", { description: msg });
