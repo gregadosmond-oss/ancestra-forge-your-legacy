@@ -1,13 +1,13 @@
 /**
- * LandingCrest — AncestorsQR branded crest with a real scannable QR code
- * overlaid on the shield area.
+ * LandingCrest — AncestorsQR branded crest (QR code is baked into the artwork).
  */
+import crestImage from "@/assets/ancestorsqr-crest.png";
+
 export default function LandingCrest() {
   return (
     <div className="relative select-none" style={{ width: 420, height: "auto" }}>
-      {/* Crest image */}
       <img
-        src="/crest.png"
+        src={crestImage}
         alt="AncestorsQR crest"
         width={420}
         height={420}
@@ -18,25 +18,6 @@ export default function LandingCrest() {
           height: "auto",
           display: "block",
           filter: "drop-shadow(0 0 48px rgba(212,160,74,0.6))",
-        }}
-      />
-
-      {/* Real scannable QR code — overlaid on the shield */}
-      <img
-        src="/qr-code.png"
-        alt="Scan to visit AncestorsQR"
-        width={59}
-        height={59}
-        decoding="async"
-        style={{
-          position: "absolute",
-          top: "59%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "14%",
-          height: "auto",
-          borderRadius: 2,
-          mixBlendMode: "multiply" as const,
         }}
       />
     </div>
