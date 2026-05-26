@@ -1,8 +1,27 @@
 # AncestorsQR
 
-> AI-powered family legacy platform. Enter your surname and get a custom coat of arms, AI-written family story, visual bloodline tree, and heirloom products that carry your family crest.
+> AI family tree builder and legacy platform. Enter your surname and get a custom coat of arms, AI-written family biography, visual bloodline tree, and QR-coded heirloom products that preserve family history.
 
-Every family has a story worth telling. AncestorsQR turns your surname into an emotional identity discovery experience — not a genealogy database.
+AncestorsQR turns your surname into ancestry stories, a digital family archive, and ancestry memory pages your descendants can scan generations from now. Not a genealogy database — an emotional identity discovery experience.
+
+## What AncestorsQR helps families do
+
+- **Family tree builder** — AI-generated bloodline tree from a single surname.
+- **Ancestry stories & AI family biographies** — 9-chapter narrative of your House, written by AI from your surname's origin, trade, and migration history.
+- **Genealogy QR codes** — every heirloom carries a QR code linking to your permanent ancestry memory page.
+- **Digital family archive** — a shareable family share page (`/f/:surname`) preserved indefinitely.
+- **Oral history preservation** — narrated chapters with ElevenLabs TTS, so the story can be *heard*, not just read.
+- **Family legacy platform** — single home for crest, story, tree, certificate, and heirloom orders.
+
+## Questions AncestorsQR answers
+
+- **Where did my family come from?** → Surname origin, region, era, and ancestral role. See [/tools/surname](/tools/surname).
+- **Why was my last name changed?** → Immigration anglicization, trade shortening, persecution, and the most likely reason yours shifted. See [/journey/2](/journey/2).
+- **Who were my ancestors before immigration?** → AI family biography of the bloodline before crossing. See [/tools/ancestor](/tools/ancestor).
+- **What secrets are hidden in my family tree?** → Forgotten name changes, lost trades, unwritten ancestors. See [/journey/3](/journey/3).
+- **Can QR codes preserve family history?** → Yes — every AncestorsQR heirloom carries one. See [/shop](/shop).
+
+
 
 ## Pages
 
