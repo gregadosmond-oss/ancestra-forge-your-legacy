@@ -39,6 +39,8 @@ project_id = "fjtkjbnvpobawqqkzrst"
     verify_jwt = false
   [functions.wikitree-search]
     verify_jwt = false
+  [functions.claude-ancestor-search]
+    verify_jwt = false
   [functions.familysearch-pull-tree]
     verify_jwt = false
   [functions.get-gift-by-id]

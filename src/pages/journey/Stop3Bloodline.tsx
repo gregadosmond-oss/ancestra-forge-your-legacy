@@ -48,6 +48,23 @@ type WikitreeResult = {
   profileUrl: string | null;
 };
 
+type ClaudeResult = {
+  id: string;
+  source: "claude-web";
+  name: string;
+  birthDate: string | null;
+  birthPlace: string | null;
+  deathDate: string | null;
+  deathPlace: string | null;
+  fatherName: string | null;
+  motherName: string | null;
+  summary: string | null;
+  profileUrl: string | null;
+  confidence: "high" | "medium" | "low";
+};
+
+type SearchPhase = "idle" | "wikitree-loading" | "claude-loading" | "done";
+
 type TreePerson = {
   id: string;
   name?: string | null;
@@ -87,8 +104,10 @@ const Stop3Bloodline = () => {
 
   // Form state
   const [isSearching, setIsSearching] = useState(false);
+  const [searchPhase, setSearchPhase] = useState<SearchPhase>("idle");
   const [searchError, setSearchError] = useState<string | null>(null);
   const [wikitreeResults, setWikitreeResults] = useState<WikitreeResult[] | null>(null);
+  const [claudeResults, setClaudeResults] = useState<ClaudeResult[] | null>(null);
 
   const [firstName, setFirstName] = useState("");
   const [birthYear, setBirthYear] = useState("");
@@ -152,23 +171,26 @@ const Stop3Bloodline = () => {
       toast.error("First name is required");
       return;
     }
+    const searchBody = {
+      surname,
+      givenName: firstName.trim(),
+      birthYear: birthYear || undefined,
+      birthPlace: birthPlace.trim() || undefined,
+      fatherName: fatherFirst.trim() || undefined,
+      motherName: motherFirst.trim() || undefined,
+      motherMaidenName: motherMaiden.trim() || undefined,
+    };
+
     setIsSearching(true);
     setSearchError(null);
     setWikitreeResults(null);
+    setClaudeResults(null);
+    setSearchPhase("wikitree-loading");
+
     try {
       const { data, error } = await supabase.functions.invoke(
         "wikitree-search",
-        {
-          body: {
-            surname,
-            givenName: firstName.trim(),
-            birthYear: birthYear || undefined,
-            birthPlace: birthPlace.trim() || undefined,
-            fatherName: fatherFirst.trim() || undefined,
-            motherName: motherFirst.trim() || undefined,
-            motherMaidenName: motherMaiden.trim() || undefined,
-          },
-        },
+        { body: searchBody },
       );
 
       if (error) {
@@ -185,10 +207,39 @@ const Stop3Bloodline = () => {
         throw new Error(resp?.error ?? "Search failed");
       }
 
-      setWikitreeResults(resp.results ?? []);
+      const wt = resp.results ?? [];
+      setWikitreeResults(wt);
+
+      // Fallback to Claude AI search if WikiTree returned nothing
+      if (wt.length === 0) {
+        setSearchPhase("claude-loading");
+        try {
+          const { data: cData, error: cError } = await supabase.functions.invoke(
+            "claude-ancestor-search",
+            { body: searchBody },
+          );
+          if (cError) {
+            const msg = (cData as { error?: string } | null)?.error ?? cError.message;
+            console.warn("[claude-ancestor-search] error:", msg);
+            setClaudeResults([]);
+          } else {
+            const cResp = cData as {
+              success: boolean;
+              results?: ClaudeResult[];
+              error?: string;
+            };
+            setClaudeResults(cResp?.success ? cResp.results ?? [] : []);
+          }
+        } catch (cErr) {
+          console.warn("[claude-ancestor-search] threw:", (cErr as Error).message);
+          setClaudeResults([]);
+        }
+      }
+      setSearchPhase("done");
     } catch (err) {
       const msg = (err as Error).message;
       setSearchError(msg);
+      setSearchPhase("done");
       toast.error("Search failed", { description: msg });
     } finally {
       setIsSearching(false);
@@ -486,38 +537,102 @@ const Stop3Bloodline = () => {
                       {isSearching ? "Searching…" : "Search records"}
                     </button>
                   </form>
-                  {wikitreeResults !== null && (
+                  {searchPhase === "claude-loading" && (
+                    <p className="mt-4 rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-serif text-sm italic text-amber-light">
+                      Searching deeper with AI…
+                    </p>
+                  )}
+
+                  {searchPhase === "done" && wikitreeResults !== null && (
                     <div className="mt-4 flex flex-col gap-3">
-                      {wikitreeResults.length === 0 ? (
+                      {wikitreeResults.length === 0 && (claudeResults?.length ?? 0) === 0 ? (
                         <p className="rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-sans text-sm text-cream-soft">
-                          No matches found. Try fewer details, or connect with FamilySearch for deeper search.
+                          No matches found in WikiTree or AI-assisted search. Try fewer details, different spelling, or connect with FamilySearch for deeper records.
                         </p>
                       ) : (
-                        wikitreeResults.map((r) => (
-                          <div key={r.id} className="rounded-[14px] border border-amber-dim/30 bg-card/60 p-4">
-                            <div className="font-display text-base text-cream-warm">{r.name}</div>
-                            {(r.birthDate || r.birthPlace) && (
-                              <div className="mt-1 font-sans text-xs text-text-dim">
-                                Born {r.birthDate ?? "—"}{r.birthPlace ? ` · ${r.birthPlace}` : ""}
-                              </div>
-                            )}
-                            {(r.deathDate || r.deathPlace) && (
-                              <div className="font-sans text-xs text-text-dim">
-                                Died {r.deathDate ?? "—"}{r.deathPlace ? ` · ${r.deathPlace}` : ""}
-                              </div>
-                            )}
-                            {r.profileUrl && (
-                              <a
-                                href={r.profileUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mt-2 inline-block font-sans text-xs uppercase tracking-[1.5px] text-amber hover:text-amber-light"
-                              >
-                                View on WikiTree →
-                              </a>
-                            )}
-                          </div>
-                        ))
+                        <>
+                          {wikitreeResults.map((r) => (
+                            <div key={r.id} className="relative rounded-[14px] border border-amber-dim/30 bg-card/60 p-4">
+                              <span className="absolute right-3 top-3 rounded-pill border border-amber/40 bg-amber/[0.10] px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] text-amber">
+                                WikiTree · verified
+                              </span>
+                              <div className="pr-28 font-display text-base text-cream-warm">{r.name}</div>
+                              {(r.birthDate || r.birthPlace) && (
+                                <div className="mt-1 font-sans text-xs text-text-dim">
+                                  Born {r.birthDate ?? "—"}{r.birthPlace ? ` · ${r.birthPlace}` : ""}
+                                </div>
+                              )}
+                              {(r.deathDate || r.deathPlace) && (
+                                <div className="font-sans text-xs text-text-dim">
+                                  Died {r.deathDate ?? "—"}{r.deathPlace ? ` · ${r.deathPlace}` : ""}
+                                </div>
+                              )}
+                              {r.profileUrl && (
+                                <a
+                                  href={r.profileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mt-2 inline-block font-sans text-xs uppercase tracking-[1.5px] text-amber hover:text-amber-light"
+                                >
+                                  View on WikiTree →
+                                </a>
+                              )}
+                            </div>
+                          ))}
+
+                          {claudeResults && claudeResults.length > 0 && (
+                            <>
+                              {wikitreeResults.length > 0 && (
+                                <div className="my-2 flex items-center gap-3">
+                                  <div className="h-px flex-1 bg-amber-dim/20" />
+                                  <span className="font-sans text-[10px] uppercase tracking-[1.5px] text-amber-dim">
+                                    AI-assisted suggestions below
+                                  </span>
+                                  <div className="h-px flex-1 bg-amber-dim/20" />
+                                </div>
+                              )}
+                              {claudeResults.map((r) => (
+                                <div key={r.id} className="relative rounded-[14px] border border-amber-dim/20 bg-card/40 p-4">
+                                  <span className="absolute right-3 top-3 rounded-pill border border-amber-dim/40 bg-amber-dim/[0.10] px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] text-amber-light">
+                                    AI-assisted research
+                                  </span>
+                                  <div className="pr-32 font-display text-base text-cream-warm">{r.name}</div>
+                                  {(r.birthDate || r.birthPlace) && (
+                                    <div className="mt-1 font-sans text-xs text-text-dim">
+                                      Born {r.birthDate ?? "—"}{r.birthPlace ? ` · ${r.birthPlace}` : ""}
+                                    </div>
+                                  )}
+                                  {(r.deathDate || r.deathPlace) && (
+                                    <div className="font-sans text-xs text-text-dim">
+                                      Died {r.deathDate ?? "—"}{r.deathPlace ? ` · ${r.deathPlace}` : ""}
+                                    </div>
+                                  )}
+                                  {r.summary && (
+                                    <p className="mt-2 font-serif text-sm italic text-cream-soft">
+                                      {r.summary}
+                                    </p>
+                                  )}
+                                  <div className="mt-2 font-sans text-[11px] text-amber-dim">
+                                    {r.confidence} confidence
+                                  </div>
+                                  {r.profileUrl && (
+                                    <a
+                                      href={r.profileUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="mt-2 inline-block font-sans text-xs uppercase tracking-[1.5px] text-amber hover:text-amber-light"
+                                    >
+                                      View source →
+                                    </a>
+                                  )}
+                                  <p className="mt-2 font-sans text-[11px] italic text-text-dim">
+                                    AI-assisted research — verify before citing as fact
+                                  </p>
+                                </div>
+                              ))}
+                            </>
+                          )}
+                        </>
                       )}
                     </div>
                   )}
@@ -766,38 +881,102 @@ const Stop3Bloodline = () => {
                       {isSearching ? "Searching…" : "Search records"}
                     </button>
                   </form>
-                  {wikitreeResults !== null && (
+                  {searchPhase === "claude-loading" && (
+                    <p className="mt-4 rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-serif text-sm italic text-amber-light">
+                      Searching deeper with AI…
+                    </p>
+                  )}
+
+                  {searchPhase === "done" && wikitreeResults !== null && (
                     <div className="mt-4 flex flex-col gap-3">
-                      {wikitreeResults.length === 0 ? (
+                      {wikitreeResults.length === 0 && (claudeResults?.length ?? 0) === 0 ? (
                         <p className="rounded-[8px] border border-amber-dim/30 bg-card/40 px-3 py-3 font-sans text-sm text-cream-soft">
-                          No matches found. Try fewer details, or connect with FamilySearch for deeper search.
+                          No matches found in WikiTree or AI-assisted search. Try fewer details, different spelling, or connect with FamilySearch for deeper records.
                         </p>
                       ) : (
-                        wikitreeResults.map((r) => (
-                          <div key={r.id} className="rounded-[14px] border border-amber-dim/30 bg-card/60 p-4">
-                            <div className="font-display text-base text-cream-warm">{r.name}</div>
-                            {(r.birthDate || r.birthPlace) && (
-                              <div className="mt-1 font-sans text-xs text-text-dim">
-                                Born {r.birthDate ?? "—"}{r.birthPlace ? ` · ${r.birthPlace}` : ""}
-                              </div>
-                            )}
-                            {(r.deathDate || r.deathPlace) && (
-                              <div className="font-sans text-xs text-text-dim">
-                                Died {r.deathDate ?? "—"}{r.deathPlace ? ` · ${r.deathPlace}` : ""}
-                              </div>
-                            )}
-                            {r.profileUrl && (
-                              <a
-                                href={r.profileUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mt-2 inline-block font-sans text-xs uppercase tracking-[1.5px] text-amber hover:text-amber-light"
-                              >
-                                View on WikiTree →
-                              </a>
-                            )}
-                          </div>
-                        ))
+                        <>
+                          {wikitreeResults.map((r) => (
+                            <div key={r.id} className="relative rounded-[14px] border border-amber-dim/30 bg-card/60 p-4">
+                              <span className="absolute right-3 top-3 rounded-pill border border-amber/40 bg-amber/[0.10] px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] text-amber">
+                                WikiTree · verified
+                              </span>
+                              <div className="pr-28 font-display text-base text-cream-warm">{r.name}</div>
+                              {(r.birthDate || r.birthPlace) && (
+                                <div className="mt-1 font-sans text-xs text-text-dim">
+                                  Born {r.birthDate ?? "—"}{r.birthPlace ? ` · ${r.birthPlace}` : ""}
+                                </div>
+                              )}
+                              {(r.deathDate || r.deathPlace) && (
+                                <div className="font-sans text-xs text-text-dim">
+                                  Died {r.deathDate ?? "—"}{r.deathPlace ? ` · ${r.deathPlace}` : ""}
+                                </div>
+                              )}
+                              {r.profileUrl && (
+                                <a
+                                  href={r.profileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mt-2 inline-block font-sans text-xs uppercase tracking-[1.5px] text-amber hover:text-amber-light"
+                                >
+                                  View on WikiTree →
+                                </a>
+                              )}
+                            </div>
+                          ))}
+
+                          {claudeResults && claudeResults.length > 0 && (
+                            <>
+                              {wikitreeResults.length > 0 && (
+                                <div className="my-2 flex items-center gap-3">
+                                  <div className="h-px flex-1 bg-amber-dim/20" />
+                                  <span className="font-sans text-[10px] uppercase tracking-[1.5px] text-amber-dim">
+                                    AI-assisted suggestions below
+                                  </span>
+                                  <div className="h-px flex-1 bg-amber-dim/20" />
+                                </div>
+                              )}
+                              {claudeResults.map((r) => (
+                                <div key={r.id} className="relative rounded-[14px] border border-amber-dim/20 bg-card/40 p-4">
+                                  <span className="absolute right-3 top-3 rounded-pill border border-amber-dim/40 bg-amber-dim/[0.10] px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] text-amber-light">
+                                    AI-assisted research
+                                  </span>
+                                  <div className="pr-32 font-display text-base text-cream-warm">{r.name}</div>
+                                  {(r.birthDate || r.birthPlace) && (
+                                    <div className="mt-1 font-sans text-xs text-text-dim">
+                                      Born {r.birthDate ?? "—"}{r.birthPlace ? ` · ${r.birthPlace}` : ""}
+                                    </div>
+                                  )}
+                                  {(r.deathDate || r.deathPlace) && (
+                                    <div className="font-sans text-xs text-text-dim">
+                                      Died {r.deathDate ?? "—"}{r.deathPlace ? ` · ${r.deathPlace}` : ""}
+                                    </div>
+                                  )}
+                                  {r.summary && (
+                                    <p className="mt-2 font-serif text-sm italic text-cream-soft">
+                                      {r.summary}
+                                    </p>
+                                  )}
+                                  <div className="mt-2 font-sans text-[11px] text-amber-dim">
+                                    {r.confidence} confidence
+                                  </div>
+                                  {r.profileUrl && (
+                                    <a
+                                      href={r.profileUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="mt-2 inline-block font-sans text-xs uppercase tracking-[1.5px] text-amber hover:text-amber-light"
+                                    >
+                                      View source →
+                                    </a>
+                                  )}
+                                  <p className="mt-2 font-sans text-[11px] italic text-text-dim">
+                                    AI-assisted research — verify before citing as fact
+                                  </p>
+                                </div>
+                              ))}
+                            </>
+                          )}
+                        </>
                       )}
                     </div>
                   )}
