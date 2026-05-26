@@ -5,6 +5,7 @@ import WarmDivider from "@/components/journey/WarmDivider";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import PacksSection from "@/components/landing/PacksSection";
 import FreeToolsSection from "@/components/landing/FreeToolsSection";
+import FaqSection from "@/components/landing/FaqSection";
 
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
 import LandingCrest from "@/components/landing/LandingCrest";
@@ -131,6 +132,8 @@ const Index = () => {
         <PacksSection />
         <WarmDivider />
         <HowItWorksSection />
+        <WarmDivider />
+        <FaqSection />
         <WarmDivider />
         <FinalCtaSection />
       </div>
