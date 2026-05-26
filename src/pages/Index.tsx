@@ -69,6 +69,7 @@ const Index = () => {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-background">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }} />
       {/* SVG grain texture overlay */}
       <svg className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-[0.018]">
         <filter id="grain">
