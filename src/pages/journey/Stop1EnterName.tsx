@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import SectionLabel from "@/components/journey/SectionLabel";
 import StaggerGroup, { staggerItem } from "@/components/journey/StaggerGroup";
@@ -11,10 +11,12 @@ import { usePageMeta } from "@/hooks/usePageMeta";
 const Stop1EnterName = () => {
   usePageMeta({ title: "Begin Your Journey | AncestorsQR", description: "Enter your surname and discover the story your family has been waiting to tell." });
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { startJourney, unknownSurname, reset } = useJourney();
-  const [surname, setSurname] = useState("");
+  const [surname, setSurname] = useState(() => searchParams.get("surname")?.trim() ?? "");
   const [submitting, setSubmitting] = useState(false);
   const [gateOpen, setGateOpen] = useState(false);
+  const autoSubmittedRef = useRef(false);
 
   // Coming back to Stop 1 after an UNKNOWN bounce: clear provider state
   // so the error message only shows once and subsequent submits start clean.
@@ -55,6 +57,17 @@ const Stop1EnterName = () => {
     proceedWithSurname();
     setSubmitting(false);
   };
+  // Auto-submit when surname is prefilled via ?surname= (e.g. from /tiktok landing)
+  useEffect(() => {
+    if (autoSubmittedRef.current) return;
+    const prefilled = searchParams.get("surname")?.trim();
+    if (prefilled && prefilled.length > 0) {
+      autoSubmittedRef.current = true;
+      handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   return (
     <div className="relative flex min-h-[72vh] items-start justify-center px-6 pt-20 pb-32">
