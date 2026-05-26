@@ -444,7 +444,10 @@ function DeepBookChapterCard({ chapter, tts }: { chapter: DeepChapter; tts: Retu
 // ─── Main component ────────────────────────────────────────────────────────────
 
 const MyLegacy = () => {
-  usePageMeta({ title: "My Legacy | AncestorsQR" });
+  usePageMeta({
+    title: "My Legacy | AncestorsQR",
+    description: "Your private family archive — coat of arms, 9-chapter ancestry story, bloodline tree and legacy certificate, all in one place to pass on.",
+  });
   const navigate = useNavigate();
   const { user, hasPurchased, loading: purchaseLoading } = usePurchase();
   const { facts, story, crestUrl: initialCrestUrl, surname, deepLegacyResearch, deepChapters, loading, generating, error } = useLegacyData(
