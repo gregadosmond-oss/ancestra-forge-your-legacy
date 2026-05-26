@@ -54,7 +54,7 @@ function MottoDisplay({ value }: { value: string }) {
 }
 
 export default function SurnameLookup() {
-  usePageMeta({ title: "Surname Lookup | AncestorsQR", description: "Discover the meaning, origin, and history of any surname." });
+  usePageMeta({ title: "Free Surname Meaning & Origin Lookup — Last Name History", description: "Look up the meaning, origin, and history of any last name free. Discover where your surname came from and what your family name reveals about your ancestors." });
   const [surname, setSurname] = useState("");
   const [result, setResult] = useState<SurnameResult | null>(null);
   const [loading, setLoading] = useState(false);

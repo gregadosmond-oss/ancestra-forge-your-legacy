@@ -109,7 +109,7 @@ const item = {
 };
 
 export default function ToolsHub() {
-  usePageMeta({ title: "Free Tools | AncestorsQR", description: "Surname lookup, bloodline quiz, motto generator, ancestor chat — all free." });
+  usePageMeta({ title: "Free Ancestry Tools — Surname Lookup, Family Motto, AI Ancestor", description: "6 free ancestry tools: surname meaning lookup, Latin motto generator, bloodline quiz, AI ancestor chat, and more. No signup to try. Discover your family story." });
   return (
     <div className="relative min-h-screen bg-background">
       {/* Castle video background */}
