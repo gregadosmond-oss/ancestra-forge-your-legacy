@@ -171,23 +171,26 @@ const Stop3Bloodline = () => {
       toast.error("First name is required");
       return;
     }
+    const searchBody = {
+      surname,
+      givenName: firstName.trim(),
+      birthYear: birthYear || undefined,
+      birthPlace: birthPlace.trim() || undefined,
+      fatherName: fatherFirst.trim() || undefined,
+      motherName: motherFirst.trim() || undefined,
+      motherMaidenName: motherMaiden.trim() || undefined,
+    };
+
     setIsSearching(true);
     setSearchError(null);
     setWikitreeResults(null);
+    setClaudeResults(null);
+    setSearchPhase("wikitree-loading");
+
     try {
       const { data, error } = await supabase.functions.invoke(
         "wikitree-search",
-        {
-          body: {
-            surname,
-            givenName: firstName.trim(),
-            birthYear: birthYear || undefined,
-            birthPlace: birthPlace.trim() || undefined,
-            fatherName: fatherFirst.trim() || undefined,
-            motherName: motherFirst.trim() || undefined,
-            motherMaidenName: motherMaiden.trim() || undefined,
-          },
-        },
+        { body: searchBody },
       );
 
       if (error) {
@@ -204,10 +207,39 @@ const Stop3Bloodline = () => {
         throw new Error(resp?.error ?? "Search failed");
       }
 
-      setWikitreeResults(resp.results ?? []);
+      const wt = resp.results ?? [];
+      setWikitreeResults(wt);
+
+      // Fallback to Claude AI search if WikiTree returned nothing
+      if (wt.length === 0) {
+        setSearchPhase("claude-loading");
+        try {
+          const { data: cData, error: cError } = await supabase.functions.invoke(
+            "claude-ancestor-search",
+            { body: searchBody },
+          );
+          if (cError) {
+            const msg = (cData as { error?: string } | null)?.error ?? cError.message;
+            console.warn("[claude-ancestor-search] error:", msg);
+            setClaudeResults([]);
+          } else {
+            const cResp = cData as {
+              success: boolean;
+              results?: ClaudeResult[];
+              error?: string;
+            };
+            setClaudeResults(cResp?.success ? cResp.results ?? [] : []);
+          }
+        } catch (cErr) {
+          console.warn("[claude-ancestor-search] threw:", (cErr as Error).message);
+          setClaudeResults([]);
+        }
+      }
+      setSearchPhase("done");
     } catch (err) {
       const msg = (err as Error).message;
       setSearchError(msg);
+      setSearchPhase("done");
       toast.error("Search failed", { description: msg });
     } finally {
       setIsSearching(false);
