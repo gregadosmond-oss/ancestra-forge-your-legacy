@@ -141,6 +141,8 @@ const Stop3Bloodline = () => {
       toast.error("First name is required");
       return;
     }
+    setIsSearching(true);
+    setSearchError(null);
     setPhase("searching");
     setErrorMessage("");
     try {
@@ -164,6 +166,9 @@ const Stop3Bloodline = () => {
         // Try to extract status code from FunctionsHttpError context
         const ctx = (error as unknown as { context?: Response }).context;
         if (ctx && ctx.status === 412) {
+          setSearchError(
+            "To search records, please connect with FamilySearch first using the button to the left. →",
+          );
           setPhase("no-fs-session");
           return;
         }
@@ -178,6 +183,9 @@ const Stop3Bloodline = () => {
       };
       if (!resp?.success) {
         if (resp?.error?.toLowerCase().includes("connect")) {
+          setSearchError(
+            "To search records, please connect with FamilySearch first using the button to the left. →",
+          );
           setPhase("no-fs-session");
           return;
         }
@@ -188,9 +196,12 @@ const Stop3Bloodline = () => {
       setPhase("matches");
     } catch (err) {
       const msg = (err as Error).message;
+      setSearchError(msg);
       setErrorMessage(msg);
       setPhase("error");
       toast.error("Search failed", { description: msg });
+    } finally {
+      setIsSearching(false);
     }
   }
 
