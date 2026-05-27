@@ -21,8 +21,12 @@ serve(async (req) => {
 
     const prices = await stripe.prices.list({ lookup_keys: [priceId] });
     if (!prices.data.length) {
-      return new Response(JSON.stringify({ error: "Price not found" }), {
-        status: 404,
+      // Soft 200 so the client hook falls back to its display price
+      // instead of throwing and blanking the page when a lookup_key
+      // doesn't exist in this Stripe environment (e.g. sandbox-only key
+      // queried against live).
+      return new Response(JSON.stringify({ notFound: true }), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
