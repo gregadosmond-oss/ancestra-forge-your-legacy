@@ -1,28 +1,34 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Lock } from "lucide-react";
+import { Check, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-const freeTools = [
-  { name: "Surname Lookup", to: "/tools/surname" },
-  { name: "Meet Your Ancestor", to: "/tools/ancestor" },
-  { name: "The 1700s You", to: "/tools/1700s" },
-  { name: "Motto Generator", to: "/tools/motto" },
-  { name: "Bloodline Quiz", to: "/tools/quiz" },
+type Tool = { name: string; to: string; key: string };
+
+const freeTools: Tool[] = [
+  { name: "Surname Lookup", to: "/tools/surname", key: "surname" },
+  { name: "Meet Your Ancestor", to: "/tools/ancestor", key: "ancestor" },
+  { name: "The 1700s You", to: "/tools/1700s", key: "1700s" },
+  { name: "Motto Generator", to: "/tools/motto", key: "motto" },
+  { name: "Bloodline Quiz", to: "/tools/quiz", key: "quiz" },
 ];
 
-const legacyTools = [
-  { name: "Chat With Your Ancestor", to: "/tools/chat" },
-  { name: "Forge Your Crest", to: "/tools/crest" },
-  { name: "Get Your Family Story", to: "/tools/story" },
-  { name: "Create Your Family Tree", to: "/tools/tree" },
-  { name: "Collect Your History From a Family Member", to: "/tools/collect" },
+const legacyTools: Tool[] = [
+  { name: "Chat With Your Ancestor", to: "/tools/chat", key: "chat" },
+  { name: "Forge Your Crest", to: "/tools/crest", key: "crest" },
+  { name: "Get Your Family Story", to: "/tools/story", key: "story" },
+  { name: "Create Your Family Tree", to: "/tools/tree", key: "tree" },
+  { name: "Collect Your History From a Family Member", to: "/tools/collect", key: "collect" },
 ];
+
+const TOTAL = 10;
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [userId, setUserId] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string>("");
   const [tier, setTier] = useState<string>("free");
+  const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,18 +39,31 @@ const Dashboard = () => {
         navigate("/login", { replace: true });
         return;
       }
-      const { data } = await supabase
-        .from("profiles")
-        .select("first_name, tier")
-        .eq("id", session.user.id)
-        .maybeSingle();
+      const uid = session.user.id;
+      const [{ data: profile }, { data: completions }] = await Promise.all([
+        supabase.from("profiles").select("first_name, tier").eq("id", uid).maybeSingle(),
+        supabase.from("tool_completions").select("tool_key").eq("user_id", uid),
+      ]);
       if (!active) return;
-      setFirstName(data?.first_name ?? "");
-      setTier(data?.tier ?? "free");
+      setUserId(uid);
+      setFirstName(profile?.first_name ?? "");
+      setTier(profile?.tier ?? "free");
+      setCompleted(new Set((completions ?? []).map((c) => c.tool_key)));
       setLoading(false);
     })();
     return () => { active = false; };
   }, [navigate]);
+
+  const markComplete = async (toolKey: string) => {
+    if (!userId || completed.has(toolKey)) return;
+    setCompleted((prev) => new Set(prev).add(toolKey));
+    const { error } = await supabase
+      .from("tool_completions")
+      .upsert({ user_id: userId, tool_key: toolKey }, { onConflict: "user_id,tool_key", ignoreDuplicates: true });
+    if (error) {
+      console.error("mark complete failed", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -55,38 +74,64 @@ const Dashboard = () => {
   }
 
   const isFree = tier === "free";
+  const completedCount = completed.size;
+  const progressPct = (completedCount / TOTAL) * 100;
 
-  const renderTool = (tool: { name: string; to: string }, locked: boolean) => {
+  const renderTool = (tool: Tool, locked: boolean) => {
+    const isDone = completed.has(tool.key);
+
     if (locked) {
       return (
-        <div
-          key={tool.to}
-          className="group flex aspect-square flex-col items-center justify-center rounded-full border border-amber-dim/10 bg-card/40 p-4 text-center"
-          style={{
-            boxShadow: "inset 0 0 40px rgba(232,148,58,0.02)",
-          }}
-        >
-          <Lock className="mb-2 text-text-dim/40" size={18} />
-          <span className="font-display text-sm leading-tight text-text-dim/40 md:text-base">
-            {tool.name}
-          </span>
+        <div key={tool.to} className="flex flex-col items-center gap-2">
+          <div
+            className="relative flex aspect-square w-full flex-col items-center justify-center rounded-full border border-amber-dim/10 bg-card/40 p-4 text-center"
+            style={{ boxShadow: "inset 0 0 40px rgba(232,148,58,0.02)" }}
+          >
+            {isDone && (
+              <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-white shadow-md ring-2 ring-background">
+                <Check size={14} strokeWidth={3} />
+              </span>
+            )}
+            <Lock className="mb-2 text-text-dim/40" size={18} />
+            <span className="font-display text-sm leading-tight text-text-dim/40 md:text-base">
+              {tool.name}
+            </span>
+          </div>
         </div>
       );
     }
 
     return (
-      <Link
-        key={tool.to}
-        to={tool.to}
-        className="group flex aspect-square flex-col items-center justify-center rounded-full border border-amber-dim/30 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-amber hover:bg-card-hover"
-        style={{
-          boxShadow: "inset 0 0 40px rgba(232,148,58,0.04)",
-        }}
-      >
-        <span className="font-display text-sm leading-tight text-cream-warm group-hover:text-amber-light md:text-base">
-          {tool.name}
-        </span>
-      </Link>
+      <div key={tool.to} className="flex flex-col items-center gap-2">
+        <Link
+          to={tool.to}
+          className="group relative flex aspect-square w-full flex-col items-center justify-center rounded-full border border-amber-dim/30 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-amber hover:bg-card-hover"
+          style={{ boxShadow: "inset 0 0 40px rgba(232,148,58,0.04)" }}
+        >
+          {isDone && (
+            <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-white shadow-md ring-2 ring-background">
+              <Check size={14} strokeWidth={3} />
+            </span>
+          )}
+          <span className="font-display text-sm leading-tight text-cream-warm group-hover:text-amber-light md:text-base">
+            {tool.name}
+          </span>
+        </Link>
+        {!isDone && (
+          <button
+            type="button"
+            onClick={() => markComplete(tool.key)}
+            className="rounded-full border border-amber-dim/30 bg-card/60 px-3 py-1 text-[10px] uppercase tracking-widest text-amber-light transition-colors hover:border-amber hover:text-amber"
+          >
+            Mark complete
+          </button>
+        )}
+        {isDone && (
+          <span className="text-[10px] uppercase tracking-widest text-emerald-500/80">
+            Completed
+          </span>
+        )}
+      </div>
     );
   };
 
@@ -99,6 +144,19 @@ const Dashboard = () => {
         <p className="mt-3 text-center font-serif text-base italic text-amber-light">
           Your family's story awaits
         </p>
+
+        <div className="mx-auto mt-10 max-w-xl">
+          <div className="mb-2 flex items-center justify-between font-sans text-xs uppercase tracking-widest text-text-dim">
+            <span>{completedCount} of {TOTAL} tools completed</span>
+            <span className="text-amber-light">{Math.round(progressPct)}%</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full border border-amber-dim/20 bg-card">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-honey to-honey-dim transition-all duration-500"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+        </div>
 
         {isFree && (
           <div className="mt-8 flex justify-center">
