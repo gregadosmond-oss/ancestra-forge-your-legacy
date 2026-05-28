@@ -43,6 +43,7 @@ export default function The1700sYou() {
   const [surname, setSurname] = useState(rememberedSurname ?? "");
   const [country, setCountry] = useState("");
   const [result, setResult] = useState<Life1700s | null>(null);
+  useMarkToolComplete("1700s", result !== null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
