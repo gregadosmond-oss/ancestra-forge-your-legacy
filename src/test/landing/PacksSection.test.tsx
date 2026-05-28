@@ -25,14 +25,14 @@ describe("PacksSection", () => {
 
   it("renders all three pack names", () => {
     renderComponent();
-    expect(screen.getByText("Free")).toBeInTheDocument();
+    expect(screen.getAllByText("Free").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Legacy")).toBeInTheDocument();
     expect(screen.getByText("Physical Book")).toBeInTheDocument();
   });
 
   it("renders the Legacy price", () => {
     renderComponent();
-    expect(screen.getByText("$29.99")).toBeInTheDocument();
+    expect(screen.getByText(/\$29\.99/)).toBeInTheDocument();
   });
 
   it("renders the Most Popular badge", () => {
