@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, Volume2, VolumeX, Pause, Play } from "lucide-react";
 import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from "@/integrations/supabase/client";
@@ -652,25 +651,6 @@ export default function AncestorChat() {
         </div>
       )}
 
-      {/* Journey CTA — only on start screen */}
-      {!started && (
-        <section className="relative z-10 py-16 text-center">
-          <p className="mb-4 font-sans text-sm text-text-dim">
-            Want the full story — crest, bloodline, and your family's legacy?
-          </p>
-          <Link
-            to="/signup"
-            className="inline-block rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-[400ms] hover:-translate-y-0.5"
-            style={{
-              background: "rgba(232,148,58,0.06)",
-              border: "1px solid rgba(232,148,58,0.18)",
-              color: "#d4a04a",
-            }}
-          >
-            Begin Your Journey
-          </Link>
-        </section>
-      )}
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, MapPin, Calendar, Shield, ScrollText, User, Compass, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -279,25 +278,6 @@ export default function SurnameLookup() {
       </AnimatePresence>
       </div>
 
-      {/* Journey CTA */}
-      <section className="relative z-10 px-4 py-20 text-center">
-        <motion.p
-          {...reveal}
-          className="mb-4 text-text-dim font-sans text-sm"
-        >
-          Want the full picture — crest, story, and bloodline?
-        </motion.p>
-        <Link
-          to="/signup"
-          className="block w-full max-w-2xl mx-auto rounded-pill px-10 py-5 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
-          style={{
-            background: "linear-gradient(135deg, #e8943a, #c47828)",
-            color: "#1a1208",
-          }}
-        >
-          {result ? `Forge Your ${result.surname} Crest →` : "Begin Your Journey →"}
-        </Link>
-      </section>
     </div>
   );
 }
