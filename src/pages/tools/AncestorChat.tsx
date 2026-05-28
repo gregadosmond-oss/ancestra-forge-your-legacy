@@ -8,6 +8,7 @@ import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { pauseAmbient, resumeAmbient } from "@/lib/ambientAudio";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { useRememberedSurname } from "@/hooks/useRememberedSurname";
 
 type Message = {
   role: "user" | "ancestor";
@@ -37,7 +38,8 @@ declare global {
 
 export default function AncestorChat() {
   usePageMeta({ title: "Ancestor Chat — Talk to Your Ancestors with AI (Free)", description: "Have a real conversation with an AI ancestor from your bloodline. Free chat tool brings your family history to life — ask anything, hear their voice." });
-  const [surname, setSurname] = useState("");
+  const { surname: rememberedSurname, setSurname: rememberSurname } = useRememberedSurname();
+  const [surname, setSurname] = useState(rememberedSurname ?? "");
   const [started, setStarted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -167,6 +169,7 @@ export default function AncestorChat() {
   const handleStart = (e: React.FormEvent) => {
     e.preventDefault();
     if (!surname.trim() || loading) return;
+    rememberSurname(surname);
     requestProceed(() => { void runStart(); });
   };
 

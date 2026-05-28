@@ -7,6 +7,7 @@ import JourneyGate from "@/components/JourneyGate";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { useRememberedSurname } from "@/hooks/useRememberedSurname";
 import { toast } from "sonner";
 
 type AncestorResult = {
@@ -28,7 +29,8 @@ const reveal = {
 
 export default function MeetYourAncestor() {
   usePageMeta({ title: "Meet Your Ancestor — Free AI Ancestor Generator", description: "Meet a historically plausible ancestor from your bloodline. Free AI tool reveals their name, era, occupation, personality, and a quote across the centuries." });
-  const [surname, setSurname] = useState("");
+  const { surname: rememberedSurname, setSurname: rememberSurname } = useRememberedSurname();
+  const [surname, setSurname] = useState(rememberedSurname ?? "");
   const [country, setCountry] = useState("");
   const [result, setResult] = useState<AncestorResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -62,6 +64,7 @@ export default function MeetYourAncestor() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!surname.trim() || loading) return;
+    rememberSurname(surname);
     requestProceed(() => { void runMeet(); });
   };
 

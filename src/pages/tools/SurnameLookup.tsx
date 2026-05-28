@@ -7,6 +7,8 @@ import JourneyGate from "@/components/JourneyGate";
 import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { useRememberedSurname } from "@/hooks/useRememberedSurname";
+
 
 type SurnameResult = {
   surname: string;
@@ -55,7 +57,9 @@ function MottoDisplay({ value }: { value: string }) {
 
 export default function SurnameLookup() {
   usePageMeta({ title: "Free Surname Meaning & Origin Lookup — Last Name History", description: "Look up the meaning, origin, and history of any last name free. Discover where your surname came from and what your family name reveals about your ancestors." });
-  const [surname, setSurname] = useState("");
+  const { surname: rememberedSurname, setSurname: rememberSurname } = useRememberedSurname();
+  const [surname, setSurname] = useState(rememberedSurname ?? "");
+
   const [result, setResult] = useState<SurnameResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,6 +93,7 @@ export default function SurnameLookup() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!surname.trim() || loading) return;
+    rememberSurname(surname);
     requestProceed(() => { void runLookup(); });
   };
 
