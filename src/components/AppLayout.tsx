@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, Play, Pause } from "lucide-react";
+import { Menu, X, Play, Pause, ChevronDown } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { toggleAmbientPlayback } from "@/lib/ambientAudio";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,6 +9,12 @@ import AuthGate from "@/components/AuthGate";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCart } from "@/contexts/CartContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const AppLayout = () => {
   const location = useLocation();
@@ -178,25 +184,36 @@ const AppLayout = () => {
           >
             Our Story
           </NavLink>
-          {loading ? null : user ? (
-            <>
-              <NavLink
-                to="/my-legacy"
-                className="transition-colors duration-200 hover:text-amber"
-                activeClassName="text-amber"
-                style={{ color: "#e8b85c" }}
-              >
-                My Legacy
-              </NavLink>
-              <button
-                onClick={handleSignOut}
-                className="transition-colors duration-200 hover:text-amber"
-                style={{ color: "#c4b8a6" }}
-              >
-                Sign Out
-              </button>
-            </>
-          ) : (
+            {loading ? null : user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-colors duration-200 hover:text-amber outline-none" style={{ color: "#e8b85c" }}>
+                  ACCOUNT <ChevronDown size={14} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="min-w-[160px] rounded-md border p-1.5"
+                  style={{
+                    background: "#1a1510",
+                    borderColor: "rgba(160,120,48,0.3)",
+                  }}
+                >
+                  <DropdownMenuItem
+                    onClick={() => navigate("/my-legacy")}
+                    className="cursor-pointer font-sans text-[14px] focus:bg-amber/10 focus:text-amber"
+                    style={{ color: "#f0e8da" }}
+                  >
+                    My Legacy
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleSignOut}
+                    className="cursor-pointer font-sans text-[14px] focus:bg-amber/10 focus:text-amber"
+                    style={{ color: "#f0e8da" }}
+                  >
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
             <button
               onClick={() => setShowAuthGate(true)}
               className="transition-colors duration-200 hover:text-amber"
