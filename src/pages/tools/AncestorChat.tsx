@@ -36,7 +36,7 @@ declare global {
 }
 
 export default function AncestorChat() {
-  usePageMeta({ title: "Ancestor Chat — Talk to Your Ancestors with AI (Free)", description: "Have a real conversation with an AI ancestor from your bloodline. Free chat tool brings your family history to life — ask anything, hear their voice." });
+  usePageMeta({ title: "Ancestor Chat — Talk to Your Ancestors with AI (Legacy)", description: "Have a real conversation with an AI ancestor from your bloodline. This Legacy tool brings your family history to life — ask anything, hear their voice." });
   const { surname: rememberedSurname, setSurname: rememberSurname } = useRememberedSurname();
   const [surname, setSurname] = useState(rememberedSurname ?? "");
   const [started, setStarted] = useState(false);
@@ -246,7 +246,7 @@ export default function AncestorChat() {
             {...reveal}
             className="mb-3 font-sans text-[10px] uppercase tracking-[4px] text-amber-dim"
           >
-            Free Tool
+            Legacy Tool
           </motion.p>
           <motion.h1
             {...reveal}
