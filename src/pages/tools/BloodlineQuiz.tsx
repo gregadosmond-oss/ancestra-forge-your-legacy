@@ -76,6 +76,7 @@ export default function BloodlineQuiz() {
   const [step, setStep] = useState(0); // 0 = intro, 1-5 = questions, 6 = loading/result
   const [answers, setAnswers] = useState<string[]>([]);
   const [result, setResult] = useState<QuizResult | null>(null);
+  useMarkToolComplete("quiz", result !== null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
