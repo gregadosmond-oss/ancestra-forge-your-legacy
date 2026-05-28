@@ -17,9 +17,7 @@ import Stop4CrestForge from "./pages/journey/Stop4CrestForge.tsx";
 import Stop5Story from "./pages/journey/Stop5Story.tsx";
 import Stop6PassItOn from "./pages/journey/Stop6PassItOn.tsx";
 import CheckoutPage from "./pages/CheckoutPage.tsx";
-import HeirloomOrderPage from "./pages/HeirloomOrderPage.tsx";
 import LegacyBookOrderPage from "./pages/LegacyBookOrderPage.tsx";
-import ProductOrderPage from "@/pages/ProductOrderPage";
 import CheckoutReturn from "./pages/CheckoutReturn.tsx";
 import MyLegacy from "./pages/MyLegacy.tsx";
 import GiftPage from "./pages/GiftPage.tsx";
@@ -38,12 +36,6 @@ import AncestorChat from "./pages/tools/AncestorChat.tsx";
 import FamilySharePage from "./pages/FamilySharePage.tsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
 import Terms from "./pages/Terms.tsx";
-import DeepLegacy from "./pages/DeepLegacy.tsx";
-import DeepLegacyInterview from "./pages/DeepLegacyInterview.tsx";
-import DeepLegacyProcessing from "./pages/DeepLegacyProcessing.tsx";
-import DeepLegacyResults from "./pages/DeepLegacyResults.tsx";
-import DeepLegacyCheckout from "./pages/DeepLegacyCheckout.tsx";
-import DeepLegacyConfirmation from "./pages/DeepLegacyConfirmation.tsx";
 import FamilySearchCallback from "./pages/auth/FamilySearchCallback.tsx";
 import FamilySearchDemo from "./pages/FamilySearchDemo.tsx";
 import Blog from "./pages/Blog.tsx";
@@ -108,12 +100,7 @@ const App = () => (
               <Route path="/gifts/:occasion" element={<GiftOccasionPage />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<Terms />} />
-              <Route path="/deep-legacy" element={<DeepLegacy />} />
-              <Route path="/deep-legacy/interview" element={<DeepLegacyInterview />} />
-              <Route path="/deep-legacy/processing" element={<DeepLegacyProcessing />} />
-              <Route path="/deep-legacy/results" element={<DeepLegacyResults />} />
-              <Route path="/deep-legacy/checkout" element={<DeepLegacyCheckout />} />
-              <Route path="/deep-legacy/confirmation" element={<DeepLegacyConfirmation />} />
+              {/* Deep Legacy routes removed during digital-first revamp — only Legacy Pack + Legacy Book remain */}
               <Route path="/auth/familysearch/callback" element={<FamilySearchCallback />} />
               <Route path="/demo/familysearch" element={<FamilySearchDemo />} />
               <Route path="/blog" element={<Blog />} />
