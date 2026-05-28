@@ -8,6 +8,7 @@ import { useEmailGate } from "@/hooks/useEmailGate";
 import { pauseAmbient, resumeAmbient } from "@/lib/ambientAudio";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { useRememberedSurname } from "@/hooks/useRememberedSurname";
+import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 
 type Message = {
   role: "user" | "ancestor";
