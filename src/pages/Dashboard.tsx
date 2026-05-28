@@ -98,15 +98,6 @@ const Dashboard = () => {
             {tool.name}
           </span>
         </Link>
-        {!isDone && (
-          <button
-            type="button"
-            onClick={() => markComplete(tool.key)}
-            className="rounded-full border border-amber-dim/30 bg-card/60 px-3 py-1 text-[10px] uppercase tracking-widest text-amber-light transition-colors hover:border-amber hover:text-amber"
-          >
-            Mark complete
-          </button>
-        )}
         {isDone && (
           <span className="text-[10px] uppercase tracking-widest text-emerald-500/80">
             Completed
