@@ -154,7 +154,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   {
     id: "legacy-book",
     name: "The Legacy Book",
-    price: "$129",
+    price: "$99",
     priceNote: "Ships in 7–10 days",
     description:
       "A hardcover heirloom of your full family story — your custom coat of arms, all 9 chapters, your visual bloodline tree, and your migration path. Bound in cream cloth with gold-foil detail. Printed and shipped worldwide.",

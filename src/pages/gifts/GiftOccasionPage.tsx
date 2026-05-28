@@ -21,7 +21,7 @@ export default function GiftOccasionPage() {
   const { occasion } = useParams<{ occasion: string }>();
   const config = getOccasionBySlug(occasion ?? "");
   const legacyPrice = useStripePrice("legacy_pack_once", "$29.99");
-  const bookPrice = useStripePrice("legacy_book_once", "$129");
+  const bookPrice = useStripePrice("legacy_book_once", "$99");
 
   if (!config) return <Navigate to="/" replace />;
 

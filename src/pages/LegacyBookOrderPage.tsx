@@ -42,7 +42,7 @@ export default function LegacyBookOrderPage() {
     description: "The hardcover heirloom of your family's full story — your crest, your chapters, your bloodline. Printed and shipped worldwide.",
   });
 
-  const displayPrice = useStripePrice("legacy_book_once", "$129");
+  const displayPrice = useStripePrice("legacy_book_once", "$99");
 
   const { user } = usePurchase();
   const [step, setStep] = useState<Step>("details");
