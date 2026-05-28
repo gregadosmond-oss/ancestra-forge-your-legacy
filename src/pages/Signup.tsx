@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { COUNTRY_LABELS } from "@/lib/countries";
 
@@ -223,6 +223,16 @@ const Signup = () => {
             {submitting ? "Creating account…" : "Create Account"}
           </button>
         </form>
+
+        <p className="mt-4 text-center font-sans text-sm text-text-dim">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="text-amber hover:text-honey-light transition-colors"
+          >
+            Log in
+          </Link>
+        </p>
       </div>
     </div>
   );
