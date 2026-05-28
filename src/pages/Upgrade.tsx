@@ -23,6 +23,7 @@ const Upgrade = () => {
   const handleUpgrade = async () => {
     setSubmitting(true);
     setError(null);
+    try {
       const { getStripeEnvironment } = await import("@/lib/stripe");
       const { data, error } = await supabase.functions.invoke("create-upgrade-checkout", {
         body: { environment: getStripeEnvironment() },
