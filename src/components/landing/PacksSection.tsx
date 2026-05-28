@@ -183,7 +183,7 @@ const PacksSection = () => {
           </div>
         </div>
 
-        {/* TIER 3 — Legacy Book */}
+        {/* TIER 3 — Physical Book */}
         <div className="relative h-full">
           <div
             className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-pill font-sans uppercase"
@@ -211,10 +211,10 @@ const PacksSection = () => {
               One-Time · Shipped Worldwide
             </p>
             <h3 className="mt-6 font-display" style={{ fontSize: 28, color: "#f0e8da" }}>
-              Legacy Book
+              Physical Book
             </h3>
             <p className="mt-2 font-serif italic" style={{ fontSize: 15, color: "#c4b8a6" }}>
-              Bound and shipped to your shelf.
+              A printed heirloom book of your family&apos;s novel.
             </p>
             <BulletList items={BOOK_ITEMS} />
             <Link
@@ -231,20 +231,6 @@ const PacksSection = () => {
             </Link>
           </div>
         </div>
-      </div>
-
-      <div className="mx-auto mt-10 max-w-[600px] text-center">
-        <p className="font-sans italic" style={{ fontSize: 13, color: "#8a7e6e" }}>
-          Looking for the premium tier? Our Deep Legacy research package includes a 15-question AI interview, deep historical records, and 24-hour turnaround.{" "}
-          <Link
-            to="/deep-legacy"
-            style={{ color: "#d4a04a", textDecoration: "none" }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.textDecoration = "underline")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.textDecoration = "none")}
-          >
-            Learn about Deep Legacy →
-          </Link>
-        </p>
       </div>
     </motion.section>
   );
