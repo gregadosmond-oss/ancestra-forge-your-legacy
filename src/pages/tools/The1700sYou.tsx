@@ -8,6 +8,7 @@ import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { toast } from "sonner";
+import { useRememberedSurname } from "@/hooks/useRememberedSurname";
 
 type Life1700s = {
   name: string;
