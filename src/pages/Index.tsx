@@ -8,7 +8,6 @@ import FreeToolsSection from "@/components/landing/FreeToolsSection";
 import FaqSection from "@/components/landing/FaqSection";
 
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
-import LandingCrest from "@/components/landing/LandingCrest";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
 const FAQ_SCHEMA = {
@@ -108,18 +107,20 @@ const Index = () => {
           }}
         />
 
-        {/* ── CREST + HEADLINE + CTA — centered over video ── */}
+        {/* ── HERO HEADLINE + CTA — centered over video ── */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-          <LandingCrest />
-
-          <h1 className="mt-6 font-display text-3xl leading-tight tracking-tight text-cream-warm sm:text-4xl md:text-5xl lg:text-6xl" style={{ textShadow: "0 2px 24px rgba(13,10,7,0.8)" }}>
-            Every family has a story
-            <br />
-            worth telling.
+          <h1
+            className="font-display text-3xl leading-tight tracking-tight text-cream-warm sm:text-4xl md:text-5xl lg:text-6xl"
+            style={{ textShadow: "0 2px 24px rgba(13,10,7,0.8)" }}
+          >
+            Your story didn't start with you.
           </h1>
 
-          <p className="mt-5 max-w-lg font-serif text-lg italic text-cream-soft sm:text-xl" style={{ textShadow: "0 2px 12px rgba(13,10,7,0.8)" }}>
-            Discover your name. Forge your crest. Pass it on.
+          <p
+            className="mt-6 max-w-2xl font-sans text-base leading-relaxed text-text sm:text-lg"
+            style={{ textShadow: "0 2px 12px rgba(13,10,7,0.8)" }}
+          >
+            Every name you carry was earned by someone who came before — their courage, their losses, their quiet hope that the line would continue. Most of that history vanishes within three generations, simply because no one wrote it down. Knowing where you come from changes how you understand who you are — and passing it on is the one gift the next generation can't get anywhere else. AncestorsQR helps you uncover your family's story and preserve it for the people who come after you.
           </p>
 
           <Link
