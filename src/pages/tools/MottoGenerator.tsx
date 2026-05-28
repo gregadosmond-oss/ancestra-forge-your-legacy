@@ -7,6 +7,7 @@ import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { toast } from "sonner";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 
 type BreakdownWord = { latin: string; english: string };
 
