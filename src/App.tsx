@@ -51,16 +51,16 @@ import BlogPost from "./pages/BlogPost.tsx";
 import TikTokLanding from "./pages/TikTokLanding.tsx";
 import Signup from "./pages/Signup.tsx";
 import Login from "./pages/Login.tsx";
-
-const queryClient = new QueryClient();
-
-import Signup from "./pages/Signup.tsx";
-import Login from "./pages/Login.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import ForgeCrest from "./pages/tools/ForgeCrest.tsx";
 import FamilyStory from "./pages/tools/FamilyStory.tsx";
 import FamilyTree from "./pages/tools/FamilyTree.tsx";
 import CollectHistory from "./pages/tools/CollectHistory.tsx";
+
+const queryClient = new QueryClient();
+
+const App = () => (
+  <CartProvider>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
