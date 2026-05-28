@@ -548,7 +548,7 @@ export default function About() {
           </p>
 
           <Link
-            to="/journey/1"
+            to="/signup"
             className="mt-10 inline-block font-sans font-semibold uppercase transition-all duration-[400ms] hover:-translate-y-0.5"
             style={{
               background: "linear-gradient(135deg, #e8943a, #c47828)",

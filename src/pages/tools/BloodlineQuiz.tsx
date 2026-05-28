@@ -403,8 +403,8 @@ export default function BloodlineQuiz() {
                   <p className="mb-4 text-text-body font-sans text-base">
                     Your bloodline has spoken. Now discover your full story.
                   </p>
-                  <Link
-                    to="/journey/1"
+                    <Link
+                      to="/signup"
                     className="inline-block rounded-pill px-10 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
                     style={{
                       background: "linear-gradient(135deg, #e8943a, #c47828)",

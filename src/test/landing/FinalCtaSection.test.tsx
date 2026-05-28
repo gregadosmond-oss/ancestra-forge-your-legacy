@@ -28,7 +28,7 @@ describe("FinalCtaSection", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders a link to /journey", () => {
+  it("renders a link to /signup", () => {
     render(
       <MemoryRouter>
         <FinalCtaSection />
@@ -36,7 +36,7 @@ describe("FinalCtaSection", () => {
     );
     const link = screen.getByRole("link", { name: /begin your journey/i });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute("href", "/journey");
+    expect(link).toHaveAttribute("href", "/signup");
   });
 
   it("renders the section label", () => {
