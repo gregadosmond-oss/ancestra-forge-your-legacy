@@ -56,6 +56,7 @@ import ForgeCrest from "./pages/tools/ForgeCrest.tsx";
 import FamilyStory from "./pages/tools/FamilyStory.tsx";
 import FamilyTree from "./pages/tools/FamilyTree.tsx";
 import CollectHistory from "./pages/tools/CollectHistory.tsx";
+import Upgrade from "./pages/Upgrade.tsx";
 
 const queryClient = new QueryClient();
 
