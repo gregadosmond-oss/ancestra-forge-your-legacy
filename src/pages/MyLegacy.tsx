@@ -502,17 +502,11 @@ const MyLegacy = () => {
           <p className="mt-4 font-serif italic text-text-body">
             Start your journey to discover your family legacy.
           </p>
-          <button
-            onClick={() => navigate("/signup")}
-            className="mt-10 rounded-pill px-12 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
-            style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
-          >
-            Begin Your Journey
-          </button>
         </motion.div>
       </div>
     );
   }
+
 
   // Purchased but no surname saved yet (edge case)
   if (!surname && !loading) {

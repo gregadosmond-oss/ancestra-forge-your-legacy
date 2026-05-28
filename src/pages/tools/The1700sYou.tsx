@@ -270,23 +270,6 @@ export default function The1700sYou() {
         </AnimatePresence>
       </div>
 
-      {/* Journey CTA */}
-      <section className="relative z-10 py-20 text-center">
-        <motion.p {...reveal} className="mb-4 font-sans text-sm text-text-dim">
-          Curious about the real story behind your family name?
-        </motion.p>
-        <Link
-          to="/signup"
-          className="inline-block rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-[400ms] hover:-translate-y-0.5"
-          style={{
-            background: "rgba(232,148,58,0.06)",
-            border: "1px solid rgba(232,148,58,0.18)",
-            color: "#d4a04a",
-          }}
-        >
-          Begin Your Journey
-        </Link>
-      </section>
     </div>
   );
 }

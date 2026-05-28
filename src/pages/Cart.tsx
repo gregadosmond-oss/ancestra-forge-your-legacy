@@ -124,26 +124,7 @@ export default function Cart() {
             </p>
 
             <div className="mt-10 flex flex-wrap justify-center gap-4">
-              <Link
-                to="/signup"
-                className="inline-block rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px]"
-                style={{
-                  background: "linear-gradient(135deg, #e8943a, #c47828)",
-                  color: "#1a1208",
-                  transition: "all 0.4s cubic-bezier(0.22,1,0.36,1)",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-2px)";
-                  (e.currentTarget as HTMLAnchorElement).style.boxShadow =
-                    "0 12px 40px rgba(232,148,58,0.25)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.transform = "";
-                  (e.currentTarget as HTMLAnchorElement).style.boxShadow = "";
-                }}
-              >
-                Begin Your Journey
-              </Link>
+
               <Link
                 to="/shop"
                 className="inline-block rounded-pill px-8 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px]"
