@@ -46,6 +46,7 @@ type InternalState = {
 };
 
 const SESSION_KEY = "ancestra_journey_surname";
+const REMEMBERED_KEY = "ancestorsqr_surname";
 
 const INITIAL: InternalState = {
   surname: null,
@@ -57,10 +58,15 @@ const INITIAL: InternalState = {
 
 export function JourneyProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<InternalState>(() => {
-    // Rehydrate surname from sessionStorage so it survives auth redirects
-    const saved = sessionStorage.getItem(SESSION_KEY);
-    return saved ? { ...INITIAL, surname: saved } : INITIAL;
+    // Rehydrate surname from localStorage so it survives auth redirects and tabs
+    try {
+      const saved = localStorage.getItem(SESSION_KEY);
+      return saved ? { ...INITIAL, surname: saved } : INITIAL;
+    } catch {
+      return INITIAL;
+    }
   });
+
   // Pinned current surname used by retry callbacks so stale closures don't fire.
   const surnameRef = useRef<string | null>(null);
 
@@ -89,7 +95,11 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const runFetch = useCallback(async (surname: string) => {
-    sessionStorage.setItem(SESSION_KEY, surname);
+    try {
+      localStorage.setItem(SESSION_KEY, surname);
+      localStorage.setItem(REMEMBERED_KEY, surname);
+    } catch { /* ignore */ }
+
     setState((s) => ({
       ...s,
       surname,
@@ -129,9 +139,10 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
     await runFetch(surname);
   }, [runFetch]);
 
-  // On mount: if surname was rehydrated from sessionStorage but data is missing, re-fetch
+  // On mount: if surname was rehydrated from localStorage but data is missing, re-fetch
   useEffect(() => {
-    const saved = sessionStorage.getItem(SESSION_KEY);
+    let saved: string | null = null;
+    try { saved = localStorage.getItem(SESSION_KEY); } catch { /* ignore */ }
     if (saved && state.facts.status === "idle") {
       void runFetch(saved);
     }
@@ -139,10 +150,11 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const reset = useCallback(() => {
-    sessionStorage.removeItem(SESSION_KEY);
+    try { localStorage.removeItem(SESSION_KEY); } catch { /* ignore */ }
     surnameRef.current = null;
     setState(INITIAL);
   }, []);
+
 
   const value = useMemo<JourneyContextValue>(() => ({
     surname: state.surname,
