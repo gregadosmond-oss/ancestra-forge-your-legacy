@@ -33,6 +33,7 @@ export default function MeetYourAncestor() {
   const [surname, setSurname] = useState(rememberedSurname ?? "");
   const [country, setCountry] = useState("");
   const [result, setResult] = useState<AncestorResult | null>(null);
+  useMarkToolComplete("ancestor", result !== null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
