@@ -173,6 +173,43 @@ const Dashboard = () => {
           {freeTools.map((tool) => renderTool(tool, false))}
           {legacyTools.map((tool) => renderTool(tool, isFree))}
         </div>
+
+        <div className="mt-16">
+          {completedCount < TOTAL ? (
+            <div className="mx-auto flex max-w-xl flex-col items-center rounded-2xl border border-amber-dim/20 bg-card/60 px-8 py-10 text-center">
+              <Lock className="mb-4 text-text-dim/50" size={28} />
+              <h2 className="font-display text-xl text-cream-warm md:text-2xl">
+                Unlock Your Novel
+              </h2>
+              <p className="mt-2 font-serif italic text-amber-light">
+                Complete all 10 tools to unlock your digital novel
+              </p>
+              <p className="mt-4 font-sans text-xs uppercase tracking-widest text-text-dim">
+                {completedCount} of {TOTAL} completed
+              </p>
+            </div>
+          ) : (
+            <div className="mx-auto flex max-w-xl flex-col items-center rounded-2xl border border-amber-dim/20 bg-card/60 px-8 py-10 text-center">
+              <h2 className="font-display text-2xl text-cream-warm md:text-3xl">
+                Your novel is unlocked
+              </h2>
+              <div className="mt-6 flex flex-col gap-4 sm:flex-row">
+                <Link
+                  to="/novel"
+                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-honey to-honey-dim px-8 py-4 text-sm font-semibold uppercase tracking-widest text-[#1a1208] shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(232,148,58,0.2)]"
+                >
+                  Read your novel
+                </Link>
+                <Link
+                  to="/order-book"
+                  className="inline-flex items-center justify-center rounded-full border border-amber-dim/30 bg-card/60 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-amber-light transition-all duration-300 hover:border-amber hover:bg-card-hover"
+                >
+                  Order the physical book — $99
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
