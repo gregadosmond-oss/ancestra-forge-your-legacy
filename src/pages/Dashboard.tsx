@@ -29,7 +29,7 @@ const Dashboard = () => {
   const [firstName, setFirstName] = useState<string>("");
   const [tier, setTier] = useState<string>("free");
   const [completed, setCompleted] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
+  const [dataReady, setDataReady] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -49,29 +49,12 @@ const Dashboard = () => {
       setFirstName(profile?.first_name ?? "");
       setTier(profile?.tier ?? "free");
       setCompleted(new Set((completions ?? []).map((c) => c.tool_key)));
-      setLoading(false);
+      setDataReady(true);
     })();
     return () => { active = false; };
   }, [navigate]);
 
-  const markComplete = async (toolKey: string) => {
-    if (!userId || completed.has(toolKey)) return;
-    setCompleted((prev) => new Set(prev).add(toolKey));
-    const { error } = await supabase
-      .from("tool_completions")
-      .upsert({ user_id: userId, tool_key: toolKey }, { onConflict: "user_id,tool_key", ignoreDuplicates: true });
-    if (error) {
-      console.error("mark complete failed", error);
-    }
-  };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background px-6 py-16 text-center font-serif italic text-text-dim">
-        Loading…
-      </div>
-    );
-  }
 
   const isFree = tier === "free";
   const completedCount = completed.size;
