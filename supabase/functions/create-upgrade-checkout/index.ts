@@ -7,9 +7,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Hard-coded to sandbox so this flow can NEVER create a live charge.
-const UPGRADE_ENV: StripeEnv = "sandbox";
-
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -34,21 +31,28 @@ serve(async (req) => {
     }
     const user = userData.user;
 
-    // Safety guard: this function must only ever run in sandbox/test mode.
-    if (UPGRADE_ENV !== "sandbox") {
+    // Parse requested environment from client (driven by publishable-key prefix).
+    let body: { environment?: string } = {};
+    try { body = await req.json(); } catch { /* no body */ }
+    const requested = body.environment;
+    if (requested !== "sandbox" && requested !== "live") {
       return new Response(
-        JSON.stringify({ error: "Upgrade checkout is misconfigured: sandbox mode is required." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        JSON.stringify({ error: "Invalid environment. Expected 'sandbox' or 'live'." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
-    if (!Deno.env.get("STRIPE_SANDBOX_API_KEY")) {
+    const env: StripeEnv = requested;
+
+    // Ensure the matching connection is configured.
+    const requiredKey = env === "live" ? "STRIPE_LIVE_API_KEY" : "STRIPE_SANDBOX_API_KEY";
+    if (!Deno.env.get(requiredKey)) {
       return new Response(
-        JSON.stringify({ error: "Upgrade checkout is misconfigured: sandbox Stripe connection is missing." }),
+        JSON.stringify({ error: `Upgrade checkout is misconfigured: ${requiredKey} is missing.` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const stripe = createStripeClient(UPGRADE_ENV);
+    const stripe = createStripeClient(env);
 
     const origin = req.headers.get("origin") || "https://ancestorsqr.com";
 
@@ -76,13 +80,24 @@ serve(async (req) => {
       },
     });
 
-    // Extra belt-and-suspenders: refuse to return a live session id.
-    if (session.id && !session.id.startsWith("cs_test_")) {
-      console.error("[create-upgrade-checkout] non-test session id returned:", session.id);
-      return new Response(
-        JSON.stringify({ error: "Refused: checkout session was not created in test mode." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+    // Environment-correct safety guard: never allow the wrong mode for the env.
+    // Stripe returns `cs_test_...` for test-mode sessions and `cs_live_...` for live.
+    if (session.id) {
+      const isTestSession = session.id.startsWith("cs_test_");
+      if (env === "sandbox" && !isTestSession) {
+        console.error("[create-upgrade-checkout] REFUSED: live session created in sandbox env:", session.id);
+        return new Response(
+          JSON.stringify({ error: "Refused: expected a test-mode session in sandbox but got a live one." }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      if (env === "live" && isTestSession) {
+        console.error("[create-upgrade-checkout] REFUSED: test session created in live env:", session.id);
+        return new Response(
+          JSON.stringify({ error: "Refused: expected a live-mode session in production but got a test one." }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
     }
 
     return new Response(JSON.stringify({ url: session.url }), {
