@@ -97,6 +97,21 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
     });
   }
 
+  // Legacy upgrade — unlock all 10 tools by setting profiles.tier = 'legacy'
+  if (productType === "legacy-upgrade" && userId && session.payment_status === "paid") {
+    const { error: tierErr } = await supabase
+      .from("profiles")
+      .update({ tier: "legacy" })
+      .eq("id", userId);
+    if (tierErr) {
+      console.error("[legacy-upgrade] failed to set tier:", tierErr);
+    } else {
+      console.log("[legacy-upgrade] tier=legacy set for user:", userId);
+    }
+  }
+
+
+
   if (!userId) {
     console.log("No userId in session metadata — anonymous purchase");
     return;
