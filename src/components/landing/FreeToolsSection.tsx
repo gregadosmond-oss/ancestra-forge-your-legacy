@@ -80,7 +80,7 @@ const FreeToolsSection = () => (
       Curious? Start here — no commitment.
     </h2>
     <p className="mx-auto mt-4 max-w-md font-serif italic text-foreground">
-      Free tools to explore your heritage. No account needed.
+      Free tools to explore your heritage. Start by creating a free account.
     </p>
 
     <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
