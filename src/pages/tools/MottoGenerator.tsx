@@ -31,6 +31,7 @@ export default function MottoGenerator() {
   usePageMeta({ title: "Free Family Motto Generator — Latin Motto Maker", description: "Generate a personalized Latin family motto with English translation. Free AI motto generator for your coat of arms, family crest, or legacy project." });
   const [values, setValues] = useState(["", "", ""]);
   const [result, setResult] = useState<MottoResult | null>(null);
+  useMarkToolComplete("motto", result !== null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
