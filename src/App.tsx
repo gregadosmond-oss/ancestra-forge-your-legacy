@@ -9,6 +9,7 @@ import AppLayout from "./components/AppLayout";
 import Pricing from "./pages/Pricing.tsx";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import JourneyLayout from "./pages/journey/JourneyLayout.tsx";
 import CheckoutPage from "./pages/CheckoutPage.tsx";
 import LegacyBookOrderPage from "./pages/LegacyBookOrderPage.tsx";
 import CheckoutReturn from "./pages/CheckoutReturn.tsx";
