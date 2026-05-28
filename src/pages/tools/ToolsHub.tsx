@@ -420,7 +420,6 @@ function The1700sSection({ initialSurname }: { initialSurname: string }) {
 
 // ───────────────────────── Section 4: Ancestor Chat ─────────────────────────
 function AncestorChatSection({ initialSurname }: { initialSurname: string }) {
-  const [surname, setSurname] = useState(initialSurname);
   const [started, setStarted] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -431,10 +430,6 @@ function AncestorChatSection({ initialSurname }: { initialSurname: string }) {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setSurname(initialSurname);
-  }, [initialSurname]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -472,20 +467,20 @@ function AncestorChatSection({ initialSurname }: { initialSurname: string }) {
 
   const start = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!surname.trim() || loading) return;
+    if (!initialSurname.trim() || loading) return;
     unlockAudio();
     setLoading(true);
     setError(null);
     try {
       const { data, error: fnError } = await supabase.functions.invoke("ancestor-chat", {
-        body: { surname: surname.trim(), messages: [] },
+        body: { surname: initialSurname.trim(), messages: [] },
       });
       if (fnError) throw new Error(fnError.message);
       if (!data || data.error) {
         setError(data?.error || "Something went wrong. Please try again.");
         return;
       }
-      setAncestorName(data.ancestorName || `Ancestor ${surname}`);
+      setAncestorName(data.ancestorName || `Ancestor ${initialSurname}`);
       setMessages([{ role: "ancestor", text: data.reply }]);
       setStarted(true);
       speak(data.reply);
@@ -508,7 +503,7 @@ function AncestorChatSection({ initialSurname }: { initialSurname: string }) {
     try {
       const { data, error: fnError } = await supabase.functions.invoke("ancestor-chat", {
         body: {
-          surname: surname.trim(),
+          surname: initialSurname.trim(),
           messages: next.map((m) => ({ role: m.role, content: m.text })),
         },
       });
@@ -527,16 +522,13 @@ function AncestorChatSection({ initialSurname }: { initialSurname: string }) {
     <ToolCard icon={ICONS.chat} title="Chat With Your Ancestor">
       {!started ? (
         <>
+          {!initialSurname.trim() && (
+            <p className="mb-4 font-serif italic text-text-dim">
+              Enter your surname above to use this tool.
+            </p>
+          )}
           <form onSubmit={start} className="flex flex-col gap-4 sm:flex-row">
-            <input
-              type="text"
-              value={surname}
-              onChange={(e) => setSurname(e.target.value)}
-              placeholder="Surname"
-              maxLength={60}
-              className={`flex-1 ${inputClass}`}
-            />
-            <button type="submit" disabled={loading || !surname.trim()} className={primaryBtnClass} style={primaryBtnStyle}>
+            <button type="submit" disabled={loading || !initialSurname.trim()} className={primaryBtnClass} style={primaryBtnStyle}>
               {loading ? "Summoning…" : "Start Conversation"}
             </button>
           </form>
