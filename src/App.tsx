@@ -50,6 +50,7 @@ import Blog from "./pages/Blog.tsx";
 import BlogPost from "./pages/BlogPost.tsx";
 import TikTokLanding from "./pages/TikTokLanding.tsx";
 import Signup from "./pages/Signup.tsx";
+import Login from "./pages/Login.tsx";
 
 const queryClient = new QueryClient();
 
