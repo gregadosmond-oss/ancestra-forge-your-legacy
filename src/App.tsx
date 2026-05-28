@@ -56,6 +56,7 @@ import ForgeCrest from "./pages/tools/ForgeCrest.tsx";
 import FamilyStory from "./pages/tools/FamilyStory.tsx";
 import FamilyTree from "./pages/tools/FamilyTree.tsx";
 import CollectHistory from "./pages/tools/CollectHistory.tsx";
+import Upgrade from "./pages/Upgrade.tsx";
 
 const queryClient = new QueryClient();
 
@@ -125,6 +126,7 @@ const App = () => (
               <Route path="/tools/story" element={<FamilyStory />} />
               <Route path="/tools/tree" element={<FamilyTree />} />
               <Route path="/tools/collect" element={<CollectHistory />} />
+              <Route path="/upgrade" element={<Upgrade />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Route>
