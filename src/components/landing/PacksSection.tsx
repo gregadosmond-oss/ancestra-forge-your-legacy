@@ -100,7 +100,7 @@ const PacksSection = () => {
       </div>
 
       <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3" style={{ alignItems: "stretch" }}>
-        {/* TIER 1 — Free Tools */}
+        {/* TIER 1 — Free */}
         <div
           style={cardBase}
           onMouseEnter={hoverIn}
@@ -108,17 +108,17 @@ const PacksSection = () => {
           className="flex flex-col"
         >
           <p className="font-sans text-[13px] uppercase" style={{ color: "#8a7e6e", letterSpacing: "2px" }}>
-            Always Free
+            Free
           </p>
           <h3 className="mt-6 font-display" style={{ fontSize: 28, color: "#f0e8da" }}>
-            Free Tools
+            Free
           </h3>
           <p className="mt-2 font-serif italic" style={{ fontSize: 15, color: "#c4b8a6" }}>
-            Start with curiosity.
+            Create a free account.
           </p>
           <BulletList items={FREE_ITEMS} />
           <Link
-            to="/tools"
+            to="/signup"
             className="block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
             style={{
               marginTop: "auto",
@@ -127,7 +127,7 @@ const PacksSection = () => {
               color: "#d4a04a",
             }}
           >
-            Try Free
+            Create Free Account
           </Link>
         </div>
 
