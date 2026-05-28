@@ -128,8 +128,3 @@ const Pricing = () => {
 };
 
 export default Pricing;
-
-// LEGACY: removed during digital-first revamp May 22 2026
-// The previous 3-tier (Free / Legacy Pack / Deep Legacy) grid was inlined here.
-// It has been replaced with the shared <PacksSection /> (Free Tools / Legacy Pack / Legacy Book).
-// Deep Legacy moved to the trailing footnote with a /deep-legacy link.
