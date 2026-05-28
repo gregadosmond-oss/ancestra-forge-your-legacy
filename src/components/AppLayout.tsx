@@ -198,18 +198,18 @@ const AppLayout = () => {
                   }}
                 >
                   <DropdownMenuItem
-                    onClick={() => navigate("/my-legacy")}
+                    onClick={() => navigate("/dashboard")}
                     className="cursor-pointer font-sans text-[14px] focus:bg-amber/10 focus:text-amber"
                     style={{ color: "#f0e8da" }}
                   >
-                    My Legacy
+                    Dashboard
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleSignOut}
                     className="cursor-pointer font-sans text-[14px] focus:bg-amber/10 focus:text-amber"
                     style={{ color: "#f0e8da" }}
                   >
-                    Sign Out
+                    Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -223,7 +223,7 @@ const AppLayout = () => {
             </button>
           )}
           <Link
-            to="/signup"
+            to={user ? "/dashboard" : "/signup"}
             className="transition-colors duration-200 hover:opacity-80"
             style={{ color: "#e8943a" }}
           >
@@ -323,19 +323,19 @@ const AppLayout = () => {
             {loading ? null : user ? (
               <>
                 <NavLink
-                  to="/my-legacy"
+                  to="/dashboard"
                   onClick={closeDrawer}
                   className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
                   style={{ color: "#e8b85c" }}
                 >
-                  My Legacy
+                  Dashboard
                 </NavLink>
                 <button
                   onClick={handleSignOutMobile}
                   className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-colors duration-200 hover:text-amber"
                   style={{ color: "#e8b85c" }}
                 >
-                  Sign Out
+                  Log out
                 </button>
               </>
             ) : (
@@ -348,7 +348,7 @@ const AppLayout = () => {
               </button>
             )}
             <Link
-              to="/signup"
+              to={user ? "/dashboard" : "/signup"}
               onClick={closeDrawer}
               className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-opacity duration-200 hover:opacity-80"
               style={{ color: "#e8943a" }}
