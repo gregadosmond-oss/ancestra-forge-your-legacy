@@ -32,7 +32,8 @@ describe("PacksSection", () => {
 
   it("renders the Legacy price", () => {
     renderComponent();
-    expect(screen.getByText((content) => content.includes("$29") && content.includes(".99"))).toBeInTheDocument();
+    expect(screen.getByText("$29")).toBeInTheDocument();
+    expect(screen.getByText(".99")).toBeInTheDocument();
   });
 
   it("renders the Most Popular badge", () => {
