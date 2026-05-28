@@ -51,6 +51,8 @@ import FamilyStory from "./pages/tools/FamilyStory.tsx";
 import FamilyTree from "./pages/tools/FamilyTree.tsx";
 import CollectHistory from "./pages/tools/CollectHistory.tsx";
 import Upgrade from "./pages/Upgrade.tsx";
+import LegacyGuard from "./components/LegacyGuard";
+import NovelGuard from "./components/NovelGuard";
 
 const queryClient = new QueryClient();
 
@@ -73,7 +75,7 @@ const App = () => (
               <Route path="/tools/quiz" element={<BloodlineQuiz />} />
               <Route path="/tools/ancestor" element={<MeetYourAncestor />} />
               <Route path="/tools/1700s" element={<The1700sYou />} />
-              <Route path="/tools/chat" element={<AncestorChat />} />
+              <Route path="/tools/chat" element={<LegacyGuard><AncestorChat /></LegacyGuard>} />
               <Route path="/journey" element={<JourneyLayout />}>
                 <Route index element={<Navigate to="/journey/1" replace />} />
                 <Route path="1" element={<Stop1EnterName />} />
@@ -111,12 +113,12 @@ const App = () => (
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/tools/crest" element={<ForgeCrest />} />
-              <Route path="/tools/story" element={<FamilyStory />} />
-              <Route path="/tools/tree" element={<FamilyTree />} />
-              <Route path="/tools/collect" element={<CollectHistory />} />
+              <Route path="/tools/crest" element={<LegacyGuard><ForgeCrest /></LegacyGuard>} />
+              <Route path="/tools/story" element={<LegacyGuard><FamilyStory /></LegacyGuard>} />
+              <Route path="/tools/tree" element={<LegacyGuard><FamilyTree /></LegacyGuard>} />
+              <Route path="/tools/collect" element={<LegacyGuard><CollectHistory /></LegacyGuard>} />
               <Route path="/upgrade" element={<Upgrade />} />
-              <Route path="/novel" element={<Novel />} />
+              <Route path="/novel" element={<NovelGuard><Novel /></NovelGuard>} />
               <Route path="/order-book" element={<OrderBook />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
