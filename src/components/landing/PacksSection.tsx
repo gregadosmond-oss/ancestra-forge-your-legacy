@@ -79,7 +79,7 @@ const hoverOut = (e: React.MouseEvent<HTMLDivElement>, bg = "#1a1510") => {
 
 const PacksSection = () => {
   const legacyPrice = useStripePrice("legacy_pack_once", "$29.99");
-  const bookPrice = useStripePrice("legacy_book_once", "$129");
+  const bookPrice = useStripePrice("legacy_book_once", "$99");
 
   // Split $29.99 into dollars + cents
   const [dollars, cents] = legacyPrice.split(".");
