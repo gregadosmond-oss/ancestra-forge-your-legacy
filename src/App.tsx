@@ -10,12 +10,6 @@ import Pricing from "./pages/Pricing.tsx";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import JourneyLayout from "./pages/journey/JourneyLayout.tsx";
-import Stop1EnterName from "./pages/journey/Stop1EnterName.tsx";
-import Stop2NameMeaning from "./pages/journey/Stop2NameMeaning.tsx";
-import Stop3Bloodline from "./pages/journey/Stop3Bloodline.tsx";
-import Stop4CrestForge from "./pages/journey/Stop4CrestForge.tsx";
-import Stop5Story from "./pages/journey/Stop5Story.tsx";
-import Stop6PassItOn from "./pages/journey/Stop6PassItOn.tsx";
 import CheckoutPage from "./pages/CheckoutPage.tsx";
 import LegacyBookOrderPage from "./pages/LegacyBookOrderPage.tsx";
 import CheckoutReturn from "./pages/CheckoutReturn.tsx";
@@ -76,15 +70,8 @@ const App = () => (
               <Route path="/tools/ancestor" element={<MeetYourAncestor />} />
               <Route path="/tools/1700s" element={<The1700sYou />} />
               <Route path="/tools/chat" element={<LegacyGuard><AncestorChat /></LegacyGuard>} />
-              <Route path="/journey" element={<JourneyLayout />}>
-                <Route index element={<Navigate to="/journey/1" replace />} />
-                <Route path="1" element={<Stop1EnterName />} />
-                <Route path="2" element={<Stop2NameMeaning />} />
-                <Route path="3" element={<Stop3Bloodline />} />
-                <Route path="4" element={<Stop4CrestForge />} />
-                <Route path="5" element={<Stop5Story />} />
-                <Route path="6" element={<Stop6PassItOn />} />
-              </Route>
+              <Route path="/journey" element={<Navigate to="/signup" replace />} />
+              <Route path="/journey/*" element={<Navigate to="/signup" replace />} />
               <Route path="/checkout" element={<JourneyLayout />}>
                 <Route index element={<CheckoutPage />} />
                 <Route path="return" element={<CheckoutReturn />} />
