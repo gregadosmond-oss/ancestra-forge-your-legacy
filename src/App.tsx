@@ -54,8 +54,13 @@ import Login from "./pages/Login.tsx";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <CartProvider>
+import Signup from "./pages/Signup.tsx";
+import Login from "./pages/Login.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
+import ForgeCrest from "./pages/tools/ForgeCrest.tsx";
+import FamilyStory from "./pages/tools/FamilyStory.tsx";
+import FamilyTree from "./pages/tools/FamilyTree.tsx";
+import CollectHistory from "./pages/tools/CollectHistory.tsx";
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
@@ -111,8 +116,15 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/tiktok" element={<TikTokLanding />} />
+              <Route path="/auth/familysearch/callback" element={<FamilySearchCallback />} />
+              <Route path="/demo/familysearch" element={<FamilySearchDemo />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/tools/crest" element={<ForgeCrest />} />
+              <Route path="/tools/story" element={<FamilyStory />} />
+              <Route path="/tools/tree" element={<FamilyTree />} />
+              <Route path="/tools/collect" element={<CollectHistory />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Route>
