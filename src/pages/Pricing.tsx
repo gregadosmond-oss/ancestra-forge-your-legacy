@@ -22,7 +22,7 @@ const FAQ = [
   },
   {
     q: "How fast is delivery?",
-    a: "The Legacy Pack is delivered within minutes. The Legacy Book is printed on demand and ships within 5–7 business days.",
+    a: "The Legacy Pack is delivered within minutes. The Legacy Book is printed on demand and ships within 7–10 business days.",
   },
   {
     q: "Can I gift this to someone?",

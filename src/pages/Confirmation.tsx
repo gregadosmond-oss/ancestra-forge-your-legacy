@@ -109,7 +109,7 @@ export default function Confirmation() {
           {isGift
             ? "We've sent your gift to the recipient's inbox. They'll receive a beautifully presented preview of their family legacy."
             : isPhysical
-            ? "Your order has been sent to production. We'll email you tracking details once it ships — usually within 5–7 business days."
+            ? "Your order has been sent to production. We'll email you tracking details once it ships — usually within 7–10 business days."
             : "Your family story, crest, migration path, and legacy certificate have been sent to your email."}
         </motion.p>
 
@@ -124,7 +124,7 @@ export default function Confirmation() {
             {(isPhysical
               ? [
                   "Check your email for your order confirmation and digital Legacy Pack",
-                  "Your physical product is in production — ships within 5–7 business days",
+                  "Your physical product is in production — ships within 7–10 business days",
                   "You'll receive tracking info by email once it leaves our production partner",
                   "Share your legacy with family — they'll want one too",
                 ]
@@ -133,7 +133,7 @@ export default function Confirmation() {
                   "Your recipient will receive a gift email with a personal preview",
                   "They'll follow the link to claim their full family legacy",
                   "Check your email for a copy of your gift confirmation",
-                  "Physical gifts ship within 5–7 business days if applicable",
+                  "Physical gifts ship within 7–10 business days if applicable",
                 ]
               : [
                   "Check your inbox — your Legacy Pack has been delivered",
