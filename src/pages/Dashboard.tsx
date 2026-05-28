@@ -54,11 +54,21 @@ const Dashboard = () => {
     return () => { active = false; };
   }, [navigate]);
 
+  const markComplete = async (toolKey: string) => {
+    if (!userId || completed.has(toolKey)) return;
+    setCompleted((prev) => new Set(prev).add(toolKey));
+    const { error } = await supabase
+      .from("tool_completions")
+      .upsert({ user_id: userId, tool_key: toolKey }, { onConflict: "user_id,tool_key", ignoreDuplicates: true });
+    if (error) {
+      console.error("mark complete failed", error);
+    }
+  };
 
-
-  const isFree = tier === "free";
+  const isFree = dataReady && tier === "free";
   const completedCount = completed.size;
   const progressPct = (completedCount / TOTAL) * 100;
+
 
   const renderTool = (tool: Tool, locked: boolean) => {
     const isDone = completed.has(tool.key);
