@@ -7,6 +7,7 @@ import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { toast } from "sonner";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 
 type BreakdownWord = { latin: string; english: string };
 
@@ -30,6 +31,7 @@ export default function MottoGenerator() {
   usePageMeta({ title: "Free Family Motto Generator — Latin Motto Maker", description: "Generate a personalized Latin family motto with English translation. Free AI motto generator for your coat of arms, family crest, or legacy project." });
   const [values, setValues] = useState(["", "", ""]);
   const [result, setResult] = useState<MottoResult | null>(null);
+  useMarkToolComplete("motto", result !== null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

@@ -7,6 +7,7 @@ import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { useRememberedSurname } from "@/hooks/useRememberedSurname";
+import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 
 
 type SurnameResult = {
@@ -60,6 +61,7 @@ export default function SurnameLookup() {
   const [surname, setSurname] = useState(rememberedSurname ?? "");
 
   const [result, setResult] = useState<SurnameResult | null>(null);
+  useMarkToolComplete("surname", result !== null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);

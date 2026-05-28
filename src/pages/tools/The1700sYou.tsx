@@ -8,6 +8,7 @@ import { useEmailGate } from "@/hooks/useEmailGate";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { toast } from "sonner";
 import { useRememberedSurname } from "@/hooks/useRememberedSurname";
+import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 
 type Life1700s = {
   name: string;
@@ -42,6 +43,7 @@ export default function The1700sYou() {
   const [surname, setSurname] = useState(rememberedSurname ?? "");
   const [country, setCountry] = useState("");
   const [result, setResult] = useState<Life1700s | null>(null);
+  useMarkToolComplete("1700s", result !== null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

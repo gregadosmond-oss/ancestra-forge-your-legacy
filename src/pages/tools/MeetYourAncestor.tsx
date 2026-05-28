@@ -8,6 +8,7 @@ import { useEmailGate } from "@/hooks/useEmailGate";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { useRememberedSurname } from "@/hooks/useRememberedSurname";
 import { toast } from "sonner";
+import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 
 type AncestorResult = {
   name: string;
@@ -32,6 +33,7 @@ export default function MeetYourAncestor() {
   const [surname, setSurname] = useState(rememberedSurname ?? "");
   const [country, setCountry] = useState("");
   const [result, setResult] = useState<AncestorResult | null>(null);
+  useMarkToolComplete("ancestor", result !== null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

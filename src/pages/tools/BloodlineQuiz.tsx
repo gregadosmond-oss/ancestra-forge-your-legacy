@@ -7,6 +7,7 @@ import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { toast } from "sonner";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 
 type QuizResult = {
   archetype: string;
@@ -75,6 +76,7 @@ export default function BloodlineQuiz() {
   const [step, setStep] = useState(0); // 0 = intro, 1-5 = questions, 6 = loading/result
   const [answers, setAnswers] = useState<string[]>([]);
   const [result, setResult] = useState<QuizResult | null>(null);
+  useMarkToolComplete("quiz", result !== null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

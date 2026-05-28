@@ -8,6 +8,7 @@ import { useEmailGate } from "@/hooks/useEmailGate";
 import { pauseAmbient, resumeAmbient } from "@/lib/ambientAudio";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { useRememberedSurname } from "@/hooks/useRememberedSurname";
+import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 
 type Message = {
   role: "user" | "ancestor";
@@ -41,6 +42,7 @@ export default function AncestorChat() {
   const [surname, setSurname] = useState(rememberedSurname ?? "");
   const [started, setStarted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  useMarkToolComplete("chat", messages.some((m) => m.role === "user"));
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [ancestorName, setAncestorName] = useState("");
