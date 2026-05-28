@@ -223,7 +223,7 @@ const AppLayout = () => {
             </button>
           )}
           <Link
-            to="/journey/1"
+            to="/signup"
             className="transition-colors duration-200 hover:opacity-80"
             style={{ color: "#e8943a" }}
           >
@@ -348,7 +348,7 @@ const AppLayout = () => {
               </button>
             )}
             <Link
-              to="/journey/1"
+              to="/signup"
               onClick={closeDrawer}
               className="font-sans text-xl font-semibold uppercase tracking-[2px] transition-opacity duration-200 hover:opacity-80"
               style={{ color: "#e8943a" }}
@@ -447,7 +447,7 @@ const AppLayout = () => {
                 Explore
               </h4>
               <div className="mt-4 flex flex-col gap-y-2">
-                <Link to="/journey/1" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Begin Journey</Link>
+                <Link to="/signup" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Begin Journey</Link>
                 <Link to="/tools" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Free Tools</Link>
                 <Link to="/shop" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Shop</Link>
                 <Link to="/pricing" className="font-sans transition-colors duration-200 hover:text-amber" style={{ color: "#e0d4c2", fontSize: "13px" }}>Pricing</Link>
