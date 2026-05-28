@@ -80,7 +80,7 @@ const Upgrade = () => {
           )}
 
           <p className="mt-4 text-center font-sans text-xs text-text-dim">
-            Secure checkout via Stripe · Test mode
+            Secure checkout via Stripe{getStripeEnvironment() === "sandbox" ? " · Test mode" : ""}
           </p>
         </div>
       </div>
