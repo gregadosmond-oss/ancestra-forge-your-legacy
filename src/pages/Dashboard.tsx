@@ -128,11 +128,31 @@ const Dashboard = () => {
     );
   };
 
+  const allTools = [...freeTools, ...legacyTools];
+
+  const renderSkeletonTool = (tool: Tool) => (
+    <div key={tool.to} className="flex flex-col items-center gap-2">
+      <div
+        className="relative flex aspect-square w-full animate-pulse flex-col items-center justify-center rounded-full border border-amber-dim/10 bg-card/40 p-4 text-center"
+        style={{ boxShadow: "inset 0 0 40px rgba(232,148,58,0.02)" }}
+      >
+        <span className="font-display text-sm leading-tight text-text-dim/30 md:text-base">
+          {tool.name}
+        </span>
+      </div>
+      <span className="h-4 w-20 animate-pulse rounded-full bg-card/60" />
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-background px-6 py-16">
       <div className="mx-auto w-full max-w-6xl">
         <h1 className="text-center font-display text-4xl text-cream-warm md:text-5xl">
-          Welcome{firstName ? `, ${firstName}` : ""}
+          {dataReady ? (
+            <>Welcome{firstName ? `, ${firstName}` : ""}</>
+          ) : (
+            <span className="mx-auto inline-block h-10 w-64 animate-pulse rounded-md bg-card/60 align-middle" />
+          )}
         </h1>
         <p className="mt-3 text-center font-serif text-base italic text-amber-light">
           Your family's story awaits
@@ -140,14 +160,25 @@ const Dashboard = () => {
 
         <div className="mx-auto mt-10 max-w-xl">
           <div className="mb-2 flex items-center justify-between font-sans text-xs uppercase tracking-widest text-text-dim">
-            <span>{completedCount} of {TOTAL} tools completed</span>
-            <span className="text-amber-light">{Math.round(progressPct)}%</span>
+            {dataReady ? (
+              <>
+                <span>{completedCount} of {TOTAL} tools completed</span>
+                <span className="text-amber-light">{Math.round(progressPct)}%</span>
+              </>
+            ) : (
+              <>
+                <span className="h-3 w-40 animate-pulse rounded-full bg-card/60" />
+                <span className="h-3 w-10 animate-pulse rounded-full bg-card/60" />
+              </>
+            )}
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full border border-amber-dim/20 bg-card">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-honey to-honey-dim transition-all duration-500"
-              style={{ width: `${progressPct}%` }}
-            />
+            {dataReady && (
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-honey to-honey-dim transition-all duration-500"
+                style={{ width: `${progressPct}%` }}
+              />
+            )}
           </div>
         </div>
 
@@ -163,12 +194,20 @@ const Dashboard = () => {
         )}
 
         <div className="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {freeTools.map((tool) => renderTool(tool, false))}
-          {legacyTools.map((tool) => renderTool(tool, isFree))}
+          {dataReady ? (
+            <>
+              {freeTools.map((tool) => renderTool(tool, false))}
+              {legacyTools.map((tool) => renderTool(tool, isFree))}
+            </>
+          ) : (
+            allTools.map((tool) => renderSkeletonTool(tool))
+          )}
         </div>
 
         <div className="mt-16">
-          {completedCount < TOTAL ? (
+          {!dataReady ? (
+            <div className="mx-auto h-48 max-w-xl animate-pulse rounded-2xl border border-amber-dim/20 bg-card/40" />
+          ) : completedCount < TOTAL ? (
             <div className="mx-auto flex max-w-xl flex-col items-center rounded-2xl border border-amber-dim/20 bg-card/60 px-8 py-10 text-center">
               <Lock className="mb-4 text-text-dim/50" size={28} />
               <h2 className="font-display text-xl text-cream-warm md:text-2xl">
@@ -206,6 +245,8 @@ const Dashboard = () => {
       </div>
     </div>
   );
+};
+
 };
 
 export default Dashboard;
