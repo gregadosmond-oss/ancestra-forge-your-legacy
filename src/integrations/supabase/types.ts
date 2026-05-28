@@ -550,6 +550,7 @@ export type Database = {
           first_name: string | null
           id: string
           surname: string | null
+          tier: string
           updated_at: string
         }
         Insert: {
@@ -560,6 +561,7 @@ export type Database = {
           first_name?: string | null
           id: string
           surname?: string | null
+          tier?: string
           updated_at?: string
         }
         Update: {
@@ -570,6 +572,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           surname?: string | null
+          tier?: string
           updated_at?: string
         }
         Relationships: []
@@ -682,6 +685,27 @@ export type Database = {
           payload?: Json
           story_payload?: Json | null
           surname?: string
+        }
+        Relationships: []
+      }
+      tool_completions: {
+        Row: {
+          completed_at: string
+          id: string
+          tool_key: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          tool_key: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          tool_key?: string
+          user_id?: string
         }
         Relationships: []
       }
