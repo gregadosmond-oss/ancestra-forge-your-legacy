@@ -1,11 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Hard-coded to sandbox so this flow can NEVER create a live charge.
+const UPGRADE_ENV: StripeEnv = "sandbox";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -31,15 +34,21 @@ serve(async (req) => {
     }
     const user = userData.user;
 
-    const stripeKey = Deno.env.get("MY_STRIPE_SANDBOX_API_KEY");
-    if (!stripeKey || !stripeKey.startsWith("sk_test_")) {
+    // Safety guard: this function must only ever run in sandbox/test mode.
+    if (UPGRADE_ENV !== "sandbox") {
       return new Response(
-        JSON.stringify({ error: "Upgrade checkout is misconfigured: a test key is required." }),
+        JSON.stringify({ error: "Upgrade checkout is misconfigured: sandbox mode is required." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
-    const stripe = new Stripe(stripeKey, { apiVersion: "2024-12-18.acacia" as any });
+    if (!Deno.env.get("STRIPE_SANDBOX_API_KEY")) {
+      return new Response(
+        JSON.stringify({ error: "Upgrade checkout is misconfigured: sandbox Stripe connection is missing." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
+    const stripe = createStripeClient(UPGRADE_ENV);
 
     const origin = req.headers.get("origin") || "https://ancestorsqr.com";
 
@@ -66,6 +75,15 @@ serve(async (req) => {
         metadata: { user_id: user.id, productType: "legacy-upgrade" },
       },
     });
+
+    // Extra belt-and-suspenders: refuse to return a live session id.
+    if (session.id && !session.id.startsWith("cs_test_")) {
+      console.error("[create-upgrade-checkout] non-test session id returned:", session.id);
+      return new Response(
+        JSON.stringify({ error: "Refused: checkout session was not created in test mode." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
