@@ -10,31 +10,35 @@ const reveal = {
 };
 
 const FREE_ITEMS = [
-  "Surname lookup",
-  "Motto generator",
-  "Bloodline quiz",
-  "Meet your ancestor",
-  "The 1700s you",
-  "Ancestor chat",
+  "Surname Lookup",
+  "Meet Your Ancestor",
+  "The 1700s You",
+  "Motto Generator",
+  "Bloodline Quiz",
 ];
 
 const LEGACY_ITEMS = [
-  "Custom coat of arms (high-res)",
-  "9-chapter family story",
-  "Visual bloodline tree",
-  "Legacy certificate",
-  "Ancestor chat",
-  "Instant access — no shipping",
+  "Surname Lookup",
+  "Meet Your Ancestor",
+  "The 1700s You",
+  "Motto Generator",
+  "Bloodline Quiz",
+  "Chat With Your Ancestor",
+  "Forge Your Crest",
+  "Get Your Family Story",
+  "Create Your Family Tree",
+  "Collect Your History From a Family Member",
+  "Complete all 10 tools to unlock your digital novel",
 ];
 
 const BOOK_ITEMS = [
-  "Everything in Legacy Pack",
+  "Everything in Legacy",
   "Heirloom hardcover, 8×11\"",
   "9 chapters, 42 pages",
   "Legacy Certificate (bound + printable)",
   "5-generation visual tree",
   "Matte-laminated cover",
-  "Printed and shipped by Gelato",
+  "Printed and shipped worldwide",
 ];
 
 const BulletList = ({ items }: { items: string[] }) => (
