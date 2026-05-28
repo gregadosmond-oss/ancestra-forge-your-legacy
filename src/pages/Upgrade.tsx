@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { getStripeEnvironment } from "@/lib/stripe";
 
 const features = [
   "Unlock all 10 legacy tools",
@@ -79,7 +80,7 @@ const Upgrade = () => {
           )}
 
           <p className="mt-4 text-center font-sans text-xs text-text-dim">
-            Secure checkout via Stripe · Test mode
+            Secure checkout via Stripe{getStripeEnvironment() === "sandbox" ? " · Test mode" : ""}
           </p>
         </div>
       </div>
