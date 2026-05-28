@@ -5,7 +5,7 @@ import SectionLabel from "@/components/journey/SectionLabel";
 import ScrollChevron from "@/components/ScrollChevron";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
-import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
+import { fetchLegacy } from "@/lib/legacyClient";
 import { stripMarkdown } from "@/lib/utils";
 import type { LegacyStory } from "@/types/legacy";
 
