@@ -8,7 +8,6 @@ import FreeToolsSection from "@/components/landing/FreeToolsSection";
 import FaqSection from "@/components/landing/FaqSection";
 
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
-import LandingCrest from "@/components/landing/LandingCrest";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
 const FAQ_SCHEMA = {
