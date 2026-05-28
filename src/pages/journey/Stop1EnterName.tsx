@@ -13,7 +13,15 @@ const Stop1EnterName = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { startJourney, unknownSurname, reset } = useJourney();
-  const [surname, setSurname] = useState(() => searchParams.get("surname")?.trim() ?? "");
+  const [surname, setSurname] = useState(() => {
+    const fromQuery = searchParams.get("surname")?.trim();
+    if (fromQuery) return fromQuery;
+    try {
+      return localStorage.getItem("ancestorsqr_surname")?.trim() ?? "";
+    } catch {
+      return "";
+    }
+  });
   const [submitting, setSubmitting] = useState(false);
   const [gateOpen, setGateOpen] = useState(false);
   const autoSubmittedRef = useRef(false);
