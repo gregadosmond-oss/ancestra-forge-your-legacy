@@ -8,6 +8,7 @@ import { useEmailGate } from "@/hooks/useEmailGate";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { useRememberedSurname } from "@/hooks/useRememberedSurname";
 import { toast } from "sonner";
+import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 
 type AncestorResult = {
   name: string;
