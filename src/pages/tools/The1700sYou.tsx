@@ -38,7 +38,8 @@ const DETAIL_CARDS = [
 
 export default function The1700sYou() {
   usePageMeta({ title: "The 1700s You — Who Would You Be 300 Years Ago?", description: "Free AI tool reveals who you would have been in the 1700s based on your surname — your trade, your village, your daily life 300 years ago." });
-  const [surname, setSurname] = useState("");
+  const { surname: rememberedSurname, setSurname: rememberSurname } = useRememberedSurname();
+  const [surname, setSurname] = useState(rememberedSurname ?? "");
   const [country, setCountry] = useState("");
   const [result, setResult] = useState<Life1700s | null>(null);
   const [loading, setLoading] = useState(false);
@@ -72,6 +73,7 @@ export default function The1700sYou() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!surname.trim() || loading) return;
+    rememberSurname(surname);
     requestProceed(() => { void runTool(); });
   };
 

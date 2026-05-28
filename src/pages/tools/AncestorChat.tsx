@@ -37,7 +37,9 @@ declare global {
 
 export default function AncestorChat() {
   usePageMeta({ title: "Ancestor Chat — Talk to Your Ancestors with AI (Free)", description: "Have a real conversation with an AI ancestor from your bloodline. Free chat tool brings your family history to life — ask anything, hear their voice." });
-  const [surname, setSurname] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { surname: rememberedSurname, setSurname: rememberSurname } = useRememberedSurnameHook();
+  const [surname, setSurname] = useState(rememberedSurname ?? "");
   const [started, setStarted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
