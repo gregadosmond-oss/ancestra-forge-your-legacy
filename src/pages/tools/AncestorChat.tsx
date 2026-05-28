@@ -169,6 +169,7 @@ export default function AncestorChat() {
   const handleStart = (e: React.FormEvent) => {
     e.preventDefault();
     if (!surname.trim() || loading) return;
+    rememberSurname(surname);
     requestProceed(() => { void runStart(); });
   };
 
