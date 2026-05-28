@@ -288,7 +288,7 @@ export default function SurnameLookup() {
           Want the full picture — crest, story, and bloodline?
         </motion.p>
         <Link
-          to="/journey/1"
+          to="/signup"
           className="block w-full max-w-2xl mx-auto rounded-pill px-10 py-5 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
           style={{
             background: "linear-gradient(135deg, #e8943a, #c47828)",

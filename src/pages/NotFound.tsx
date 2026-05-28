@@ -18,7 +18,7 @@ const NotFound = () => {
         <p className="mb-2 text-xl text-muted-foreground">This branch of the family tree doesn't exist.</p>
         <p className="mb-6 text-base italic text-muted-foreground">But yours does — and it's waiting to be discovered.</p>
         <a
-          href="/journey/1"
+          href="/signup"
           className="inline-block rounded-full px-10 py-4 text-xs font-semibold uppercase tracking-[1.5px] transition-transform hover:-translate-y-0.5"
           style={{
             background: "linear-gradient(135deg, #e8943a, #c47828)",
