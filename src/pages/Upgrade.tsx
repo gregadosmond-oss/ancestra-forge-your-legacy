@@ -20,7 +20,7 @@ const Upgrade = () => {
   if (loading) return null;
   if (!user) return <Navigate to="/auth" replace />;
 
-  const handleUpgrade = async () => {
+  if (!user) return <Navigate to="/" replace />;
     setSubmitting(true);
     setError(null);
     try {
