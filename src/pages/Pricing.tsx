@@ -51,7 +51,7 @@ const FAQ_JSONLD = {
 const Pricing = () => {
   usePageMeta({
     title: "Pricing | AncestorsQR",
-    description: "Start free. Unlock your full digital legacy for $29.99. Bind it as a hardcover heirloom for $129.",
+    description: "Start free. Unlock your full digital legacy for $29.99. Bind it as a hardcover heirloom for $99.",
   });
 
   return (
