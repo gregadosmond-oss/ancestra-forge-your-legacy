@@ -156,7 +156,7 @@ export default function Cart() {
                 {/* LEGACY: Family Crest Mug card removed during digital-first revamp May 22 2026 */}
                 {([
                   { kind: "link" as const, name: "Legacy Pack", price: legacyPrice, note: "Instant delivery", path: "/journey" },
-                  { kind: "link" as const, name: "The Legacy Book", price: "$129", note: "Ships in 7–10 days", path: "/shop" },
+                  { kind: "link" as const, name: "The Legacy Book", price: "$99", note: "Ships in 7–10 days", path: "/shop" },
                 ] as Array<{ kind: "link" | "waitlist"; name: string; price: string; note: string; path?: string }>).map((item) => {
                   const cardStyle: React.CSSProperties = {
                     background: "rgba(26,21,14,0.9)",

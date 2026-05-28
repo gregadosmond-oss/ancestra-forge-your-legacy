@@ -66,7 +66,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
     ],
     bundle: {
       name: "Dad Bundle",
-      price: "$129",
+      price: "$99",
       includes: ["Framed crest print", "Whiskey glass", "Legacy certificate"],
     },
   },
@@ -147,7 +147,7 @@ export const GIFT_OCCASIONS: OccasionConfig[] = [
     ],
     bundle: {
       name: "Christmas Bundle",
-      price: "$129",
+      price: "$99",
       includes: ["3× ornaments", "Legacy book", "Coaster set"],
     },
   },

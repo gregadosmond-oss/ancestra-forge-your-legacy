@@ -72,7 +72,7 @@ export default function Shop() {
     description: "Your family's story, bound in heirloom hardcover. 9 chapters, custom coat of arms, 5-generation tree. Printed and shipped worldwide.",
   });
 
-  const bookPrice = useStripePrice("legacy_book_once", "$129");
+  const bookPrice = useStripePrice("legacy_book_once", "$99");
   const { user } = useAuth();
 
   const [form, setForm] = useState<FormState>(EMPTY);
