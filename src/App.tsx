@@ -126,6 +126,7 @@ const App = () => (
               <Route path="/tools/story" element={<FamilyStory />} />
               <Route path="/tools/tree" element={<FamilyTree />} />
               <Route path="/tools/collect" element={<CollectHistory />} />
+              <Route path="/upgrade" element={<Upgrade />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Route>
