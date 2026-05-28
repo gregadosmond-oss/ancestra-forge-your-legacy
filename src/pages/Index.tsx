@@ -107,8 +107,6 @@ const Index = () => {
           }}
         />
 
-        {/* ── CREST + HEADLINE + CTA — centered over video ── */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
         {/* ── HERO HEADLINE + CTA — centered over video ── */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
           <h1
