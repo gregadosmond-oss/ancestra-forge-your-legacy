@@ -13,16 +13,16 @@ const reveal = {
 
 const FAQ = [
   {
-    q: "What do I get with the Legacy Pack?",
+    q: "What do I get with Legacy?",
     a: "Your full 9-chapter family story written by AI using real historical records, a high-resolution coat of arms, a visual bloodline tree, and a legacy certificate — all delivered to your email within minutes.",
   },
   {
-    q: "What's the difference between the Legacy Pack and the Legacy Book?",
-    a: "The Legacy Pack is the full digital experience, delivered instantly. The Legacy Book is the same story bound as a hardcover heirloom — 9 chapters, 42 pages, matte-laminated cover — printed and shipped worldwide.",
+    q: "What's the difference between Legacy and the Physical Book?",
+    a: "Legacy is the full digital experience, delivered instantly. The Physical Book is the same story bound as a hardcover heirloom — 9 chapters, 42 pages, matte-laminated cover — printed and shipped worldwide.",
   },
   {
     q: "How fast is delivery?",
-    a: "The Legacy Pack is delivered within minutes. The Legacy Book is printed on demand and ships within 7–10 business days.",
+    a: "Legacy is delivered within minutes. The Physical Book is printed on demand and ships within 7–10 business days.",
   },
   {
     q: "Can I gift this to someone?",
@@ -34,7 +34,7 @@ const FAQ = [
   },
   {
     q: "Refund policy?",
-    a: "Digital Legacy Packs are non-refundable once delivered. For the Legacy Book, we replace anything damaged or misprinted at no cost. Email greg@ancestorsqr.com if something's wrong.",
+    a: "Digital Legacy purchases are non-refundable once delivered. For the Physical Book, we replace anything damaged or misprinted at no cost. Email greg@ancestorsqr.com if something's wrong.",
   },
 ];
 
@@ -51,7 +51,7 @@ const FAQ_JSONLD = {
 const Pricing = () => {
   usePageMeta({
     title: "Pricing | AncestorsQR",
-    description: "Start free. Unlock your full digital legacy for $29.99. Bind it as a hardcover heirloom for $129.",
+    description: "Start free. Unlock your full digital legacy for $29.99. Bind it as a hardcover heirloom for $99.",
   });
 
   return (
@@ -128,8 +128,3 @@ const Pricing = () => {
 };
 
 export default Pricing;
-
-// LEGACY: removed during digital-first revamp May 22 2026
-// The previous 3-tier (Free / Legacy Pack / Deep Legacy) grid was inlined here.
-// It has been replaced with the shared <PacksSection /> (Free Tools / Legacy Pack / Legacy Book).
-// Deep Legacy moved to the trailing footnote with a /deep-legacy link.

@@ -10,31 +10,35 @@ const reveal = {
 };
 
 const FREE_ITEMS = [
-  "Surname lookup",
-  "Motto generator",
-  "Bloodline quiz",
-  "Meet your ancestor",
-  "The 1700s you",
-  "Ancestor chat",
+  "Surname Lookup",
+  "Meet Your Ancestor",
+  "The 1700s You",
+  "Motto Generator",
+  "Bloodline Quiz",
 ];
 
 const LEGACY_ITEMS = [
-  "Custom coat of arms (high-res)",
-  "9-chapter family story",
-  "Visual bloodline tree",
-  "Legacy certificate",
-  "Ancestor chat",
-  "Instant access — no shipping",
+  "Surname Lookup",
+  "Meet Your Ancestor",
+  "The 1700s You",
+  "Motto Generator",
+  "Bloodline Quiz",
+  "Chat With Your Ancestor",
+  "Forge Your Crest",
+  "Get Your Family Story",
+  "Create Your Family Tree",
+  "Collect Your History From a Family Member",
+  "Complete all 10 tools to unlock your digital novel",
 ];
 
 const BOOK_ITEMS = [
-  "Everything in Legacy Pack",
+  "Everything in Legacy",
   "Heirloom hardcover, 8×11\"",
   "9 chapters, 42 pages",
   "Legacy Certificate (bound + printable)",
   "5-generation visual tree",
   "Matte-laminated cover",
-  "Printed and shipped by Gelato",
+  "Printed and shipped worldwide",
 ];
 
 const BulletList = ({ items }: { items: string[] }) => (
@@ -75,7 +79,7 @@ const hoverOut = (e: React.MouseEvent<HTMLDivElement>, bg = "#1a1510") => {
 
 const PacksSection = () => {
   const legacyPrice = useStripePrice("legacy_pack_once", "$29.99");
-  const bookPrice = useStripePrice("legacy_book_once", "$129");
+  const bookPrice = useStripePrice("legacy_book_once", "$99");
 
   // Split $29.99 into dollars + cents
   const [dollars, cents] = legacyPrice.split(".");
@@ -96,7 +100,7 @@ const PacksSection = () => {
       </div>
 
       <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3" style={{ alignItems: "stretch" }}>
-        {/* TIER 1 — Free Tools */}
+        {/* TIER 1 — Free */}
         <div
           style={cardBase}
           onMouseEnter={hoverIn}
@@ -104,17 +108,17 @@ const PacksSection = () => {
           className="flex flex-col"
         >
           <p className="font-sans text-[13px] uppercase" style={{ color: "#8a7e6e", letterSpacing: "2px" }}>
-            Always Free
+            Free
           </p>
           <h3 className="mt-6 font-display" style={{ fontSize: 28, color: "#f0e8da" }}>
-            Free Tools
+            Free
           </h3>
           <p className="mt-2 font-serif italic" style={{ fontSize: 15, color: "#c4b8a6" }}>
-            Start with curiosity.
+            Create a free account.
           </p>
           <BulletList items={FREE_ITEMS} />
           <Link
-            to="/tools"
+            to="/signup"
             className="block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
             style={{
               marginTop: "auto",
@@ -123,11 +127,11 @@ const PacksSection = () => {
               color: "#d4a04a",
             }}
           >
-            Try Free
+            Create Free Account
           </Link>
         </div>
 
-        {/* TIER 2 — Legacy Pack (featured) */}
+        {/* TIER 2 — Legacy (featured) */}
         <div className="relative h-full">
           <div
             className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-pill font-sans font-bold uppercase"
@@ -159,14 +163,14 @@ const PacksSection = () => {
               One-Time
             </p>
             <h3 className="mt-6 font-display" style={{ fontSize: 28, color: "#f0e8da" }}>
-              Legacy Pack
+              Legacy
             </h3>
             <p className="mt-2 font-serif italic" style={{ fontSize: 15, color: "#c4b8a6" }}>
               Your full digital legacy.
             </p>
             <BulletList items={LEGACY_ITEMS} />
             <Link
-              to="/journey/1"
+              to="/signup"
               className="block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
               style={{
                 marginTop: "auto",
@@ -179,7 +183,7 @@ const PacksSection = () => {
           </div>
         </div>
 
-        {/* TIER 3 — Legacy Book */}
+        {/* TIER 3 — Physical Book */}
         <div className="relative h-full">
           <div
             className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-pill font-sans uppercase"
@@ -207,10 +211,10 @@ const PacksSection = () => {
               One-Time · Shipped Worldwide
             </p>
             <h3 className="mt-6 font-display" style={{ fontSize: 28, color: "#f0e8da" }}>
-              Legacy Book
+              Physical Book
             </h3>
             <p className="mt-2 font-serif italic" style={{ fontSize: 15, color: "#c4b8a6" }}>
-              Bound and shipped to your shelf.
+              A printed heirloom book of your family&apos;s novel.
             </p>
             <BulletList items={BOOK_ITEMS} />
             <Link
@@ -227,20 +231,6 @@ const PacksSection = () => {
             </Link>
           </div>
         </div>
-      </div>
-
-      <div className="mx-auto mt-10 max-w-[600px] text-center">
-        <p className="font-sans italic" style={{ fontSize: 13, color: "#8a7e6e" }}>
-          Looking for the premium tier? Our Deep Legacy research package includes a 15-question AI interview, deep historical records, and 24-hour turnaround.{" "}
-          <Link
-            to="/deep-legacy"
-            style={{ color: "#d4a04a", textDecoration: "none" }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.textDecoration = "underline")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.textDecoration = "none")}
-          >
-            Learn about Deep Legacy →
-          </Link>
-        </p>
       </div>
     </motion.section>
   );

@@ -3,14 +3,14 @@ import { motion } from "framer-motion";
 
 const TOOLS = [
   {
-    href: "/tools/chat",
-    heading: "Chat With Your Ancestor",
-    body: "A live conversation with an AI character drawn from your family's real history.",
-    ctaLabel: "Start the Chat",
-    bullets: ["Live AI conversation", "Period-accurate voice", "Ask them anything"],
+    href: "/tools/surname",
+    heading: "Surname Lookup",
+    body: "Instant meaning, origin, and historical role for any surname.",
+    ctaLabel: "Try the Lookup",
+    bullets: ["Origin & meaning", "Historical role", "Era of first record"],
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
       </svg>
     ),
   },
@@ -23,6 +23,18 @@ const TOOLS = [
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    ),
+  },
+  {
+    href: "/tools/1700s",
+    heading: "The 1700s You",
+    body: "What would your life look like 300 years ago based on your surname?",
+    ctaLabel: "See Your 1700s Self",
+    bullets: ["Your 1700s trade", "Where you'd live", "How you'd be known"],
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
       </svg>
     ),
   },
@@ -50,30 +62,6 @@ const TOOLS = [
       </svg>
     ),
   },
-  {
-    href: "/tools/surname",
-    heading: "Surname Lookup",
-    body: "Instant meaning, origin, and historical role for any surname.",
-    ctaLabel: "Try the Lookup",
-    bullets: ["Origin & meaning", "Historical role", "Era of first record"],
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
-      </svg>
-    ),
-  },
-  {
-    href: "/tools/1700s",
-    heading: "The 1700s You",
-    body: "What would your life look like 300 years ago based on your surname?",
-    ctaLabel: "See Your 1700s Self",
-    bullets: ["Your 1700s trade", "Where you'd live", "How you'd be known"],
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4a04a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-      </svg>
-    ),
-  },
 ] as const;
 
 const reveal = {
@@ -92,7 +80,7 @@ const FreeToolsSection = () => (
       Curious? Start here — no commitment.
     </h2>
     <p className="mx-auto mt-4 max-w-md font-serif italic text-foreground">
-      Free tools to explore your heritage. No account needed.
+      Free tools to explore your heritage. Start by creating a free account.
     </p>
 
     <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
