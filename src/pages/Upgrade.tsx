@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { getStripeEnvironment } from "@/lib/stripe";
 
 const features = [
   "Unlock all 10 legacy tools",
