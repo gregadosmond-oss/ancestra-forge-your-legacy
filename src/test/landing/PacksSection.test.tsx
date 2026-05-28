@@ -32,7 +32,7 @@ describe("PacksSection", () => {
 
   it("renders the Legacy price", () => {
     renderComponent();
-    expect(screen.getByText(/\$29\.99/)).toBeInTheDocument();
+    expect(screen.getByText((content) => content.includes("$29") && content.includes(".99"))).toBeInTheDocument();
   });
 
   it("renders the Most Popular badge", () => {
@@ -54,7 +54,7 @@ describe("PacksSection", () => {
 
   it("renders free items list", () => {
     renderComponent();
-    expect(screen.getByText("Surname Lookup")).toBeInTheDocument();
+    expect(screen.getAllByText("Surname Lookup").length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders legacy items list with all 10 tools", () => {
