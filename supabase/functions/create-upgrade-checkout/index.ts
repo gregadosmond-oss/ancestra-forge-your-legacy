@@ -32,12 +32,14 @@ serve(async (req) => {
     const user = userData.user;
 
     const stripeKey = Deno.env.get("MY_STRIPE_SANDBOX_API_KEY");
-    if (!stripeKey) {
-      return new Response(JSON.stringify({ error: "Stripe not configured" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!stripeKey || !stripeKey.startsWith("sk_test_")) {
+      return new Response(
+        JSON.stringify({ error: "Upgrade checkout is misconfigured: a test key is required." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
     const stripe = new Stripe(stripeKey, { apiVersion: "2024-12-18.acacia" as any });
+
 
     const origin = req.headers.get("origin") || "https://ancestorsqr.com";
 
