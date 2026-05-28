@@ -25,12 +25,12 @@ describe("PacksSection", () => {
 
   it("renders all three pack names", () => {
     renderComponent();
-    expect(screen.getByText("Explorer")).toBeInTheDocument();
-    expect(screen.getByText("Legacy Pack")).toBeInTheDocument();
-    expect(screen.getByText("Heirloom Shop")).toBeInTheDocument();
+    expect(screen.getByText("Free")).toBeInTheDocument();
+    expect(screen.getByText("Legacy")).toBeInTheDocument();
+    expect(screen.getByText("Physical Book")).toBeInTheDocument();
   });
 
-  it("renders the Legacy Pack price", () => {
+  it("renders the Legacy price", () => {
     renderComponent();
     expect(screen.getByText("$29.99")).toBeInTheDocument();
   });
@@ -42,30 +42,36 @@ describe("PacksSection", () => {
 
   it("renders CTA buttons with correct links", () => {
     renderComponent();
-    const startFreeLink = screen.getByRole("link", { name: /start free/i });
-    expect(startFreeLink).toHaveAttribute("href", "/journey");
+    const startFreeLink = screen.getByRole("link", { name: /create free account/i });
+    expect(startFreeLink).toHaveAttribute("href", "/signup");
 
-    const unlockLink = screen.getByRole("link", { name: /unlock my legacy/i });
-    expect(unlockLink).toHaveAttribute("href", "/journey");
+    const unlockLink = screen.getByRole("link", { name: /unlock your legacy/i });
+    expect(unlockLink).toHaveAttribute("href", "/signup");
 
-    const shopLink = screen.getByRole("link", { name: /browse heirloom shop/i });
+    const shopLink = screen.getByRole("link", { name: /order the book/i });
     expect(shopLink).toHaveAttribute("href", "/shop");
   });
 
   it("renders free items list", () => {
     renderComponent();
-    expect(screen.getByText("Surname meaning & origin")).toBeInTheDocument();
+    expect(screen.getByText("Surname Lookup")).toBeInTheDocument();
   });
 
-  it("renders legacy pack items list", () => {
+  it("renders legacy items list with all 10 tools", () => {
     renderComponent();
+    expect(screen.getByText("Forge Your Crest")).toBeInTheDocument();
     expect(
-      screen.getByText("Custom coat of arms (hi-res)")
+      screen.getByText("Complete all 10 tools to unlock your digital novel")
     ).toBeInTheDocument();
   });
 
-  it("renders heirloom items list", () => {
+  it("renders book items list", () => {
     renderComponent();
-    expect(screen.getByText("Framed crest print, mugs & glassware")).toBeInTheDocument();
+    expect(screen.getByText("Everything in Legacy")).toBeInTheDocument();
+  });
+
+  it("does not render Deep Legacy link", () => {
+    renderComponent();
+    expect(screen.queryByText(/deep legacy/i)).not.toBeInTheDocument();
   });
 });
