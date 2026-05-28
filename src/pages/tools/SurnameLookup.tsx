@@ -7,6 +7,7 @@ import ScrollChevron from "@/components/ScrollChevron";
 import { useEmailGate } from "@/hooks/useEmailGate";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { useRememberedSurname } from "@/hooks/useRememberedSurname";
+import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 
 
 type SurnameResult = {
