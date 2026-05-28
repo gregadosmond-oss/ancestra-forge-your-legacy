@@ -25,7 +25,6 @@ const TOTAL = 10;
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string>("");
   const [tier, setTier] = useState<string>("free");
   const [completed, setCompleted] = useState<Set<string>>(new Set());
@@ -45,7 +44,6 @@ const Dashboard = () => {
         supabase.from("tool_completions").select("tool_key").eq("user_id", uid),
       ]);
       if (!active) return;
-      setUserId(uid);
       setFirstName(profile?.first_name ?? "");
       setTier(profile?.tier ?? "free");
       setCompleted(new Set((completions ?? []).map((c) => c.tool_key)));
@@ -54,16 +52,6 @@ const Dashboard = () => {
     return () => { active = false; };
   }, [navigate]);
 
-  const markComplete = async (toolKey: string) => {
-    if (!userId || completed.has(toolKey)) return;
-    setCompleted((prev) => new Set(prev).add(toolKey));
-    const { error } = await supabase
-      .from("tool_completions")
-      .upsert({ user_id: userId, tool_key: toolKey }, { onConflict: "user_id,tool_key", ignoreDuplicates: true });
-    if (error) {
-      console.error("mark complete failed", error);
-    }
-  };
 
   const isFree = dataReady && tier === "free";
   const completedCount = completed.size;
