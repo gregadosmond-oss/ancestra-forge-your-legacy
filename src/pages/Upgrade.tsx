@@ -3,6 +3,7 @@ import { Navigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { getStripeEnvironment } from "@/lib/stripe";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const features = [
   "Unlock all 10 legacy tools",
@@ -14,6 +15,11 @@ const features = [
 ];
 
 const Upgrade = () => {
+  usePageMeta({
+    title: "Upgrade to Legacy — AncestorsQR",
+    description: "Unlock every tool in your bloodline. Forge your crest, read your full family story, and pass your legacy on.",
+  });
+
   const { user, loading: authLoading } = useAuth();
   const [tier, setTier] = useState<string | null>(null);
   const [tierLoading, setTierLoading] = useState(true);
