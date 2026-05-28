@@ -332,25 +332,20 @@ const DETAIL_1700S = [
 ];
 
 function The1700sSection({ initialSurname }: { initialSurname: string }) {
-  const [surname, setSurname] = useState(initialSurname);
   const [country, setCountry] = useState("");
   const [result, setResult] = useState<Life1700s | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setSurname(initialSurname);
-  }, [initialSurname]);
-
   const run = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!surname.trim() || loading) return;
+    if (!initialSurname.trim() || loading) return;
     setLoading(true);
     setError(null);
     setResult(null);
     try {
       const { data, error: fnError } = await supabase.functions.invoke("the-1700s-you", {
-        body: { surname: surname.trim(), country: country.trim() },
+        body: { surname: initialSurname.trim(), country: country.trim() },
       });
       if (fnError) throw new Error(fnError.message);
       if (!data || data.error) {
@@ -367,15 +362,12 @@ function The1700sSection({ initialSurname }: { initialSurname: string }) {
 
   return (
     <ToolCard icon={ICONS.clock} title="The 1700s You">
+      {!initialSurname.trim() && (
+        <p className="mb-4 font-serif italic text-text-dim">
+          Enter your surname above to use this tool.
+        </p>
+      )}
       <form onSubmit={run} className="flex flex-col gap-4">
-        <input
-          type="text"
-          value={surname}
-          onChange={(e) => setSurname(e.target.value)}
-          placeholder="Surname"
-          maxLength={60}
-          className={inputClass}
-        />
         <input
           type="text"
           value={country}
@@ -384,7 +376,7 @@ function The1700sSection({ initialSurname }: { initialSurname: string }) {
           maxLength={60}
           className={inputClass}
         />
-        <button type="submit" disabled={loading || !surname.trim()} className={primaryBtnClass} style={primaryBtnStyle}>
+        <button type="submit" disabled={loading || !initialSurname.trim()} className={primaryBtnClass} style={primaryBtnStyle}>
           {loading ? "Stepping back in time…" : "See Your 1700s Self"}
         </button>
       </form>
