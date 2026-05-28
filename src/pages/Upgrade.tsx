@@ -18,9 +18,9 @@ const Upgrade = () => {
   const [error, setError] = useState<string | null>(null);
 
   if (loading) return null;
-  if (!user) return <Navigate to="/auth" replace />;
-
   if (!user) return <Navigate to="/" replace />;
+
+  const handleUpgrade = async () => {
     setSubmitting(true);
     setError(null);
     try {
