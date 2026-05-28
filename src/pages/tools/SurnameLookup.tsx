@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, MapPin, Calendar, Shield, ScrollText, User, Compass, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
