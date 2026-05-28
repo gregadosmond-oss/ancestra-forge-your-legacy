@@ -85,8 +85,8 @@ const App = () => (
                 <Route index element={<CheckoutPage />} />
                 <Route path="return" element={<CheckoutReturn />} />
               </Route>
-              <Route path="/heirloom-order" element={<HeirloomOrderPage />} />
-              <Route path="/product-order" element={<ProductOrderPage />} />
+              <Route path="/heirloom-order" element={<Navigate to="/shop" replace />} />
+              <Route path="/product-order" element={<Navigate to="/shop" replace />} />
               <Route path="/legacy-book" element={<LegacyBookOrderPage />} />
               <Route path="/shop" element={<Shop />} />
               <Route path="/cart" element={<Cart />} />
