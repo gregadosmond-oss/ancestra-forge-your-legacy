@@ -1035,7 +1035,7 @@ export default function ToolsHub() {
         <div className="mt-16 text-center">
           <p className="font-sans text-sm text-text-dim">Ready to discover your full legacy?</p>
           <Link
-            to="/journey/1"
+            to="/signup"
             className="mt-4 inline-block rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-[400ms] hover:-translate-y-0.5"
             style={primaryBtnStyle}
           >
