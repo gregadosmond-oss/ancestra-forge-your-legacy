@@ -131,7 +131,7 @@ const PacksSection = () => {
           </Link>
         </div>
 
-        {/* TIER 2 — Legacy Pack (featured) */}
+        {/* TIER 2 — Legacy (featured) */}
         <div className="relative h-full">
           <div
             className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-pill font-sans font-bold uppercase"
@@ -163,14 +163,14 @@ const PacksSection = () => {
               One-Time
             </p>
             <h3 className="mt-6 font-display" style={{ fontSize: 28, color: "#f0e8da" }}>
-              Legacy Pack
+              Legacy
             </h3>
             <p className="mt-2 font-serif italic" style={{ fontSize: 15, color: "#c4b8a6" }}>
               Your full digital legacy.
             </p>
             <BulletList items={LEGACY_ITEMS} />
             <Link
-              to="/journey/1"
+              to="/signup"
               className="block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
               style={{
                 marginTop: "auto",
