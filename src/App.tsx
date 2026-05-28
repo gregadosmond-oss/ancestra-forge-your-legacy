@@ -70,15 +70,8 @@ const App = () => (
               <Route path="/tools/ancestor" element={<MeetYourAncestor />} />
               <Route path="/tools/1700s" element={<The1700sYou />} />
               <Route path="/tools/chat" element={<LegacyGuard><AncestorChat /></LegacyGuard>} />
-              <Route path="/journey" element={<JourneyLayout />}>
-                <Route index element={<Navigate to="/journey/1" replace />} />
-                <Route path="1" element={<Stop1EnterName />} />
-                <Route path="2" element={<Stop2NameMeaning />} />
-                <Route path="3" element={<Stop3Bloodline />} />
-                <Route path="4" element={<Stop4CrestForge />} />
-                <Route path="5" element={<Stop5Story />} />
-                <Route path="6" element={<Stop6PassItOn />} />
-              </Route>
+              <Route path="/journey" element={<Navigate to="/signup" replace />} />
+              <Route path="/journey/*" element={<Navigate to="/signup" replace />} />
               <Route path="/checkout" element={<JourneyLayout />}>
                 <Route index element={<CheckoutPage />} />
                 <Route path="return" element={<CheckoutReturn />} />
