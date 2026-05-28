@@ -116,6 +116,8 @@ import CollectHistory from "./pages/tools/CollectHistory.tsx";
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/tiktok" element={<TikTokLanding />} />
+              <Route path="/auth/familysearch/callback" element={<FamilySearchCallback />} />
+              <Route path="/demo/familysearch" element={<FamilySearchDemo />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
               <Route path="/dashboard" element={<Dashboard />} />
