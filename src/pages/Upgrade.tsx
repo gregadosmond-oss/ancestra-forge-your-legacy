@@ -24,8 +24,9 @@ const Upgrade = () => {
     setSubmitting(true);
     setError(null);
     try {
+      const { getStripeEnvironment } = await import("@/lib/stripe");
       const { data, error } = await supabase.functions.invoke("create-upgrade-checkout", {
-        body: {},
+        body: { environment: getStripeEnvironment() },
       });
       if (error) throw error;
       if (!data?.url) throw new Error("No checkout URL returned");
