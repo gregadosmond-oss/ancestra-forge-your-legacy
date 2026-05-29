@@ -283,6 +283,33 @@ export type Database = {
         }
         Relationships: []
       }
+      family_memories: {
+        Row: {
+          answers: Json
+          created_at: string
+          id: string
+          relationship: string
+          relative_name: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          created_at?: string
+          id?: string
+          relationship: string
+          relative_name: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          id?: string
+          relationship?: string
+          relative_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       familysearch_search_inputs: {
         Row: {
           birth_place: string | null
