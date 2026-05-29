@@ -340,16 +340,13 @@ const FamilyTree = () => {
         )}
 
         {pickedResults.length > 0 && (
-          <div className="mt-16">
-            <p className="text-center font-sans text-[11px] uppercase tracking-[3px] text-amber-dim">
-              Your bloodline
-            </p>
-            <h2 className="mt-3 text-center font-display text-2xl text-cream-warm sm:text-3xl">
-              {pickedResults.length} generation{pickedResults.length === 1 ? "" : "s"} back
-            </h2>
-            <div className="mt-8">
-              <BloodlineTree generations={treeGenerations} />
-            </div>
+          <div className="mt-20">
+            <LegacyChart
+              surname={surname || "Family"}
+              generations={chartGenerations}
+              originPlace={originPlace}
+              currentPlace={birthPlace || null}
+            />
           </div>
         )}
       </div>
