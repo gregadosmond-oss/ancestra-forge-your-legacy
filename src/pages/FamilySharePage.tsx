@@ -7,6 +7,7 @@ import ShareQRCode from "@/components/ShareQRCode";
 import SocialShare from "@/components/SocialShare";
 import type { LegacyFacts, LegacyStory } from "@/types/legacy";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { formatSurname } from "@/lib/surname";
 
 function OrnamentDivider() {
   return (
@@ -22,7 +23,7 @@ const FamilySharePage = () => {
   const { surname: rawSurname } = useParams<{ surname: string }>();
   const navigate = useNavigate();
   const surname = rawSurname?.toLowerCase().trim() ?? "";
-  const cap = surname ? surname.charAt(0).toUpperCase() + surname.slice(1).toLowerCase() : "";
+  const cap = formatSurname(surname);
 
   const [facts, setFacts] = useState<LegacyFacts | null>(null);
   const [story, setStory] = useState<LegacyStory | null>(null);
@@ -61,7 +62,7 @@ const FamilySharePage = () => {
   }, [surname]);
 
   const shareUrl = `${window.location.origin}/f/${surname}`;
-  const displaySurname = facts?.displaySurname ?? (rawSurname ? rawSurname.charAt(0).toUpperCase() + rawSurname.slice(1) : "");
+  const displaySurname = facts?.displaySurname ?? formatSurname(rawSurname);
 
   if (loading) {
     return (

@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { formatSurname } from "@/lib/surname";
 
 const GiftPage = () => {
   const { giftId } = useParams<{ giftId: string }>();
@@ -132,7 +133,7 @@ const GiftPage = () => {
     );
   }
 
-  const surname = gift.surname.charAt(0).toUpperCase() + gift.surname.slice(1);
+  const surname = formatSurname(gift.surname);
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-16 relative overflow-hidden">
