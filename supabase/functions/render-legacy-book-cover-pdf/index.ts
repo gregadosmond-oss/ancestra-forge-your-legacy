@@ -368,6 +368,7 @@ Deno.serve(async (req) => {
   let fixtureUrl: string | null = null;
   let mode: PaletteMode = "print";
   let surnameOverride: string | null = null;
+  let userId: string | null = null;
   try {
     const body = await req.json().catch(() => ({}));
     if (body && typeof body.fixtureUrl === "string" && body.fixtureUrl.trim()) {
@@ -378,6 +379,9 @@ Deno.serve(async (req) => {
     }
     if (body && typeof body.surname === "string" && body.surname.trim()) {
       surnameOverride = body.surname.trim();
+    }
+    if (body && typeof body.user_id === "string" && body.user_id.trim()) {
+      userId = body.user_id.trim();
     }
   } catch (_) {
     // keep defaults
@@ -412,6 +416,30 @@ Deno.serve(async (req) => {
     }
     if (!fixture.facts.surname) {
       fixture.facts.surname = surnameOverride;
+    }
+  }
+
+  // Per-user motto override: the user's forged crest is the single source of
+  // truth for the family motto on the printed book's cover.
+  if (userId) {
+    try {
+      const mottoClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+      const { data: crestRow } = await mottoClient
+        .from("crests")
+        .select("motto_latin, motto_english")
+        .eq("user_id", userId)
+        .not("motto_latin", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (crestRow?.motto_latin) {
+        fixture.facts = fixture.facts ?? {};
+        fixture.facts.mottoLatin = crestRow.motto_latin;
+        fixture.facts.mottoEnglish =
+          crestRow.motto_english ?? fixture.facts.mottoEnglish ?? "";
+      }
+    } catch (e) {
+      console.warn("[render-legacy-book-cover-pdf] crest motto lookup failed", e);
     }
   }
 

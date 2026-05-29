@@ -65,7 +65,7 @@ const ForgeCrest = () => {
         setFacts(legacy.facts);
 
         // 2) Crest (cached by generate-crest server-side)
-        const crest = await fetchCrest(sn, legacy.facts);
+        const crest = await fetchCrest(sn, legacy.facts, user.id);
         setImageUrl(crest.imageUrl);
         setPhase("ready");
       } catch (e) {

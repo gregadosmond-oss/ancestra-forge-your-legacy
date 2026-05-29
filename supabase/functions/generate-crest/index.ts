@@ -33,7 +33,7 @@ Deno.serve(async (req: Request) => {
     return json({ error: "missing env" }, 500);
   }
 
-  let body: { surname?: unknown; facts?: unknown };
+  let body: { surname?: unknown; facts?: unknown; user_id?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -54,6 +54,9 @@ Deno.serve(async (req: Request) => {
     return json({ error: "facts.symbolism must be a non-empty array" }, 400);
   }
 
+  const userId = typeof body.user_id === "string" && body.user_id.trim().length > 0
+    ? body.user_id.trim()
+    : null;
   const facts = body.facts as LegacyFacts;
   const client = createClient(supabaseUrl, supabaseKey);
 
@@ -174,6 +177,43 @@ Deno.serve(async (req: Request) => {
         return publicUrl;
       },
     });
+
+    // Persist the user's crest + motto as the per-user source of truth so
+    // the novel cover, printed book, and Legacy Certificate can all read
+    // the same motto the crest displays. Best-effort — never fail the crest call.
+    if (userId) {
+      try {
+        const normalized = surname.trim().toLowerCase();
+        const mottoLatin = typeof facts.mottoLatin === "string" ? facts.mottoLatin : null;
+        const mottoEnglish = typeof facts.mottoEnglish === "string" ? facts.mottoEnglish : null;
+        const { data: existing } = await client
+          .from("crests")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("surname", normalized)
+          .maybeSingle();
+        if (existing?.id) {
+          await client
+            .from("crests")
+            .update({
+              crest_url: imageUrl,
+              motto_latin: mottoLatin,
+              motto_english: mottoEnglish,
+            })
+            .eq("id", existing.id);
+        } else {
+          await client.from("crests").insert({
+            user_id: userId,
+            surname: normalized,
+            crest_url: imageUrl,
+            motto_latin: mottoLatin,
+            motto_english: mottoEnglish,
+          });
+        }
+      } catch (e) {
+        console.warn("generate-crest: failed to persist user crest row", (e as Error).message);
+      }
+    }
 
     return json({ code: "OK", imageUrl });
   } catch (err) {
