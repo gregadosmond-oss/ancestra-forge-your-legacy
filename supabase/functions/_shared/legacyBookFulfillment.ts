@@ -218,7 +218,21 @@ export async function triggerLegacyBookFulfillment(
       gelato_order_reference_id: gelatoOrderRef,
       fulfillment_status: "submitted",
       fulfillment_error: null,
-    });
+    }, { critical: true });
+
+    // Verify the write actually landed by reading the row back.
+    const { data: verifyRow, error: verifyErr } = await supabase
+      .from("legacy_book_orders")
+      .select("id, fulfillment_status, gelato_order_id")
+      .eq("id", orderId)
+      .maybeSingle();
+    if (verifyErr) {
+      throw new Error(`verify read failed: ${verifyErr.message}`);
+    }
+    if (!verifyRow || verifyRow.fulfillment_status !== "submitted" || verifyRow.gelato_order_id !== gelatoOrderId) {
+      throw new Error(`verify mismatch: row=${JSON.stringify(verifyRow)} expected gelato_order_id=${gelatoOrderId}`);
+    }
+    console.log("[legacy-book] verified row after submit:", JSON.stringify(verifyRow));
 
     console.log("[legacy-book] SUBMITTED gelato_order_id:", gelatoOrderId, "ref:", gelatoOrderRef);
 
