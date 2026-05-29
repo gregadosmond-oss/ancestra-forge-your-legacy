@@ -60,8 +60,10 @@ RULES — absolute, non-negotiable:
 - If a field is blank, simply omit it — never speculate.
 - Write in third-person, present-or-past tense as appropriate, in continuous paragraphs (NOT as a Q&A list).
 - Give each relative their own short section (2-4 paragraphs). Begin each section with the relative's name as a heading on its own line preceded by "## " (markdown H2). Underneath, in italics on its own line preceded by "_", write their relationship to the storyteller (e.g. "_Grandmother_").
+- Sparse notes are valid: if there is only one filled answer, still write a brief 50-90 word prose section from that exact detail.
 - Do not include any preamble, framing, "here is the chapter", or closing remarks. Output only the chapter body.
 - Length: aim for ~150-280 words per relative section.
+- Never decorate sparse notes with outside knowledge. If the notes only say "grew up: Cork, Ireland", mention Cork, Ireland and the meaning of a remembered place, but do not add streets, rivers, landmarks, occupations, events, or family details not present in the notes.
 - Honour the warm, literary tone of a legacy book. Avoid clichés ("salt of the earth", "a life well lived"). Avoid lists. Avoid em-dashes everywhere — use them sparingly.`;
 
   const userPrompt = `Surname: ${surname}\n\nRaw memory notes:\n\n${memoryBlock}\n\nWeave these into the "In Their Words" chapter now.`;
