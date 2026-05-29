@@ -92,51 +92,59 @@ const FamilyTree = () => {
     })();
   }, [user]);
 
-  // Hydrate saved tree members from DB on mount
-  useEffect(() => {
+  // Hydrate saved tree members from DB
+  const hydrateSaved = async () => {
     if (!user) return;
-    (async () => {
-      const { data, error } = await supabase
-        .from("family_tree_members")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("position", { ascending: true });
-      if (error || !data) return;
-      const hydrated: AnyResult[] = data.map((row: any) => {
-        const rid = `db:${row.id}`;
-        const base = {
-          id: rid,
-          name: row.name,
-          birthDate: row.birth_date ?? null,
-          birthPlace: row.birth_place ?? null,
-          deathDate: row.death_date ?? null,
-          deathPlace: row.death_place ?? null,
-          fatherName: row.father_name ?? null,
-          motherName: row.mother_name ?? null,
-          profileUrl: row.profile_url ?? null,
+    const { data, error } = await supabase
+      .from("family_tree_members")
+      .select("*")
+      .eq("user_id", user.id);
+    if (error || !data) return;
+    const rows = [...data].sort((a: any, b: any) => {
+      const ag = a.generations_back ?? 9999;
+      const bg = b.generations_back ?? 9999;
+      if (ag !== bg) return ag - bg;
+      return (a.position ?? 0) - (b.position ?? 0);
+    });
+    const hydrated: AnyResult[] = rows.map((row: any) => {
+      const rid = `db:${row.id}`;
+      const base = {
+        id: rid,
+        name: row.name,
+        birthDate: row.birth_date ?? null,
+        birthPlace: row.birth_place ?? null,
+        deathDate: row.death_date ?? null,
+        deathPlace: row.death_place ?? null,
+        fatherName: row.father_name ?? null,
+        motherName: row.mother_name ?? null,
+        profileUrl: row.profile_url ?? null,
+      };
+      if (row.source === "claude-web") {
+        return {
+          ...base,
+          source: "claude-web" as const,
+          summary: row.summary ?? null,
+          confidence: (row.confidence as "high" | "medium" | "low") ?? "medium",
         };
-        if (row.source === "claude-web") {
-          return {
-            ...base,
-            source: "claude-web" as const,
-            summary: row.summary ?? null,
-            confidence: (row.confidence as "high" | "medium" | "low") ?? "medium",
-          };
-        }
-        return { ...base, source: "wikitree" as const };
-      });
-      setSavedResults(hydrated);
-      setPickedIds((prev) => {
-        const next = new Set(prev);
-        for (const r of hydrated) next.add(r.id);
-        return next;
-      });
-      setSavedDbIds((prev) => {
-        const next = new Map(prev);
-        for (const row of data as any[]) next.set(`db:${row.id}`, row.id);
-        return next;
-      });
-    })();
+      }
+      return { ...base, source: "wikitree" as const };
+    });
+    setSavedResults(hydrated);
+    setPickedIds((prev) => {
+      const next = new Set(prev);
+      for (const r of hydrated) next.add(r.id);
+      return next;
+    });
+    setSavedDbIds((prev) => {
+      const next = new Map(prev);
+      for (const row of rows as any[]) next.set(`db:${row.id}`, row.id);
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    hydrateSaved();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const allResults: AnyResult[] = useMemo(
