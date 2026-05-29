@@ -281,21 +281,37 @@ const Novel = () => {
     facts?.migration?.waypoints?.[0]?.year ||
     "antiquity";
 
-  const chapterOneTitle: string = story.chapterOneTitle || "Chapter I";
-  const chapterOneBody: string = stripMarkdown(story.chapterOneBody || "");
-  const teaserChapters: string[] = Array.isArray(story.teaserChapters)
-    ? story.teaserChapters.slice(0, 8)
-    : [];
-  const chapterBodies = extractChapterBodies(fixture);
+  // Prefer personalized 9-chapter story when available; otherwise fall back to shared surname story.
+  const allChapters: { num: string; title: string; body: string }[] = personalStory
+    ? [
+        {
+          num: "I",
+          title: personalStory.chapterOne.title || "Chapter I",
+          body: stripMarkdown(personalStory.chapterOne.body || ""),
+        },
+        ...personalStory.chapters.slice(0, 8).map((c, i) => ({
+          num: ROMAN[i + 1],
+          title: c.title,
+          body: stripMarkdown(c.body || ""),
+        })),
+      ]
+    : (() => {
+        const chapterOneTitle: string = story.chapterOneTitle || "Chapter I";
+        const chapterOneBody: string = stripMarkdown(story.chapterOneBody || "");
+        const teaserChapters: string[] = Array.isArray(story.teaserChapters)
+          ? story.teaserChapters.slice(0, 8)
+          : [];
+        const chapterBodies = extractChapterBodies(fixture);
+        return [
+          { num: "I", title: chapterOneTitle, body: chapterOneBody },
+          ...teaserChapters.map((title, i) => ({
+            num: ROMAN[i + 1],
+            title,
+            body: stripMarkdown(chapterBodies[i] ?? ""),
+          })),
+        ];
+      })();
 
-  const allChapters: { num: string; title: string; body: string }[] = [
-    { num: "I", title: chapterOneTitle, body: chapterOneBody },
-    ...teaserChapters.map((title, i) => ({
-      num: ROMAN[i + 1],
-      title,
-      body: stripMarkdown(chapterBodies[i] ?? ""),
-    })),
-  ];
 
   const certNumber = `${displaySurname.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8)}-${Date.now().toString().slice(-6)}`;
 
