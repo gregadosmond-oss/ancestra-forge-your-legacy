@@ -17,7 +17,7 @@ const FREE_ITEMS = [
   "Bloodline Quiz",
 ];
 
-const LEGACY_ITEMS = [
+const LEGACY_TOOLS = [
   "Surname Lookup",
   "Meet Your Ancestor",
   "The 1700s You",
@@ -28,7 +28,6 @@ const LEGACY_ITEMS = [
   "Get Your Family Story",
   "Create Your Family Tree",
   "Collect Your History From a Family Member",
-  "Complete all 10 tools to unlock your digital novel",
 ];
 
 const BOOK_ITEMS = [
