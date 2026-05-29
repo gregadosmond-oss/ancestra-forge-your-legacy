@@ -123,8 +123,107 @@ serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  const interiorPath = `books/${normalizedSurname}-book-interior.pdf`;
+  const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+  const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const userId = body.user_id?.trim();
+
+  // Default: shared surname-based PDFs (legacy/admin flow)
+  let interiorPath = `books/${normalizedSurname}-book-interior.pdf`;
   const coverPath = `books/${normalizedSurname}-book-cover.pdf`;
+
+  // Per-user flow: assemble combined fixture (shared + tree + memories),
+  // upload to per-user path, render per-user interior PDF that includes
+  // the Family Tree + In Their Words sections.
+  if (userId) {
+    const userInteriorFile = `${userId}-${normalizedSurname}-book-interior.pdf`;
+    const userFixturePath = `fixtures/users/${userId}-${normalizedSurname}-fixture.json`;
+    const userInteriorPath = `books/users/${userInteriorFile}`;
+
+    const authHeaders = {
+      Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+      apikey: SERVICE_ROLE_KEY,
+      "Content-Type": "application/json",
+    };
+
+    // 1. Assemble combined fixture
+    const asmRes = await fetch(
+      `${SUPABASE_URL}/functions/v1/assemble-legacy-payload`,
+      {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify({ surname, user_id: userId }),
+      },
+    );
+    if (!asmRes.ok) {
+      const detail = await asmRes.text();
+      return json(500, {
+        success: false,
+        step: "assemble-legacy-payload",
+        error: detail.slice(0, 800),
+      });
+    }
+    const asmJson = await asmRes.json();
+    const combinedFixture = asmJson?.fixture;
+    if (!combinedFixture) {
+      return json(500, {
+        success: false,
+        step: "assemble-legacy-payload",
+        error: "Missing fixture in response",
+      });
+    }
+
+    // 2. Upload combined fixture
+    const fixtureBytes = new TextEncoder().encode(
+      JSON.stringify(combinedFixture, null, 2),
+    );
+    const { error: fxUploadErr } = await supabase.storage
+      .from("print-designs")
+      .upload(userFixturePath, fixtureBytes, {
+        contentType: "application/json",
+        upsert: true,
+      });
+    if (fxUploadErr) {
+      return json(500, {
+        success: false,
+        step: "upload-user-fixture",
+        error: fxUploadErr.message,
+      });
+    }
+    const { data: fxSigned, error: fxSignErr } = await supabase.storage
+      .from("print-designs")
+      .createSignedUrl(userFixturePath, 3600);
+    if (fxSignErr || !fxSigned?.signedUrl) {
+      return json(500, {
+        success: false,
+        step: "sign-user-fixture",
+        error: fxSignErr?.message ?? "no signed url",
+      });
+    }
+
+    // 3. Render per-user interior PDF
+    const renderRes = await fetch(
+      `${SUPABASE_URL}/functions/v1/render-legacy-book-pdf`,
+      {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify({
+          fixtureUrl: fxSigned.signedUrl,
+          mode: "print",
+          outputPath: userInteriorPath,
+        }),
+      },
+    );
+    if (!renderRes.ok) {
+      const detail = await renderRes.text();
+      return json(500, {
+        success: false,
+        step: "render-legacy-book-pdf",
+        error: detail.slice(0, 800),
+      });
+    }
+
+    interiorPath = userInteriorPath;
+  }
 
   const missingResponse = () =>
     json(400, {
