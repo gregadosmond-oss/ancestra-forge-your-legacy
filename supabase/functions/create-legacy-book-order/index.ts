@@ -207,6 +207,8 @@ serve(async (req) => {
         method: "POST",
         headers: authHeaders,
         body: JSON.stringify({
+          user_id: userId,
+          surname,
           fixtureUrl: fxSigned.signedUrl,
           mode: "print",
           outputPath: userInteriorPath,
