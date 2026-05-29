@@ -209,20 +209,40 @@ function personalSectionsHtml(fixture: any): string {
 
   // "In Their Words — Family Memories" — mirrors Novel.tsx title + order
   if (memories.length > 0) {
-    const entries = memories
-      .map((m) => {
-        const answers = m.answers && typeof m.answers === "object" ? m.answers : {};
-        const pairs = Object.entries(answers as Record<string, unknown>)
-          .filter(([, v]) => v != null && String(v).trim().length > 0)
-          .map(
-            ([q, a]) =>
-              `<div class="mem-pair">
-                <div class="mem-q">${escapeHtml(String(q))}</div>
-                <div class="mem-a">${escapeHtml(String(a))}</div>
-              </div>`,
-          )
-          .join("\n");
-        return `
+    const prose: string =
+      typeof personal.memoriesProse === "string" ? personal.memoriesProse : "";
+
+    let body = "";
+    if (prose.trim().length > 0) {
+      // Render the AI-woven prose: ## headings → mem-name, _italic_ line → mem-rel, paragraphs.
+      const blocks = prose.split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
+      body = blocks
+        .map((block) => {
+          if (block.startsWith("## ")) {
+            return `<h3 class="mem-name">${escapeHtml(block.slice(3).trim())}</h3>`;
+          }
+          if (block.startsWith("_") && block.endsWith("_")) {
+            return `<div class="mem-rel">${escapeHtml(block.slice(1, -1).trim())}</div>`;
+          }
+          return `<p class="mem-prose">${escapeHtml(block)}</p>`;
+        })
+        .join("\n");
+    } else {
+      // Fallback: raw Q&A per relative
+      body = memories
+        .map((m) => {
+          const answers = m.answers && typeof m.answers === "object" ? m.answers : {};
+          const pairs = Object.entries(answers as Record<string, unknown>)
+            .filter(([, v]) => v != null && String(v).trim().length > 0)
+            .map(
+              ([q, a]) =>
+                `<div class="mem-pair">
+                  <div class="mem-q">${escapeHtml(String(q))}</div>
+                  <div class="mem-a">${escapeHtml(String(a))}</div>
+                </div>`,
+            )
+            .join("\n");
+          return `
 <div class="mem-entry">
   <h3 class="mem-name">${escapeHtml(String(m.relative_name ?? ""))}</h3>
   <div class="mem-rel">${escapeHtml(String(m.relationship ?? ""))}</div>
@@ -231,8 +251,9 @@ function personalSectionsHtml(fixture: any): string {
     ${pairs || '<div class="mem-empty">(No memories recorded.)</div>'}
   </div>
 </div>`;
-      })
-      .join("\n");
+        })
+        .join("\n");
+    }
 
     html += `
 <section class="personal-divider clean-page">
@@ -242,12 +263,13 @@ function personalSectionsHtml(fixture: any): string {
   <div class="pd-flourish">✦ ❦ ✦</div>
 </section>
 <section class="family-memories">
-  ${entries}
+  ${body}
 </section>`;
   }
 
   return html;
 }
+
 
 function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
   const facts = fixture?.facts ?? {};
