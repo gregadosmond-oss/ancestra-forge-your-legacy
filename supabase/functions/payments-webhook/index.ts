@@ -75,7 +75,7 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
     try {
       await triggerLegacyBookFulfillment({
         surname,
-        shippingAddress: JSON.parse(shippingAddressRaw),
+        shippingAddress: typeof shippingAddressRaw === "string" ? JSON.parse(shippingAddressRaw) : shippingAddressRaw,
         buyerEmail: buyerEmail ?? undefined,
         sessionId: session.id,
         paymentIntent: typeof (session as unknown as { payment_intent?: string }).payment_intent === "string"
