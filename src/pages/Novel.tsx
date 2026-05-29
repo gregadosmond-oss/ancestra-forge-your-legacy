@@ -37,7 +37,7 @@ type Fixture = {
   chapters?: any;
 };
 
-type Phase = "loading" | "generating" | "ready" | "error";
+type Phase = "loading" | "generating" | "generating-personal" | "ready" | "error";
 type MemoryProsePhase = "idle" | "loading" | "ready" | "error";
 type PersonalStoryPhase = "idle" | "loading" | "ready" | "error";
 
