@@ -185,6 +185,8 @@ const Index = () => {
         <WarmDivider />
         <FaqSection />
         <WarmDivider />
+        <MadeToBeGivenSection />
+        <WarmDivider />
         <FinalCtaSection />
       </div>
 
