@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 import { usePageMeta } from "@/hooks/usePageMeta";
-import BloodlineTree from "@/components/journey/BloodlineTree";
+import LegacyChart, { type TreePerson } from "@/components/journey/LegacyChart";
 
 type WikitreeResult = {
   id: string;
@@ -191,30 +191,35 @@ const FamilyTree = () => {
     });
   }
 
-  // Build tree generations: you + picked ancestors (oldest to youngest visually)
-  const treeGenerations = useMemo(() => {
-    const ancestors = pickedResults
-      .map((r) => ({
-        name: r.name,
-        years: r.birthDate
-          ? `${r.birthDate}${r.deathDate ? ` – ${r.deathDate}` : ""}`
-          : "Year unknown",
-        location: r.birthPlace ?? r.deathPlace ?? "Place unknown",
-        role: "source" in r && r.source === "claude-web" ? "AI-assisted" : "WikiTree",
-      }))
-      .sort((a, b) => {
-        const ay = parseInt(a.years.slice(0, 4), 10) || 9999;
-        const by = parseInt(b.years.slice(0, 4), 10) || 9999;
-        return ay - by;
-      });
-    const you = {
+  // Build chart generations: each picked ancestor as its own generation (oldest → youngest), then "you"
+  const chartGenerations = useMemo<TreePerson[][]>(() => {
+    const ancestors: TreePerson[] = pickedResults.map((r) => ({
+      name: r.name,
+      birthYear: r.birthDate ?? null,
+      birthPlace: r.birthPlace ?? null,
+      deathYear: r.deathDate ?? null,
+      deathPlace: r.deathPlace ?? null,
+    }));
+    ancestors.sort((a, b) => {
+      const ay = parseInt(String(a.birthYear ?? "").slice(0, 4), 10);
+      const by = parseInt(String(b.birthYear ?? "").slice(0, 4), 10);
+      return (Number.isNaN(ay) ? 9999 : ay) - (Number.isNaN(by) ? 9999 : by);
+    });
+    const you: TreePerson = {
       name: `${firstName || "You"} ${surname}`.trim() || "You",
-      years: birthYear || "today",
-      location: birthPlace || "—",
+      birthYear: birthYear || null,
+      birthPlace: birthPlace || null,
       isYou: true,
     };
-    return [...ancestors, you];
+    return [...ancestors.map((p) => [p]), [you]];
   }, [pickedResults, firstName, surname, birthYear, birthPlace]);
+
+  const originPlace = useMemo(() => {
+    const first = pickedResults
+      .map((r) => r.birthPlace)
+      .find((p) => !!p);
+    return first ?? null;
+  }, [pickedResults]);
 
   return (
     <div className="min-h-screen bg-background px-6 py-20">
@@ -335,16 +340,13 @@ const FamilyTree = () => {
         )}
 
         {pickedResults.length > 0 && (
-          <div className="mt-16">
-            <p className="text-center font-sans text-[11px] uppercase tracking-[3px] text-amber-dim">
-              Your bloodline
-            </p>
-            <h2 className="mt-3 text-center font-display text-2xl text-cream-warm sm:text-3xl">
-              {pickedResults.length} generation{pickedResults.length === 1 ? "" : "s"} back
-            </h2>
-            <div className="mt-8">
-              <BloodlineTree generations={treeGenerations} />
-            </div>
+          <div className="mt-20">
+            <LegacyChart
+              surname={surname || "Family"}
+              generations={chartGenerations}
+              originPlace={originPlace}
+              currentPlace={birthPlace || null}
+            />
           </div>
         )}
       </div>
