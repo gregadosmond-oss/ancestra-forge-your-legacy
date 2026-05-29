@@ -398,6 +398,88 @@ const Novel = () => {
           )}
         </section>
 
+        {/* Family Tree */}
+        {treeMembers.length > 0 && (
+          <>
+            <section className="flex min-h-[40vh] flex-col items-center justify-center py-16 text-center">
+              <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
+                Part Two
+              </p>
+              <h2 className="mt-6 font-display text-4xl italic text-amber-light">
+                Your Family Tree
+              </h2>
+              <div className="mt-6 text-sm tracking-[0.4em] text-amber-dim">✦ ❦ ✦</div>
+            </section>
+            <section className="py-8">
+              <LegacyChart
+                surname={displaySurname || "Family"}
+                generations={treeGenerations}
+                originPlace={treeOriginPlace}
+                currentPlace={null}
+              />
+            </section>
+          </>
+        )}
+
+        {/* In Their Words — Family Memories */}
+        {memories.length > 0 && (
+          <>
+            <section className="flex min-h-[40vh] flex-col items-center justify-center py-16 text-center">
+              <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
+                Part Three
+              </p>
+              <h2 className="mt-6 font-display text-4xl italic text-amber-light">
+                In Their Words
+              </h2>
+              <p className="mt-4 font-serif italic text-cream-soft">
+                Family Memories
+              </p>
+              <div className="mt-6 text-sm tracking-[0.4em] text-amber-dim">✦ ❦ ✦</div>
+            </section>
+            <section className="py-8">
+              {memories.map((m) => {
+                const entries = m.answers && typeof m.answers === "object"
+                  ? Object.entries(m.answers as Record<string, unknown>).filter(
+                      ([, v]) => v != null && String(v).trim().length > 0,
+                    )
+                  : [];
+                return (
+                  <div key={m.id} className="mb-16">
+                    <h3 className="text-center font-display text-2xl text-cream-warm">
+                      {m.relative_name}
+                    </h3>
+                    <p className="text-center font-serif italic text-amber-dim">
+                      {m.relationship}
+                    </p>
+                    <Ornament />
+                    <div className="mx-auto max-w-xl space-y-6">
+                      {entries.length === 0 ? (
+                        <p className="text-center font-serif italic text-text-dim">
+                          (No memories recorded yet.)
+                        </p>
+                      ) : (
+                        entries.map(([q, a]) => (
+                          <div key={q}>
+                            <p className="font-sans text-[10px] uppercase tracking-[3px] text-amber-dim">
+                              {q}
+                            </p>
+                            <p
+                              className="mt-2 whitespace-pre-line font-serif leading-[1.85] text-text-body"
+                              style={{ fontSize: "1.0625rem" }}
+                            >
+                              {String(a)}
+                            </p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </section>
+          </>
+        )}
+
         {/* Legacy Certificate */}
         <section className="py-16">
           <div
