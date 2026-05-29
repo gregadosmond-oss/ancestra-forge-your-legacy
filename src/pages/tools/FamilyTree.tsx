@@ -149,6 +149,15 @@ const FamilyTree = () => {
       for (const row of rows as any[]) next.set(`db:${row.id}`, row.id);
       return next;
     });
+    setSavedGens(() => {
+      const next = new Map<string, number>();
+      for (const row of rows as any[]) {
+        if (typeof row.generations_back === "number") {
+          next.set(`db:${row.id}`, row.generations_back);
+        }
+      }
+      return next;
+    });
   };
 
   useEffect(() => {
