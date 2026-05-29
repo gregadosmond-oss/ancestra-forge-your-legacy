@@ -80,6 +80,21 @@ export default function Shop() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [completedCount, setCompletedCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!user) { setCompletedCount(null); return; }
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from("tool_completions")
+        .select("tool_key")
+        .eq("user_id", user.id);
+      if (!active) return;
+      setCompletedCount(data?.length ?? 0);
+    })();
+    return () => { active = false; };
+  }, [user]);
 
   const set = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
