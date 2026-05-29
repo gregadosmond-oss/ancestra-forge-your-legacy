@@ -282,9 +282,8 @@ const Novel = () => {
 
   const facts = fixture.facts ?? {};
   const story = fixture.story ?? {};
-  const crestMotto = (fixture as any).__crestMotto as { latin?: string; english?: string } | undefined;
-  const mottoLatin: string = crestMotto?.latin || facts.mottoLatin || "";
-  const mottoEnglish: string = crestMotto?.english || facts.mottoEnglish || "";
+  const mottoLatin: string = facts.mottoLatin || "";
+  const mottoEnglish: string = facts.mottoEnglish || "";
   const generatedDate = fixture.generatedAt
     ? new Date(fixture.generatedAt).toLocaleDateString("en-US", {
         year: "numeric",
