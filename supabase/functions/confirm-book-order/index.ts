@@ -55,7 +55,7 @@ serve(async (req) => {
       session.customer_details?.email ??
       session.customer_email ??
       undefined;
-    const shippingAddressRaw = session.metadata?.shippingAddress;
+    const shippingAddressRaw = session.metadata?.shipping ?? session.metadata?.shippingAddress;
 
     if (!surname || !shippingAddressRaw) {
       console.warn("[confirm-book-order] missing surname or shippingAddress in session metadata");
