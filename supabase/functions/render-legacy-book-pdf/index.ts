@@ -790,6 +790,9 @@ ${chapterTitlePage(num, title)}
       text-transform: uppercase;
       color: var(--chapter-label);
       margin-top: 20mm;
+    }
+
+
 
 
     .certificate {
