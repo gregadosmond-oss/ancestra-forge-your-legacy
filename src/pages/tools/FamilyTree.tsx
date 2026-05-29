@@ -595,7 +595,15 @@ const FamilyTree = () => {
               <div className="mt-4 flex flex-col gap-3">
                 {allResults.map((r) => {
                   const picked = pickedIds.has(r.id);
-                  const isClaude = "confidence" in r && !!r.confidence;
+                  const rSource = (r as any).source as AncestorSource | undefined;
+                  const badge = sourceBadgeLabel(rSource);
+                  const isAiBadge = badge === "AI-assisted";
+                  const isUserBadge = badge === "Added by you";
+                  const badgeClass = isAiBadge
+                    ? "border-amber-dim/40 bg-amber-dim/[0.10] text-amber-light"
+                    : isUserBadge
+                      ? "border-cream-soft/30 bg-cream-soft/[0.08] text-cream-soft"
+                      : "border-amber/40 bg-amber/[0.10] text-amber";
                   if (picked) {
                     return (
                       <div
@@ -603,13 +611,9 @@ const FamilyTree = () => {
                         className="relative rounded-[14px] border border-amber/60 bg-amber/[0.08] p-4 text-left transition-all"
                       >
                         <span
-                          className={`absolute right-3 top-3 rounded-pill border px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] ${
-                            isClaude
-                              ? "border-amber-dim/40 bg-amber-dim/[0.10] text-amber-light"
-                              : "border-amber/40 bg-amber/[0.10] text-amber"
-                          }`}
+                          className={`absolute right-3 top-3 rounded-pill border px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] ${badgeClass}`}
                         >
-                          {isClaude ? "AI-assisted" : "WikiTree"}
+                          {badge}
                         </span>
                         <div className="pr-28 font-display text-base text-cream-warm">{r.name}</div>
                         {(r.birthDate || r.birthPlace) && (
@@ -636,7 +640,7 @@ const FamilyTree = () => {
                             onClick={(e) => {
                               e.stopPropagation();
                               if (window.confirm(`Remove ${r.name} from your tree?`)) {
-                                togglePick(r.id);
+                                removeAncestor(r.id);
                               }
                             }}
                             className="font-sans text-[11px] text-text-dim hover:text-cream-soft underline underline-offset-2"
@@ -737,21 +741,16 @@ const FamilyTree = () => {
                       </div>
                     );
                   }
+                  const isPending = pendingPickId === r.id;
                   return (
-                    <button
+                    <div
                       key={r.id}
-                      type="button"
-                      onClick={() => togglePick(r.id)}
                       className="relative rounded-[14px] border border-amber-dim/20 bg-card/60 p-4 text-left transition-all hover:border-amber/40"
                     >
                       <span
-                        className={`absolute right-3 top-3 rounded-pill border px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] ${
-                          isClaude
-                            ? "border-amber-dim/40 bg-amber-dim/[0.10] text-amber-light"
-                            : "border-amber/40 bg-amber/[0.10] text-amber"
-                        }`}
+                        className={`absolute right-3 top-3 rounded-pill border px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] ${badgeClass}`}
                       >
-                        {isClaude ? "AI-assisted" : "WikiTree"}
+                        {badge}
                       </span>
                       <div className="pr-28 font-display text-base text-cream-warm">{r.name}</div>
                       {(r.birthDate || r.birthPlace) && (
@@ -769,10 +768,67 @@ const FamilyTree = () => {
                       {"summary" in r && r.summary && (
                         <p className="mt-2 font-serif text-sm italic text-cream-soft">{r.summary}</p>
                       )}
-                      <span className="mt-3 inline-block font-sans text-[11px] uppercase tracking-[1.5px] text-amber">
-                        Add to tree →
-                      </span>
-                    </button>
+                      {!isPending ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPendingPickId(r.id);
+                            setPendingRelationship("");
+                          }}
+                          className="mt-3 inline-block font-sans text-[11px] uppercase tracking-[1.5px] text-amber hover:text-amber-light"
+                        >
+                          Add to tree →
+                        </button>
+                      ) : (
+                        <div className="mt-3 rounded-[10px] border border-amber-dim/30 bg-bg-warm/60 p-3">
+                          <p className="font-sans text-[11px] uppercase tracking-[1.5px] text-amber-dim">
+                            Relationship to you
+                          </p>
+                          <select
+                            value={pendingRelationship}
+                            onChange={(e) => setPendingRelationship(e.target.value)}
+                            className="mt-2 w-full rounded-[10px] border border-amber-dim/30 bg-bg-input/80 px-3 py-2 font-sans text-sm text-cream-soft focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber/40"
+                          >
+                            <option value="">Choose relationship…</option>
+                            {RELATIONSHIP_OPTIONS.map((o) => (
+                              <option key={o.label} value={o.label}>
+                                {o.label}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="mt-3 flex flex-wrap items-center gap-3">
+                            <button
+                              type="button"
+                              disabled={!pendingRelationship}
+                              onClick={() => {
+                                const match = RELATIONSHIP_OPTIONS.find(
+                                  (o) => o.label === pendingRelationship,
+                                );
+                                if (!match) {
+                                  toast.error("Pick a relationship");
+                                  return;
+                                }
+                                addSearchResult(r.id, match.generations_back, match.label);
+                              }}
+                              className="rounded-pill px-5 py-2 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all disabled:cursor-not-allowed disabled:opacity-50"
+                              style={{ background: "linear-gradient(135deg, #e8943a, #c47828)" }}
+                            >
+                              Add to tree
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPendingPickId(null);
+                                setPendingRelationship("");
+                              }}
+                              className="font-sans text-[11px] text-text-dim hover:text-cream-soft underline underline-offset-2"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </div>
