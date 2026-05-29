@@ -22,11 +22,15 @@ serve(async (req) => {
       productType,
     } = await req.json();
 
-    if (!priceId || typeof priceId !== "string" || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {
-      return new Response(JSON.stringify({ error: "Invalid priceId" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const isLegacyBook = productType === "legacy-book";
+
+    if (!isLegacyBook) {
+      if (!priceId || typeof priceId !== "string" || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {
+        return new Response(JSON.stringify({ error: "Invalid priceId" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     const env: StripeEnv = environment === "live" ? "live" : "sandbox";
@@ -35,14 +39,32 @@ serve(async (req) => {
     // create-upgrade-checkout path).
     const stripe = createStripeClient(env);
 
-    const prices = await stripe.prices.list({ lookup_keys: [priceId] });
-    if (!prices.data.length) {
-      return new Response(JSON.stringify({ error: "Price not found" }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    // Legacy Book uses inline price_data — the stored $99 price isn't
+    // available in the managed gateway's Stripe account. Other products
+    // continue to resolve via lookup_keys.
+    let lineItems: Array<Record<string, unknown>>;
+    if (isLegacyBook) {
+      lineItems = [{
+        price_data: {
+          currency: "usd",
+          unit_amount: 9900,
+          product_data: {
+            name: "Legacy Book",
+            description: "Heirloom hardcover edition of your family's personalized story — 9 chapters, 42 pages.",
+          },
+        },
+        quantity: 1,
+      }];
+    } else {
+      const prices = await stripe.prices.list({ lookup_keys: [priceId] });
+      if (!prices.data.length) {
+        return new Response(JSON.stringify({ error: "Price not found" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      lineItems = [{ price: prices.data[0].id, quantity: quantity || 1 }];
     }
-    const stripePrice = prices.data[0];
 
     // Session metadata — webhook reads these to identify the buyer and
     // dispatch the correct fulfillment path.
