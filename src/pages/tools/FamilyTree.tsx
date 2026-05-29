@@ -610,7 +610,7 @@ const FamilyTree = () => {
                         {"summary" in r && r.summary && (
                           <p className="mt-2 font-serif text-sm italic text-cream-soft">{r.summary}</p>
                         )}
-                        <div className="mt-3 flex items-center gap-3">
+                        <div className="mt-3 flex flex-wrap items-center gap-3">
                           <span className="font-sans text-[11px] uppercase tracking-[1.5px] text-amber">
                             ✓ Added to tree
                           </span>
@@ -626,7 +626,97 @@ const FamilyTree = () => {
                           >
                             Remove
                           </button>
+                          {r.id === oldestSavedId && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                findParents(r);
+                              }}
+                              disabled={extendLoading && extendingId === r.id}
+                              className="ml-auto rounded-pill border border-amber/40 bg-amber/[0.08] px-3 py-1 font-sans text-[11px] uppercase tracking-[1.5px] text-amber transition-colors hover:bg-amber/[0.15] disabled:opacity-50"
+                            >
+                              {extendLoading && extendingId === r.id
+                                ? "Searching…"
+                                : `Find ${firstNameOf(r.name)}'s parents`}
+                            </button>
+                          )}
                         </div>
+
+                        {extendingId === r.id && (
+                          <div className="mt-4 rounded-[12px] border border-amber-dim/30 bg-bg-warm/60 p-3">
+                            {extendLoading && (
+                              <p className="font-serif text-sm italic text-amber-light animate-pulse">
+                                Searching records for {firstNameOf(r.name)}'s parents…
+                              </p>
+                            )}
+                            {!extendLoading && extendError && (
+                              <p className="font-sans text-sm text-cream-soft">
+                                Search failed: {extendError}
+                              </p>
+                            )}
+                            {!extendLoading && !extendError && extendResults && extendResults.length === 0 && (
+                              <p className="font-serif text-sm italic text-cream-soft">
+                                We couldn't find verified records for {r.name}'s parents — you can add them manually if you know them.
+                              </p>
+                            )}
+                            {!extendLoading && extendResults && extendResults.length > 0 && (
+                              <div className="flex flex-col gap-2">
+                                <p className="font-sans text-[11px] uppercase tracking-[1.5px] text-amber-dim">
+                                  {extendSourceLabel === "wikitree"
+                                    ? "Possible parents — tap one to add"
+                                    : "AI-assisted suggestions — confirm before adding"}
+                                </p>
+                                {extendResults.map((s) => {
+                                  const isAi = "confidence" in s && !!s.confidence;
+                                  return (
+                                    <button
+                                      key={s.id}
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        addSuggestedParent(s, r.id);
+                                      }}
+                                      className="relative rounded-[12px] border border-amber-dim/30 bg-card/60 p-3 text-left transition-all hover:border-amber/50"
+                                    >
+                                      <span
+                                        className={`absolute right-2 top-2 rounded-pill border px-2 py-[2px] font-sans text-[9px] uppercase tracking-[1px] ${
+                                          isAi
+                                            ? "border-amber-dim/40 bg-amber-dim/[0.10] text-amber-light"
+                                            : "border-amber/40 bg-amber/[0.10] text-amber"
+                                        }`}
+                                      >
+                                        {isAi
+                                          ? "AI-assisted · unverified — confirm before adding"
+                                          : "WikiTree · verified"}
+                                      </span>
+                                      <div className="pr-32 font-display text-sm text-cream-warm">
+                                        {s.name}
+                                      </div>
+                                      {(s.birthDate || s.birthPlace) && (
+                                        <div className="mt-1 font-sans text-xs text-text-dim">
+                                          Born {s.birthDate ?? "—"}
+                                          {s.birthPlace ? ` · ${s.birthPlace}` : ""}
+                                        </div>
+                                      )}
+                                      {(s.deathDate || s.deathPlace) && (
+                                        <div className="font-sans text-xs text-text-dim">
+                                          Died {s.deathDate ?? "—"}
+                                          {s.deathPlace ? ` · ${s.deathPlace}` : ""}
+                                        </div>
+                                      )}
+                                      {"summary" in s && s.summary && (
+                                        <p className="mt-1 font-serif text-xs italic text-cream-soft">
+                                          {s.summary}
+                                        </p>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   }
