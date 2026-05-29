@@ -111,7 +111,13 @@ Deno.serve(async (req) => {
   // Upload to Storage
   try {
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
-    const path = "fixtures/osmond-fixture.json";
+    const surnameSlug =
+      surname
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9-]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "osmond";
+    const path = `fixtures/${surnameSlug}-fixture.json`;
     const { error: uploadErr } = await supabase.storage
       .from("print-designs")
       .upload(path, bytes, {
@@ -125,6 +131,7 @@ Deno.serve(async (req) => {
     const { data: pub } = supabase.storage
       .from("print-designs")
       .getPublicUrl(path);
+
 
     const chapterCount = Array.isArray(chapters)
       ? chapters.length
