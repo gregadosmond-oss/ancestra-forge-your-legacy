@@ -165,9 +165,30 @@ const PacksSection = () => {
               Legacy
             </h3>
             <p className="mt-2 font-serif italic" style={{ fontSize: 15, color: "#c4b8a6" }}>
-              Your full digital legacy.
+              Your family&apos;s story, written as a personalized novel.
             </p>
-            <BulletList items={LEGACY_ITEMS} />
+
+            {/* Lead benefit */}
+            <div
+              className="mt-6 rounded-lg border p-4 text-left"
+              style={{ borderColor: "rgba(232,148,58,0.22)", background: "rgba(232,148,58,0.06)" }}
+            >
+              <p className="font-display text-[15px] font-semibold" style={{ color: "#e8b85c" }}>
+                A personalized 9-chapter novel starring your real ancestors
+              </p>
+            </div>
+
+            {/* Label above tool list */}
+            <p className="mt-5 w-full text-left font-sans text-[11px] uppercase tracking-[2px]" style={{ color: "#8a7e6e" }}>
+              Plus all 10 tools to build it:
+            </p>
+
+            <BulletList items={LEGACY_TOOLS} />
+
+            {/* Muted note below list */}
+            <p className="mt-4 w-full text-left font-sans text-[12px] italic" style={{ color: "#8a7e6e" }}>
+              Finish the 10 tools and your novel, crest, and family tree generate automatically.
+            </p>
             <Link
               to="/signup"
               className="block w-full rounded-pill py-3 text-center font-sans text-[12px] font-semibold uppercase tracking-[1.5px]"
