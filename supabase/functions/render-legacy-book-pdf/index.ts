@@ -1083,7 +1083,7 @@ ${chapterTitlePage(num, title)}
   </div>
 </section>
 
-${notesMemoriesPage(1)}
+
 
 ${laterChaptersHtml}
 
