@@ -74,7 +74,7 @@ serve(async (req) => {
 
     const result = await triggerLegacyBookFulfillment({
       surname,
-      shippingAddress: JSON.parse(shippingAddressRaw),
+      shippingAddress: typeof shippingAddressRaw === "string" ? JSON.parse(shippingAddressRaw) : shippingAddressRaw,
       buyerEmail: buyerEmail ?? undefined,
       sessionId: session.id,
       paymentIntent,
