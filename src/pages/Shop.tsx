@@ -113,14 +113,16 @@ export default function Shop() {
     setCheckoutOpen(true);
   };
 
+  // Shape must match create-legacy-book-order / Gelato expectations.
   const shippingAddress = {
-    name: `${form.firstName} ${form.lastName}`.trim(),
-    address1: form.addressLine1,
-    address2: form.addressLine2,
+    firstName: form.firstName,
+    lastName: form.lastName,
+    addressLine1: form.addressLine1,
+    addressLine2: form.addressLine2,
     city: form.city,
     state: form.state,
+    postCode: form.postCode,
     country: form.country,
-    zip: form.postCode,
     email: form.email,
   };
 

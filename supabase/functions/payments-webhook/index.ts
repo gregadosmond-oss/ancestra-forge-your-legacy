@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { type StripeEnv, verifyWebhook } from "../_shared/stripe.ts";
+import { triggerLegacyBookFulfillment } from "../_shared/legacyBookFulfillment.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -67,23 +68,27 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
 
   console.log("Parsed metadata — surname:", surname, "user_id:", userId, "email:", buyerEmail, "productType:", productType);
 
-  // Legacy Book order — print + ship hardcover via Gelato
+  // Legacy Book order — print + ship hardcover via Gelato (idempotent on session_id)
   if (productType === "legacy-book" && surname && shippingAddressRaw) {
     console.log("[legacy-book] order detected — surname:", surname);
     await triggerCrestGeneration(surname);
-    await triggerLegacyBookOrder({
-      surname,
-      shippingAddress: JSON.parse(shippingAddressRaw),
-      buyerEmail: buyerEmail ?? undefined,
-      sessionId: session.id,
-      paymentIntent: typeof (session as unknown as { payment_intent?: string }).payment_intent === "string"
-        ? (session as unknown as { payment_intent?: string }).payment_intent
-        : undefined,
-      amountTotal: session.amount_total ?? undefined,
-      currency: session.currency ?? undefined,
-      userId: userId || undefined,
-      env,
-    });
+    try {
+      await triggerLegacyBookFulfillment({
+        surname,
+        shippingAddress: JSON.parse(shippingAddressRaw),
+        buyerEmail: buyerEmail ?? undefined,
+        sessionId: session.id,
+        paymentIntent: typeof (session as unknown as { payment_intent?: string }).payment_intent === "string"
+          ? (session as unknown as { payment_intent?: string }).payment_intent
+          : undefined,
+        amountTotal: session.amount_total ?? undefined,
+        currency: session.currency ?? undefined,
+        userId: userId || undefined,
+        env,
+      });
+    } catch (err) {
+      console.error("[legacy-book] webhook fulfillment threw:", err);
+    }
   }
 
   // Printful physical order — ensure crest exists, then trigger Printful fulfillment
@@ -261,119 +266,9 @@ async function triggerPrintfulOrder({ productType, surname, shippingAddress, buy
   }
 }
 
-// ─── Legacy Book order trigger ───────────────────────────────────────────────
+// ─── Legacy Book trigger now lives in ../_shared/legacyBookFulfillment.ts ───
 
 
-async function triggerLegacyBookOrder({
-  surname,
-  shippingAddress,
-  buyerEmail,
-  sessionId,
-  paymentIntent,
-  amountTotal,
-  currency,
-  userId,
-  env,
-}: {
-  surname: string;
-  shippingAddress: Record<string, string>;
-  buyerEmail?: string;
-  sessionId: string;
-  paymentIntent?: string;
-  amountTotal?: number;
-  currency?: string;
-  userId?: string;
-  env: StripeEnv;
-}) {
-  const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!supabaseUrl || !serviceKey) {
-    console.warn("triggerLegacyBookOrder: missing env, skipping");
-    return;
-  }
-
-  const normalized = surname.trim().toLowerCase();
-  const displaySurname = surname.trim().replace(/\b\w/g, (c: string) => c.toUpperCase());
-
-  // 1. Insert order row, capture id
-  const { data: inserted, error: insertError } = await supabase
-    .from("legacy_book_orders")
-    .insert({
-      user_id: userId ?? null,
-      buyer_email: buyerEmail ?? "",
-      surname: normalized,
-      display_surname: displaySurname,
-      stripe_session_id: sessionId,
-      stripe_payment_intent: paymentIntent ?? null,
-      amount_total: amountTotal ?? null,
-      currency: currency ?? null,
-      shipping_address: shippingAddress,
-      fulfillment_status: "pending",
-    })
-    .select("id")
-    .single();
-
-  if (insertError || !inserted) {
-    console.error("[legacy-book] failed to insert order:", insertError);
-    return;
-  }
-
-  const orderId = inserted.id;
-  console.log("[legacy-book] order row inserted:", orderId);
-
-  const markFailed = async (err: unknown) => {
-    const errStr = typeof err === "string" ? err : JSON.stringify(err);
-    await supabase
-      .from("legacy_book_orders")
-      .update({ fulfillment_status: "failed", fulfillment_error: errStr })
-      .eq("id", orderId);
-  };
-
-  const callFn = async (name: string, body: Record<string, unknown>) => {
-    const res = await fetch(`${supabaseUrl}/functions/v1/${name}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
-      body: JSON.stringify(body),
-    });
-    const text = await res.text();
-    let parsed: unknown = null;
-    try { parsed = JSON.parse(text); } catch { /* keep raw text */ }
-    if (!res.ok) {
-      throw { fn: name, status: res.status, body: parsed ?? text };
-    }
-    return parsed as Record<string, unknown> | null;
-  };
-
-  try {
-    await callFn("render-legacy-book-pdf", { surname: normalized, user_id: userId ?? undefined });
-    await callFn("render-legacy-book-cover-pdf", { surname: normalized, user_id: userId ?? undefined });
-    const gelatoRes = await callFn("create-legacy-book-order", {
-      surname: normalized,
-      user_id: userId ?? undefined,
-      shippingAddress,
-      // Safety gate: sandbox/preview checkouts NEVER trigger a live print.
-      orderType: env === "sandbox" ? "draft" : "order",
-      quantity: 1,
-    });
-
-    const gelatoOrderId = (gelatoRes?.orderId ?? gelatoRes?.gelato_order_id ?? null) as string | null;
-    const gelatoOrderRef = (gelatoRes?.orderReferenceId ?? gelatoRes?.gelato_order_reference_id ?? null) as string | null;
-
-    await supabase
-      .from("legacy_book_orders")
-      .update({
-        gelato_order_id: gelatoOrderId,
-        gelato_order_reference_id: gelatoOrderRef,
-        fulfillment_status: "submitted",
-      })
-      .eq("id", orderId);
-
-    console.log("[legacy-book] order submitted to Gelato:", gelatoOrderId);
-  } catch (err) {
-    console.error("[legacy-book] fulfillment failed:", err);
-    await markFailed(err);
-  }
-}
 
 
 
