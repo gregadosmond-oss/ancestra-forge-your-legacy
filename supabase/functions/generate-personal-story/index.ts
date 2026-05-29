@@ -101,52 +101,51 @@ function factsBlock(facts: any): string {
 type Chapter = { title: string; body: string };
 type StoryOut = { chapterOne: Chapter; chapters: Chapter[] };
 
-async function callClaude(params: {
-  surname: string;
-  facts: any;
-  tree: any[];
-  memories: any[];
-}): Promise<StoryOut> {
-  const { surname, facts, tree, memories } = params;
-  const hasTree = tree.length > 0;
-  const hasMemories = memories.length > 0;
+// Fixed 9-chapter arc. Same structure the single-prompt version produced,
+// now split so each chapter can be generated in parallel.
+const CHAPTER_SLOTS: Array<{ roman: string; focus: string }> = [
+  { roman: "I",    focus: "Origins of the name itself — its etymology, its earliest known bearers, the land and language it was forged in. Set the oldest scene." },
+  { roman: "II",   focus: "The early centuries of the line — medieval life, the work and weather of that era, the rhythms of the homeland." },
+  { roman: "III",  focus: "Land and labour — the trades, crafts, fields, or seas that shaped the family across generations." },
+  { roman: "IV",   focus: "Faith, hearth, and community — the parish, the household, the seasonal rituals that held the line together." },
+  { roman: "V",    focus: "Upheaval — war, famine, plague, enclosure, or political turning points that pressed on the family." },
+  { roman: "VI",   focus: "Crossing — migration, departure, the long journey to a new land (or the choice to stay). Use the migration waypoints if present." },
+  { roman: "VII",  focus: "Forebears remembered — the named ancestors from earlier centuries in the family tree, placed in their proper era." },
+  { roman: "VIII", focus: "Parents and grandparents — the more recent named ancestors from the family tree, the generations just before the reader." },
+  { roman: "IX",   focus: "Living memory — the present generation and the relatives the reader has spoken about. Close the arc." },
+];
 
-  const system = `You are the literary author of "The House of ${surname}" — a warm, lyrical 9-chapter family legacy book.
+function buildSystem(surname: string, hasTree: boolean, hasMemories: boolean): string {
+  return `You are the literary author of "The House of ${surname}" — a warm, lyrical 9-chapter family legacy book.
 Your voice is measured, literary, emotionally grounded, in the register of Robert Macfarlane or Marilynne Robinson. Warm, never sentimental. Specific, never generic.
 
 You will be given:
   (a) Shared historical scaffolding about the surname (origin, migration waypoints, motto).
   (b) A list of NAMED ANCESTORS the reader has actually documented (with real dates and places where known).
   (c) A list of LIVING-MEMORY notes about recent relatives.
-
-Your task is to write a 9-chapter family legacy that WEAVES (b) and (c) into the historical arc of (a).
+  (d) The specific chapter slot you are writing right now, with its chronological focus.
 
 ABSOLUTE RULES — non-negotiable:
 - Use ONLY the named individuals, dates, and places present in the provided data. Do not invent ancestors, dates, places, occupations, or events about real people.
 - Connective tissue is allowed: sensory atmosphere, weather, the sound of a place, the texture of a craft, the rhythm of a century. New factual claims about specific real people are not.
-- Place each named ancestor into the chapter that fits their century chronologically. If two ancestors share a century, both belong in that chapter.
-- ${hasTree ? "You MUST reference the named ancestors by name at least once each across the chapters where they chronologically fit." : "If no named ancestors are provided, write the chapters around the shared historical scaffolding only — do not invent named people."}
-- ${hasMemories ? "Chapter IX must reference the living-memory relatives by name, drawing only on the notes given." : "If no living memories are provided, Chapter IX should close the arc on the present generation in general terms."}
-- Each chapter must be ${WORDS_PER_CHAPTER_MIN}–${WORDS_PER_CHAPTER_MAX} words. This is a hard constraint — the book has a fixed page budget.
+- Place each named ancestor into the chapter that fits their century chronologically. Only mention named ancestors here if they belong in THIS chapter's era.
+- ${hasTree ? "Across the full 9-chapter arc, every named ancestor should be referenced by name in the chapter that fits their era. In THIS chapter, only name the ones whose era matches the focus." : "If no named ancestors are provided, write around the shared historical scaffolding only — do not invent named people."}
+- ${hasMemories ? "Chapter IX is the only chapter that should reference the living-memory relatives by name, drawing only on the notes given." : "If no living memories are provided, Chapter IX should close the arc on the present generation in general terms."}
+- The chapter must be ${WORDS_PER_CHAPTER_MIN}–${WORDS_PER_CHAPTER_MAX} words. This is a hard constraint — the book has a fixed page budget.
 - Avoid clichés ("salt of the earth", "a life well lived"). Avoid bullet lists. Use em-dashes sparingly.
 
 OUTPUT FORMAT — strict JSON only, no prose outside the JSON, no markdown fences:
-{
-  "chapterOne": { "title": "string", "body": "string" },
-  "chapters": [
-    { "title": "string", "body": "string" },
-    { "title": "string", "body": "string" },
-    { "title": "string", "body": "string" },
-    { "title": "string", "body": "string" },
-    { "title": "string", "body": "string" },
-    { "title": "string", "body": "string" },
-    { "title": "string", "body": "string" },
-    { "title": "string", "body": "string" }
-  ]
+{ "title": "string", "body": "string" }`;
 }
-chapterOne is Chapter I. The chapters array is chapters II–IX in order. Total 9 chapters.`;
 
-  const user = `Surname: ${surname}
+function buildUser(
+  surname: string,
+  facts: any,
+  tree: any[],
+  memories: any[],
+  slot: { roman: string; focus: string },
+): string {
+  return `Surname: ${surname}
 
 SHARED HISTORICAL SCAFFOLDING:
 ${factsBlock(facts)}
@@ -154,11 +153,16 @@ ${factsBlock(facts)}
 NAMED ANCESTORS (from the reader's family tree):
 ${treeBlock(tree)}
 
-LIVING-MEMORY NOTES (for Chapter IX):
+LIVING-MEMORY NOTES (only for Chapter IX):
 ${memoriesBlock(memories)}
 
-Write the 9-chapter legacy now. Output JSON only.`;
+YOU ARE WRITING CHAPTER ${slot.roman} OF IX.
+Chapter focus: ${slot.focus}
 
+Write Chapter ${slot.roman} now. Output JSON only: { "title": "...", "body": "..." }.`;
+}
+
+async function callClaudeChapter(system: string, user: string): Promise<Chapter> {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -168,7 +172,7 @@ Write the 9-chapter legacy now. Output JSON only.`;
     },
     body: JSON.stringify({
       model: MODEL,
-      max_tokens: 16000,
+      max_tokens: 4000,
       system,
       messages: [{ role: "user", content: user }],
     }),
@@ -182,7 +186,6 @@ Write the 9-chapter legacy now. Output JSON only.`;
   const text: string = data?.content?.[0]?.text ?? "";
   if (!text) throw new Error("Claude returned empty text");
 
-  // Strip any accidental fencing.
   const cleaned = text
     .replace(/^```(?:json)?\s*/i, "")
     .replace(/\s*```\s*$/i, "")
@@ -194,22 +197,51 @@ Write the 9-chapter legacy now. Output JSON only.`;
   } catch (e) {
     throw new Error(`Claude returned non-JSON: ${(e as Error).message}`);
   }
-
-  const chapterOne = parsed?.chapterOne;
-  const chapters = parsed?.chapters;
-  if (
-    !chapterOne ||
-    typeof chapterOne.title !== "string" ||
-    typeof chapterOne.body !== "string" ||
-    !Array.isArray(chapters) ||
-    chapters.length !== 8 ||
-    chapters.some(
-      (c: any) => typeof c?.title !== "string" || typeof c?.body !== "string",
-    )
-  ) {
-    throw new Error("Claude JSON shape invalid");
+  if (typeof parsed?.title !== "string" || typeof parsed?.body !== "string") {
+    throw new Error("Claude JSON shape invalid (expected {title, body})");
   }
-  return { chapterOne, chapters } as StoryOut;
+  return { title: parsed.title, body: parsed.body };
+}
+
+async function callChapterWithRetry(system: string, user: string, roman: string): Promise<Chapter> {
+  try {
+    return await callClaudeChapter(system, user);
+  } catch (e) {
+    console.warn(`[generate-personal-story] chapter ${roman} failed once, retrying: ${(e as Error).message}`);
+    return await callClaudeChapter(system, user);
+  }
+}
+
+async function generateAllChapters(params: {
+  surname: string;
+  facts: any;
+  tree: any[];
+  memories: any[];
+}): Promise<StoryOut> {
+  const { surname, facts, tree, memories } = params;
+  const system = buildSystem(surname, tree.length > 0, memories.length > 0);
+
+  const tasks = CHAPTER_SLOTS.map((slot) => {
+    const user = buildUser(surname, facts, tree, memories, slot);
+    return callChapterWithRetry(system, user, slot.roman);
+  });
+
+  const settled = await Promise.allSettled(tasks);
+  const failures: string[] = [];
+  const chapters: Chapter[] = [];
+  settled.forEach((r, i) => {
+    if (r.status === "fulfilled") {
+      chapters[i] = r.value;
+    } else {
+      failures.push(`Chapter ${CHAPTER_SLOTS[i].roman}: ${(r.reason as Error)?.message ?? "unknown error"}`);
+    }
+  });
+
+  if (failures.length) {
+    throw new Error(`chapter_generation_failed: ${failures.join(" | ")}`);
+  }
+
+  return { chapterOne: chapters[0], chapters: chapters.slice(1) };
 }
 
 Deno.serve(async (req) => {
@@ -230,7 +262,6 @@ Deno.serve(async (req) => {
 
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
-  // Load profile (surname), tree, memories, shared surname facts.
   const { data: profile, error: profErr } = await supabase
     .from("profiles")
     .select("surname")
@@ -273,7 +304,6 @@ Deno.serve(async (req) => {
   const memories = memRes.data ?? [];
   const facts = (factsRes.data?.payload as any) ?? null;
 
-  // Build signature from the inputs that should invalidate the cache.
   const sigInput = JSON.stringify({
     surname: normSurname,
     model: MODEL,
@@ -301,7 +331,6 @@ Deno.serve(async (req) => {
     `[generate-personal-story] user=${userId} surname=${normSurname} tree=${tree.length} memories=${memories.length} sig=${signature.slice(0, 8)} force=${force}`,
   );
 
-  // Cache check
   if (!force) {
     const { data: cached } = await supabase
       .from("personal_legacy_stories")
@@ -319,14 +348,14 @@ Deno.serve(async (req) => {
     }
   }
 
-  // Generate
   let story: StoryOut;
+  const t0 = Date.now();
   try {
-    story = await callClaude({ surname: displaySurname, facts, tree, memories });
+    story = await generateAllChapters({ surname: displaySurname, facts, tree, memories });
     const wc = (s: string) => s.trim().split(/\s+/).filter(Boolean).length;
     const totals = [story.chapterOne, ...story.chapters].map((c) => wc(c.body));
     console.log(
-      `[generate-personal-story] Claude success user=${userId} word_counts=${totals.join(",")}`,
+      `[generate-personal-story] Claude success user=${userId} word_counts=${totals.join(",")} elapsed_ms=${Date.now() - t0}`,
     );
   } catch (e) {
     console.error("[generate-personal-story] claude failed", e);
