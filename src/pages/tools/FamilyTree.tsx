@@ -528,9 +528,16 @@ const RELATIONSHIP_OPTIONS: { label: string; generations_back: number }[] = [
   { label: "Parent", generations_back: 1 },
   { label: "Grandparent", generations_back: 2 },
   { label: "Great-grandparent", generations_back: 3 },
-  { label: "2× great-grandparent", generations_back: 4 },
-  { label: "3× great-grandparent", generations_back: 5 },
-  { label: "4× great-grandparent", generations_back: 6 },
+  { label: "2nd great-grandparent", generations_back: 4 },
+  { label: "3rd great-grandparent", generations_back: 5 },
+  { label: "4th great-grandparent", generations_back: 6 },
+  { label: "5th great-grandparent", generations_back: 7 },
+  { label: "6th great-grandparent", generations_back: 8 },
+  { label: "7th great-grandparent", generations_back: 9 },
+  { label: "8th great-grandparent", generations_back: 10 },
+  { label: "9th great-grandparent", generations_back: 11 },
+  { label: "10th great-grandparent", generations_back: 12 },
+  { label: "11th great-grandparent", generations_back: 13 },
 ];
 
 function KnownAncestorForm({
