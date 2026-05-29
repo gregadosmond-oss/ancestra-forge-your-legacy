@@ -1031,7 +1031,17 @@ ${chapterNotes}`;
       font-style: italic;
       color: var(--divider);
       text-align: center;
+    .family-memories .mem-prose {
+      font-family: 'Libre Caslon Text', serif;
+      font-size: 11pt;
+      line-height: 1.75;
+      color: var(--body-text);
+      text-align: justify;
+      margin: 0 0 5mm 0;
     }
+    .family-memories .mem-prose + .mem-name { margin-top: 12mm; }
+  `;
+
   `;
 
   return `<!DOCTYPE html>
