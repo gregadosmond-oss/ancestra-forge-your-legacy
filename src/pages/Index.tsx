@@ -120,7 +120,7 @@ const Index = () => {
             className="mt-6 max-w-2xl font-sans text-base leading-relaxed text-text sm:text-lg"
             style={{ textShadow: "0 2px 12px rgba(13,10,7,0.8)" }}
           >
-            Every name you carry was earned by someone who came before — their courage, their losses, their quiet hope that the line would continue. Most of that history vanishes within three generations, simply because no one wrote it down. Knowing where you come from changes how you understand who you are — and passing it on is the one gift the next generation can't get anywhere else. AncestorsQR helps you uncover your family's story and preserve it for the people who come after you.
+            Every name you carry was earned by someone who came before — their courage, their losses, their quiet hope that the line would continue. Most of that history vanishes within three generations, simply because no one wrote it down. AncestorsQR helps you uncover your roots, build your real family tree, and weave your ancestors into a personalized story your family will keep for generations.
           </p>
 
           <Link

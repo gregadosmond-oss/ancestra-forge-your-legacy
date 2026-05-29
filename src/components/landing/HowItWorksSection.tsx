@@ -3,18 +3,18 @@ import { motion } from "framer-motion";
 const STEPS = [
   {
     num: "1",
-    heading: "Enter Your Name",
-    body: "Type your surname. Our AI searches centuries of history — origins, migration, and ancestral role.",
+    heading: "Start With Your Name",
+    body: "Enter your surname and instantly see your origin, your crest, and the era your line began.",
   },
   {
     num: "2",
-    heading: "Your Legacy Unfolds",
-    body: "Your custom crest is forged, your bloodline mapped, your family story written by AI.",
+    heading: "Bring Your Family In",
+    body: "Add the ancestors you know — we search the records to reach further back — and capture family memories in their own words.",
   },
   {
     num: "3",
-    heading: "Pass It On",
-    body: "Download, gift, or display your legacy. Physical products shipped worldwide.",
+    heading: "Receive Your Legacy",
+    body: "A personalized nine-chapter novel starring your real ancestors, your family crest, and an heirloom book to gift and pass on.",
   },
 ] as const;
 
@@ -34,7 +34,7 @@ const HowItWorksSection = () => (
       Five minutes to discover 900 years.
     </h2>
     <p className="mx-auto mt-4 max-w-md font-serif italic text-foreground">
-      Enter your surname. We do the rest.
+      Start with your surname. Make it yours.
     </p>
 
     <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
