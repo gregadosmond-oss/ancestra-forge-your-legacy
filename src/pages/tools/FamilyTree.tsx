@@ -191,6 +191,14 @@ const FamilyTree = () => {
     });
   }
 
+  function capitalize(str: string): string {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
+  const displaySurname = capitalize(surname);
+  const displayFirstName = capitalize(firstName);
+
   // Build chart generations: each picked ancestor as its own generation (oldest → youngest), then "you"
   const chartGenerations = useMemo<TreePerson[][]>(() => {
     const ancestors: TreePerson[] = pickedResults.map((r) => ({
@@ -206,13 +214,13 @@ const FamilyTree = () => {
       return (Number.isNaN(ay) ? 9999 : ay) - (Number.isNaN(by) ? 9999 : by);
     });
     const you: TreePerson = {
-      name: `${firstName || "You"} ${surname}`.trim() || "You",
+      name: `${displayFirstName || "You"} ${displaySurname}`.trim() || "You",
       birthYear: birthYear || null,
       birthPlace: birthPlace || null,
       isYou: true,
     };
     return [...ancestors.map((p) => [p]), [you]];
-  }, [pickedResults, firstName, surname, birthYear, birthPlace]);
+  }, [pickedResults, displayFirstName, displaySurname, birthYear, birthPlace]);
 
   const originPlace = useMemo(() => {
     const first = pickedResults
