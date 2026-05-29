@@ -15,82 +15,114 @@ export type TreePerson = {
 
 type Props = {
   surname: string;
-  generations: TreePerson[][];
+  // kept for backwards compatibility — no longer used.
+  // Lineage is now sourced directly from family_tree_members.
+  generations?: TreePerson[][];
   originPlace?: string | null;
   currentPlace?: string | null;
 };
 
-function formatLifeLine(p: TreePerson): string | null {
+type AncestorNode = {
+  id: string;
+  name: string;
+  relationshipLabel: string;
+  generationsBack: number;
+  birthYear?: string | null;
+  birthPlace?: string | null;
+  deathYear?: string | null;
+};
+
+function yearOf(s?: string | null): string | null {
+  if (!s) return null;
+  const m = String(s).match(/\d{4}/);
+  return m ? m[0] : null;
+}
+
+function formatLifeLine(p: AncestorNode): string | null {
   const parts: string[] = [];
   if (p.birthYear || p.birthPlace) {
-    parts.push(
-      `b. ${[p.birthYear, p.birthPlace].filter(Boolean).join(" ")}`.trim(),
-    );
+    parts.push(`b. ${[p.birthYear, p.birthPlace].filter(Boolean).join(" ")}`.trim());
   }
-  if (p.deathYear || p.deathPlace) {
-    parts.push(
-      `d. ${[p.deathYear, p.deathPlace].filter(Boolean).join(" ")}`.trim(),
-    );
+  if (p.deathYear) {
+    parts.push(`d. ${p.deathYear}`);
   }
   return parts.length ? parts.join(" · ") : null;
 }
 
-type YouProfile = {
-  name: string;
-  subline?: string | null;
-};
-
-const LegacyChart = ({ surname, generations, originPlace, currentPlace }: Props) => {
-  const [you, setYou] = useState<YouProfile>({ name: "You" });
+const LegacyChart = ({ surname, originPlace, currentPlace }: Props) => {
+  const [you, setYou] = useState<{ name: string }>({ name: "You" });
+  const [ancestors, setAncestors] = useState<AncestorNode[]>([]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("first_name, surname, country_of_origin")
-        .eq("id", user.id)
-        .maybeSingle();
+
+      const [{ data: profile }, { data: members }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("first_name, surname")
+          .eq("id", user.id)
+          .maybeSingle(),
+        supabase
+          .from("family_tree_members")
+          .select("id, name, generations_back, relationship_label, birth_date, birth_place, death_date")
+          .eq("user_id", user.id)
+          .not("generations_back", "is", null),
+      ]);
       if (cancelled) return;
+
       const first = profile?.first_name?.trim();
       const last = profile?.surname?.trim() || surname;
-      const name = first ? `${first} ${last}`.trim() : "You";
-      setYou({ name, subline: profile?.country_of_origin || null });
+      const name = first || last ? `${first ?? ""} ${last ?? ""}`.trim() : "You";
+      setYou({ name });
+
+      const list: AncestorNode[] = (members ?? [])
+        .filter((m: any) => typeof m.generations_back === "number")
+        .map((m: any) => ({
+          id: m.id,
+          name: m.name,
+          relationshipLabel: (m.relationship_label || "Ancestor").toString(),
+          generationsBack: m.generations_back as number,
+          birthYear: yearOf(m.birth_date),
+          birthPlace: m.birth_place || null,
+          deathYear: yearOf(m.death_date),
+        }))
+        // oldest first (largest generations_back at top)
+        .sort((a, b) => b.generationsBack - a.generationsBack);
+
+      setAncestors(list);
     })();
     return () => {
       cancelled = true;
     };
   }, [surname]);
 
-  // Strip any incoming "isYou" nodes — the YOU node is owned by this component
-  // and built strictly from the signed-in user's profile. Ancestor records
-  // (family_tree_members) must never render as YOU.
-  const ancestorGenerations: TreePerson[][] = generations
-    .map((gen) => gen.filter((p) => !p.isYou))
-    .filter((gen) => gen.length > 0);
-
-  const youPerson: TreePerson = {
-    name: you.name,
-    birthPlace: you.subline || null,
-    isYou: true,
-  };
-
-  const displayGenerations: TreePerson[][] = [...ancestorGenerations, [youPerson]];
-
-  const allPeople = displayGenerations.flat();
-  const years = allPeople
-    .flatMap((p) => [p.birthYear, p.deathYear])
-    .map((y) => (y ? parseInt(String(y).slice(0, 4), 10) : NaN))
+  const renderedCount = ancestors.length + 1; // + You
+  const birthYears = ancestors
+    .map((a) => (a.birthYear ? parseInt(a.birthYear, 10) : NaN))
     .filter((n) => !Number.isNaN(n));
-  const earliest = years.length ? Math.min(...years) : null;
-  const latest = years.length ? Math.max(...years) : null;
+  const deathYears = ancestors
+    .map((a) => (a.deathYear ? parseInt(a.deathYear, 10) : NaN))
+    .filter((n) => !Number.isNaN(n));
+  const earliest = birthYears.length ? Math.min(...birthYears) : null;
+  const latest = deathYears.length ? Math.max(...deathYears) : null;
 
   const placeLine = [originPlace, currentPlace].filter(Boolean).join(" → ");
   const metaBits: string[] = [];
-  metaBits.push(`${displayGenerations.length} generation${displayGenerations.length === 1 ? "" : "s"}`);
+  metaBits.push(`${renderedCount} generation${renderedCount === 1 ? "" : "s"}`);
   if (earliest && latest) metaBits.push(`${earliest}–${latest}`);
+  else if (earliest) metaBits.push(`${earliest}`);
+
+  type Node =
+    | { kind: "ancestor"; data: AncestorNode }
+    | { kind: "you"; name: string };
+
+  const nodes: Node[] = [
+    ...ancestors.map((a) => ({ kind: "ancestor" as const, data: a })),
+    { kind: "you" as const, name: you.name },
+  ];
 
   return (
     <section className="mx-auto w-full max-w-2xl">
@@ -111,77 +143,56 @@ const LegacyChart = ({ surname, generations, originPlace, currentPlace }: Props)
         <div className="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-amber/50 to-transparent" />
       </div>
 
-      {/* Chart */}
+      {/* Chart — single descending column */}
       <div className="relative mt-10 flex flex-col items-center">
-        {displayGenerations.map((gen, gi) => {
-          const isLast = gi === displayGenerations.length - 1;
+        {nodes.map((node, idx) => {
+          const isLast = idx === nodes.length - 1;
+          const isYou = node.kind === "you";
+          const label = isYou
+            ? "You"
+            : (node as Extract<Node, { kind: "ancestor" }>).data.relationshipLabel.toUpperCase();
+          const displayName = isYou
+            ? node.name
+            : (node as Extract<Node, { kind: "ancestor" }>).data.name;
+          const life = isYou
+            ? null
+            : formatLifeLine((node as Extract<Node, { kind: "ancestor" }>).data);
+
           return (
-            <div key={gi} className="relative flex w-full flex-col items-center">
-              {/* Gen label */}
-              <div className="mb-3 rounded-pill border border-amber-dim/30 bg-card/40 px-3 py-[3px] font-sans text-[10px] uppercase tracking-[3px] text-amber">
-                Gen {gi + 1}
+            <div key={isYou ? "you" : (node as any).data.id} className="relative flex w-full flex-col items-center">
+              <div
+                className={`mb-3 rounded-pill border px-3 py-[3px] font-sans text-[10px] uppercase tracking-[3px] ${
+                  isYou
+                    ? "border-amber/50 bg-amber/[0.08] text-amber"
+                    : "border-amber-dim/30 bg-card/40 text-amber"
+                }`}
+              >
+                {label}
               </div>
 
-              {/* Person cards row */}
-              <div className="relative flex w-full flex-wrap items-stretch justify-center gap-4">
-                {gen.length > 1 && (
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute left-[12%] right-[12%] top-0 h-px -translate-y-3 bg-amber-dim/30"
-                  />
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 + idx * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                className={`relative w-full max-w-sm rounded-[14px] border px-5 py-4 text-center backdrop-blur-sm ${
+                  isYou
+                    ? "border-amber/60 bg-amber/[0.07] shadow-[0_0_40px_rgba(232,148,58,0.15)]"
+                    : "border-amber-dim/25 bg-card/60"
+                }`}
+              >
+                <h3
+                  className={`font-display ${
+                    isYou ? "text-2xl text-cream-warm" : "text-xl text-cream-soft"
+                  }`}
+                >
+                  {displayName}
+                </h3>
+                {life && (
+                  <p className="mt-1.5 font-sans text-xs leading-relaxed text-text-dim">
+                    {life}
+                  </p>
                 )}
-                {gen.map((p, pi) => {
-                  const life = p.isYou ? null : formatLifeLine(p);
-                  return (
-                    <motion.div
-                      key={`${gi}-${pi}-${p.name}`}
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        duration: 0.6,
-                        delay: 0.1 + gi * 0.12 + pi * 0.05,
-                        ease: [0.22, 1, 0.36, 1],
-                      }}
-                      className={`relative w-full max-w-sm rounded-[14px] border px-5 py-4 text-center backdrop-blur-sm ${
-                        p.isYou
-                          ? "border-amber/60 bg-amber/[0.07] shadow-[0_0_40px_rgba(232,148,58,0.15)]"
-                          : "border-amber-dim/25 bg-card/60"
-                      }`}
-                    >
-                      {p.isYou && (
-                        <p className="mb-1 font-sans text-[10px] uppercase tracking-[4px] text-amber">
-                          You
-                        </p>
-                      )}
-                      <h3
-                        className={`font-display ${
-                          p.isYou
-                            ? "text-2xl text-cream-warm"
-                            : "text-xl text-cream-soft"
-                        }`}
-                      >
-                        {p.name}
-                      </h3>
-                      {p.isYou && p.birthPlace && (
-                        <p className="mt-1.5 font-sans text-xs leading-relaxed text-text-dim">
-                          {p.birthPlace}
-                        </p>
-                      )}
-                      {life && (
-                        <p className="mt-1.5 font-sans text-xs leading-relaxed text-text-dim">
-                          {life}
-                        </p>
-                      )}
-                      {!p.isYou && p.spouseName && (
-                        <p className="mt-1 font-serif text-sm italic text-amber-dim">
-                          m. {p.spouseName}
-                          {p.marriageYear ? ` · ${p.marriageYear}` : ""}
-                        </p>
-                      )}
-                    </motion.div>
-                  );
-                })}
-              </div>
+              </motion.div>
 
               {!isLast && (
                 <div
