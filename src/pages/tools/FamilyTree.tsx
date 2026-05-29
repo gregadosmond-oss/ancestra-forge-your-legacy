@@ -437,16 +437,63 @@ const FamilyTree = () => {
                 {allResults.map((r) => {
                   const picked = pickedIds.has(r.id);
                   const isClaude = "confidence" in r && !!r.confidence;
+                  if (picked) {
+                    return (
+                      <div
+                        key={r.id}
+                        className="relative rounded-[14px] border border-amber/60 bg-amber/[0.08] p-4 text-left transition-all"
+                      >
+                        <span
+                          className={`absolute right-3 top-3 rounded-pill border px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] ${
+                            isClaude
+                              ? "border-amber-dim/40 bg-amber-dim/[0.10] text-amber-light"
+                              : "border-amber/40 bg-amber/[0.10] text-amber"
+                          }`}
+                        >
+                          {isClaude ? "AI-assisted" : "WikiTree"}
+                        </span>
+                        <div className="pr-28 font-display text-base text-cream-warm">{r.name}</div>
+                        {(r.birthDate || r.birthPlace) && (
+                          <div className="mt-1 font-sans text-xs text-text-dim">
+                            Born {r.birthDate ?? "—"}
+                            {r.birthPlace ? ` · ${r.birthPlace}` : ""}
+                          </div>
+                        )}
+                        {(r.deathDate || r.deathPlace) && (
+                          <div className="font-sans text-xs text-text-dim">
+                            Died {r.deathDate ?? "—"}
+                            {r.deathPlace ? ` · ${r.deathPlace}` : ""}
+                          </div>
+                        )}
+                        {"summary" in r && r.summary && (
+                          <p className="mt-2 font-serif text-sm italic text-cream-soft">{r.summary}</p>
+                        )}
+                        <div className="mt-3 flex items-center gap-3">
+                          <span className="font-sans text-[11px] uppercase tracking-[1.5px] text-amber">
+                            ✓ Added to tree
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm(`Remove ${r.name} from your tree?`)) {
+                                togglePick(r.id);
+                              }
+                            }}
+                            className="font-sans text-[11px] text-text-dim hover:text-cream-soft underline underline-offset-2"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
                   return (
                     <button
                       key={r.id}
                       type="button"
                       onClick={() => togglePick(r.id)}
-                      className={`relative rounded-[14px] border p-4 text-left transition-all ${
-                        picked
-                          ? "border-amber/60 bg-amber/[0.08]"
-                          : "border-amber-dim/20 bg-card/60 hover:border-amber/40"
-                      }`}
+                      className="relative rounded-[14px] border border-amber-dim/20 bg-card/60 p-4 text-left transition-all hover:border-amber/40"
                     >
                       <span
                         className={`absolute right-3 top-3 rounded-pill border px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] ${
@@ -474,7 +521,7 @@ const FamilyTree = () => {
                         <p className="mt-2 font-serif text-sm italic text-cream-soft">{r.summary}</p>
                       )}
                       <span className="mt-3 inline-block font-sans text-[11px] uppercase tracking-[1.5px] text-amber">
-                        {picked ? "✓ Added to tree" : "Add to tree →"}
+                        Add to tree →
                       </span>
                     </button>
                   );
