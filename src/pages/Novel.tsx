@@ -132,6 +132,23 @@ const Novel = () => {
         }
 
         setFixture(getRes!.fixture!);
+
+        // Personal sections: tree + memories (RLS scopes to this user)
+        const [treeRes, memRes] = await Promise.all([
+          supabase
+            .from("family_tree_members")
+            .select("id,name,birth_date,birth_place,death_date,death_place,position")
+            .eq("user_id", user.id)
+            .order("position", { ascending: true }),
+          supabase
+            .from("family_memories")
+            .select("id,relative_name,relationship,answers,created_at")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: true }),
+        ]);
+        if (treeRes.data) setTreeMembers(treeRes.data as TreeRow[]);
+        if (memRes.data) setMemories(memRes.data as MemoryRow[]);
+
         setPhase("ready");
       } catch (e) {
         console.error("Novel load error", e);
