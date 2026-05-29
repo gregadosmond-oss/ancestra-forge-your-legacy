@@ -144,12 +144,24 @@ export async function triggerLegacyBookFulfillment(
     console.log("[legacy-book] inserted row:", orderId);
   }
 
-  const updateRow = async (patch: Record<string, unknown>) => {
-    const { error } = await supabase
+  const updateRow = async (patch: Record<string, unknown>, opts: { critical?: boolean } = {}) => {
+    const { data, error } = await supabase
       .from("legacy_book_orders")
       .update(patch)
-      .eq("id", orderId);
-    if (error) console.error("[legacy-book] row update failed:", error, "patch:", patch);
+      .eq("id", orderId)
+      .select("id");
+    if (error) {
+      console.error("[legacy-book] row update ERROR:", error, "patch:", patch);
+      if (opts.critical) throw new Error(`legacy_book_orders update failed: ${error.message}`);
+      return;
+    }
+    const affected = data?.length ?? 0;
+    console.log(`[legacy-book] row update affected=${affected} id=${orderId} patch_keys=${Object.keys(patch).join(",")}`);
+    if (affected === 0) {
+      const msg = `legacy_book_orders update affected 0 rows for id=${orderId}`;
+      console.error("[legacy-book]", msg);
+      if (opts.critical) throw new Error(msg);
+    }
   };
 
   const callFn = async (name: string, body: Record<string, unknown>) => {
@@ -206,7 +218,21 @@ export async function triggerLegacyBookFulfillment(
       gelato_order_reference_id: gelatoOrderRef,
       fulfillment_status: "submitted",
       fulfillment_error: null,
-    });
+    }, { critical: true });
+
+    // Verify the write actually landed by reading the row back.
+    const { data: verifyRow, error: verifyErr } = await supabase
+      .from("legacy_book_orders")
+      .select("id, fulfillment_status, gelato_order_id")
+      .eq("id", orderId)
+      .maybeSingle();
+    if (verifyErr) {
+      throw new Error(`verify read failed: ${verifyErr.message}`);
+    }
+    if (!verifyRow || verifyRow.fulfillment_status !== "submitted" || verifyRow.gelato_order_id !== gelatoOrderId) {
+      throw new Error(`verify mismatch: row=${JSON.stringify(verifyRow)} expected gelato_order_id=${gelatoOrderId}`);
+    }
+    console.log("[legacy-book] verified row after submit:", JSON.stringify(verifyRow));
 
     console.log("[legacy-book] SUBMITTED gelato_order_id:", gelatoOrderId, "ref:", gelatoOrderRef);
 
