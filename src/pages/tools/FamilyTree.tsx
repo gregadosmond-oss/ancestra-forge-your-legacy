@@ -371,6 +371,130 @@ const FamilyTree = () => {
     return first ?? null;
   }, [pickedResults]);
 
+  // Identify the oldest saved ancestor (highest generations_back)
+  const oldestSavedId = useMemo(() => {
+    let bestId: string | null = null;
+    let bestGen = -1;
+    for (const [id, g] of savedGens) {
+      if (g > bestGen) {
+        bestGen = g;
+        bestId = id;
+      }
+    }
+    return bestId;
+  }, [savedGens]);
+
+  function relationshipForGen(g: number): string {
+    const m = RELATIONSHIP_OPTIONS.find((o) => o.generations_back === g);
+    return m?.label ?? `${g} generations back`;
+  }
+
+  function firstNameOf(full: string): string {
+    return (full || "").trim().split(/\s+/)[0] || "this ancestor";
+  }
+
+  function surnameOf(full: string): string {
+    const parts = (full || "").trim().split(/\s+/);
+    return parts.length > 1 ? parts[parts.length - 1] : "";
+  }
+
+  async function findParents(ancestor: AnyResult) {
+    setExtendingId(ancestor.id);
+    setExtendLoading(true);
+    setExtendResults(null);
+    setExtendSourceLabel(null);
+    setExtendError(null);
+
+    // Build a search body for a likely parent.
+    // Prefer a known fatherName, fall back to motherName, else just search the surname.
+    const knownParentName =
+      (ancestor.fatherName && ancestor.fatherName.trim()) ||
+      (ancestor.motherName && ancestor.motherName.trim()) ||
+      "";
+    const parentSurname = knownParentName
+      ? surnameOf(knownParentName) || surnameOf(ancestor.name)
+      : surnameOf(ancestor.name);
+    const parentGiven = knownParentName ? firstNameOf(knownParentName) : "";
+
+    const ancestorYear = parseInt(
+      String(ancestor.birthDate ?? "").slice(0, 4),
+      10,
+    );
+    const approxParentYear = Number.isFinite(ancestorYear)
+      ? String(ancestorYear - 30)
+      : undefined;
+
+    const body = {
+      surname: parentSurname || surnameOf(ancestor.name) || "",
+      givenName: parentGiven || undefined,
+      birthYear: approxParentYear,
+      birthPlace: ancestor.birthPlace ?? undefined,
+    };
+
+    try {
+      const wt = await supabase.functions.invoke("wikitree-search", { body });
+      const wtData = wt.data as
+        | { success: boolean; results?: WikitreeResult[]; error?: string }
+        | null;
+      const wtList = wtData?.success ? wtData.results ?? [] : [];
+      if (wtList.length > 0) {
+        setExtendResults(wtList);
+        setExtendSourceLabel("wikitree");
+      } else {
+        const cl = await supabase.functions.invoke("claude-ancestor-search", { body });
+        const clData = cl.data as
+          | { success: boolean; results?: ClaudeResult[]; error?: string }
+          | null;
+        const clList = clData?.success ? clData.results ?? [] : [];
+        setExtendResults(clList);
+        setExtendSourceLabel(clList.length > 0 ? "ai" : null);
+      }
+    } catch (err) {
+      setExtendError((err as Error).message);
+    } finally {
+      setExtendLoading(false);
+    }
+  }
+
+  async function addSuggestedParent(suggestion: AnyResult, fromAncestorId: string) {
+    if (!user) return;
+    const oldGen = savedGens.get(fromAncestorId);
+    if (typeof oldGen !== "number") {
+      toast.error("Can't determine generation");
+      return;
+    }
+    const newGen = oldGen + 1;
+    const isAi = "confidence" in suggestion && !!suggestion.confidence;
+    const insertRow = {
+      user_id: user.id,
+      source: isAi ? "ai" : "wikitree",
+      name: suggestion.name,
+      birth_date: suggestion.birthDate ?? null,
+      birth_place: suggestion.birthPlace ?? null,
+      death_date: suggestion.deathDate ?? null,
+      death_place: suggestion.deathPlace ?? null,
+      father_name: suggestion.fatherName ?? null,
+      mother_name: suggestion.motherName ?? null,
+      profile_url: suggestion.profileUrl ?? null,
+      summary: (suggestion as any).summary ?? null,
+      confidence: (suggestion as any).confidence ?? null,
+      generations_back: newGen,
+      relationship_label: relationshipForGen(newGen),
+      position: newGen,
+    };
+    const { error } = await supabase.from("family_tree_members").insert(insertRow);
+    if (error) {
+      toast.error("Couldn't add ancestor", { description: error.message });
+      return;
+    }
+    toast.success(`${suggestion.name} added`);
+    setExtendingId(null);
+    setExtendResults(null);
+    setExtendSourceLabel(null);
+    await hydrateSaved();
+  }
+
+
   return (
     <div className="min-h-screen bg-background px-6 py-20">
       <div className="mx-auto max-w-3xl">
