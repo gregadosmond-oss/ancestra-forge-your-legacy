@@ -77,6 +77,8 @@ const Novel = () => {
   const [memories, setMemories] = useState<MemoryRow[]>([]);
   const [memoriesProse, setMemoriesProse] = useState<string | null>(null);
   const [memoriesProsePhase, setMemoriesProsePhase] = useState<MemoryProsePhase>("idle");
+  const [personalStory, setPersonalStory] = useState<PersonalStory | null>(null);
+  const [personalStoryPhase, setPersonalStoryPhase] = useState<PersonalStoryPhase>("idle");
   const ranRef = useRef(false);
 
 
