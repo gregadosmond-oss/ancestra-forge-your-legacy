@@ -188,6 +188,8 @@ const Index = () => {
         <WarmDivider />
         <MadeToBeGivenSection />
         <WarmDivider />
+        <TestimonialsSection />
+        <WarmDivider />
         <FinalCtaSection />
       </div>
 
