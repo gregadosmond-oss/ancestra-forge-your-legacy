@@ -153,6 +153,29 @@ function useLegacyData(userId: string | undefined): LegacyData {
           return;
         }
 
+        // Override the family motto with this user's forged crest motto so the
+        // Legacy Certificate (and any other UI reading facts.mottoLatin) matches
+        // the crest. Falls back to the surname motto when no crest exists yet.
+        try {
+          const { data: crestRow } = await supabase
+            .from("crests")
+            .select("motto_latin, motto_english")
+            .eq("user_id", userId)
+            .not("motto_latin", "is", null)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (facts && crestRow?.motto_latin) {
+            facts = {
+              ...facts,
+              mottoLatin: crestRow.motto_latin,
+              mottoEnglish: crestRow.motto_english ?? facts.mottoEnglish ?? "",
+            } as LegacyFacts;
+          }
+        } catch {
+          // non-fatal — fall back to surname motto
+        }
+
         setData({ facts, story, crestUrl, surname, deepLegacyResearch, deepChapters, loading: false, generating: false, error: null });
       } catch (err) {
         setData((d) => ({ ...d, loading: false, generating: false, error: (err as Error).message }));
