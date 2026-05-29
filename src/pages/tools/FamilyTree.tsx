@@ -201,14 +201,7 @@ const FamilyTree = () => {
   // Mark complete once at least one ancestor has been added to the tree
   useMarkToolComplete("tree", pickedResults.length > 0);
 
-  // Auto-pick the first wikitree result on initial reveal (lower friction);
-  // user can deselect or add others
-  useEffect(() => {
-    if (searchPhase === "done" && pickedIds.size === 0 && allResults.length > 0) {
-      setPickedIds(new Set([allResults[0].id]));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchPhase]);
+  // (No auto-pick: each search result requires an explicit relationship choice.)
 
   useEffect(() => {
     if (searchPhase === "done" || searchPhase === "claude-loading") {
