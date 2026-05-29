@@ -178,6 +178,43 @@ Deno.serve(async (req: Request) => {
       },
     });
 
+    // Persist the user's crest + motto as the per-user source of truth so
+    // the novel cover, printed book, and Legacy Certificate can all read
+    // the same motto the crest displays. Best-effort — never fail the crest call.
+    if (userId) {
+      try {
+        const normalized = surname.trim().toLowerCase();
+        const mottoLatin = typeof facts.mottoLatin === "string" ? facts.mottoLatin : null;
+        const mottoEnglish = typeof facts.mottoEnglish === "string" ? facts.mottoEnglish : null;
+        const { data: existing } = await client
+          .from("crests")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("surname", normalized)
+          .maybeSingle();
+        if (existing?.id) {
+          await client
+            .from("crests")
+            .update({
+              crest_url: imageUrl,
+              motto_latin: mottoLatin,
+              motto_english: mottoEnglish,
+            })
+            .eq("id", existing.id);
+        } else {
+          await client.from("crests").insert({
+            user_id: userId,
+            surname: normalized,
+            crest_url: imageUrl,
+            motto_latin: mottoLatin,
+            motto_english: mottoEnglish,
+          });
+        }
+      } catch (e) {
+        console.warn("generate-crest: failed to persist user crest row", (e as Error).message);
+      }
+    }
+
     return json({ code: "OK", imageUrl });
   } catch (err) {
     const msg = (err as Error).message;
