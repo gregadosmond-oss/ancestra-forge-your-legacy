@@ -9,7 +9,7 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const MODEL = "claude-sonnet-4-5-20250929";
-const MODEL = "claude-3-5-sonnet-20241022";
+const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
 
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), {
@@ -46,6 +46,10 @@ function memoriesToPromptBlock(memories: any[]): string {
 async function callClaude(memories: any[], surname: string): Promise<string> {
   const memoryBlock = memoriesToPromptBlock(memories);
 
+  if (!ANTHROPIC_API_KEY) {
+    throw new Error("Missing ANTHROPIC_API_KEY");
+  }
+
   const systemPrompt = `You are the literary author of "The House of ${surname}" — a warm, lyrical family legacy book.
 Your voice is the voice of the existing chapters: measured, literary, emotionally grounded, in the register of Robert Macfarlane or Marilynne Robinson. Warm, never sentimental. Specific, never generic.
 
@@ -56,8 +60,10 @@ RULES — absolute, non-negotiable:
 - If a field is blank, simply omit it — never speculate.
 - Write in third-person, present-or-past tense as appropriate, in continuous paragraphs (NOT as a Q&A list).
 - Give each relative their own short section (2-4 paragraphs). Begin each section with the relative's name as a heading on its own line preceded by "## " (markdown H2). Underneath, in italics on its own line preceded by "_", write their relationship to the storyteller (e.g. "_Grandmother_").
+- Sparse notes are valid: if there is only one filled answer, still write a brief 50-90 word prose section from that exact detail.
 - Do not include any preamble, framing, "here is the chapter", or closing remarks. Output only the chapter body.
 - Length: aim for ~150-280 words per relative section.
+- Never decorate sparse notes with outside knowledge. If the notes only say "grew up: Cork, Ireland", mention Cork, Ireland and the meaning of a remembered place, but do not add streets, rivers, landmarks, occupations, events, or family details not present in the notes.
 - Honour the warm, literary tone of a legacy book. Avoid clichés ("salt of the earth", "a life well lived"). Avoid lists. Avoid em-dashes everywhere — use them sparingly.`;
 
   const userPrompt = `Surname: ${surname}\n\nRaw memory notes:\n\n${memoryBlock}\n\nWeave these into the "In Their Words" chapter now.`;
@@ -122,6 +128,10 @@ Deno.serve(async (req) => {
 
   const signature = buildSignature(memories);
 
+  console.log(
+    `[weave-memories-chapter] invoked user=${userId} memories=${memories.length} signature=${signature} model=${MODEL}`,
+  );
+
   // Check cache
   if (!force) {
     const { data: cached } = await supabase
@@ -130,6 +140,7 @@ Deno.serve(async (req) => {
       .eq("user_id", userId)
       .maybeSingle();
     if (cached && cached.signature === signature) {
+      console.log(`[weave-memories-chapter] cache hit user=${userId}`);
       return json(200, { prose: cached.prose, signature, cached: true });
     }
   }
@@ -148,6 +159,9 @@ Deno.serve(async (req) => {
   let prose: string;
   try {
     prose = await callClaude(memories, displaySurname);
+    console.log(
+      `[weave-memories-chapter] Claude success user=${userId} chars=${prose.length}`,
+    );
   } catch (e) {
     console.error("[weave-memories-chapter]", e);
     return json(500, { error: "claude_failed", detail: (e as Error).message });
