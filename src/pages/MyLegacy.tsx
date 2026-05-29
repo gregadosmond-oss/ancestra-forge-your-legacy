@@ -573,7 +573,7 @@ const MyLegacy = () => {
     );
   }
 
-  const displaySurname = facts?.displaySurname ?? (surname ? surname.replace(/\b\w/g, (c) => c.toUpperCase()) : "");
+  const displaySurname = facts?.displaySurname ?? formatSurname(surname);
 
   return (
     <div className="relative min-h-screen px-6 pb-32 pt-16">
