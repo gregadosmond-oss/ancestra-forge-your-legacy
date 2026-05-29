@@ -117,18 +117,9 @@ function paragraphsWithDropCap(body: string): string {
   return paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n");
 }
 
-function notesMemoriesPage(chapterIndex: number): string {
-  const ruledLines = Array.from({ length: 13 }, () => '<div class="notes-line"></div>').join("\n");
-  return `
-<section class="notes-page chapter-${chapterIndex}-notes">
-  <h3>Notes &amp; Memories</h3>
-  <div class="notes-rule"></div>
-  <div class="notes-lines">
-    ${ruledLines}
-  </div>
-  <div class="notes-instruction">Use these pages to record names, dates, memories, or quotes that matter to your family.</div>
-</section>`;
-}
+// Ruled "Notes & Memories" filler pages were removed — the book now flows
+// straight from one chapter into the next.
+
 
 type PaletteMode = "print" | "digital";
 
