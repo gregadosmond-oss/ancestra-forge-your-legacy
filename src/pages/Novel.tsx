@@ -149,9 +149,25 @@ const Novel = () => {
             .order("created_at", { ascending: true }),
         ]);
         if (treeRes.data) setTreeMembers(treeRes.data as TreeRow[]);
-        if (memRes.data) setMemories(memRes.data as MemoryRow[]);
+        const mems = (memRes.data ?? []) as MemoryRow[];
+        if (memRes.data) setMemories(mems);
+
+        // Lazily refresh / fetch AI-woven memories chapter (only regenerates when memories changed)
+        if (mems.length > 0) {
+          supabase.functions
+            .invoke<{ prose?: string | null }>("weave-memories-chapter", {
+              body: { user_id: user.id },
+            })
+            .then(({ data }) => {
+              if (data && typeof data.prose === "string") {
+                setMemoriesProse(data.prose);
+              }
+            })
+            .catch((e) => console.warn("weave-memories-chapter failed", e));
+        }
 
         setPhase("ready");
+
       } catch (e) {
         console.error("Novel load error", e);
         setError("The archive could not be opened. Try again shortly.");
