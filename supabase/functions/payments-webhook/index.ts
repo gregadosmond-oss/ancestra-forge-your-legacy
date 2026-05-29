@@ -82,6 +82,7 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
       amountTotal: session.amount_total ?? undefined,
       currency: session.currency ?? undefined,
       userId: userId || undefined,
+      env,
     });
   }
 
