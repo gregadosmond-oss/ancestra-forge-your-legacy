@@ -144,6 +144,28 @@ const Novel = () => {
           getRes = second.data;
         }
 
+        // Override the family motto with the user's forged crest motto (single
+        // source of truth). Falls back to the shared surname motto if absent.
+        try {
+          const { data: crestRow } = await supabase
+            .from("crests")
+            .select("motto_latin, motto_english")
+            .eq("user_id", user.id)
+            .not("motto_latin", "is", null)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (crestRow?.motto_latin && getRes?.fixture) {
+            getRes.fixture.facts = {
+              ...(getRes.fixture.facts ?? {}),
+              mottoLatin: crestRow.motto_latin,
+              mottoEnglish: crestRow.motto_english ?? getRes.fixture.facts?.mottoEnglish ?? "",
+            } as any;
+          }
+        } catch (e) {
+          console.warn("crest motto override failed", e);
+        }
+
         setFixture(getRes!.fixture!);
 
         // Personal sections: tree + memories (RLS scopes to this user)
