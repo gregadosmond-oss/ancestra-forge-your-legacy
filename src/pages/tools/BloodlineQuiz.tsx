@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Share2 } from "lucide-react";
+import { Share2, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import JourneyGate from "@/components/JourneyGate";
 import ScrollChevron from "@/components/ScrollChevron";
@@ -73,40 +73,58 @@ const reveal = {
 
 export default function BloodlineQuiz() {
   usePageMeta({ title: "Free Bloodline Quiz — Discover Your Family Archetype", description: "Take the free 5-question bloodline quiz to reveal your ancestral archetype: Warrior, Builder, Explorer, Healer, or Scholar. Discover what runs in your blood." });
-  const [step, setStep] = useState(0); // 0 = intro, 1-5 = questions, 6 = loading/result
+  const [step, setStep] = useState(0); // 0 = intro, 1-5 = questions, 6 = result
   const [answers, setAnswers] = useState<string[]>([]);
   const [result, setResult] = useState<QuizResult | null>(null);
   useMarkToolComplete("quiz", result !== null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleAnswer = async (letter: string) => {
-    const newAnswers = [...answers, letter];
-    setAnswers(newAnswers);
+  const questionIndex = step - 1;
+  const currentAnswer = answers[questionIndex] ?? null;
 
-    if (newAnswers.length < 5) {
-      setStep(step + 1);
+  const selectAnswer = (letter: string) => {
+    setAnswers((prev) => {
+      const next = [...prev];
+      next[questionIndex] = letter;
+      return next;
+    });
+  };
+
+  const goNext = () => {
+    if (!currentAnswer) return;
+    if (step < 5) {
+      setStep((s) => s + 1);
     } else {
-      // All answered — submit
       setStep(6);
-      setLoading(true);
-      setError(null);
-      try {
-        const { data, error: fnError } = await supabase.functions.invoke(
-          "bloodline-quiz",
-          { body: { answers: newAnswers } },
-        );
-        if (fnError) throw new Error(fnError.message);
-        if (!data || data.error) {
-          setError(data?.error || "Something went wrong. Please try again.");
-          return;
-        }
-        setResult(data as QuizResult);
-      } catch {
-        setError("Something went wrong. Please try again.");
-      } finally {
-        setLoading(false);
+      submitQuiz();
+    }
+  };
+
+  const goBack = () => {
+    if (step > 1) {
+      setStep((s) => s - 1);
+    }
+  };
+
+  const submitQuiz = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke(
+        "bloodline-quiz",
+        { body: { answers } },
+      );
+      if (fnError) throw new Error(fnError.message);
+      if (!data || data.error) {
+        setError(data?.error || "Something went wrong. Please try again.");
+        return;
       }
+      setResult(data as QuizResult);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -130,15 +148,13 @@ export default function BloodlineQuiz() {
     setError(null);
   };
 
-  const questionIndex = step - 1;
-
   const { gateOpen, requestProceed, handleGateSuccess } = useEmailGate();
 
   return (
     <div className="relative min-h-screen bg-background">
       <JourneyGate open={gateOpen} source="tool-bloodline-quiz" onSuccess={handleGateSuccess} />
       {/* Castle video background */}
-            <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
+      <img src="/hero.jpg" alt="" className="pointer-events-none fixed inset-0 h-full w-full object-cover" style={{ objectPosition: "center 30%", opacity: 0.38, filter: "saturate(0.7) brightness(0.95)" }} />
       <div className="pointer-events-none fixed inset-0" style={{ background: "rgba(13,10,7,0.45)" }} />
       {/* Content */}
       <div className="relative z-10">
@@ -183,7 +199,7 @@ export default function BloodlineQuiz() {
       )}
 
       {/* Questions */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {step >= 1 && step <= 5 && (
           <motion.section
             key={`q-${step}`}
@@ -193,10 +209,24 @@ export default function BloodlineQuiz() {
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="flex min-h-[80vh] flex-col items-center justify-center px-4 text-center"
           >
-            {/* Progress */}
-            <p className="mb-8 text-[10px] uppercase tracking-[4px] text-amber-dim font-sans">
-              Question {step} of 5
-            </p>
+            {/* Back + Progress */}
+            <div className="mb-6 flex w-full max-w-lg items-center justify-between">
+              {step > 1 ? (
+                <button
+                  onClick={goBack}
+                  className="flex items-center gap-1.5 text-[11px] uppercase tracking-[2px] text-text-dim font-sans transition-colors hover:text-amber-light"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  Back
+                </button>
+              ) : (
+                <span />
+              )}
+              <p className="text-[10px] uppercase tracking-[4px] text-amber-dim font-sans">
+                Question {step} of 5
+              </p>
+              <span className="w-10" />
+            </div>
 
             {/* Progress bar */}
             <div className="mb-10 h-1 w-full max-w-md overflow-hidden rounded-full bg-gold-line">
@@ -214,29 +244,63 @@ export default function BloodlineQuiz() {
             </h2>
 
             <div className="mt-10 flex w-full max-w-lg flex-col gap-3">
-              {questions[questionIndex].options.map((opt) => (
-                <button
-                  key={opt.letter}
-                  onClick={() => handleAnswer(opt.letter)}
-                  className="group w-full rounded-pill px-8 py-4 text-left font-sans text-sm transition-all duration-[400ms] hover:-translate-y-0.5"
-                  style={{
-                    background: "rgba(232,148,58,0.04)",
-                    border: "1px solid rgba(232,148,58,0.12)",
-                    color: "#d0c4b4",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(232,148,58,0.1)";
-                    e.currentTarget.style.borderColor = "rgba(232,148,58,0.25)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "rgba(232,148,58,0.04)";
-                    e.currentTarget.style.borderColor = "rgba(232,148,58,0.12)";
-                  }}
-                >
-                  <span className="mr-3 text-amber-dim font-semibold">{opt.letter})</span>
-                  {opt.text}
-                </button>
-              ))}
+              {questions[questionIndex].options.map((opt) => {
+                const isSelected = currentAnswer === opt.letter;
+                return (
+                  <button
+                    key={opt.letter}
+                    onClick={() => selectAnswer(opt.letter)}
+                    className="group w-full rounded-pill px-8 py-4 text-left font-sans text-sm transition-all duration-[400ms] hover:-translate-y-0.5"
+                    style={{
+                      background: isSelected
+                        ? "rgba(232,148,58,0.18)"
+                        : "rgba(232,148,58,0.04)",
+                      border: isSelected
+                        ? "1px solid rgba(232,148,58,0.45)"
+                        : "1px solid rgba(232,148,58,0.12)",
+                      color: isSelected ? "#f0e8da" : "#d0c4b4",
+                      boxShadow: isSelected ? "0 0 20px rgba(232,148,58,0.08)" : "none",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.background = "rgba(232,148,58,0.1)";
+                        e.currentTarget.style.borderColor = "rgba(232,148,58,0.25)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.background = "rgba(232,148,58,0.04)";
+                        e.currentTarget.style.borderColor = "rgba(232,148,58,0.12)";
+                      }
+                    }}
+                  >
+                    <span className="mr-3 text-amber-dim font-semibold">{opt.letter})</span>
+                    {opt.text}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Next button */}
+            <div className="mt-8 h-14">
+              <AnimatePresence>
+                {currentAnswer && (
+                  <motion.button
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    onClick={goNext}
+                    className="rounded-pill px-12 py-4 text-[13px] font-semibold uppercase tracking-[1.5px] font-sans transition-all duration-[400ms] hover:-translate-y-0.5"
+                    style={{
+                      background: "linear-gradient(135deg, #e8943a, #c47828)",
+                      color: "#1a1208",
+                    }}
+                  >
+                    {step === 5 ? "Reveal My Archetype" : "Next Question"}
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </div>
           </motion.section>
         )}
