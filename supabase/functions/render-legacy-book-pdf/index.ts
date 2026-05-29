@@ -1031,6 +1031,7 @@ ${chapterNotes}`;
       font-style: italic;
       color: var(--divider);
       text-align: center;
+    }
     .family-memories .mem-prose {
       font-family: 'Libre Caslon Text', serif;
       font-size: 11pt;
@@ -1042,7 +1043,6 @@ ${chapterNotes}`;
     .family-memories .mem-prose + .mem-name { margin-top: 12mm; }
   `;
 
-  `;
 
   return `<!DOCTYPE html>
 <html lang="en">
