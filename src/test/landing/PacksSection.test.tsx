@@ -62,7 +62,13 @@ describe("PacksSection", () => {
     renderComponent();
     expect(screen.getByText("Forge Your Crest")).toBeInTheDocument();
     expect(
-      screen.getByText("Complete all 10 tools to unlock your digital novel")
+      screen.getByText("A personalized 9-chapter novel starring your real ancestors")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Plus all 10 tools to build it:")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Finish the 10 tools and your novel, crest, and family tree generate automatically.")
     ).toBeInTheDocument();
   });
 
