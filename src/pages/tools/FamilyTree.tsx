@@ -97,6 +97,10 @@ const FamilyTree = () => {
   const [savedResults, setSavedResults] = useState<AnyResult[]>([]);
   const resultsRef = useRef<HTMLDivElement | null>(null);
 
+  // Inline relationship picker for an unsaved search result
+  const [pendingPickId, setPendingPickId] = useState<string | null>(null);
+  const [pendingRelationship, setPendingRelationship] = useState<string>("");
+
   // "Find parents" state — keyed by the ancestor (db) id we're extending from
   const [extendingId, setExtendingId] = useState<string | null>(null);
   const [extendLoading, setExtendLoading] = useState(false);
