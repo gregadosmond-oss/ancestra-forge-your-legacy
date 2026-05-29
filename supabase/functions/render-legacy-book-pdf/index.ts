@@ -1123,6 +1123,7 @@ Deno.serve(async (req) => {
 
   let fixtureUrl: string | null = null;
   let mode: PaletteMode = "print";
+  let outputPath: string | null = null;
   try {
     const body = await req.json().catch(() => ({}));
     if (body && typeof body.fixtureUrl === "string" && body.fixtureUrl.trim()) {
@@ -1130,6 +1131,9 @@ Deno.serve(async (req) => {
     }
     if (body && (body.mode === "print" || body.mode === "digital")) {
       mode = body.mode;
+    }
+    if (body && typeof body.outputPath === "string" && body.outputPath.trim()) {
+      outputPath = body.outputPath.trim();
     }
   } catch (_) {
     // keep defaults
