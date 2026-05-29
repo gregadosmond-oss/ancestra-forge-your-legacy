@@ -66,8 +66,18 @@ serve(async (req) => {
       lineItems = [{ price: prices.data[0].id, quantity: quantity || 1 }];
     }
 
+    // Stripe metadata values MUST be strings. Normalize shippingAddress
+    // to a JSON string regardless of whether the caller passed an object
+    // or an already-stringified payload.
+    const shippingJson =
+      typeof shippingAddress === "string"
+        ? shippingAddress
+        : shippingAddress
+          ? JSON.stringify(shippingAddress)
+          : undefined;
+
     // Session metadata — webhook reads these to identify the buyer and
-    // dispatch the correct fulfillment path.
+    // dispatch the correct fulfillment path. All values are strings.
     const metadata: Record<string, string> = {
       surname: surname ?? "",
       user_id: userId ?? "",
@@ -77,7 +87,11 @@ serve(async (req) => {
     if (isGift) metadata.isGift = "true";
     if (recipientEmail) metadata.recipientEmail = recipientEmail;
     if (productType) metadata.productType = productType;
-    if (shippingAddress) metadata.shippingAddress = shippingAddress;
+    if (shippingJson) {
+      metadata.shipping = shippingJson;
+      // Back-compat: older fulfillment code reads `shippingAddress`.
+      metadata.shippingAddress = shippingJson;
+    }
 
     // PaymentIntent metadata — mirrors session metadata so the buyer is
     // identifiable on the PI itself (parity with create-upgrade-checkout).
@@ -85,6 +99,7 @@ serve(async (req) => {
     if (userId) piMetadata.user_id = userId;
     if (productType) piMetadata.productType = productType;
     if (surname) piMetadata.surname = surname;
+    if (shippingJson) piMetadata.shipping = shippingJson;
 
     console.log(
       "[create-checkout] env:", env,
