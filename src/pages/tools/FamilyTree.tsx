@@ -65,7 +65,10 @@ const FamilyTree = () => {
   const [wikitreeResults, setWikitreeResults] = useState<WikitreeResult[] | null>(null);
   const [claudeResults, setClaudeResults] = useState<ClaudeResult[] | null>(null);
   const [pickedIds, setPickedIds] = useState<Set<string>>(new Set());
-  const resultsRef = useRef<HTMLDivElement | null>(null);
+  // Map of result.id → row id in family_tree_members (for delete)
+  const [savedDbIds, setSavedDbIds] = useState<Map<string, string>>(new Map());
+  // Hydrated ancestors from DB (rendered alongside fresh search results)
+  const [savedResults, setSavedResults] = useState<AnyResult[]>([]);
 
   // Prefill from profile
   useEffect(() => {
