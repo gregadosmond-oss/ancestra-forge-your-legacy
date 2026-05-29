@@ -12,9 +12,9 @@ describe("HowItWorksSection", () => {
 
   it("renders all 3 step card headings", () => {
     render(<HowItWorksSection />);
-    expect(screen.getByText("Enter Your Name")).toBeInTheDocument();
-    expect(screen.getByText("Your Legacy Unfolds")).toBeInTheDocument();
-    expect(screen.getByText("Pass It On")).toBeInTheDocument();
+    expect(screen.getByText("Start With Your Name")).toBeInTheDocument();
+    expect(screen.getByText("Bring Your Family In")).toBeInTheDocument();
+    expect(screen.getByText("Receive Your Legacy")).toBeInTheDocument();
   });
 
   it("renders step numbers 1, 2, 3", () => {
