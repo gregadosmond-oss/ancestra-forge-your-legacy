@@ -72,9 +72,14 @@ serve(async (req) => {
     const paymentIntent =
       typeof session.payment_intent === "string" ? session.payment_intent : undefined;
 
+    const parsedShipping = typeof shippingAddressRaw === "string"
+      ? JSON.parse(shippingAddressRaw)
+      : shippingAddressRaw;
+
+    console.log("[confirm-book-order] invoking fulfillment helper for session:", session.id);
     const result = await triggerLegacyBookFulfillment({
       surname,
-      shippingAddress: typeof shippingAddressRaw === "string" ? JSON.parse(shippingAddressRaw) : shippingAddressRaw,
+      shippingAddress: parsedShipping,
       buyerEmail: buyerEmail ?? undefined,
       sessionId: session.id,
       paymentIntent,
@@ -83,6 +88,7 @@ serve(async (req) => {
       userId,
       env,
     });
+    console.log("[confirm-book-order] fulfillment result:", JSON.stringify(result).slice(0, 500));
 
     return new Response(
       JSON.stringify({
@@ -91,6 +97,8 @@ serve(async (req) => {
         fulfillmentStatus: result.fulfillmentStatus,
         alreadyFulfilled: result.alreadyFulfilled,
         orderId: result.orderId,
+        gelatoOrderId: result.gelatoOrderId,
+        error: result.error,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
