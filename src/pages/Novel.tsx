@@ -37,7 +37,7 @@ type Fixture = {
   chapters?: any;
 };
 
-type Phase = "loading" | "generating" | "ready" | "error";
+type Phase = "loading" | "generating" | "generating-personal" | "ready" | "error";
 type MemoryProsePhase = "idle" | "loading" | "ready" | "error";
 type PersonalStoryPhase = "idle" | "loading" | "ready" | "error";
 
@@ -188,31 +188,43 @@ const Novel = () => {
           setMemoriesProsePhase("idle");
         }
 
-        // Lazily fetch the personal woven 9-chapter story (cached per-user by signature)
-        setPersonalStoryPhase("loading");
-        supabase.functions
-          .invoke<{ chapters?: PersonalStory }>("generate-personal-story", {
-            body: { user_id: user.id },
-          })
-          .then(({ data, error }) => {
-            if (error) throw error;
-            const ch = data?.chapters;
-            if (
-              ch &&
-              ch.chapterOne?.body &&
-              Array.isArray(ch.chapters) &&
-              ch.chapters.length === 8
-            ) {
+        // Personalized 9-chapter story: check cache first; if missing, generate now (await).
+        const { data: existingStory } = await supabase
+          .from("personal_legacy_stories")
+          .select("chapters")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        const validStory = (ch: any): ch is PersonalStory =>
+          !!ch &&
+          ch.chapterOne?.body &&
+          Array.isArray(ch.chapters) &&
+          ch.chapters.length === 8;
+
+        if (existingStory && validStory(existingStory.chapters)) {
+          setPersonalStory(existingStory.chapters as PersonalStory);
+          setPersonalStoryPhase("ready");
+        } else {
+          // No personalized story yet — generate it now with a full-page loading state.
+          setPhase("generating-personal");
+          setPersonalStoryPhase("loading");
+          try {
+            const { data: genData, error: genErr } = await supabase.functions.invoke<{
+              chapters?: PersonalStory;
+            }>("generate-personal-story", { body: { user_id: user.id } });
+            if (genErr) throw genErr;
+            const ch = genData?.chapters;
+            if (validStory(ch)) {
               setPersonalStory(ch);
               setPersonalStoryPhase("ready");
             } else {
               setPersonalStoryPhase("error");
             }
-          })
-          .catch((e) => {
+          } catch (e) {
             console.warn("generate-personal-story failed; falling back to shared story", e);
             setPersonalStoryPhase("error");
-          });
+          }
+        }
 
         setPhase("ready");
 
@@ -238,17 +250,23 @@ const Novel = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, [phase]);
 
-  if (phase === "loading" || phase === "generating") {
+  if (phase === "loading" || phase === "generating" || phase === "generating-personal") {
+    const heading =
+      phase === "generating-personal"
+        ? "Writing your family's story…"
+        : displaySurname
+          ? `The ${displaySurname} Novel`
+          : "Your Novel";
+    const subline =
+      phase === "generating-personal"
+        ? "This takes about a minute — we're weaving your ancestors into all nine chapters."
+        : phase === "generating"
+          ? "Forging your novel from the archive… this can take up to a minute."
+          : "Opening the archive…";
     return (
       <div className="min-h-screen bg-background px-6 py-24 text-center">
-        <h1 className="font-display text-3xl text-cream-warm">
-          {displaySurname ? `The ${displaySurname} Novel` : "Your Novel"}
-        </h1>
-        <p className="mt-6 font-serif italic text-amber-light">
-          {phase === "generating"
-            ? "Forging your novel from the archive… this can take up to a minute."
-            : "Opening the archive…"}
-        </p>
+        <h1 className="font-display text-3xl text-cream-warm">{heading}</h1>
+        <p className="mt-6 font-serif italic text-amber-light">{subline}</p>
       </div>
     );
   }
