@@ -9,6 +9,7 @@ import FaqSection from "@/components/landing/FaqSection";
 
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
 import MadeToBeGivenSection from "@/components/landing/MadeToBeGivenSection";
+import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
 const FAQ_SCHEMA = {
