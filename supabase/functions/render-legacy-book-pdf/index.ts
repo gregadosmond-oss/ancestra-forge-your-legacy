@@ -1240,7 +1240,7 @@ Deno.serve(async (req) => {
   let finalPageCount = 0;
 
   try {
-    if (mode === "print") {
+    if (mode === "print" && !skipPageCap) {
       const adjusted = await adjustInteriorPageCount(pdfBytes, surname);
       pdfBytes = adjusted.pdfBytes;
       finalPageCount = adjusted.finalPages;
