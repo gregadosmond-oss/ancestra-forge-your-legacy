@@ -63,7 +63,7 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
   const isGift = session.metadata?.isGift === 'true';
   const recipientEmail = session.metadata?.recipientEmail;
   const productType = session.metadata?.productType;
-  const shippingAddressRaw = session.metadata?.shippingAddress;
+  const shippingAddressRaw = session.metadata?.shipping ?? session.metadata?.shippingAddress;
   const buyerEmail = metadataEmail ?? session.customer_details?.email ?? session.customer_email;
 
   console.log("Parsed metadata — surname:", surname, "user_id:", userId, "email:", buyerEmail, "productType:", productType);
@@ -75,7 +75,7 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
     try {
       await triggerLegacyBookFulfillment({
         surname,
-        shippingAddress: JSON.parse(shippingAddressRaw),
+        shippingAddress: typeof shippingAddressRaw === "string" ? JSON.parse(shippingAddressRaw) : shippingAddressRaw,
         buyerEmail: buyerEmail ?? undefined,
         sessionId: session.id,
         paymentIntent: typeof (session as unknown as { payment_intent?: string }).payment_intent === "string"
@@ -98,7 +98,7 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
     await triggerPrintfulOrder({
       productType,
       surname,
-      shippingAddress: JSON.parse(shippingAddressRaw),
+      shippingAddress: typeof shippingAddressRaw === "string" ? JSON.parse(shippingAddressRaw) : shippingAddressRaw,
       buyerEmail: buyerEmail ?? undefined,
     });
   }

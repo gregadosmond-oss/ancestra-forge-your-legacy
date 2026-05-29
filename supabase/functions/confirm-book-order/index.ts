@@ -55,7 +55,7 @@ serve(async (req) => {
       session.customer_details?.email ??
       session.customer_email ??
       undefined;
-    const shippingAddressRaw = session.metadata?.shippingAddress;
+    const shippingAddressRaw = session.metadata?.shipping ?? session.metadata?.shippingAddress;
 
     if (!surname || !shippingAddressRaw) {
       console.warn("[confirm-book-order] missing surname or shippingAddress in session metadata");
@@ -74,7 +74,7 @@ serve(async (req) => {
 
     const result = await triggerLegacyBookFulfillment({
       surname,
-      shippingAddress: JSON.parse(shippingAddressRaw),
+      shippingAddress: typeof shippingAddressRaw === "string" ? JSON.parse(shippingAddressRaw) : shippingAddressRaw,
       buyerEmail: buyerEmail ?? undefined,
       sessionId: session.id,
       paymentIntent,
