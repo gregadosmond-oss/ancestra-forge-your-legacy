@@ -94,7 +94,7 @@ serve(async (req) => {
     );
 
     const session = await stripe.checkout.sessions.create({
-      line_items: [{ price: stripePrice.id, quantity: quantity || 1 }],
+      line_items: lineItems as never,
       mode: "payment",
       ui_mode: "embedded",
       payment_method_types: ["card"],
