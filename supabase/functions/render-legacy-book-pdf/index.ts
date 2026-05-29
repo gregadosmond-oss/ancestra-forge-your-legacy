@@ -160,6 +160,95 @@ function paletteCss(mode: PaletteMode): string {
     .join("\n")}\n}`;
 }
 
+
+function personalSectionsHtml(fixture: any): string {
+  const personal = fixture?.personal ?? {};
+  const tree: any[] = Array.isArray(personal.tree) ? personal.tree : [];
+  const memories: any[] = Array.isArray(personal.memories) ? personal.memories : [];
+
+  let html = "";
+
+  // "Your Family Tree" — mirrors Novel.tsx title + order
+  if (tree.length > 0) {
+    const cards = tree
+      .map((m, i) => {
+        const born = m.birth_date || m.birthYear || "";
+        const bornPlace = m.birth_place || m.birthPlace || "";
+        const died = m.death_date || m.deathYear || "";
+        const diedPlace = m.death_place || m.deathPlace || "";
+        const bornLine = born || bornPlace
+          ? `<div class="ft-life">b. ${escapeHtml(String(born || "—"))}${bornPlace ? ` · ${escapeHtml(String(bornPlace))}` : ""}</div>`
+          : "";
+        const diedLine = died || diedPlace
+          ? `<div class="ft-life">d. ${escapeHtml(String(died || "—"))}${diedPlace ? ` · ${escapeHtml(String(diedPlace))}` : ""}</div>`
+          : "";
+        return `
+<div class="ft-gen">
+  <div class="ft-gen-label">Gen ${i + 1}</div>
+  <div class="ft-card">
+    <div class="ft-name">${escapeHtml(String(m.name ?? ""))}</div>
+    ${bornLine}
+    ${diedLine}
+  </div>
+</div>`;
+      })
+      .join("\n");
+
+    html += `
+<section class="personal-divider clean-page">
+  <div class="pd-eyebrow">Part Two</div>
+  <div class="pd-title">Your Family Tree</div>
+  <div class="pd-flourish">✦ ❦ ✦</div>
+</section>
+<section class="family-tree">
+  <div class="ft-wrap">
+    ${cards}
+  </div>
+</section>`;
+  }
+
+  // "In Their Words — Family Memories" — mirrors Novel.tsx title + order
+  if (memories.length > 0) {
+    const entries = memories
+      .map((m) => {
+        const answers = m.answers && typeof m.answers === "object" ? m.answers : {};
+        const pairs = Object.entries(answers as Record<string, unknown>)
+          .filter(([, v]) => v != null && String(v).trim().length > 0)
+          .map(
+            ([q, a]) =>
+              `<div class="mem-pair">
+                <div class="mem-q">${escapeHtml(String(q))}</div>
+                <div class="mem-a">${escapeHtml(String(a))}</div>
+              </div>`,
+          )
+          .join("\n");
+        return `
+<div class="mem-entry">
+  <h3 class="mem-name">${escapeHtml(String(m.relative_name ?? ""))}</h3>
+  <div class="mem-rel">${escapeHtml(String(m.relationship ?? ""))}</div>
+  <div class="mem-ornament">✦ ❦ ✦</div>
+  <div class="mem-pairs">
+    ${pairs || '<div class="mem-empty">(No memories recorded.)</div>'}
+  </div>
+</div>`;
+      })
+      .join("\n");
+
+    html += `
+<section class="personal-divider clean-page">
+  <div class="pd-eyebrow">Part Three</div>
+  <div class="pd-title">In Their Words</div>
+  <div class="pd-subtitle">Family Memories</div>
+  <div class="pd-flourish">✦ ❦ ✦</div>
+</section>
+<section class="family-memories">
+  ${entries}
+</section>`;
+  }
+
+  return html;
+}
+
 function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
   const facts = fixture?.facts ?? {};
   const story = fixture?.story ?? {};
