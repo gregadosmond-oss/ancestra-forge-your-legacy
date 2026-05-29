@@ -7,6 +7,7 @@ import ShareQRCode from "@/components/ShareQRCode";
 import SocialShare from "@/components/SocialShare";
 import type { LegacyFacts, LegacyStory } from "@/types/legacy";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { formatSurname } from "@/lib/surname";
 
 function OrnamentDivider() {
   return (
