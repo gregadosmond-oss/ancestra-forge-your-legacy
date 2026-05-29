@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BookOpen, Crown, Layers, GitBranch } from "lucide-react";
@@ -7,6 +7,7 @@ import StripeEmbeddedCheckout from "@/components/StripeEmbeddedCheckout";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { useStripePrice } from "@/hooks/useStripePrice";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { COUNTRY_LABELS } from "@/lib/countries";
 
 const reveal = {
