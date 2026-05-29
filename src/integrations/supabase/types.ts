@@ -310,6 +310,60 @@ export type Database = {
         }
         Relationships: []
       }
+      family_tree_members: {
+        Row: {
+          birth_date: string | null
+          birth_place: string | null
+          confidence: string | null
+          created_at: string
+          death_date: string | null
+          death_place: string | null
+          father_name: string | null
+          id: string
+          mother_name: string | null
+          name: string
+          position: number
+          profile_url: string | null
+          source: string
+          summary: string | null
+          user_id: string
+        }
+        Insert: {
+          birth_date?: string | null
+          birth_place?: string | null
+          confidence?: string | null
+          created_at?: string
+          death_date?: string | null
+          death_place?: string | null
+          father_name?: string | null
+          id?: string
+          mother_name?: string | null
+          name: string
+          position?: number
+          profile_url?: string | null
+          source: string
+          summary?: string | null
+          user_id: string
+        }
+        Update: {
+          birth_date?: string | null
+          birth_place?: string | null
+          confidence?: string | null
+          created_at?: string
+          death_date?: string | null
+          death_place?: string | null
+          father_name?: string | null
+          id?: string
+          mother_name?: string | null
+          name?: string
+          position?: number
+          profile_url?: string | null
+          source?: string
+          summary?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       familysearch_search_inputs: {
         Row: {
           birth_place: string | null

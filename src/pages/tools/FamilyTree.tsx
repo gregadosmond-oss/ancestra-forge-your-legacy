@@ -65,6 +65,10 @@ const FamilyTree = () => {
   const [wikitreeResults, setWikitreeResults] = useState<WikitreeResult[] | null>(null);
   const [claudeResults, setClaudeResults] = useState<ClaudeResult[] | null>(null);
   const [pickedIds, setPickedIds] = useState<Set<string>>(new Set());
+  // Map of result.id → row id in family_tree_members (for delete)
+  const [savedDbIds, setSavedDbIds] = useState<Map<string, string>>(new Map());
+  // Hydrated ancestors from DB (rendered alongside fresh search results)
+  const [savedResults, setSavedResults] = useState<AnyResult[]>([]);
   const resultsRef = useRef<HTMLDivElement | null>(null);
 
   // Prefill from profile
@@ -88,9 +92,56 @@ const FamilyTree = () => {
     })();
   }, [user]);
 
+  // Hydrate saved tree members from DB on mount
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data, error } = await supabase
+        .from("family_tree_members")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("position", { ascending: true });
+      if (error || !data) return;
+      const hydrated: AnyResult[] = data.map((row: any) => {
+        const rid = `db:${row.id}`;
+        const base = {
+          id: rid,
+          name: row.name,
+          birthDate: row.birth_date ?? null,
+          birthPlace: row.birth_place ?? null,
+          deathDate: row.death_date ?? null,
+          deathPlace: row.death_place ?? null,
+          fatherName: row.father_name ?? null,
+          motherName: row.mother_name ?? null,
+          profileUrl: row.profile_url ?? null,
+        };
+        if (row.source === "claude-web") {
+          return {
+            ...base,
+            source: "claude-web" as const,
+            summary: row.summary ?? null,
+            confidence: (row.confidence as "high" | "medium" | "low") ?? "medium",
+          };
+        }
+        return { ...base, source: "wikitree" as const };
+      });
+      setSavedResults(hydrated);
+      setPickedIds((prev) => {
+        const next = new Set(prev);
+        for (const r of hydrated) next.add(r.id);
+        return next;
+      });
+      setSavedDbIds((prev) => {
+        const next = new Map(prev);
+        for (const row of data as any[]) next.set(`db:${row.id}`, row.id);
+        return next;
+      });
+    })();
+  }, [user]);
+
   const allResults: AnyResult[] = useMemo(
-    () => [...(wikitreeResults ?? []), ...(claudeResults ?? [])],
-    [wikitreeResults, claudeResults],
+    () => [...savedResults, ...(wikitreeResults ?? []), ...(claudeResults ?? [])],
+    [savedResults, wikitreeResults, claudeResults],
   );
 
   const pickedResults = allResults.filter((r) => pickedIds.has(r.id));
@@ -182,13 +233,78 @@ const FamilyTree = () => {
     }
   }
 
-  function togglePick(id: string) {
+  async function togglePick(id: string) {
+    const isPicked = pickedIds.has(id);
     setPickedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
+      if (isPicked) next.delete(id);
       else next.add(id);
       return next;
     });
+    if (!user) return;
+
+    if (isPicked) {
+      // Remove from DB
+      const dbId = savedDbIds.get(id);
+      if (!dbId) return;
+      const { error } = await supabase
+        .from("family_tree_members")
+        .delete()
+        .eq("id", dbId)
+        .eq("user_id", user.id);
+      if (error) {
+        toast.error("Couldn't remove ancestor", { description: error.message });
+        // revert
+        setPickedIds((prev) => new Set(prev).add(id));
+        return;
+      }
+      setSavedDbIds((prev) => {
+        const next = new Map(prev);
+        next.delete(id);
+        return next;
+      });
+      setSavedResults((prev) => prev.filter((r) => r.id !== id));
+    } else {
+      // Add to DB
+      const r = allResults.find((x) => x.id === id);
+      if (!r) return;
+      const isClaude = "confidence" in r && !!r.confidence;
+      const insertRow = {
+        user_id: user.id,
+        source: isClaude ? "claude-web" : r.source ?? "wikitree",
+        name: r.name,
+        birth_date: r.birthDate ?? null,
+        birth_place: r.birthPlace ?? null,
+        death_date: r.deathDate ?? null,
+        death_place: r.deathPlace ?? null,
+        father_name: r.fatherName ?? null,
+        mother_name: r.motherName ?? null,
+        profile_url: r.profileUrl ?? null,
+        summary: (r as any).summary ?? null,
+        confidence: (r as any).confidence ?? null,
+        position: pickedIds.size,
+      };
+      const { data, error } = await supabase
+        .from("family_tree_members")
+        .insert(insertRow)
+        .select("id")
+        .single();
+      if (error || !data) {
+        toast.error("Couldn't save ancestor", { description: error?.message });
+        // revert
+        setPickedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+        return;
+      }
+      setSavedDbIds((prev) => {
+        const next = new Map(prev);
+        next.set(id, data.id);
+        return next;
+      });
+    }
   }
 
   function capitalize(str: string): string {
