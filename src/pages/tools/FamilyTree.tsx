@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 import { usePageMeta } from "@/hooks/usePageMeta";
-import BloodlineTree from "@/components/journey/BloodlineTree";
+import LegacyChart, { type TreePerson } from "@/components/journey/LegacyChart";
 
 type WikitreeResult = {
   id: string;
