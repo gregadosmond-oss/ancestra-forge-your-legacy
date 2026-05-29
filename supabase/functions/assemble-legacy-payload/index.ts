@@ -258,6 +258,7 @@ Deno.serve(async (req) => {
     personal: {
       user_id: userId,
       tree,
+      you: { first_name: youFirst, surname: youSurname, name: youName },
       memories,
       memoriesProse,
       assembledAt: new Date().toISOString(),
