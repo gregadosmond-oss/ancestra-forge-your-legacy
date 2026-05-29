@@ -346,7 +346,7 @@ async function triggerLegacyBookOrder({
 
   try {
     await callFn("render-legacy-book-pdf", { surname: normalized, user_id: userId ?? undefined });
-    await callFn("render-legacy-book-cover-pdf", { surname: normalized });
+    await callFn("render-legacy-book-cover-pdf", { surname: normalized, user_id: userId ?? undefined });
     const gelatoRes = await callFn("create-legacy-book-order", {
       surname: normalized,
       user_id: userId ?? undefined,
