@@ -67,9 +67,18 @@ const FamilyTree = () => {
   const [pickedIds, setPickedIds] = useState<Set<string>>(new Set());
   // Map of result.id → row id in family_tree_members (for delete)
   const [savedDbIds, setSavedDbIds] = useState<Map<string, string>>(new Map());
+  // Map of result.id → generations_back (for the saved rows)
+  const [savedGens, setSavedGens] = useState<Map<string, number>>(new Map());
   // Hydrated ancestors from DB (rendered alongside fresh search results)
   const [savedResults, setSavedResults] = useState<AnyResult[]>([]);
   const resultsRef = useRef<HTMLDivElement | null>(null);
+
+  // "Find parents" state — keyed by the ancestor (db) id we're extending from
+  const [extendingId, setExtendingId] = useState<string | null>(null);
+  const [extendLoading, setExtendLoading] = useState(false);
+  const [extendResults, setExtendResults] = useState<AnyResult[] | null>(null);
+  const [extendSourceLabel, setExtendSourceLabel] = useState<"wikitree" | "ai" | null>(null);
+  const [extendError, setExtendError] = useState<string | null>(null);
 
   // Prefill from profile
   useEffect(() => {
@@ -138,6 +147,15 @@ const FamilyTree = () => {
     setSavedDbIds((prev) => {
       const next = new Map(prev);
       for (const row of rows as any[]) next.set(`db:${row.id}`, row.id);
+      return next;
+    });
+    setSavedGens(() => {
+      const next = new Map<string, number>();
+      for (const row of rows as any[]) {
+        if (typeof row.generations_back === "number") {
+          next.set(`db:${row.id}`, row.generations_back);
+        }
+      }
       return next;
     });
   };
@@ -353,6 +371,130 @@ const FamilyTree = () => {
     return first ?? null;
   }, [pickedResults]);
 
+  // Identify the oldest saved ancestor (highest generations_back)
+  const oldestSavedId = useMemo(() => {
+    let bestId: string | null = null;
+    let bestGen = -1;
+    for (const [id, g] of savedGens) {
+      if (g > bestGen) {
+        bestGen = g;
+        bestId = id;
+      }
+    }
+    return bestId;
+  }, [savedGens]);
+
+  function relationshipForGen(g: number): string {
+    const m = RELATIONSHIP_OPTIONS.find((o) => o.generations_back === g);
+    return m?.label ?? `${g} generations back`;
+  }
+
+  function firstNameOf(full: string): string {
+    return (full || "").trim().split(/\s+/)[0] || "this ancestor";
+  }
+
+  function surnameOf(full: string): string {
+    const parts = (full || "").trim().split(/\s+/);
+    return parts.length > 1 ? parts[parts.length - 1] : "";
+  }
+
+  async function findParents(ancestor: AnyResult) {
+    setExtendingId(ancestor.id);
+    setExtendLoading(true);
+    setExtendResults(null);
+    setExtendSourceLabel(null);
+    setExtendError(null);
+
+    // Build a search body for a likely parent.
+    // Prefer a known fatherName, fall back to motherName, else just search the surname.
+    const knownParentName =
+      (ancestor.fatherName && ancestor.fatherName.trim()) ||
+      (ancestor.motherName && ancestor.motherName.trim()) ||
+      "";
+    const parentSurname = knownParentName
+      ? surnameOf(knownParentName) || surnameOf(ancestor.name)
+      : surnameOf(ancestor.name);
+    const parentGiven = knownParentName ? firstNameOf(knownParentName) : "";
+
+    const ancestorYear = parseInt(
+      String(ancestor.birthDate ?? "").slice(0, 4),
+      10,
+    );
+    const approxParentYear = Number.isFinite(ancestorYear)
+      ? String(ancestorYear - 30)
+      : undefined;
+
+    const body = {
+      surname: parentSurname || surnameOf(ancestor.name) || "",
+      givenName: parentGiven || undefined,
+      birthYear: approxParentYear,
+      birthPlace: ancestor.birthPlace ?? undefined,
+    };
+
+    try {
+      const wt = await supabase.functions.invoke("wikitree-search", { body });
+      const wtData = wt.data as
+        | { success: boolean; results?: WikitreeResult[]; error?: string }
+        | null;
+      const wtList = wtData?.success ? wtData.results ?? [] : [];
+      if (wtList.length > 0) {
+        setExtendResults(wtList);
+        setExtendSourceLabel("wikitree");
+      } else {
+        const cl = await supabase.functions.invoke("claude-ancestor-search", { body });
+        const clData = cl.data as
+          | { success: boolean; results?: ClaudeResult[]; error?: string }
+          | null;
+        const clList = clData?.success ? clData.results ?? [] : [];
+        setExtendResults(clList);
+        setExtendSourceLabel(clList.length > 0 ? "ai" : null);
+      }
+    } catch (err) {
+      setExtendError((err as Error).message);
+    } finally {
+      setExtendLoading(false);
+    }
+  }
+
+  async function addSuggestedParent(suggestion: AnyResult, fromAncestorId: string) {
+    if (!user) return;
+    const oldGen = savedGens.get(fromAncestorId);
+    if (typeof oldGen !== "number") {
+      toast.error("Can't determine generation");
+      return;
+    }
+    const newGen = oldGen + 1;
+    const isAi = "confidence" in suggestion && !!suggestion.confidence;
+    const insertRow = {
+      user_id: user.id,
+      source: isAi ? "ai" : "wikitree",
+      name: suggestion.name,
+      birth_date: suggestion.birthDate ?? null,
+      birth_place: suggestion.birthPlace ?? null,
+      death_date: suggestion.deathDate ?? null,
+      death_place: suggestion.deathPlace ?? null,
+      father_name: suggestion.fatherName ?? null,
+      mother_name: suggestion.motherName ?? null,
+      profile_url: suggestion.profileUrl ?? null,
+      summary: (suggestion as any).summary ?? null,
+      confidence: (suggestion as any).confidence ?? null,
+      generations_back: newGen,
+      relationship_label: relationshipForGen(newGen),
+      position: newGen,
+    };
+    const { error } = await supabase.from("family_tree_members").insert(insertRow);
+    if (error) {
+      toast.error("Couldn't add ancestor", { description: error.message });
+      return;
+    }
+    toast.success(`${suggestion.name} added`);
+    setExtendingId(null);
+    setExtendResults(null);
+    setExtendSourceLabel(null);
+    await hydrateSaved();
+  }
+
+
   return (
     <div className="min-h-screen bg-background px-6 py-20">
       <div className="mx-auto max-w-3xl">
@@ -423,7 +565,7 @@ const FamilyTree = () => {
           </div>
         )}
 
-        {searchPhase === "done" && wikitreeResults !== null && (
+        {((searchPhase === "done" && wikitreeResults !== null) || savedResults.length > 0) && (
           <div ref={resultsRef} className="mx-auto mt-10 max-w-xl">
             <p className="text-center font-sans text-[11px] uppercase tracking-[2px] text-amber-dim">
               Tap matches to add to your tree
@@ -468,7 +610,7 @@ const FamilyTree = () => {
                         {"summary" in r && r.summary && (
                           <p className="mt-2 font-serif text-sm italic text-cream-soft">{r.summary}</p>
                         )}
-                        <div className="mt-3 flex items-center gap-3">
+                        <div className="mt-3 flex flex-wrap items-center gap-3">
                           <span className="font-sans text-[11px] uppercase tracking-[1.5px] text-amber">
                             ✓ Added to tree
                           </span>
@@ -484,7 +626,97 @@ const FamilyTree = () => {
                           >
                             Remove
                           </button>
+                          {r.id === oldestSavedId && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                findParents(r);
+                              }}
+                              disabled={extendLoading && extendingId === r.id}
+                              className="ml-auto rounded-pill border border-amber/40 bg-amber/[0.08] px-3 py-1 font-sans text-[11px] uppercase tracking-[1.5px] text-amber transition-colors hover:bg-amber/[0.15] disabled:opacity-50"
+                            >
+                              {extendLoading && extendingId === r.id
+                                ? "Searching…"
+                                : `Find ${firstNameOf(r.name)}'s parents`}
+                            </button>
+                          )}
                         </div>
+
+                        {extendingId === r.id && (
+                          <div className="mt-4 rounded-[12px] border border-amber-dim/30 bg-bg-warm/60 p-3">
+                            {extendLoading && (
+                              <p className="font-serif text-sm italic text-amber-light animate-pulse">
+                                Searching records for {firstNameOf(r.name)}'s parents…
+                              </p>
+                            )}
+                            {!extendLoading && extendError && (
+                              <p className="font-sans text-sm text-cream-soft">
+                                Search failed: {extendError}
+                              </p>
+                            )}
+                            {!extendLoading && !extendError && extendResults && extendResults.length === 0 && (
+                              <p className="font-serif text-sm italic text-cream-soft">
+                                We couldn't find verified records for {r.name}'s parents — you can add them manually if you know them.
+                              </p>
+                            )}
+                            {!extendLoading && extendResults && extendResults.length > 0 && (
+                              <div className="flex flex-col gap-2">
+                                <p className="font-sans text-[11px] uppercase tracking-[1.5px] text-amber-dim">
+                                  {extendSourceLabel === "wikitree"
+                                    ? "Possible parents — tap one to add"
+                                    : "AI-assisted suggestions — confirm before adding"}
+                                </p>
+                                {extendResults.map((s) => {
+                                  const isAi = "confidence" in s && !!s.confidence;
+                                  return (
+                                    <button
+                                      key={s.id}
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        addSuggestedParent(s, r.id);
+                                      }}
+                                      className="relative rounded-[12px] border border-amber-dim/30 bg-card/60 p-3 text-left transition-all hover:border-amber/50"
+                                    >
+                                      <span
+                                        className={`absolute right-2 top-2 rounded-pill border px-2 py-[2px] font-sans text-[9px] uppercase tracking-[1px] ${
+                                          isAi
+                                            ? "border-amber-dim/40 bg-amber-dim/[0.10] text-amber-light"
+                                            : "border-amber/40 bg-amber/[0.10] text-amber"
+                                        }`}
+                                      >
+                                        {isAi
+                                          ? "AI-assisted · unverified — confirm before adding"
+                                          : "WikiTree · verified"}
+                                      </span>
+                                      <div className="pr-32 font-display text-sm text-cream-warm">
+                                        {s.name}
+                                      </div>
+                                      {(s.birthDate || s.birthPlace) && (
+                                        <div className="mt-1 font-sans text-xs text-text-dim">
+                                          Born {s.birthDate ?? "—"}
+                                          {s.birthPlace ? ` · ${s.birthPlace}` : ""}
+                                        </div>
+                                      )}
+                                      {(s.deathDate || s.deathPlace) && (
+                                        <div className="font-sans text-xs text-text-dim">
+                                          Died {s.deathDate ?? "—"}
+                                          {s.deathPlace ? ` · ${s.deathPlace}` : ""}
+                                        </div>
+                                      )}
+                                      {"summary" in s && s.summary && (
+                                        <p className="mt-1 font-serif text-xs italic text-cream-soft">
+                                          {s.summary}
+                                        </p>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   }
