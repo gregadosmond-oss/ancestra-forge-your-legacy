@@ -302,8 +302,8 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
     : [];
 
   const chapterBodies: string[] =
-    (Array.isArray(chapters?.chapterBodies) && chapters.chapterBodies) ||
     (Array.isArray(story?.chapterBodies) && story.chapterBodies) ||
+    (Array.isArray(chapters?.chapterBodies) && chapters.chapterBodies) ||
     (Array.isArray(chapters?.chapters) &&
       chapters.chapters.map((c: any) => c?.body ?? "")) ||
     (Array.isArray(chapters?.expandedChapters) &&
