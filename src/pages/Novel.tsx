@@ -537,7 +537,7 @@ const Novel = () => {
               )}
             </section>
 
-            </section>
+
           </>
         )}
 
