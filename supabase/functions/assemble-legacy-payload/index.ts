@@ -93,15 +93,50 @@ Deno.serve(async (req) => {
     return (a.position ?? 0) - (b.position ?? 0);
   });
 
+  // 3. Refresh / fetch the AI-woven memories chapter (cached, regenerates only when memories changed)
+  let memoriesProse: string | null = null;
+  const memories = memRes.data ?? [];
+  if (memories.length > 0) {
+    try {
+      const weaveRes = await fetch(
+        `${SUPABASE_URL}/functions/v1/weave-memories-chapter`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+            apikey: SERVICE_ROLE_KEY,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ user_id: userId }),
+        },
+      );
+      if (weaveRes.ok) {
+        const weaveJson = await weaveRes.json();
+        if (typeof weaveJson?.prose === "string") {
+          memoriesProse = weaveJson.prose;
+        }
+      } else {
+        console.warn(
+          "[assemble-legacy-payload] weave-memories-chapter failed",
+          weaveRes.status,
+        );
+      }
+    } catch (e) {
+      console.warn("[assemble-legacy-payload] weave invoke threw", e);
+    }
+  }
+
   const combined = {
     ...shared,
     personal: {
       user_id: userId,
       tree,
-      memories: memRes.data ?? [],
+      memories,
+      memoriesProse,
       assembledAt: new Date().toISOString(),
     },
   };
 
   return json(200, { fixture: combined });
 });
+

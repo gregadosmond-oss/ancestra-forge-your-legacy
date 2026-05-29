@@ -67,7 +67,9 @@ const Novel = () => {
   const [progress, setProgress] = useState(0);
   const [treeMembers, setTreeMembers] = useState<TreeRow[]>([]);
   const [memories, setMemories] = useState<MemoryRow[]>([]);
+  const [memoriesProse, setMemoriesProse] = useState<string | null>(null);
   const ranRef = useRef(false);
+
 
   const displaySurname =
     fixture?.facts?.displaySurname ||
@@ -147,9 +149,25 @@ const Novel = () => {
             .order("created_at", { ascending: true }),
         ]);
         if (treeRes.data) setTreeMembers(treeRes.data as TreeRow[]);
-        if (memRes.data) setMemories(memRes.data as MemoryRow[]);
+        const mems = (memRes.data ?? []) as MemoryRow[];
+        if (memRes.data) setMemories(mems);
+
+        // Lazily refresh / fetch AI-woven memories chapter (only regenerates when memories changed)
+        if (mems.length > 0) {
+          supabase.functions
+            .invoke<{ prose?: string | null }>("weave-memories-chapter", {
+              body: { user_id: user.id },
+            })
+            .then(({ data }) => {
+              if (data && typeof data.prose === "string") {
+                setMemoriesProse(data.prose);
+              }
+            })
+            .catch((e) => console.warn("weave-memories-chapter failed", e));
+        }
 
         setPhase("ready");
+
       } catch (e) {
         console.error("Novel load error", e);
         setError("The archive could not be opened. Try again shortly.");
@@ -437,46 +455,89 @@ const Novel = () => {
               <div className="mt-6 text-sm tracking-[0.4em] text-amber-dim">✦ ❦ ✦</div>
             </section>
             <section className="py-8">
-              {memories.map((m) => {
-                const entries = m.answers && typeof m.answers === "object"
-                  ? Object.entries(m.answers as Record<string, unknown>).filter(
-                      ([, v]) => v != null && String(v).trim().length > 0,
-                    )
-                  : [];
-                return (
-                  <div key={m.id} className="mb-16">
-                    <h3 className="text-center font-display text-2xl text-cream-warm">
-                      {m.relative_name}
-                    </h3>
-                    <p className="text-center font-serif italic text-amber-dim">
-                      {m.relationship}
-                    </p>
-                    <Ornament />
-                    <div className="mx-auto max-w-xl space-y-6">
-                      {entries.length === 0 ? (
-                        <p className="text-center font-serif italic text-text-dim">
-                          (No memories recorded yet.)
+
+              {memoriesProse && memoriesProse.trim().length > 0 ? (
+                <div className="mx-auto max-w-xl">
+                  {memoriesProse
+                    .split(/\n\s*\n/)
+                    .map((b) => b.trim())
+                    .filter(Boolean)
+                    .map((block, i) => {
+                      if (block.startsWith("## ")) {
+                        return (
+                          <h3
+                            key={i}
+                            className="mt-12 text-center font-display text-2xl text-cream-warm first:mt-0"
+                          >
+                            {block.slice(3).trim()}
+                          </h3>
+                        );
+                      }
+                      if (block.startsWith("_") && block.endsWith("_")) {
+                        return (
+                          <p
+                            key={i}
+                            className="text-center font-serif italic text-amber-dim"
+                          >
+                            {block.slice(1, -1).trim()}
+                          </p>
+                        );
+                      }
+                      return (
+                        <p
+                          key={i}
+                          className="mt-5 whitespace-pre-line font-serif leading-[1.85] text-text-body"
+                          style={{ fontSize: "1.0625rem", textAlign: "justify" }}
+                        >
+                          {block}
                         </p>
-                      ) : (
-                        entries.map(([q, a]) => (
-                          <div key={q}>
-                            <p className="font-sans text-[10px] uppercase tracking-[3px] text-amber-dim">
-                              {q}
-                            </p>
-                            <p
-                              className="mt-2 whitespace-pre-line font-serif leading-[1.85] text-text-body"
-                              style={{ fontSize: "1.0625rem" }}
-                            >
-                              {String(a)}
-                            </p>
-                          </div>
-                        ))
-                      )}
+                      );
+                    })}
+                </div>
+              ) : (
+                memories.map((m) => {
+                  const entries = m.answers && typeof m.answers === "object"
+                    ? Object.entries(m.answers as Record<string, unknown>).filter(
+                        ([, v]) => v != null && String(v).trim().length > 0,
+                      )
+                    : [];
+                  return (
+                    <div key={m.id} className="mb-16">
+                      <h3 className="text-center font-display text-2xl text-cream-warm">
+                        {m.relative_name}
+                      </h3>
+                      <p className="text-center font-serif italic text-amber-dim">
+                        {m.relationship}
+                      </p>
+                      <Ornament />
+                      <div className="mx-auto max-w-xl space-y-6">
+                        {entries.length === 0 ? (
+                          <p className="text-center font-serif italic text-text-dim">
+                            (No memories recorded yet.)
+                          </p>
+                        ) : (
+                          entries.map(([q, a]) => (
+                            <div key={q}>
+                              <p className="font-sans text-[10px] uppercase tracking-[3px] text-amber-dim">
+                                {q}
+                              </p>
+                              <p
+                                className="mt-2 whitespace-pre-line font-serif leading-[1.85] text-text-body"
+                                style={{ fontSize: "1.0625rem" }}
+                              >
+                                {String(a)}
+                              </p>
+                            </div>
+                          ))
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </section>
+
+
           </>
         )}
 

@@ -310,6 +310,33 @@ export type Database = {
         }
         Relationships: []
       }
+      family_memory_chapters: {
+        Row: {
+          created_at: string
+          model: string | null
+          prose: string
+          signature: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          model?: string | null
+          prose: string
+          signature: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          model?: string | null
+          prose?: string
+          signature?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       family_tree_members: {
         Row: {
           birth_date: string | null
