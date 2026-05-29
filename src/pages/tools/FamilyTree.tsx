@@ -350,7 +350,7 @@ const FamilyTree = () => {
         {pickedResults.length > 0 && (
           <div className="mt-20">
             <LegacyChart
-              surname={surname || "Family"}
+              surname={displaySurname || "Family"}
               generations={chartGenerations}
               originPlace={originPlace}
               currentPlace={birthPlace || null}
