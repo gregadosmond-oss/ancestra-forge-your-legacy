@@ -160,6 +160,95 @@ function paletteCss(mode: PaletteMode): string {
     .join("\n")}\n}`;
 }
 
+
+function personalSectionsHtml(fixture: any): string {
+  const personal = fixture?.personal ?? {};
+  const tree: any[] = Array.isArray(personal.tree) ? personal.tree : [];
+  const memories: any[] = Array.isArray(personal.memories) ? personal.memories : [];
+
+  let html = "";
+
+  // "Your Family Tree" — mirrors Novel.tsx title + order
+  if (tree.length > 0) {
+    const cards = tree
+      .map((m, i) => {
+        const born = m.birth_date || m.birthYear || "";
+        const bornPlace = m.birth_place || m.birthPlace || "";
+        const died = m.death_date || m.deathYear || "";
+        const diedPlace = m.death_place || m.deathPlace || "";
+        const bornLine = born || bornPlace
+          ? `<div class="ft-life">b. ${escapeHtml(String(born || "—"))}${bornPlace ? ` · ${escapeHtml(String(bornPlace))}` : ""}</div>`
+          : "";
+        const diedLine = died || diedPlace
+          ? `<div class="ft-life">d. ${escapeHtml(String(died || "—"))}${diedPlace ? ` · ${escapeHtml(String(diedPlace))}` : ""}</div>`
+          : "";
+        return `
+<div class="ft-gen">
+  <div class="ft-gen-label">Gen ${i + 1}</div>
+  <div class="ft-card">
+    <div class="ft-name">${escapeHtml(String(m.name ?? ""))}</div>
+    ${bornLine}
+    ${diedLine}
+  </div>
+</div>`;
+      })
+      .join("\n");
+
+    html += `
+<section class="personal-divider clean-page">
+  <div class="pd-eyebrow">Part Two</div>
+  <div class="pd-title">Your Family Tree</div>
+  <div class="pd-flourish">✦ ❦ ✦</div>
+</section>
+<section class="family-tree">
+  <div class="ft-wrap">
+    ${cards}
+  </div>
+</section>`;
+  }
+
+  // "In Their Words — Family Memories" — mirrors Novel.tsx title + order
+  if (memories.length > 0) {
+    const entries = memories
+      .map((m) => {
+        const answers = m.answers && typeof m.answers === "object" ? m.answers : {};
+        const pairs = Object.entries(answers as Record<string, unknown>)
+          .filter(([, v]) => v != null && String(v).trim().length > 0)
+          .map(
+            ([q, a]) =>
+              `<div class="mem-pair">
+                <div class="mem-q">${escapeHtml(String(q))}</div>
+                <div class="mem-a">${escapeHtml(String(a))}</div>
+              </div>`,
+          )
+          .join("\n");
+        return `
+<div class="mem-entry">
+  <h3 class="mem-name">${escapeHtml(String(m.relative_name ?? ""))}</h3>
+  <div class="mem-rel">${escapeHtml(String(m.relationship ?? ""))}</div>
+  <div class="mem-ornament">✦ ❦ ✦</div>
+  <div class="mem-pairs">
+    ${pairs || '<div class="mem-empty">(No memories recorded.)</div>'}
+  </div>
+</div>`;
+      })
+      .join("\n");
+
+    html += `
+<section class="personal-divider clean-page">
+  <div class="pd-eyebrow">Part Three</div>
+  <div class="pd-title">In Their Words</div>
+  <div class="pd-subtitle">Family Memories</div>
+  <div class="pd-flourish">✦ ❦ ✦</div>
+</section>
+<section class="family-memories">
+  ${entries}
+</section>`;
+  }
+
+  return html;
+}
+
 function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
   const facts = fixture?.facts ?? {};
   const story = fixture?.story ?? {};
@@ -807,6 +896,120 @@ ${chapterNotes}`;
       color: var(--divider);
       margin-top: 12mm;
     }
+    /* ----- Personal sections (Family Tree + Memories) ----- */
+    .personal-divider {
+      page-break-before: always;
+      text-align: center;
+      padding-top: 80mm;
+    }
+    .personal-divider .pd-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8pt;
+      letter-spacing: 4pt;
+      text-transform: uppercase;
+      color: var(--divider);
+    }
+    .personal-divider .pd-title {
+      font-family: 'Libre Caslon Display', serif;
+      font-size: 28pt;
+      font-style: italic;
+      color: var(--accent);
+      margin-top: 14mm;
+    }
+    .personal-divider .pd-subtitle {
+      font-family: 'Libre Caslon Text', serif;
+      font-style: italic;
+      color: var(--body);
+      margin-top: 6mm;
+      font-size: 13pt;
+    }
+    .personal-divider .pd-flourish {
+      margin-top: 16mm;
+      letter-spacing: 6pt;
+      color: var(--divider);
+    }
+
+    .family-tree { page-break-before: always; padding-top: 14mm; }
+    .family-tree .ft-wrap { display: flex; flex-direction: column; gap: 10mm; align-items: center; }
+    .family-tree .ft-gen { position: relative; text-align: center; padding-top: 8mm; }
+    .family-tree .ft-gen::before {
+      content: ""; position: absolute; top: 0; left: 50%;
+      width: 1px; height: 8mm; background: var(--divider);
+    }
+    .family-tree .ft-gen:first-child { padding-top: 0; }
+    .family-tree .ft-gen:first-child::before { display: none; }
+    .family-tree .ft-gen-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8pt;
+      letter-spacing: 3pt;
+      text-transform: uppercase;
+      color: var(--divider);
+      margin-bottom: 4mm;
+    }
+    .family-tree .ft-card {
+      display: inline-block;
+      border: 1px solid var(--divider);
+      border-radius: 4mm;
+      padding: 6mm 10mm;
+      min-width: 70mm;
+    }
+    .family-tree .ft-name {
+      font-family: 'Libre Caslon Display', serif;
+      font-size: 14pt;
+      color: var(--heading);
+    }
+    .family-tree .ft-life {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9pt;
+      color: var(--body);
+      margin-top: 2mm;
+    }
+
+    .family-memories { page-break-before: always; padding-top: 10mm; }
+    .family-memories .mem-entry { margin-bottom: 18mm; page-break-inside: avoid; }
+    .family-memories .mem-name {
+      font-family: 'Libre Caslon Display', serif;
+      font-size: 18pt;
+      color: var(--heading);
+      text-align: center;
+      margin: 0;
+    }
+    .family-memories .mem-rel {
+      font-family: 'Libre Caslon Text', serif;
+      font-style: italic;
+      color: var(--divider);
+      text-align: center;
+      margin-top: 2mm;
+      font-size: 11pt;
+    }
+    .family-memories .mem-ornament {
+      text-align: center;
+      color: var(--divider);
+      letter-spacing: 4pt;
+      margin: 6mm 0 8mm 0;
+    }
+    .family-memories .mem-pair { margin-bottom: 8mm; }
+    .family-memories .mem-q {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8pt;
+      letter-spacing: 2.5pt;
+      text-transform: uppercase;
+      color: var(--divider);
+      margin-bottom: 2mm;
+    }
+    .family-memories .mem-a {
+      font-family: 'Libre Caslon Text', serif;
+      font-size: 11pt;
+      line-height: 1.7;
+      color: var(--body);
+      white-space: pre-line;
+    }
+    .family-memories .mem-empty {
+      font-family: 'Libre Caslon Text', serif;
+      font-style: italic;
+      color: var(--divider);
+      text-align: center;
+    }
   `;
 
   return `<!DOCTYPE html>
@@ -879,6 +1082,10 @@ ${laterChaptersHtml}
   <div class="colophon-flourish">❦</div>
 </section>
 
+${personalSectionsHtml(fixture)}
+
+
+
 <section class="certificate clean-page">
   <div class="certificate-outer">
     <div class="certificate-frame">
@@ -916,6 +1123,7 @@ Deno.serve(async (req) => {
 
   let fixtureUrl: string | null = null;
   let mode: PaletteMode = "print";
+  let outputPath: string | null = null;
   try {
     const body = await req.json().catch(() => ({}));
     if (body && typeof body.fixtureUrl === "string" && body.fixtureUrl.trim()) {
@@ -923,6 +1131,9 @@ Deno.serve(async (req) => {
     }
     if (body && (body.mode === "print" || body.mode === "digital")) {
       mode = body.mode;
+    }
+    if (body && typeof body.outputPath === "string" && body.outputPath.trim()) {
+      outputPath = body.outputPath.trim();
     }
   } catch (_) {
     // keep defaults
@@ -1003,9 +1214,9 @@ Deno.serve(async (req) => {
     }
 
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
-    const path = mode === "digital"
+    const path = outputPath ?? (mode === "digital"
       ? `books/${surname}-book-interior-digital.pdf`
-      : `books/${surname}-book-interior.pdf`;
+      : `books/${surname}-book-interior.pdf`);
     const { error: uploadErr } = await supabase.storage
       .from("print-designs")
       .upload(path, pdfBytes, {
