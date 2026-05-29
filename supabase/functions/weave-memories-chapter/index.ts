@@ -8,7 +8,7 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
+const MODEL = "claude-sonnet-4-5-20250929";
 const MODEL = "claude-3-5-sonnet-20241022";
 
 const json = (status: number, body: unknown) =>
