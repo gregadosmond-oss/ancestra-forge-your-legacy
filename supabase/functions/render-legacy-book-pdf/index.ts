@@ -1156,6 +1156,7 @@ Deno.serve(async (req) => {
   let fixtureUrl: string | null = null;
   let mode: PaletteMode = "print";
   let outputPath: string | null = null;
+  let skipPageCap = false;
   try {
     const body = await req.json().catch(() => ({}));
     if (body && typeof body.fixtureUrl === "string" && body.fixtureUrl.trim()) {
@@ -1166,6 +1167,9 @@ Deno.serve(async (req) => {
     }
     if (body && typeof body.outputPath === "string" && body.outputPath.trim()) {
       outputPath = body.outputPath.trim();
+    }
+    if (body && body.skipPageCap === true) {
+      skipPageCap = true;
     }
   } catch (_) {
     // keep defaults
@@ -1236,7 +1240,7 @@ Deno.serve(async (req) => {
   let finalPageCount = 0;
 
   try {
-    if (mode === "print") {
+    if (mode === "print" && !skipPageCap) {
       const adjusted = await adjustInteriorPageCount(pdfBytes, surname);
       pdfBytes = adjusted.pdfBytes;
       finalPageCount = adjusted.finalPages;
