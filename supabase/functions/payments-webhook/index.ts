@@ -345,10 +345,11 @@ async function triggerLegacyBookOrder({
   };
 
   try {
-    await callFn("render-legacy-book-pdf", { surname: normalized });
+    await callFn("render-legacy-book-pdf", { surname: normalized, user_id: userId ?? undefined });
     await callFn("render-legacy-book-cover-pdf", { surname: normalized });
     const gelatoRes = await callFn("create-legacy-book-order", {
       surname: normalized,
+      user_id: userId ?? undefined,
       shippingAddress,
       // Safety gate: sandbox/preview checkouts NEVER trigger a live print.
       orderType: env === "sandbox" ? "draft" : "order",
