@@ -69,6 +69,7 @@ const FamilyTree = () => {
   const [savedDbIds, setSavedDbIds] = useState<Map<string, string>>(new Map());
   // Hydrated ancestors from DB (rendered alongside fresh search results)
   const [savedResults, setSavedResults] = useState<AnyResult[]>([]);
+  const resultsRef = useRef<HTMLDivElement | null>(null);
 
   // Prefill from profile
   useEffect(() => {
