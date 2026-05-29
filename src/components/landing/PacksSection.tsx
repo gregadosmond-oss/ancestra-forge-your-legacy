@@ -35,7 +35,7 @@ const BOOK_ITEMS = [
   "Heirloom hardcover, 8×11\"",
   "9 chapters, 42 pages",
   "Legacy Certificate (bound + printable)",
-  "5-generation visual tree",
+  "Full visual bloodline tree",
   "Matte-laminated cover",
   "Printed and shipped worldwide",
 ];

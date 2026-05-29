@@ -33,6 +33,10 @@ const FAQ = [
     a: "No. Everything is a one-time payment. No recurring charges.",
   },
   {
+    q: "How accurate is the family story?",
+    a: "Your story is a crafted narrative — written from the real family tree you build and grounded in historical records of your surname, era, and region of origin. It's a beautifully written heirloom that brings your lineage to life, not a certified genealogical document.",
+  },
+  {
     q: "Refund policy?",
     a: "Digital Legacy purchases are non-refundable once delivered. For the Physical Book, we replace anything damaged or misprinted at no cost. Email greg@ancestorsqr.com if something's wrong.",
   },

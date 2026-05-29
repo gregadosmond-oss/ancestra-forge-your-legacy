@@ -45,7 +45,7 @@ const EMPTY: FormState = {
 const INSIDE_CELLS = [
   { Icon: Crown, label: "Your Coat of Arms", body: "Custom heraldic crest, gold foil cover stamp." },
   { Icon: BookOpen, label: "9 Chapters", body: "Origin story, ancestral migration, legacy threads." },
-  { Icon: GitBranch, label: "5-Generation Tree", body: "Visual bloodline pulled from your surname." },
+  { Icon: GitBranch, label: "Your Full Bloodline Tree", body: "Your real family tree, traced generation by generation, as far back as the records reach." },
   { Icon: Layers, label: "Heirloom Binding", body: "Matte-laminated hardcover, archival paper." },
 ];
 
