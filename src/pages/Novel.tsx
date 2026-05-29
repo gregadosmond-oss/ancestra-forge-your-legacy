@@ -65,6 +65,8 @@ const Novel = () => {
   const [surname, setSurname] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const [treeMembers, setTreeMembers] = useState<TreeRow[]>([]);
+  const [memories, setMemories] = useState<MemoryRow[]>([]);
   const ranRef = useRef(false);
 
   const displaySurname =
