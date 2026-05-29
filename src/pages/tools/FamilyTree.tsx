@@ -6,6 +6,8 @@ import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import LegacyChart, { type TreePerson } from "@/components/journey/LegacyChart";
 
+type AncestorSource = "wikitree" | "claude-web" | "user" | "ai";
+
 type WikitreeResult = {
   id: string;
   source: "wikitree";
@@ -34,9 +36,31 @@ type ClaudeResult = {
   confidence: "high" | "medium" | "low";
 };
 
+type SavedResult = {
+  id: string;
+  source: AncestorSource;
+  name: string;
+  birthDate: string | null;
+  birthPlace: string | null;
+  deathDate: string | null;
+  deathPlace: string | null;
+  fatherName: string | null;
+  motherName: string | null;
+  profileUrl: string | null;
+  summary?: string | null;
+  confidence?: "high" | "medium" | "low";
+};
+
 type AnyResult =
   | (WikitreeResult & { confidence?: undefined; summary?: undefined })
-  | ClaudeResult;
+  | ClaudeResult
+  | SavedResult;
+
+function sourceBadgeLabel(source: AncestorSource | string | undefined | null): string {
+  if (source === "user") return "Added by you";
+  if (source === "ai" || source === "claude-web") return "AI-assisted";
+  return "WikiTree";
+}
 
 type SearchPhase = "idle" | "wikitree-loading" | "claude-loading" | "done";
 
