@@ -441,6 +441,9 @@ export default function Shop() {
                 <p className="text-center font-sans text-[11px]" style={{ color: "#8a7e6e" }}>
                   One-time purchase · Secure Stripe checkout · No subscription
                 </p>
+                <p className="text-center font-sans text-[11px] italic" style={{ color: "#8a7e6e" }}>
+                  Sending it as a gift? Enter the recipient's shipping address and we'll send the heirloom straight to them, ready to open.
+                </p>
               </div>
             </form>
           ) : (
