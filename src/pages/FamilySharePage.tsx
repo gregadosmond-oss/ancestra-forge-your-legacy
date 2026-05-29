@@ -62,7 +62,7 @@ const FamilySharePage = () => {
   }, [surname]);
 
   const shareUrl = `${window.location.origin}/f/${surname}`;
-  const displaySurname = facts?.displaySurname ?? (rawSurname ? rawSurname.charAt(0).toUpperCase() + rawSurname.slice(1) : "");
+  const displaySurname = facts?.displaySurname ?? formatSurname(rawSurname);
 
   if (loading) {
     return (
