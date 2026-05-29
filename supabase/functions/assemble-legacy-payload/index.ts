@@ -61,11 +61,11 @@ Deno.serve(async (req) => {
   // 2. Fetch personal tree + memories (service role bypasses RLS, scoped by user_id)
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
-  const [treeRes, memRes] = await Promise.all([
+  const [treeRes, memRes, profileRes] = await Promise.all([
     supabase
       .from("family_tree_members")
       .select(
-        "id,name,birth_date,birth_place,death_date,death_place,father_name,mother_name,profile_url,summary,confidence,source,position",
+        "id,name,birth_date,birth_place,death_date,death_place,father_name,mother_name,profile_url,summary,confidence,source,position,generations_back,relationship_label",
       )
       .eq("user_id", userId)
       .order("position", { ascending: true }),
@@ -74,6 +74,11 @@ Deno.serve(async (req) => {
       .select("id,relative_name,relationship,answers,created_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: true }),
+    supabase
+      .from("profiles")
+      .select("first_name, surname")
+      .eq("id", userId)
+      .maybeSingle(),
   ]);
 
   if (treeRes.error) {
@@ -83,15 +88,19 @@ Deno.serve(async (req) => {
     return json(500, { error: "memories_query_failed", detail: memRes.error.message });
   }
 
-  // Sort tree by birth year (oldest → youngest), tie-break on position
+  // Sort tree to mirror the on-screen Legacy Chart on /tools/tree:
+  // oldest ancestor first (highest generations_back) down to the parent.
+  // Entries without generations_back are pushed to the end (above YOU).
   const tree = (treeRes.data ?? []).slice().sort((a: any, b: any) => {
-    const ay = parseInt(String(a.birth_date ?? "").slice(0, 4), 10);
-    const by = parseInt(String(b.birth_date ?? "").slice(0, 4), 10);
-    const aNum = Number.isNaN(ay) ? 9999 : ay;
-    const bNum = Number.isNaN(by) ? 9999 : by;
-    if (aNum !== bNum) return aNum - bNum;
+    const ag = typeof a.generations_back === "number" ? a.generations_back : -Infinity;
+    const bg = typeof b.generations_back === "number" ? b.generations_back : -Infinity;
+    if (ag !== bg) return bg - ag;
     return (a.position ?? 0) - (b.position ?? 0);
   });
+
+  const youFirst = profileRes.data?.first_name?.trim() ?? "";
+  const youSurname = profileRes.data?.surname?.trim() ?? "";
+  const youName = [youFirst, youSurname].filter(Boolean).join(" ").trim() || "You";
 
   // 3. Refresh / fetch the AI-woven memories chapter (cached, regenerates only when memories changed)
   let memoriesProse: string | null = null;
