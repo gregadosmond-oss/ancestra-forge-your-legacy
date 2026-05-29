@@ -188,31 +188,43 @@ const Novel = () => {
           setMemoriesProsePhase("idle");
         }
 
-        // Lazily fetch the personal woven 9-chapter story (cached per-user by signature)
-        setPersonalStoryPhase("loading");
-        supabase.functions
-          .invoke<{ chapters?: PersonalStory }>("generate-personal-story", {
-            body: { user_id: user.id },
-          })
-          .then(({ data, error }) => {
-            if (error) throw error;
-            const ch = data?.chapters;
-            if (
-              ch &&
-              ch.chapterOne?.body &&
-              Array.isArray(ch.chapters) &&
-              ch.chapters.length === 8
-            ) {
+        // Personalized 9-chapter story: check cache first; if missing, generate now (await).
+        const { data: existingStory } = await supabase
+          .from("personal_legacy_stories")
+          .select("chapters")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        const validStory = (ch: any): ch is PersonalStory =>
+          !!ch &&
+          ch.chapterOne?.body &&
+          Array.isArray(ch.chapters) &&
+          ch.chapters.length === 8;
+
+        if (existingStory && validStory(existingStory.chapters)) {
+          setPersonalStory(existingStory.chapters as PersonalStory);
+          setPersonalStoryPhase("ready");
+        } else {
+          // No personalized story yet — generate it now with a full-page loading state.
+          setPhase("generating-personal");
+          setPersonalStoryPhase("loading");
+          try {
+            const { data: genData, error: genErr } = await supabase.functions.invoke<{
+              chapters?: PersonalStory;
+            }>("generate-personal-story", { body: { user_id: user.id } });
+            if (genErr) throw genErr;
+            const ch = genData?.chapters;
+            if (validStory(ch)) {
               setPersonalStory(ch);
               setPersonalStoryPhase("ready");
             } else {
               setPersonalStoryPhase("error");
             }
-          })
-          .catch((e) => {
+          } catch (e) {
             console.warn("generate-personal-story failed; falling back to shared story", e);
             setPersonalStoryPhase("error");
-          });
+          }
+        }
 
         setPhase("ready");
 
