@@ -879,6 +879,10 @@ ${laterChaptersHtml}
   <div class="colophon-flourish">❦</div>
 </section>
 
+${personalSectionsHtml(fixture)}
+
+
+
 <section class="certificate clean-page">
   <div class="certificate-outer">
     <div class="certificate-frame">
