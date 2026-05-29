@@ -369,6 +369,19 @@ const FamilyTree = () => {
           </p>
         </div>
 
+        {user && (
+          <KnownAncestorForm userId={user.id} onAdded={hydrateSaved} />
+        )}
+
+        <div className="mx-auto mt-16 max-w-xl text-center">
+          <p className="font-sans text-[11px] uppercase tracking-[3px] text-amber-dim">
+            Or search the records
+          </p>
+          <p className="mt-3 font-serif italic text-cream-soft">
+            Don't know much yet? Let us search WikiTree and historical archives for you.
+          </p>
+        </div>
+
         <form
           onSubmit={handleSubmit}
           className="mx-auto mt-10 grid max-w-xl gap-3 rounded-[14px] border border-amber-dim/20 bg-card/50 p-6 backdrop-blur-sm"
