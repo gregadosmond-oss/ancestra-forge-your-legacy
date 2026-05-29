@@ -80,6 +80,10 @@ export default function BloodlineQuiz() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    console.log("[DEBUG] RENDER step:", step, "answers:", answers);
+  });
+
   const handleAnswer = (letter: string) => {
     console.log("[DEBUG] handleAnswer called with letter:", letter, "current step:", step, "current answers:", answers);
     const newAnswers = [...answers, letter];
