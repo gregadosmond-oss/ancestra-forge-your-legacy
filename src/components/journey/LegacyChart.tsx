@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 export type TreePerson = {
   name: string;
@@ -13,7 +15,7 @@ export type TreePerson = {
 
 type Props = {
   surname: string;
-  generations: TreePerson[][]; // outer = generations oldest→youngest; inner = people in that gen
+  generations: TreePerson[][];
   originPlace?: string | null;
   currentPlace?: string | null;
 };
@@ -33,8 +35,51 @@ function formatLifeLine(p: TreePerson): string | null {
   return parts.length ? parts.join(" · ") : null;
 }
 
+type YouProfile = {
+  name: string;
+  subline?: string | null;
+};
+
 const LegacyChart = ({ surname, generations, originPlace, currentPlace }: Props) => {
-  const allPeople = generations.flat();
+  const [you, setYou] = useState<YouProfile>({ name: "You" });
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("first_name, surname, country_of_origin")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      const first = profile?.first_name?.trim();
+      const last = profile?.surname?.trim() || surname;
+      const name = first ? `${first} ${last}`.trim() : "You";
+      setYou({ name, subline: profile?.country_of_origin || null });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [surname]);
+
+  // Strip any incoming "isYou" nodes — the YOU node is owned by this component
+  // and built strictly from the signed-in user's profile. Ancestor records
+  // (family_tree_members) must never render as YOU.
+  const ancestorGenerations: TreePerson[][] = generations
+    .map((gen) => gen.filter((p) => !p.isYou))
+    .filter((gen) => gen.length > 0);
+
+  const youPerson: TreePerson = {
+    name: you.name,
+    birthPlace: you.subline || null,
+    isYou: true,
+  };
+
+  const displayGenerations: TreePerson[][] = [...ancestorGenerations, [youPerson]];
+
+  const allPeople = displayGenerations.flat();
   const years = allPeople
     .flatMap((p) => [p.birthYear, p.deathYear])
     .map((y) => (y ? parseInt(String(y).slice(0, 4), 10) : NaN))
@@ -44,7 +89,7 @@ const LegacyChart = ({ surname, generations, originPlace, currentPlace }: Props)
 
   const placeLine = [originPlace, currentPlace].filter(Boolean).join(" → ");
   const metaBits: string[] = [];
-  metaBits.push(`${generations.length} generation${generations.length === 1 ? "" : "s"}`);
+  metaBits.push(`${displayGenerations.length} generation${displayGenerations.length === 1 ? "" : "s"}`);
   if (earliest && latest) metaBits.push(`${earliest}–${latest}`);
 
   return (
@@ -68,8 +113,8 @@ const LegacyChart = ({ surname, generations, originPlace, currentPlace }: Props)
 
       {/* Chart */}
       <div className="relative mt-10 flex flex-col items-center">
-        {generations.map((gen, gi) => {
-          const isLast = gi === generations.length - 1;
+        {displayGenerations.map((gen, gi) => {
+          const isLast = gi === displayGenerations.length - 1;
           return (
             <div key={gi} className="relative flex w-full flex-col items-center">
               {/* Gen label */}
@@ -77,9 +122,8 @@ const LegacyChart = ({ surname, generations, originPlace, currentPlace }: Props)
                 Gen {gi + 1}
               </div>
 
-              {/* Person cards row (with branching when >1) */}
+              {/* Person cards row */}
               <div className="relative flex w-full flex-wrap items-stretch justify-center gap-4">
-                {/* Branch connectors for multi-person rows */}
                 {gen.length > 1 && (
                   <div
                     aria-hidden
@@ -87,7 +131,7 @@ const LegacyChart = ({ surname, generations, originPlace, currentPlace }: Props)
                   />
                 )}
                 {gen.map((p, pi) => {
-                  const life = formatLifeLine(p);
+                  const life = p.isYou ? null : formatLifeLine(p);
                   return (
                     <motion.div
                       key={`${gi}-${pi}-${p.name}`}
@@ -118,12 +162,17 @@ const LegacyChart = ({ surname, generations, originPlace, currentPlace }: Props)
                       >
                         {p.name}
                       </h3>
+                      {p.isYou && p.birthPlace && (
+                        <p className="mt-1.5 font-sans text-xs leading-relaxed text-text-dim">
+                          {p.birthPlace}
+                        </p>
+                      )}
                       {life && (
                         <p className="mt-1.5 font-sans text-xs leading-relaxed text-text-dim">
                           {life}
                         </p>
                       )}
-                      {p.spouseName && (
+                      {!p.isYou && p.spouseName && (
                         <p className="mt-1 font-serif text-sm italic text-amber-dim">
                           m. {p.spouseName}
                           {p.marriageYear ? ` · ${p.marriageYear}` : ""}
@@ -134,7 +183,6 @@ const LegacyChart = ({ surname, generations, originPlace, currentPlace }: Props)
                 })}
               </div>
 
-              {/* Vertical connector to next gen */}
               {!isLast && (
                 <div
                   aria-hidden
