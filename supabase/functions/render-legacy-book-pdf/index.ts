@@ -159,10 +159,18 @@ function personalSectionsHtml(fixture: any): string {
 
   let html = "";
 
-  // "Your Family Tree" — mirrors Novel.tsx title + order
+  // "Your Family Tree" — mirrors the on-screen Legacy Chart on /tools/tree:
+  // oldest ancestor first (highest generations_back), down to parent, ending
+  // with the signed-in user as the final YOU card.
   if (tree.length > 0) {
-    const cards = tree
-      .map((m, i) => {
+    const you = personal?.you ?? {};
+    const youName =
+      (typeof you.name === "string" && you.name.trim()) ||
+      [you.first_name, you.surname].filter(Boolean).join(" ").trim() ||
+      "You";
+
+    const ancestorCards = tree
+      .map((m) => {
         const born = m.birth_date || m.birthYear || "";
         const bornPlace = m.birth_place || m.birthPlace || "";
         const died = m.death_date || m.deathYear || "";
@@ -173,9 +181,10 @@ function personalSectionsHtml(fixture: any): string {
         const diedLine = died || diedPlace
           ? `<div class="ft-life">d. ${escapeHtml(String(died || "—"))}${diedPlace ? ` · ${escapeHtml(String(diedPlace))}` : ""}</div>`
           : "";
+        const label = (m.relationship_label || "Ancestor").toString().toUpperCase();
         return `
 <div class="ft-gen">
-  <div class="ft-gen-label">Gen ${i + 1}</div>
+  <div class="ft-gen-label">${escapeHtml(label)}</div>
   <div class="ft-card">
     <div class="ft-name">${escapeHtml(String(m.name ?? ""))}</div>
     ${bornLine}
@@ -185,6 +194,14 @@ function personalSectionsHtml(fixture: any): string {
       })
       .join("\n");
 
+    const youCard = `
+<div class="ft-gen">
+  <div class="ft-gen-label">YOU</div>
+  <div class="ft-card">
+    <div class="ft-name">${escapeHtml(youName)}</div>
+  </div>
+</div>`;
+
     html += `
 <section class="personal-divider clean-page">
   <div class="pd-eyebrow">Part Two</div>
@@ -193,7 +210,8 @@ function personalSectionsHtml(fixture: any): string {
 </section>
 <section class="family-tree">
   <div class="ft-wrap">
-    ${cards}
+    ${ancestorCards}
+    ${youCard}
   </div>
 </section>`;
   }
