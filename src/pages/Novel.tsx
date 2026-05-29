@@ -39,6 +39,13 @@ type Fixture = {
 
 type Phase = "loading" | "generating" | "ready" | "error";
 type MemoryProsePhase = "idle" | "loading" | "ready" | "error";
+type PersonalStoryPhase = "idle" | "loading" | "ready" | "error";
+
+type PersonalChapter = { title: string; body: string };
+type PersonalStory = {
+  chapterOne: PersonalChapter;
+  chapters: PersonalChapter[];
+};
 
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"];
 
