@@ -12,6 +12,7 @@ import { fetchLegacy } from "@/lib/legacyClient";
 import FreeCrest from "@/components/FreeCrest";
 import type { LegacyFacts, LegacyStory } from "@/types/legacy";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { formatSurname } from "@/lib/surname";
 
 // ─── Data hook ────────────────────────────────────────────────────────────────
 
