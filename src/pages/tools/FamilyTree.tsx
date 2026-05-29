@@ -281,78 +281,76 @@ const FamilyTree = () => {
     }
   }
 
-  async function togglePick(id: string) {
-    const isPicked = pickedIds.has(id);
+  async function removeAncestor(id: string) {
+    if (!user) return;
+    const dbId = savedDbIds.get(id);
+    if (!dbId) return;
+    const prevPicked = new Set(pickedIds);
     setPickedIds((prev) => {
       const next = new Set(prev);
-      if (isPicked) next.delete(id);
-      else next.add(id);
+      next.delete(id);
       return next;
     });
-    if (!user) return;
-
-    if (isPicked) {
-      // Remove from DB
-      const dbId = savedDbIds.get(id);
-      if (!dbId) return;
-      const { error } = await supabase
-        .from("family_tree_members")
-        .delete()
-        .eq("id", dbId)
-        .eq("user_id", user.id);
-      if (error) {
-        toast.error("Couldn't remove ancestor", { description: error.message });
-        // revert
-        setPickedIds((prev) => new Set(prev).add(id));
-        return;
-      }
-      setSavedDbIds((prev) => {
-        const next = new Map(prev);
-        next.delete(id);
-        return next;
-      });
-      setSavedResults((prev) => prev.filter((r) => r.id !== id));
-    } else {
-      // Add to DB
-      const r = allResults.find((x) => x.id === id);
-      if (!r) return;
-      const isClaude = "confidence" in r && !!r.confidence;
-      const insertRow = {
-        user_id: user.id,
-        source: isClaude ? "claude-web" : r.source ?? "wikitree",
-        name: r.name,
-        birth_date: r.birthDate ?? null,
-        birth_place: r.birthPlace ?? null,
-        death_date: r.deathDate ?? null,
-        death_place: r.deathPlace ?? null,
-        father_name: r.fatherName ?? null,
-        mother_name: r.motherName ?? null,
-        profile_url: r.profileUrl ?? null,
-        summary: (r as any).summary ?? null,
-        confidence: (r as any).confidence ?? null,
-        position: pickedIds.size,
-      };
-      const { data, error } = await supabase
-        .from("family_tree_members")
-        .insert(insertRow)
-        .select("id")
-        .single();
-      if (error || !data) {
-        toast.error("Couldn't save ancestor", { description: error?.message });
-        // revert
-        setPickedIds((prev) => {
-          const next = new Set(prev);
-          next.delete(id);
-          return next;
-        });
-        return;
-      }
-      setSavedDbIds((prev) => {
-        const next = new Map(prev);
-        next.set(id, data.id);
-        return next;
-      });
+    const { error } = await supabase
+      .from("family_tree_members")
+      .delete()
+      .eq("id", dbId)
+      .eq("user_id", user.id);
+    if (error) {
+      toast.error("Couldn't remove ancestor", { description: error.message });
+      setPickedIds(prevPicked);
+      return;
     }
+    setSavedDbIds((prev) => {
+      const next = new Map(prev);
+      next.delete(id);
+      return next;
+    });
+    setSavedGens((prev) => {
+      const next = new Map(prev);
+      next.delete(id);
+      return next;
+    });
+    setSavedResults((prev) => prev.filter((r) => r.id !== id));
+  }
+
+  async function addSearchResult(id: string, generations_back: number, label: string) {
+    if (!user) return;
+    const r = allResults.find((x) => x.id === id);
+    if (!r) return;
+    const isClaude = "confidence" in r && !!r.confidence;
+    const insertRow = {
+      user_id: user.id,
+      source: isClaude ? "claude-web" : (r as any).source ?? "wikitree",
+      name: r.name,
+      birth_date: r.birthDate ?? null,
+      birth_place: r.birthPlace ?? null,
+      death_date: r.deathDate ?? null,
+      death_place: r.deathPlace ?? null,
+      father_name: r.fatherName ?? null,
+      mother_name: r.motherName ?? null,
+      profile_url: r.profileUrl ?? null,
+      summary: (r as any).summary ?? null,
+      confidence: (r as any).confidence ?? null,
+      generations_back,
+      relationship_label: label,
+      position: generations_back,
+    };
+    const { data, error } = await supabase
+      .from("family_tree_members")
+      .insert(insertRow)
+      .select("id")
+      .single();
+    if (error || !data) {
+      toast.error("Couldn't save ancestor", { description: error?.message });
+      return;
+    }
+    setPickedIds((prev) => new Set(prev).add(id));
+    setSavedDbIds((prev) => new Map(prev).set(id, data.id));
+    setSavedGens((prev) => new Map(prev).set(id, generations_back));
+    setPendingPickId(null);
+    toast.success(`${r.name} added as ${label.toLowerCase()}`);
+    await hydrateSaved();
   }
 
   function capitalize(str: string): string {
