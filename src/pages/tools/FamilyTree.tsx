@@ -191,30 +191,35 @@ const FamilyTree = () => {
     });
   }
 
-  // Build tree generations: you + picked ancestors (oldest to youngest visually)
-  const treeGenerations = useMemo(() => {
-    const ancestors = pickedResults
-      .map((r) => ({
-        name: r.name,
-        years: r.birthDate
-          ? `${r.birthDate}${r.deathDate ? ` – ${r.deathDate}` : ""}`
-          : "Year unknown",
-        location: r.birthPlace ?? r.deathPlace ?? "Place unknown",
-        role: "source" in r && r.source === "claude-web" ? "AI-assisted" : "WikiTree",
-      }))
-      .sort((a, b) => {
-        const ay = parseInt(a.years.slice(0, 4), 10) || 9999;
-        const by = parseInt(b.years.slice(0, 4), 10) || 9999;
-        return ay - by;
-      });
-    const you = {
+  // Build chart generations: each picked ancestor as its own generation (oldest → youngest), then "you"
+  const chartGenerations = useMemo<TreePerson[][]>(() => {
+    const ancestors: TreePerson[] = pickedResults.map((r) => ({
+      name: r.name,
+      birthYear: r.birthDate ?? null,
+      birthPlace: r.birthPlace ?? null,
+      deathYear: r.deathDate ?? null,
+      deathPlace: r.deathPlace ?? null,
+    }));
+    ancestors.sort((a, b) => {
+      const ay = parseInt(String(a.birthYear ?? "").slice(0, 4), 10);
+      const by = parseInt(String(b.birthYear ?? "").slice(0, 4), 10);
+      return (Number.isNaN(ay) ? 9999 : ay) - (Number.isNaN(by) ? 9999 : by);
+    });
+    const you: TreePerson = {
       name: `${firstName || "You"} ${surname}`.trim() || "You",
-      years: birthYear || "today",
-      location: birthPlace || "—",
+      birthYear: birthYear || null,
+      birthPlace: birthPlace || null,
       isYou: true,
     };
-    return [...ancestors, you];
+    return [...ancestors.map((p) => [p]), [you]];
   }, [pickedResults, firstName, surname, birthYear, birthPlace]);
+
+  const originPlace = useMemo(() => {
+    const first = pickedResults
+      .map((r) => r.birthPlace)
+      .find((p) => !!p);
+    return first ?? null;
+  }, [pickedResults]);
 
   return (
     <div className="min-h-screen bg-background px-6 py-20">
