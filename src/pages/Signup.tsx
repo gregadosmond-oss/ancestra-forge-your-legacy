@@ -90,7 +90,7 @@ const Signup = () => {
           id: userId,
           email: email.trim(),
           first_name: firstName.trim(),
-          surname: lastName.trim(),
+          surname: formatSurname(lastName),
           country_of_origin: COUNTRY_LABELS[country] ?? country,
           tier: "free",
         },
