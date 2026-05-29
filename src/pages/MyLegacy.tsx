@@ -73,12 +73,14 @@ function useLegacyData(userId: string | undefined): LegacyData {
           return;
         }
 
-        // Normalize for DB lookups — surname_crests/surname_facts are keyed on lowercase
+        // Cache lookups (surname_facts/surname_crests) are keyed on lowercase,
+        // but the profile stores the display-friendly Capitalized form.
         const surname = rawSurname.trim().toLowerCase();
+        const displaySurnameForProfile = formatSurname(rawSurname);
 
-        // Always keep profile in sync with the journey surname (store normalized)
-        if (surname !== profile?.surname) {
-          await supabase.from("profiles").upsert({ id: userId, surname }, { onConflict: "id" });
+        // Always keep profile in sync with the journey surname (Capitalized)
+        if (displaySurnameForProfile && displaySurnameForProfile !== profile?.surname) {
+          await supabase.from("profiles").upsert({ id: userId, surname: displaySurnameForProfile }, { onConflict: "id" });
         }
 
         // Step 2: load facts + story + crest + deep legacy research + chapters in parallel
