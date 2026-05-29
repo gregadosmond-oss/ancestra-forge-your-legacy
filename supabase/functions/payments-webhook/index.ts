@@ -98,7 +98,7 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
     await triggerPrintfulOrder({
       productType,
       surname,
-      shippingAddress: JSON.parse(shippingAddressRaw),
+      shippingAddress: typeof shippingAddressRaw === "string" ? JSON.parse(shippingAddressRaw) : shippingAddressRaw,
       buyerEmail: buyerEmail ?? undefined,
     });
   }
