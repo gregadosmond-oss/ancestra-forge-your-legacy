@@ -6,6 +6,8 @@ import { useMarkToolComplete } from "@/hooks/useMarkToolComplete";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import LegacyChart, { type TreePerson } from "@/components/journey/LegacyChart";
 
+type AncestorSource = "wikitree" | "claude-web" | "user" | "ai";
+
 type WikitreeResult = {
   id: string;
   source: "wikitree";
@@ -34,9 +36,31 @@ type ClaudeResult = {
   confidence: "high" | "medium" | "low";
 };
 
+type SavedResult = {
+  id: string;
+  source: AncestorSource;
+  name: string;
+  birthDate: string | null;
+  birthPlace: string | null;
+  deathDate: string | null;
+  deathPlace: string | null;
+  fatherName: string | null;
+  motherName: string | null;
+  profileUrl: string | null;
+  summary?: string | null;
+  confidence?: "high" | "medium" | "low";
+};
+
 type AnyResult =
   | (WikitreeResult & { confidence?: undefined; summary?: undefined })
-  | ClaudeResult;
+  | ClaudeResult
+  | SavedResult;
+
+function sourceBadgeLabel(source: AncestorSource | string | undefined | null): string {
+  if (source === "user") return "Added by you";
+  if (source === "ai" || source === "claude-web") return "AI-assisted";
+  return "WikiTree";
+}
 
 type SearchPhase = "idle" | "wikitree-loading" | "claude-loading" | "done";
 
@@ -72,6 +96,10 @@ const FamilyTree = () => {
   // Hydrated ancestors from DB (rendered alongside fresh search results)
   const [savedResults, setSavedResults] = useState<AnyResult[]>([]);
   const resultsRef = useRef<HTMLDivElement | null>(null);
+
+  // Inline relationship picker for an unsaved search result
+  const [pendingPickId, setPendingPickId] = useState<string | null>(null);
+  const [pendingRelationship, setPendingRelationship] = useState<string>("");
 
   // "Find parents" state — keyed by the ancestor (db) id we're extending from
   const [extendingId, setExtendingId] = useState<string | null>(null);
@@ -117,8 +145,13 @@ const FamilyTree = () => {
     });
     const hydrated: AnyResult[] = rows.map((row: any) => {
       const rid = `db:${row.id}`;
-      const base = {
+      const src: AncestorSource =
+        row.source === "user" || row.source === "ai" || row.source === "claude-web"
+          ? row.source
+          : "wikitree";
+      return {
         id: rid,
+        source: src,
         name: row.name,
         birthDate: row.birth_date ?? null,
         birthPlace: row.birth_place ?? null,
@@ -127,16 +160,9 @@ const FamilyTree = () => {
         fatherName: row.father_name ?? null,
         motherName: row.mother_name ?? null,
         profileUrl: row.profile_url ?? null,
-      };
-      if (row.source === "claude-web") {
-        return {
-          ...base,
-          source: "claude-web" as const,
-          summary: row.summary ?? null,
-          confidence: (row.confidence as "high" | "medium" | "low") ?? "medium",
-        };
-      }
-      return { ...base, source: "wikitree" as const };
+        summary: row.summary ?? null,
+        confidence: (row.confidence as "high" | "medium" | "low") ?? undefined,
+      } as SavedResult;
     });
     setSavedResults(hydrated);
     setPickedIds((prev) => {
@@ -175,14 +201,7 @@ const FamilyTree = () => {
   // Mark complete once at least one ancestor has been added to the tree
   useMarkToolComplete("tree", pickedResults.length > 0);
 
-  // Auto-pick the first wikitree result on initial reveal (lower friction);
-  // user can deselect or add others
-  useEffect(() => {
-    if (searchPhase === "done" && pickedIds.size === 0 && allResults.length > 0) {
-      setPickedIds(new Set([allResults[0].id]));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchPhase]);
+  // (No auto-pick: each search result requires an explicit relationship choice.)
 
   useEffect(() => {
     if (searchPhase === "done" || searchPhase === "claude-loading") {
@@ -259,78 +278,76 @@ const FamilyTree = () => {
     }
   }
 
-  async function togglePick(id: string) {
-    const isPicked = pickedIds.has(id);
+  async function removeAncestor(id: string) {
+    if (!user) return;
+    const dbId = savedDbIds.get(id);
+    if (!dbId) return;
+    const prevPicked = new Set(pickedIds);
     setPickedIds((prev) => {
       const next = new Set(prev);
-      if (isPicked) next.delete(id);
-      else next.add(id);
+      next.delete(id);
       return next;
     });
-    if (!user) return;
-
-    if (isPicked) {
-      // Remove from DB
-      const dbId = savedDbIds.get(id);
-      if (!dbId) return;
-      const { error } = await supabase
-        .from("family_tree_members")
-        .delete()
-        .eq("id", dbId)
-        .eq("user_id", user.id);
-      if (error) {
-        toast.error("Couldn't remove ancestor", { description: error.message });
-        // revert
-        setPickedIds((prev) => new Set(prev).add(id));
-        return;
-      }
-      setSavedDbIds((prev) => {
-        const next = new Map(prev);
-        next.delete(id);
-        return next;
-      });
-      setSavedResults((prev) => prev.filter((r) => r.id !== id));
-    } else {
-      // Add to DB
-      const r = allResults.find((x) => x.id === id);
-      if (!r) return;
-      const isClaude = "confidence" in r && !!r.confidence;
-      const insertRow = {
-        user_id: user.id,
-        source: isClaude ? "claude-web" : r.source ?? "wikitree",
-        name: r.name,
-        birth_date: r.birthDate ?? null,
-        birth_place: r.birthPlace ?? null,
-        death_date: r.deathDate ?? null,
-        death_place: r.deathPlace ?? null,
-        father_name: r.fatherName ?? null,
-        mother_name: r.motherName ?? null,
-        profile_url: r.profileUrl ?? null,
-        summary: (r as any).summary ?? null,
-        confidence: (r as any).confidence ?? null,
-        position: pickedIds.size,
-      };
-      const { data, error } = await supabase
-        .from("family_tree_members")
-        .insert(insertRow)
-        .select("id")
-        .single();
-      if (error || !data) {
-        toast.error("Couldn't save ancestor", { description: error?.message });
-        // revert
-        setPickedIds((prev) => {
-          const next = new Set(prev);
-          next.delete(id);
-          return next;
-        });
-        return;
-      }
-      setSavedDbIds((prev) => {
-        const next = new Map(prev);
-        next.set(id, data.id);
-        return next;
-      });
+    const { error } = await supabase
+      .from("family_tree_members")
+      .delete()
+      .eq("id", dbId)
+      .eq("user_id", user.id);
+    if (error) {
+      toast.error("Couldn't remove ancestor", { description: error.message });
+      setPickedIds(prevPicked);
+      return;
     }
+    setSavedDbIds((prev) => {
+      const next = new Map(prev);
+      next.delete(id);
+      return next;
+    });
+    setSavedGens((prev) => {
+      const next = new Map(prev);
+      next.delete(id);
+      return next;
+    });
+    setSavedResults((prev) => prev.filter((r) => r.id !== id));
+  }
+
+  async function addSearchResult(id: string, generations_back: number, label: string) {
+    if (!user) return;
+    const r = allResults.find((x) => x.id === id);
+    if (!r) return;
+    const isClaude = "confidence" in r && !!r.confidence;
+    const insertRow = {
+      user_id: user.id,
+      source: isClaude ? "claude-web" : (r as any).source ?? "wikitree",
+      name: r.name,
+      birth_date: r.birthDate ?? null,
+      birth_place: r.birthPlace ?? null,
+      death_date: r.deathDate ?? null,
+      death_place: r.deathPlace ?? null,
+      father_name: r.fatherName ?? null,
+      mother_name: r.motherName ?? null,
+      profile_url: r.profileUrl ?? null,
+      summary: (r as any).summary ?? null,
+      confidence: (r as any).confidence ?? null,
+      generations_back,
+      relationship_label: label,
+      position: generations_back,
+    };
+    const { data, error } = await supabase
+      .from("family_tree_members")
+      .insert(insertRow)
+      .select("id")
+      .single();
+    if (error || !data) {
+      toast.error("Couldn't save ancestor", { description: error?.message });
+      return;
+    }
+    setPickedIds((prev) => new Set(prev).add(id));
+    setSavedDbIds((prev) => new Map(prev).set(id, data.id));
+    setSavedGens((prev) => new Map(prev).set(id, generations_back));
+    setPendingPickId(null);
+    toast.success(`${r.name} added as ${label.toLowerCase()}`);
+    await hydrateSaved();
   }
 
   function capitalize(str: string): string {
@@ -578,7 +595,15 @@ const FamilyTree = () => {
               <div className="mt-4 flex flex-col gap-3">
                 {allResults.map((r) => {
                   const picked = pickedIds.has(r.id);
-                  const isClaude = "confidence" in r && !!r.confidence;
+                  const rSource = (r as any).source as AncestorSource | undefined;
+                  const badge = sourceBadgeLabel(rSource);
+                  const isAiBadge = badge === "AI-assisted";
+                  const isUserBadge = badge === "Added by you";
+                  const badgeClass = isAiBadge
+                    ? "border-amber-dim/40 bg-amber-dim/[0.10] text-amber-light"
+                    : isUserBadge
+                      ? "border-cream-soft/30 bg-cream-soft/[0.08] text-cream-soft"
+                      : "border-amber/40 bg-amber/[0.10] text-amber";
                   if (picked) {
                     return (
                       <div
@@ -586,13 +611,9 @@ const FamilyTree = () => {
                         className="relative rounded-[14px] border border-amber/60 bg-amber/[0.08] p-4 text-left transition-all"
                       >
                         <span
-                          className={`absolute right-3 top-3 rounded-pill border px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] ${
-                            isClaude
-                              ? "border-amber-dim/40 bg-amber-dim/[0.10] text-amber-light"
-                              : "border-amber/40 bg-amber/[0.10] text-amber"
-                          }`}
+                          className={`absolute right-3 top-3 rounded-pill border px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] ${badgeClass}`}
                         >
-                          {isClaude ? "AI-assisted" : "WikiTree"}
+                          {badge}
                         </span>
                         <div className="pr-28 font-display text-base text-cream-warm">{r.name}</div>
                         {(r.birthDate || r.birthPlace) && (
@@ -619,7 +640,7 @@ const FamilyTree = () => {
                             onClick={(e) => {
                               e.stopPropagation();
                               if (window.confirm(`Remove ${r.name} from your tree?`)) {
-                                togglePick(r.id);
+                                removeAncestor(r.id);
                               }
                             }}
                             className="font-sans text-[11px] text-text-dim hover:text-cream-soft underline underline-offset-2"
@@ -720,21 +741,16 @@ const FamilyTree = () => {
                       </div>
                     );
                   }
+                  const isPending = pendingPickId === r.id;
                   return (
-                    <button
+                    <div
                       key={r.id}
-                      type="button"
-                      onClick={() => togglePick(r.id)}
                       className="relative rounded-[14px] border border-amber-dim/20 bg-card/60 p-4 text-left transition-all hover:border-amber/40"
                     >
                       <span
-                        className={`absolute right-3 top-3 rounded-pill border px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] ${
-                          isClaude
-                            ? "border-amber-dim/40 bg-amber-dim/[0.10] text-amber-light"
-                            : "border-amber/40 bg-amber/[0.10] text-amber"
-                        }`}
+                        className={`absolute right-3 top-3 rounded-pill border px-2 py-[3px] font-sans text-[10px] uppercase tracking-[1px] ${badgeClass}`}
                       >
-                        {isClaude ? "AI-assisted" : "WikiTree"}
+                        {badge}
                       </span>
                       <div className="pr-28 font-display text-base text-cream-warm">{r.name}</div>
                       {(r.birthDate || r.birthPlace) && (
@@ -752,10 +768,67 @@ const FamilyTree = () => {
                       {"summary" in r && r.summary && (
                         <p className="mt-2 font-serif text-sm italic text-cream-soft">{r.summary}</p>
                       )}
-                      <span className="mt-3 inline-block font-sans text-[11px] uppercase tracking-[1.5px] text-amber">
-                        Add to tree →
-                      </span>
-                    </button>
+                      {!isPending ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPendingPickId(r.id);
+                            setPendingRelationship("");
+                          }}
+                          className="mt-3 inline-block font-sans text-[11px] uppercase tracking-[1.5px] text-amber hover:text-amber-light"
+                        >
+                          Add to tree →
+                        </button>
+                      ) : (
+                        <div className="mt-3 rounded-[10px] border border-amber-dim/30 bg-bg-warm/60 p-3">
+                          <p className="font-sans text-[11px] uppercase tracking-[1.5px] text-amber-dim">
+                            Relationship to you
+                          </p>
+                          <select
+                            value={pendingRelationship}
+                            onChange={(e) => setPendingRelationship(e.target.value)}
+                            className="mt-2 w-full rounded-[10px] border border-amber-dim/30 bg-bg-input/80 px-3 py-2 font-sans text-sm text-cream-soft focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber/40"
+                          >
+                            <option value="">Choose relationship…</option>
+                            {RELATIONSHIP_OPTIONS.map((o) => (
+                              <option key={o.label} value={o.label}>
+                                {o.label}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="mt-3 flex flex-wrap items-center gap-3">
+                            <button
+                              type="button"
+                              disabled={!pendingRelationship}
+                              onClick={() => {
+                                const match = RELATIONSHIP_OPTIONS.find(
+                                  (o) => o.label === pendingRelationship,
+                                );
+                                if (!match) {
+                                  toast.error("Pick a relationship");
+                                  return;
+                                }
+                                addSearchResult(r.id, match.generations_back, match.label);
+                              }}
+                              className="rounded-pill px-5 py-2 font-sans text-[11px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all disabled:cursor-not-allowed disabled:opacity-50"
+                              style={{ background: "linear-gradient(135deg, #e8943a, #c47828)" }}
+                            >
+                              Add to tree
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPendingPickId(null);
+                                setPendingRelationship("");
+                              }}
+                              className="font-sans text-[11px] text-text-dim hover:text-cream-soft underline underline-offset-2"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </div>
