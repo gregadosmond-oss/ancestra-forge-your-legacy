@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { formatSurname } from "@/lib/surname";
 
 const GiftPage = () => {
   const { giftId } = useParams<{ giftId: string }>();
