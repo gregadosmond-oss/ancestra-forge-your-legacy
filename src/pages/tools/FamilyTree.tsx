@@ -93,8 +93,8 @@ const FamilyTree = () => {
   }, [user]);
 
   const allResults: AnyResult[] = useMemo(
-    () => [...(wikitreeResults ?? []), ...(claudeResults ?? [])],
-    [wikitreeResults, claudeResults],
+    () => [...savedResults, ...(wikitreeResults ?? []), ...(claudeResults ?? [])],
+    [savedResults, wikitreeResults, claudeResults],
   );
 
   const pickedResults = allResults.filter((r) => pickedIds.has(r.id));
