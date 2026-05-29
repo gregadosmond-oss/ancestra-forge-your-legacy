@@ -702,6 +702,96 @@ ${chapterTitlePage(num, title)}
       line-height: 1.7;
     }
 
+    .family-notes {
+      min-height: calc(280mm - 56mm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-sizing: border-box;
+      padding-top: 18mm;
+    }
+    .family-notes h2 {
+      font-family: 'Libre Caslon Display', serif;
+      font-style: italic;
+      font-size: 32pt;
+      color: var(--heading);
+      margin: 0 0 6mm 0;
+      text-align: center;
+    }
+    .family-notes .family-notes-sub {
+      font-family: 'Libre Caslon Text', serif;
+      font-style: italic;
+      font-size: 12pt;
+      color: var(--motto);
+      text-align: center;
+      max-width: 130mm;
+      margin: 0 auto 14mm auto;
+      line-height: 1.5;
+    }
+    .family-notes .family-notes-lines {
+      width: 140mm;
+      margin: 0 auto;
+    }
+    .family-notes .family-notes-line {
+      border-bottom: 0.5pt solid var(--divider);
+      height: 14mm;
+    }
+
+    .final-dedication {
+      min-height: calc(280mm - 56mm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-sizing: border-box;
+      padding: 30mm 20mm;
+    }
+    .final-dedication .fd-ornament {
+      font-size: 16pt;
+      letter-spacing: 0.4em;
+      color: var(--divider);
+      margin-bottom: 18mm;
+    }
+    .final-dedication .fd-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10pt;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--chapter-label);
+      margin-bottom: 10mm;
+    }
+    .final-dedication .fd-body {
+      font-family: 'Libre Caslon Text', serif;
+      font-size: 13pt;
+      line-height: 1.7;
+      color: var(--body-text);
+      max-width: 130mm;
+      margin: 0 auto 14mm auto;
+    }
+    .final-dedication .fd-motto-latin {
+      font-family: 'Libre Caslon Text', serif;
+      font-style: italic;
+      font-size: 14pt;
+      color: var(--motto);
+      margin-top: 4mm;
+    }
+    .final-dedication .fd-motto-en {
+      font-family: 'Libre Caslon Text', serif;
+      font-style: italic;
+      font-size: 11pt;
+      color: var(--chapter-label);
+      margin-top: 2mm;
+    }
+    .final-dedication .fd-colophon {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8pt;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--chapter-label);
+      margin-top: 20mm;
+
+
     .certificate {
       page-break-before: always;
       page-break-after: avoid;
