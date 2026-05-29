@@ -565,7 +565,7 @@ const FamilyTree = () => {
           </div>
         )}
 
-        {searchPhase === "done" && wikitreeResults !== null && (
+        {((searchPhase === "done" && wikitreeResults !== null) || savedResults.length > 0) && (
           <div ref={resultsRef} className="mx-auto mt-10 max-w-xl">
             <p className="text-center font-sans text-[11px] uppercase tracking-[2px] text-amber-dim">
               Tap matches to add to your tree
