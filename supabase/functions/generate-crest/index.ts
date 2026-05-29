@@ -33,7 +33,7 @@ Deno.serve(async (req: Request) => {
     return json({ error: "missing env" }, 500);
   }
 
-  let body: { surname?: unknown; facts?: unknown };
+  let body: { surname?: unknown; facts?: unknown; user_id?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -54,6 +54,9 @@ Deno.serve(async (req: Request) => {
     return json({ error: "facts.symbolism must be a non-empty array" }, 400);
   }
 
+  const userId = typeof body.user_id === "string" && body.user_id.trim().length > 0
+    ? body.user_id.trim()
+    : null;
   const facts = body.facts as LegacyFacts;
   const client = createClient(supabaseUrl, supabaseKey);
 
