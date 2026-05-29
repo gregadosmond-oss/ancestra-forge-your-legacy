@@ -232,6 +232,30 @@ const Novel = () => {
 
   const certNumber = `${displaySurname.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8)}-${Date.now().toString().slice(-6)}`;
 
+  // Build generations for the Family Tree section (sorted oldest → youngest)
+  const treeGenerations: TreePerson[][] = (() => {
+    if (treeMembers.length === 0) return [];
+    const sorted = [...treeMembers].sort((a, b) => {
+      const ay = parseInt(String(a.birth_date ?? "").slice(0, 4), 10);
+      const by = parseInt(String(b.birth_date ?? "").slice(0, 4), 10);
+      const aNum = Number.isNaN(ay) ? 9999 : ay;
+      const bNum = Number.isNaN(by) ? 9999 : by;
+      if (aNum !== bNum) return aNum - bNum;
+      return (a.position ?? 0) - (b.position ?? 0);
+    });
+    return sorted.map((m) => [
+      {
+        name: m.name,
+        birthYear: m.birth_date ?? null,
+        birthPlace: m.birth_place ?? null,
+        deathYear: m.death_date ?? null,
+        deathPlace: m.death_place ?? null,
+      } as TreePerson,
+    ]);
+  })();
+  const treeOriginPlace =
+    treeMembers.map((m) => m.birth_place).find((p) => !!p) ?? null;
+
   return (
     <div className="relative min-h-screen bg-background">
       {/* Reading progress */}
