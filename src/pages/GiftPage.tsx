@@ -133,7 +133,7 @@ const GiftPage = () => {
     );
   }
 
-  const surname = gift.surname.charAt(0).toUpperCase() + gift.surname.slice(1);
+  const surname = formatSurname(gift.surname);
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-16 relative overflow-hidden">
