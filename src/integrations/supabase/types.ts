@@ -346,11 +346,14 @@ export type Database = {
           death_date: string | null
           death_place: string | null
           father_name: string | null
+          generations_back: number | null
           id: string
+          known_notes: string | null
           mother_name: string | null
           name: string
           position: number
           profile_url: string | null
+          relationship_label: string | null
           source: string
           summary: string | null
           user_id: string
@@ -363,11 +366,14 @@ export type Database = {
           death_date?: string | null
           death_place?: string | null
           father_name?: string | null
+          generations_back?: number | null
           id?: string
+          known_notes?: string | null
           mother_name?: string | null
           name: string
           position?: number
           profile_url?: string | null
+          relationship_label?: string | null
           source: string
           summary?: string | null
           user_id: string
@@ -380,11 +386,14 @@ export type Database = {
           death_date?: string | null
           death_place?: string | null
           father_name?: string | null
+          generations_back?: number | null
           id?: string
+          known_notes?: string | null
           mother_name?: string | null
           name?: string
           position?: number
           profile_url?: string | null
+          relationship_label?: string | null
           source?: string
           summary?: string | null
           user_id?: string
