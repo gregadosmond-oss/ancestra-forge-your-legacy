@@ -93,6 +93,7 @@ serve(async (req) => {
       payment_method_types: ["card"],
       return_url: returnUrl || `${req.headers.get("origin")}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
       ...(customerEmail && { customer_email: customerEmail }),
+      ...(userId && { client_reference_id: userId }),
       metadata,
     });
 
