@@ -4,6 +4,25 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { stripMarkdown } from "@/lib/utils";
+import LegacyChart, { type TreePerson } from "@/components/journey/LegacyChart";
+
+type TreeRow = {
+  id: string;
+  name: string;
+  birth_date: string | null;
+  birth_place: string | null;
+  death_date: string | null;
+  death_place: string | null;
+  position: number | null;
+};
+
+type MemoryRow = {
+  id: string;
+  relative_name: string;
+  relationship: string;
+  answers: Record<string, unknown> | null;
+  created_at: string;
+};
 
 type Fixture = {
   surname?: string;
@@ -46,6 +65,8 @@ const Novel = () => {
   const [surname, setSurname] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const [treeMembers, setTreeMembers] = useState<TreeRow[]>([]);
+  const [memories, setMemories] = useState<MemoryRow[]>([]);
   const ranRef = useRef(false);
 
   const displaySurname =
@@ -111,6 +132,23 @@ const Novel = () => {
         }
 
         setFixture(getRes!.fixture!);
+
+        // Personal sections: tree + memories (RLS scopes to this user)
+        const [treeRes, memRes] = await Promise.all([
+          supabase
+            .from("family_tree_members")
+            .select("id,name,birth_date,birth_place,death_date,death_place,position")
+            .eq("user_id", user.id)
+            .order("position", { ascending: true }),
+          supabase
+            .from("family_memories")
+            .select("id,relative_name,relationship,answers,created_at")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: true }),
+        ]);
+        if (treeRes.data) setTreeMembers(treeRes.data as TreeRow[]);
+        if (memRes.data) setMemories(memRes.data as MemoryRow[]);
+
         setPhase("ready");
       } catch (e) {
         console.error("Novel load error", e);
@@ -193,6 +231,30 @@ const Novel = () => {
   ];
 
   const certNumber = `${displaySurname.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8)}-${Date.now().toString().slice(-6)}`;
+
+  // Build generations for the Family Tree section (sorted oldest → youngest)
+  const treeGenerations: TreePerson[][] = (() => {
+    if (treeMembers.length === 0) return [];
+    const sorted = [...treeMembers].sort((a, b) => {
+      const ay = parseInt(String(a.birth_date ?? "").slice(0, 4), 10);
+      const by = parseInt(String(b.birth_date ?? "").slice(0, 4), 10);
+      const aNum = Number.isNaN(ay) ? 9999 : ay;
+      const bNum = Number.isNaN(by) ? 9999 : by;
+      if (aNum !== bNum) return aNum - bNum;
+      return (a.position ?? 0) - (b.position ?? 0);
+    });
+    return sorted.map((m) => [
+      {
+        name: m.name,
+        birthYear: m.birth_date ?? null,
+        birthPlace: m.birth_place ?? null,
+        deathYear: m.death_date ?? null,
+        deathPlace: m.death_place ?? null,
+      } as TreePerson,
+    ]);
+  })();
+  const treeOriginPlace =
+    treeMembers.map((m) => m.birth_place).find((p) => !!p) ?? null;
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -335,6 +397,88 @@ const Novel = () => {
             <p className="mt-2 font-serif italic text-amber-dim">— {mottoEnglish}</p>
           )}
         </section>
+
+        {/* Family Tree */}
+        {treeMembers.length > 0 && (
+          <>
+            <section className="flex min-h-[40vh] flex-col items-center justify-center py-16 text-center">
+              <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
+                Part Two
+              </p>
+              <h2 className="mt-6 font-display text-4xl italic text-amber-light">
+                Your Family Tree
+              </h2>
+              <div className="mt-6 text-sm tracking-[0.4em] text-amber-dim">✦ ❦ ✦</div>
+            </section>
+            <section className="py-8">
+              <LegacyChart
+                surname={displaySurname || "Family"}
+                generations={treeGenerations}
+                originPlace={treeOriginPlace}
+                currentPlace={null}
+              />
+            </section>
+          </>
+        )}
+
+        {/* In Their Words — Family Memories */}
+        {memories.length > 0 && (
+          <>
+            <section className="flex min-h-[40vh] flex-col items-center justify-center py-16 text-center">
+              <p className="font-sans text-[10px] uppercase tracking-[4px] text-amber-dim">
+                Part Three
+              </p>
+              <h2 className="mt-6 font-display text-4xl italic text-amber-light">
+                In Their Words
+              </h2>
+              <p className="mt-4 font-serif italic text-cream-soft">
+                Family Memories
+              </p>
+              <div className="mt-6 text-sm tracking-[0.4em] text-amber-dim">✦ ❦ ✦</div>
+            </section>
+            <section className="py-8">
+              {memories.map((m) => {
+                const entries = m.answers && typeof m.answers === "object"
+                  ? Object.entries(m.answers as Record<string, unknown>).filter(
+                      ([, v]) => v != null && String(v).trim().length > 0,
+                    )
+                  : [];
+                return (
+                  <div key={m.id} className="mb-16">
+                    <h3 className="text-center font-display text-2xl text-cream-warm">
+                      {m.relative_name}
+                    </h3>
+                    <p className="text-center font-serif italic text-amber-dim">
+                      {m.relationship}
+                    </p>
+                    <Ornament />
+                    <div className="mx-auto max-w-xl space-y-6">
+                      {entries.length === 0 ? (
+                        <p className="text-center font-serif italic text-text-dim">
+                          (No memories recorded yet.)
+                        </p>
+                      ) : (
+                        entries.map(([q, a]) => (
+                          <div key={q}>
+                            <p className="font-sans text-[10px] uppercase tracking-[3px] text-amber-dim">
+                              {q}
+                            </p>
+                            <p
+                              className="mt-2 whitespace-pre-line font-serif leading-[1.85] text-text-body"
+                              style={{ fontSize: "1.0625rem" }}
+                            >
+                              {String(a)}
+                            </p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </section>
+          </>
+        )}
 
         {/* Legacy Certificate */}
         <section className="py-16">
