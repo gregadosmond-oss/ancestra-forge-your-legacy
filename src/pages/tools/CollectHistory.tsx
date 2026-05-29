@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -41,6 +41,14 @@ const PROMPTS: { key: string; label: string; placeholder: string }[] = [
   },
 ];
 
+type MemoryRow = {
+  id: string;
+  relative_name: string;
+  relationship: string;
+  answers: Record<string, string>;
+  created_at: string;
+};
+
 type FormState = {
   relativeName: string;
   relationship: string;
@@ -65,8 +73,37 @@ const CollectHistory = () => {
   const [saving, setSaving] = useState(false);
   const [savedCount, setSavedCount] = useState(0);
   const [justSavedName, setJustSavedName] = useState<string | null>(null);
+  const [memories, setMemories] = useState<MemoryRow[]>([]);
+  const [loadingMemories, setLoadingMemories] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  useMarkToolComplete("collect", savedCount > 0);
+  useMarkToolComplete("collect", savedCount > 0 || memories.length > 0);
+
+  async function fetchMemories() {
+    if (!user) {
+      setMemories([]);
+      setLoadingMemories(false);
+      return;
+    }
+    setLoadingMemories(true);
+    const { data, error } = await supabase
+      .from("family_memories")
+      .select("id, relative_name, relationship, answers, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+    if (error) {
+      console.warn("fetchMemories failed", error);
+    } else {
+      setMemories((data as MemoryRow[]) ?? []);
+      setSavedCount((data ?? []).length);
+    }
+    setLoadingMemories(false);
+  }
+
+  useEffect(() => {
+    fetchMemories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   function updateAnswer(key: string, value: string) {
     setForm((f) => ({ ...f, answers: { ...f.answers, [key]: value } }));
@@ -102,13 +139,12 @@ const CollectHistory = () => {
       });
       if (error) throw error;
       setJustSavedName(form.relativeName.trim());
-      setSavedCount((n) => n + 1);
       toast.success("Memory saved");
       // Refresh the AI-woven memories chapter in the background (fire & forget)
       supabase.functions
         .invoke("weave-memories-chapter", { body: { user_id: user.id } })
         .catch((e) => console.warn("weave-memories-chapter failed", e));
-
+      await fetchMemories();
     } catch (err) {
       toast.error("Couldn't save", { description: (err as Error).message });
     } finally {
@@ -116,11 +152,36 @@ const CollectHistory = () => {
     }
   }
 
+  async function removeMemory(id: string, relativeName: string) {
+    if (!user) return;
+    if (!window.confirm(`Remove ${relativeName}'s memory?`)) return;
+    setDeletingId(id);
+    const prev = [...memories];
+    setMemories((m) => m.filter((row) => row.id !== id));
+    const { error } = await supabase
+      .from("family_memories")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user.id);
+    if (error) {
+      toast.error("Couldn't remove memory", { description: error.message });
+      setMemories(prev);
+      setDeletingId(null);
+      return;
+    }
+    setSavedCount((n) => Math.max(0, n - 1));
+    toast.success(`${relativeName}'s memory removed`);
+    setDeletingId(null);
+  }
+
   function addAnother() {
     setForm(emptyForm());
     setJustSavedName(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+
+  const relationshipLabel = (value: string) =>
+    RELATIONSHIPS.find((r) => r.value === value)?.label ?? value;
 
   return (
     <div className="min-h-screen bg-background px-6 py-20">
@@ -222,6 +283,70 @@ const CollectHistory = () => {
               {saving ? "Saving…" : "Save this memory"}
             </button>
           </form>
+        )}
+
+        {/* Saved memories list */}
+        {user && (
+          <div className="mt-14">
+            <div className="flex items-center justify-between">
+              <p className="font-sans text-[11px] uppercase tracking-[3px] text-amber-dim">
+                Saved memories
+              </p>
+              {loadingMemories && (
+                <span className="font-sans text-[11px] text-text-dim">Loading…</span>
+              )}
+            </div>
+
+            {memories.length === 0 && !loadingMemories && (
+              <p className="mt-4 rounded-[10px] border border-amber-dim/20 bg-card/40 px-4 py-4 text-center font-sans text-sm text-text-dim">
+                No memories saved yet. Fill in the form above to add your first one.
+              </p>
+            )}
+
+            <div className="mt-4 flex flex-col gap-4">
+              {memories.map((m) => (
+                <div
+                  key={m.id}
+                  className="relative rounded-[14px] border border-amber-dim/20 bg-card/50 p-5 backdrop-blur-sm"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-display text-lg text-cream-warm">
+                        {m.relative_name}
+                      </h3>
+                      <p className="mt-0.5 font-sans text-[11px] uppercase tracking-[1.5px] text-amber-dim">
+                        {relationshipLabel(m.relationship)}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeMemory(m.id, m.relative_name)}
+                      disabled={deletingId === m.id}
+                      className="shrink-0 font-sans text-[11px] text-text-dim hover:text-cream-soft underline underline-offset-2 disabled:opacity-50"
+                    >
+                      {deletingId === m.id ? "Removing…" : "Remove"}
+                    </button>
+                  </div>
+                  <div className="mt-3 flex flex-col gap-2">
+                    {PROMPTS.map((p) => {
+                      const answer = m.answers[p.key];
+                      if (!answer || !answer.trim()) return null;
+                      return (
+                        <div key={p.key}>
+                          <p className="font-sans text-[10px] uppercase tracking-[1.5px] text-amber-dim">
+                            {p.label}
+                          </p>
+                          <p className="mt-0.5 font-sans text-sm text-cream-soft">
+                            {answer}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>
