@@ -80,33 +80,40 @@ export default function BloodlineQuiz() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleAnswer = async (letter: string) => {
+  const handleAnswer = (letter: string) => {
+    console.log("[DEBUG] handleAnswer called with letter:", letter, "current step:", step, "current answers:", answers);
     const newAnswers = [...answers, letter];
     setAnswers(newAnswers);
 
     if (newAnswers.length < 5) {
+      console.log("[DEBUG] Advancing to step", step + 1);
       setStep(step + 1);
     } else {
       // All answered — submit
+      console.log("[DEBUG] All answered, submitting quiz");
       setStep(6);
-      setLoading(true);
-      setError(null);
-      try {
-        const { data, error: fnError } = await supabase.functions.invoke(
-          "bloodline-quiz",
-          { body: { answers: newAnswers } },
-        );
-        if (fnError) throw new Error(fnError.message);
-        if (!data || data.error) {
-          setError(data?.error || "Something went wrong. Please try again.");
-          return;
-        }
-        setResult(data as QuizResult);
-      } catch {
-        setError("Something went wrong. Please try again.");
-      } finally {
-        setLoading(false);
+      submitQuiz(newAnswers);
+    }
+  };
+
+  const submitQuiz = async (finalAnswers: string[]) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke(
+        "bloodline-quiz",
+        { body: { answers: finalAnswers } },
+      );
+      if (fnError) throw new Error(fnError.message);
+      if (!data || data.error) {
+        setError(data?.error || "Something went wrong. Please try again.");
+        return;
       }
+      setResult(data as QuizResult);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
