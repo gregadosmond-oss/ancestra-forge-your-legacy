@@ -4,6 +4,25 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { stripMarkdown } from "@/lib/utils";
+import LegacyChart, { type TreePerson } from "@/components/journey/LegacyChart";
+
+type TreeRow = {
+  id: string;
+  name: string;
+  birth_date: string | null;
+  birth_place: string | null;
+  death_date: string | null;
+  death_place: string | null;
+  position: number | null;
+};
+
+type MemoryRow = {
+  id: string;
+  relative_name: string;
+  relationship: string;
+  answers: Record<string, unknown> | null;
+  created_at: string;
+};
 
 type Fixture = {
   surname?: string;
