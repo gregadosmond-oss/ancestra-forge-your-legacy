@@ -67,9 +67,18 @@ const FamilyTree = () => {
   const [pickedIds, setPickedIds] = useState<Set<string>>(new Set());
   // Map of result.id → row id in family_tree_members (for delete)
   const [savedDbIds, setSavedDbIds] = useState<Map<string, string>>(new Map());
+  // Map of result.id → generations_back (for the saved rows)
+  const [savedGens, setSavedGens] = useState<Map<string, number>>(new Map());
   // Hydrated ancestors from DB (rendered alongside fresh search results)
   const [savedResults, setSavedResults] = useState<AnyResult[]>([]);
   const resultsRef = useRef<HTMLDivElement | null>(null);
+
+  // "Find parents" state — keyed by the ancestor (db) id we're extending from
+  const [extendingId, setExtendingId] = useState<string | null>(null);
+  const [extendLoading, setExtendLoading] = useState(false);
+  const [extendResults, setExtendResults] = useState<AnyResult[] | null>(null);
+  const [extendSourceLabel, setExtendSourceLabel] = useState<"wikitree" | "ai" | null>(null);
+  const [extendError, setExtendError] = useState<string | null>(null);
 
   // Prefill from profile
   useEffect(() => {
