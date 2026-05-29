@@ -141,8 +141,13 @@ const FamilyTree = () => {
     });
     const hydrated: AnyResult[] = rows.map((row: any) => {
       const rid = `db:${row.id}`;
-      const base = {
+      const src: AncestorSource =
+        row.source === "user" || row.source === "ai" || row.source === "claude-web"
+          ? row.source
+          : "wikitree";
+      return {
         id: rid,
+        source: src,
         name: row.name,
         birthDate: row.birth_date ?? null,
         birthPlace: row.birth_place ?? null,
@@ -151,16 +156,9 @@ const FamilyTree = () => {
         fatherName: row.father_name ?? null,
         motherName: row.mother_name ?? null,
         profileUrl: row.profile_url ?? null,
-      };
-      if (row.source === "claude-web") {
-        return {
-          ...base,
-          source: "claude-web" as const,
-          summary: row.summary ?? null,
-          confidence: (row.confidence as "high" | "medium" | "low") ?? "medium",
-        };
-      }
-      return { ...base, source: "wikitree" as const };
+        summary: row.summary ?? null,
+        confidence: (row.confidence as "high" | "medium" | "low") ?? undefined,
+      } as SavedResult;
     });
     setSavedResults(hydrated);
     setPickedIds((prev) => {
