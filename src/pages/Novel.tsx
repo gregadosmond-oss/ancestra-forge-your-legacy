@@ -452,7 +452,10 @@ const Novel = () => {
               <p className="mt-4 font-serif italic text-cream-soft">
                 Family Memories
               </p>
+              <div className="mt-6 text-sm tracking-[0.4em] text-amber-dim">✦ ❦ ✦</div>
+            </section>
             <section className="py-8">
+
               {memoriesProse && memoriesProse.trim().length > 0 ? (
                 <div className="mx-auto max-w-xl">
                   {memoriesProse
