@@ -250,17 +250,23 @@ const Novel = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, [phase]);
 
-  if (phase === "loading" || phase === "generating") {
+  if (phase === "loading" || phase === "generating" || phase === "generating-personal") {
+    const heading =
+      phase === "generating-personal"
+        ? "Writing your family's story…"
+        : displaySurname
+          ? `The ${displaySurname} Novel`
+          : "Your Novel";
+    const subline =
+      phase === "generating-personal"
+        ? "This takes about a minute — we're weaving your ancestors into all nine chapters."
+        : phase === "generating"
+          ? "Forging your novel from the archive… this can take up to a minute."
+          : "Opening the archive…";
     return (
       <div className="min-h-screen bg-background px-6 py-24 text-center">
-        <h1 className="font-display text-3xl text-cream-warm">
-          {displaySurname ? `The ${displaySurname} Novel` : "Your Novel"}
-        </h1>
-        <p className="mt-6 font-serif italic text-amber-light">
-          {phase === "generating"
-            ? "Forging your novel from the archive… this can take up to a minute."
-            : "Opening the archive…"}
-        </p>
+        <h1 className="font-display text-3xl text-cream-warm">{heading}</h1>
+        <p className="mt-6 font-serif italic text-amber-light">{subline}</p>
       </div>
     );
   }
