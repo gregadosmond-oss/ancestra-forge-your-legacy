@@ -649,6 +649,33 @@ export type Database = {
         }
         Relationships: []
       }
+      personal_legacy_stories: {
+        Row: {
+          chapters: Json
+          created_at: string
+          model: string | null
+          signature: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chapters: Json
+          created_at?: string
+          model?: string | null
+          signature: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chapters?: Json
+          created_at?: string
+          model?: string | null
+          signature?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           birth_year: number | null
