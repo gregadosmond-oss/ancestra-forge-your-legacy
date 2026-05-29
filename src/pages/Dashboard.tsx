@@ -212,10 +212,10 @@ const Dashboard = () => {
                   Read your novel
                 </Link>
                 <Link
-                  to="/order-book"
+                  to="/shop"
                   className="inline-flex items-center justify-center rounded-full border border-amber-dim/30 bg-card/60 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-amber-light transition-all duration-300 hover:border-amber hover:bg-card-hover"
                 >
-                  Order the physical book — $99
+                  Order the Physical Book — $99
                 </Link>
               </div>
             </div>

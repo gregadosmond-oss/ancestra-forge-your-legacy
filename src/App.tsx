@@ -40,7 +40,7 @@ import Login from "./pages/Login.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import ForgeCrest from "./pages/tools/ForgeCrest.tsx";
 import Novel from "./pages/Novel.tsx";
-import OrderBook from "./pages/OrderBook.tsx";
+
 import FamilyStory from "./pages/tools/FamilyStory.tsx";
 import FamilyTree from "./pages/tools/FamilyTree.tsx";
 import CollectHistory from "./pages/tools/CollectHistory.tsx";
@@ -106,7 +106,7 @@ const App = () => (
               <Route path="/tools/collect" element={<LegacyGuard><CollectHistory /></LegacyGuard>} />
               <Route path="/upgrade" element={<Upgrade />} />
               <Route path="/novel" element={<NovelGuard><Novel /></NovelGuard>} />
-              <Route path="/order-book" element={<OrderBook />} />
+              <Route path="/order-book" element={<Navigate to="/shop" replace />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Route>
