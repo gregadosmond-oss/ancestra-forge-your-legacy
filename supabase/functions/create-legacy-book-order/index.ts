@@ -234,17 +234,21 @@ serve(async (req) => {
     });
 
   try {
+    // Derive folder + filename from interiorPath (may be per-user: books/users/{file})
+    const interiorDir = interiorPath.substring(0, interiorPath.lastIndexOf("/"));
+    const interiorFile = interiorPath.substring(interiorPath.lastIndexOf("/") + 1);
+
     const [interiorList, coverList] = await Promise.all([
       supabase.storage
         .from("print-designs")
-        .list("books", { search: `${normalizedSurname}-book-interior.pdf` }),
+        .list(interiorDir, { search: interiorFile }),
       supabase.storage
         .from("print-designs")
         .list("books", { search: `${normalizedSurname}-book-cover.pdf` }),
     ]);
     if (
       interiorList.error || coverList.error ||
-      !interiorList.data?.some((f) => f.name === `${normalizedSurname}-book-interior.pdf`) ||
+      !interiorList.data?.some((f) => f.name === interiorFile) ||
       !coverList.data?.some((f) => f.name === `${normalizedSurname}-book-cover.pdf`)
     ) {
       return missingResponse();
