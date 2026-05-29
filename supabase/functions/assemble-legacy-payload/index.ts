@@ -126,14 +126,87 @@ Deno.serve(async (req) => {
     }
   }
 
+  // 4. Fetch (or generate) the personalized 9-chapter story so the printed book
+  //    reads identically to the /novel page.
+  type PersonalChapter = { title: string; body: string };
+  type PersonalStory = { chapterOne: PersonalChapter; chapters: PersonalChapter[] };
+  const isValidStory = (ch: any): ch is PersonalStory =>
+    !!ch &&
+    ch.chapterOne &&
+    typeof ch.chapterOne.title === "string" &&
+    typeof ch.chapterOne.body === "string" &&
+    Array.isArray(ch.chapters) &&
+    ch.chapters.length === 8 &&
+    ch.chapters.every(
+      (c: any) => typeof c?.title === "string" && typeof c?.body === "string",
+    );
+
+  let personalStory: PersonalStory | null = null;
+  const { data: existingStoryRow } = await supabase
+    .from("personal_legacy_stories")
+    .select("chapters")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (existingStoryRow && isValidStory(existingStoryRow.chapters)) {
+    personalStory = existingStoryRow.chapters as PersonalStory;
+  } else {
+    try {
+      const genRes = await fetch(
+        `${SUPABASE_URL}/functions/v1/generate-personal-story`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+            apikey: SERVICE_ROLE_KEY,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ user_id: userId }),
+        },
+      );
+      if (genRes.ok) {
+        const genJson = await genRes.json();
+        if (isValidStory(genJson?.chapters)) {
+          personalStory = genJson.chapters as PersonalStory;
+        } else {
+          console.warn(
+            "[assemble-legacy-payload] generate-personal-story returned invalid shape",
+          );
+        }
+      } else {
+        console.warn(
+          "[assemble-legacy-payload] generate-personal-story failed",
+          genRes.status,
+          (await genRes.text()).slice(0, 300),
+        );
+      }
+    } catch (e) {
+      console.warn("[assemble-legacy-payload] generate-personal-story threw", e);
+    }
+  }
+
+  // If we have a personalized story, override the shared fixture's story
+  // chapters so the book renders the same Chapters I–IX as /novel.
+  const mergedStory = personalStory
+    ? {
+        ...(shared?.story ?? {}),
+        chapterOneTitle: personalStory.chapterOne.title,
+        chapterOneBody: personalStory.chapterOne.body,
+        teaserChapters: personalStory.chapters.map((c) => c.title),
+        chapterBodies: personalStory.chapters.map((c) => c.body),
+      }
+    : shared?.story;
+
   const combined = {
     ...shared,
+    story: mergedStory,
     personal: {
       user_id: userId,
       tree,
       memories,
       memoriesProse,
       assembledAt: new Date().toISOString(),
+      personalStoryUsed: !!personalStory,
     },
   };
 
