@@ -1150,7 +1150,27 @@ ${personalSectionsHtml(fixture)}
       </div>
     </div>
   </div>
+  </section>
+
+<section class="family-notes clean-page">
+  <h2>Family Notes</h2>
+  <div class="family-notes-sub">Every generation adds to the story. Use this page to write what should never be forgotten.</div>
+  <div class="family-notes-lines">
+    ${Array.from({ length: 9 }).map(() => `<div class="family-notes-line"></div>`).join("")}
+  </div>
 </section>
+
+<section class="final-dedication clean-page">
+  <div class="fd-ornament">✦ ❦ ✦</div>
+  <div class="fd-eyebrow">Dedication</div>
+  <div class="fd-body">
+    For Kevin Osmond — and for everyone like him: the family historians who follow the thread back as far as it will go, gathering the names, dates, and stories so they are never lost. Every book like this one exists because someone cared enough to remember. It is dedicated to them.
+  </div>
+  ${mottoLatin ? `<div class="fd-motto-latin">"${escapeHtml(mottoLatin)}"</div>` : ""}
+  ${mottoEnglish ? `<div class="fd-motto-en">${escapeHtml(mottoEnglish)}</div>` : ""}
+  <div class="fd-colophon">Created with AncestorsQR · ${new Date().getFullYear()}</div>
+</section>
+
 
 </body>
 </html>`;
