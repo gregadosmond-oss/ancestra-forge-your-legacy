@@ -390,7 +390,43 @@ export default function Shop() {
             Includes a printable Legacy Certificate — bound as page 42 of your book and available digitally on your dashboard.
           </p>
 
-          {!checkoutOpen ? (
+          {!user ? (
+            <div className="mt-10 flex flex-col items-center gap-5 text-center">
+              <h3 className="font-display text-2xl text-cream-warm" style={{ fontSize: 26 }}>
+                Your book begins with your story
+              </h3>
+              <p className="max-w-md font-serif italic" style={{ color: "#c4b8a6", fontSize: 16 }}>
+                Create your account and complete your journey to unlock your Legacy Book.
+              </p>
+              <Link
+                to="/signup"
+                className="mt-2 inline-block rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
+              >
+                Begin Your Journey
+              </Link>
+            </div>
+          ) : completedCount === null ? (
+            <div className="mt-10 flex justify-center">
+              <div className="h-10 w-48 animate-pulse rounded-full bg-card/60" />
+            </div>
+          ) : completedCount < 10 ? (
+            <div className="mt-10 flex flex-col items-center gap-5 text-center">
+              <h3 className="font-display text-2xl text-cream-warm" style={{ fontSize: 26 }}>
+                Your Legacy Book is forged from your journey
+              </h3>
+              <p className="max-w-md font-serif italic" style={{ color: "#c4b8a6", fontSize: 16 }}>
+                You've completed {completedCount} of 10 tools. Finish all 10 to unlock your book.
+              </p>
+              <Link
+                to="/dashboard"
+                className="mt-2 inline-block rounded-pill px-10 py-4 font-sans text-[13px] font-semibold uppercase tracking-[1.5px] transition-all duration-300 hover:-translate-y-0.5"
+                style={{ background: "linear-gradient(135deg, #e8943a, #c47828)", color: "#1a1208" }}
+              >
+                Go to Dashboard
+              </Link>
+            </div>
+          ) : !checkoutOpen ? (
             <form onSubmit={handleSubmit} className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <label className="mb-2 block font-sans text-[10px] uppercase tracking-[2px]" style={{ color: "#a07830" }}>Surname *</label>
