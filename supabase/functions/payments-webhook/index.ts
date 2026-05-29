@@ -350,7 +350,8 @@ async function triggerLegacyBookOrder({
     const gelatoRes = await callFn("create-legacy-book-order", {
       surname: normalized,
       shippingAddress,
-      orderType: "order",
+      // Safety gate: sandbox/preview checkouts NEVER trigger a live print.
+      orderType: env === "sandbox" ? "draft" : "order",
       quantity: 1,
     });
 
