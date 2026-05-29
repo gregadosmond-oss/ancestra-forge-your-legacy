@@ -92,51 +92,59 @@ const FamilyTree = () => {
     })();
   }, [user]);
 
-  // Hydrate saved tree members from DB on mount
-  useEffect(() => {
+  // Hydrate saved tree members from DB
+  const hydrateSaved = async () => {
     if (!user) return;
-    (async () => {
-      const { data, error } = await supabase
-        .from("family_tree_members")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("position", { ascending: true });
-      if (error || !data) return;
-      const hydrated: AnyResult[] = data.map((row: any) => {
-        const rid = `db:${row.id}`;
-        const base = {
-          id: rid,
-          name: row.name,
-          birthDate: row.birth_date ?? null,
-          birthPlace: row.birth_place ?? null,
-          deathDate: row.death_date ?? null,
-          deathPlace: row.death_place ?? null,
-          fatherName: row.father_name ?? null,
-          motherName: row.mother_name ?? null,
-          profileUrl: row.profile_url ?? null,
+    const { data, error } = await supabase
+      .from("family_tree_members")
+      .select("*")
+      .eq("user_id", user.id);
+    if (error || !data) return;
+    const rows = [...data].sort((a: any, b: any) => {
+      const ag = a.generations_back ?? 9999;
+      const bg = b.generations_back ?? 9999;
+      if (ag !== bg) return ag - bg;
+      return (a.position ?? 0) - (b.position ?? 0);
+    });
+    const hydrated: AnyResult[] = rows.map((row: any) => {
+      const rid = `db:${row.id}`;
+      const base = {
+        id: rid,
+        name: row.name,
+        birthDate: row.birth_date ?? null,
+        birthPlace: row.birth_place ?? null,
+        deathDate: row.death_date ?? null,
+        deathPlace: row.death_place ?? null,
+        fatherName: row.father_name ?? null,
+        motherName: row.mother_name ?? null,
+        profileUrl: row.profile_url ?? null,
+      };
+      if (row.source === "claude-web") {
+        return {
+          ...base,
+          source: "claude-web" as const,
+          summary: row.summary ?? null,
+          confidence: (row.confidence as "high" | "medium" | "low") ?? "medium",
         };
-        if (row.source === "claude-web") {
-          return {
-            ...base,
-            source: "claude-web" as const,
-            summary: row.summary ?? null,
-            confidence: (row.confidence as "high" | "medium" | "low") ?? "medium",
-          };
-        }
-        return { ...base, source: "wikitree" as const };
-      });
-      setSavedResults(hydrated);
-      setPickedIds((prev) => {
-        const next = new Set(prev);
-        for (const r of hydrated) next.add(r.id);
-        return next;
-      });
-      setSavedDbIds((prev) => {
-        const next = new Map(prev);
-        for (const row of data as any[]) next.set(`db:${row.id}`, row.id);
-        return next;
-      });
-    })();
+      }
+      return { ...base, source: "wikitree" as const };
+    });
+    setSavedResults(hydrated);
+    setPickedIds((prev) => {
+      const next = new Set(prev);
+      for (const r of hydrated) next.add(r.id);
+      return next;
+    });
+    setSavedDbIds((prev) => {
+      const next = new Map(prev);
+      for (const row of rows as any[]) next.set(`db:${row.id}`, row.id);
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    hydrateSaved();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const allResults: AnyResult[] = useMemo(
@@ -361,6 +369,19 @@ const FamilyTree = () => {
           </p>
         </div>
 
+        {user && (
+          <KnownAncestorForm userId={user.id} onAdded={hydrateSaved} />
+        )}
+
+        <div className="mx-auto mt-16 max-w-xl text-center">
+          <p className="font-sans text-[11px] uppercase tracking-[3px] text-amber-dim">
+            Or search the records
+          </p>
+          <p className="mt-3 font-serif italic text-cream-soft">
+            Don't know much yet? Let us search WikiTree and historical archives for you.
+          </p>
+        </div>
+
         <form
           onSubmit={handleSubmit}
           className="mx-auto mt-10 grid max-w-xl gap-3 rounded-[14px] border border-amber-dim/20 bg-card/50 p-6 backdrop-blur-sm"
@@ -500,6 +521,147 @@ function FsInput({
       required={required}
       className="rounded-[10px] border border-amber-dim/20 bg-bg-input/80 px-4 py-2.5 font-sans text-sm text-cream-soft placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber/40"
     />
+  );
+}
+
+const RELATIONSHIP_OPTIONS: { label: string; generations_back: number }[] = [
+  { label: "Parent", generations_back: 1 },
+  { label: "Grandparent", generations_back: 2 },
+  { label: "Great-grandparent", generations_back: 3 },
+  { label: "2× great-grandparent", generations_back: 4 },
+  { label: "3× great-grandparent", generations_back: 5 },
+  { label: "4× great-grandparent", generations_back: 6 },
+];
+
+function KnownAncestorForm({
+  userId,
+  onAdded,
+}: {
+  userId: string;
+  onAdded: () => void | Promise<void>;
+}) {
+  const [relationship, setRelationship] = useState("");
+  const [name, setName] = useState("");
+  const [birthYear, setBirthYear] = useState("");
+  const [deathYear, setDeathYear] = useState("");
+  const [place, setPlace] = useState("");
+  const [notes, setNotes] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!relationship) {
+      toast.error("Pick a relationship");
+      return;
+    }
+    if (!name.trim()) {
+      toast.error("Full name is required");
+      return;
+    }
+    const match = RELATIONSHIP_OPTIONS.find((o) => o.label === relationship);
+    if (!match) return;
+
+    setSaving(true);
+    const { error } = await supabase.from("family_tree_members").insert({
+      user_id: userId,
+      source: "user",
+      name: name.trim(),
+      birth_date: birthYear.trim() || null,
+      birth_place: place.trim() || null,
+      death_date: deathYear.trim() || null,
+      death_place: null,
+      generations_back: match.generations_back,
+      relationship_label: match.label,
+      known_notes: notes.trim() || null,
+      position: match.generations_back,
+    });
+    setSaving(false);
+    if (error) {
+      toast.error("Couldn't save ancestor", { description: error.message });
+      return;
+    }
+    toast.success(`${match.label} added`);
+    setRelationship("");
+    setName("");
+    setBirthYear("");
+    setDeathYear("");
+    setPlace("");
+    setNotes("");
+    await onAdded();
+  }
+
+  return (
+    <div className="mx-auto mt-10 max-w-xl">
+      <div className="text-center">
+        <h2 className="font-display text-2xl text-cream-warm sm:text-3xl">
+          Add an ancestor you know
+        </h2>
+        <p className="mx-auto mt-3 max-w-lg font-serif italic text-amber-light">
+          Start with what you know — a parent, a grandparent, as far back as you
+          can. Add them one at a time. We'll search the records to fill in the
+          rest.
+        </p>
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        className="mt-6 grid gap-3 rounded-[14px] border border-amber-dim/20 bg-card/50 p-6 backdrop-blur-sm"
+      >
+        <select
+          value={relationship}
+          onChange={(e) => setRelationship(e.target.value)}
+          required
+          className="rounded-[10px] border border-amber-dim/20 bg-bg-input/80 px-4 py-2.5 font-sans text-sm text-cream-soft focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber/40"
+        >
+          <option value="">Relationship to you *</option>
+          {RELATIONSHIP_OPTIONS.map((o) => (
+            <option key={o.label} value={o.label}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+
+        <FsInput value={name} onChange={setName} placeholder="Full name *" required />
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <FsInput
+            value={birthYear}
+            onChange={setBirthYear}
+            placeholder="Approx birth year"
+            type="number"
+          />
+          <FsInput
+            value={deathYear}
+            onChange={setDeathYear}
+            placeholder="Approx death year"
+            type="number"
+          />
+        </div>
+
+        <FsInput
+          value={place}
+          onChange={setPlace}
+          placeholder="Birthplace / where they lived"
+        />
+
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="What you know about them — stories, jobs, places they lived…"
+          rows={4}
+          className="rounded-[10px] border border-amber-dim/20 bg-bg-input/80 px-4 py-2.5 font-sans text-sm text-cream-soft placeholder:text-text-dim focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber/40"
+        />
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="mt-2 rounded-pill px-8 py-3 font-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-primary-foreground transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
+          style={{ background: "linear-gradient(135deg, #e8943a, #c47828)" }}
+        >
+          {saving ? "Saving…" : "Add to my tree"}
+        </button>
+      </form>
+    </div>
   );
 }
 
