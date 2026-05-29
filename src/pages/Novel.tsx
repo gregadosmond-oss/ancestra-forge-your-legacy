@@ -188,7 +188,34 @@ const Novel = () => {
           setMemoriesProsePhase("idle");
         }
 
+        // Lazily fetch the personal woven 9-chapter story (cached per-user by signature)
+        setPersonalStoryPhase("loading");
+        supabase.functions
+          .invoke<{ chapters?: PersonalStory }>("generate-personal-story", {
+            body: { user_id: user.id },
+          })
+          .then(({ data, error }) => {
+            if (error) throw error;
+            const ch = data?.chapters;
+            if (
+              ch &&
+              ch.chapterOne?.body &&
+              Array.isArray(ch.chapters) &&
+              ch.chapters.length === 8
+            ) {
+              setPersonalStory(ch);
+              setPersonalStoryPhase("ready");
+            } else {
+              setPersonalStoryPhase("error");
+            }
+          })
+          .catch((e) => {
+            console.warn("generate-personal-story failed; falling back to shared story", e);
+            setPersonalStoryPhase("error");
+          });
+
         setPhase("ready");
+
 
       } catch (e) {
         console.error("Novel load error", e);
