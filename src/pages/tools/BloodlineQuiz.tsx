@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Share2 } from "lucide-react";
+import { Share2, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import JourneyGate from "@/components/JourneyGate";
 import ScrollChevron from "@/components/ScrollChevron";
