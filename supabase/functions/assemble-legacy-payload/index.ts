@@ -197,9 +197,29 @@ Deno.serve(async (req) => {
       }
     : shared?.story;
 
+  // Also override the top-level `chapters` block — the book renderer checks
+  // fixture.chapters.chapterBodies BEFORE story.chapterBodies. Without this
+  // override the renderer falls back to the shared fixture's generic chapter
+  // bodies (e.g. the Astrid/Danelaw Chapter IX text).
+  const mergedChapters = personalStory
+    ? {
+        ...(shared?.chapters ?? {}),
+        chapterBodies: personalStory.chapters.map((c) => c.body),
+        chapters: personalStory.chapters.map((c) => ({
+          title: c.title,
+          body: c.body,
+        })),
+        expandedChapters: personalStory.chapters.map((c) => ({
+          title: c.title,
+          body: c.body,
+        })),
+      }
+    : shared?.chapters;
+
   const combined = {
     ...shared,
     story: mergedStory,
+    chapters: mergedChapters,
     personal: {
       user_id: userId,
       tree,
