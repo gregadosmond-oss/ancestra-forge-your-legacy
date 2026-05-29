@@ -39,6 +39,13 @@ type Fixture = {
 
 type Phase = "loading" | "generating" | "ready" | "error";
 type MemoryProsePhase = "idle" | "loading" | "ready" | "error";
+type PersonalStoryPhase = "idle" | "loading" | "ready" | "error";
+
+type PersonalChapter = { title: string; body: string };
+type PersonalStory = {
+  chapterOne: PersonalChapter;
+  chapters: PersonalChapter[];
+};
 
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"];
 
@@ -70,6 +77,8 @@ const Novel = () => {
   const [memories, setMemories] = useState<MemoryRow[]>([]);
   const [memoriesProse, setMemoriesProse] = useState<string | null>(null);
   const [memoriesProsePhase, setMemoriesProsePhase] = useState<MemoryProsePhase>("idle");
+  const [personalStory, setPersonalStory] = useState<PersonalStory | null>(null);
+  const [personalStoryPhase, setPersonalStoryPhase] = useState<PersonalStoryPhase>("idle");
   const ranRef = useRef(false);
 
 
@@ -179,7 +188,34 @@ const Novel = () => {
           setMemoriesProsePhase("idle");
         }
 
+        // Lazily fetch the personal woven 9-chapter story (cached per-user by signature)
+        setPersonalStoryPhase("loading");
+        supabase.functions
+          .invoke<{ chapters?: PersonalStory }>("generate-personal-story", {
+            body: { user_id: user.id },
+          })
+          .then(({ data, error }) => {
+            if (error) throw error;
+            const ch = data?.chapters;
+            if (
+              ch &&
+              ch.chapterOne?.body &&
+              Array.isArray(ch.chapters) &&
+              ch.chapters.length === 8
+            ) {
+              setPersonalStory(ch);
+              setPersonalStoryPhase("ready");
+            } else {
+              setPersonalStoryPhase("error");
+            }
+          })
+          .catch((e) => {
+            console.warn("generate-personal-story failed; falling back to shared story", e);
+            setPersonalStoryPhase("error");
+          });
+
         setPhase("ready");
+
 
       } catch (e) {
         console.error("Novel load error", e);
@@ -245,21 +281,37 @@ const Novel = () => {
     facts?.migration?.waypoints?.[0]?.year ||
     "antiquity";
 
-  const chapterOneTitle: string = story.chapterOneTitle || "Chapter I";
-  const chapterOneBody: string = stripMarkdown(story.chapterOneBody || "");
-  const teaserChapters: string[] = Array.isArray(story.teaserChapters)
-    ? story.teaserChapters.slice(0, 8)
-    : [];
-  const chapterBodies = extractChapterBodies(fixture);
+  // Prefer personalized 9-chapter story when available; otherwise fall back to shared surname story.
+  const allChapters: { num: string; title: string; body: string }[] = personalStory
+    ? [
+        {
+          num: "I",
+          title: personalStory.chapterOne.title || "Chapter I",
+          body: stripMarkdown(personalStory.chapterOne.body || ""),
+        },
+        ...personalStory.chapters.slice(0, 8).map((c, i) => ({
+          num: ROMAN[i + 1],
+          title: c.title,
+          body: stripMarkdown(c.body || ""),
+        })),
+      ]
+    : (() => {
+        const chapterOneTitle: string = story.chapterOneTitle || "Chapter I";
+        const chapterOneBody: string = stripMarkdown(story.chapterOneBody || "");
+        const teaserChapters: string[] = Array.isArray(story.teaserChapters)
+          ? story.teaserChapters.slice(0, 8)
+          : [];
+        const chapterBodies = extractChapterBodies(fixture);
+        return [
+          { num: "I", title: chapterOneTitle, body: chapterOneBody },
+          ...teaserChapters.map((title, i) => ({
+            num: ROMAN[i + 1],
+            title,
+            body: stripMarkdown(chapterBodies[i] ?? ""),
+          })),
+        ];
+      })();
 
-  const allChapters: { num: string; title: string; body: string }[] = [
-    { num: "I", title: chapterOneTitle, body: chapterOneBody },
-    ...teaserChapters.map((title, i) => ({
-      num: ROMAN[i + 1],
-      title,
-      body: stripMarkdown(chapterBodies[i] ?? ""),
-    })),
-  ];
 
   const certNumber = `${displaySurname.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8)}-${Date.now().toString().slice(-6)}`;
 
