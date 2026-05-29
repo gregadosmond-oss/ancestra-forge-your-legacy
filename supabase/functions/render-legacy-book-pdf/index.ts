@@ -365,17 +365,16 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       const body = chapterBodies[i] || "";
       const num = romanNumerals[i + 1];
       const chapterIndex = i + 2;
-      const chapterNotes = chapterIndex < 9 ? notesMemoriesPage(chapterIndex) : "";
       return `
 ${chapterTitlePage(num, title)}
 <section class="chapter chapter-${chapterIndex}-body">
   <div class="chapter-body">
     ${paragraphsWithDropCap(body)}
   </div>
-</section>
-${chapterNotes}`;
+</section>`;
     })
     .join("\n");
+
 
   // Pass 2: per-chapter running heads. Build one @page chapter-N rule + class
   // for each of the 9 chapters. Roman numeral · chapter title at top-center.
