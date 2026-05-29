@@ -9,7 +9,7 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const MODEL = "claude-sonnet-4-5-20250929";
-const MODEL = "claude-3-5-sonnet-20241022";
+const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
 
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), {
@@ -45,6 +45,10 @@ function memoriesToPromptBlock(memories: any[]): string {
 
 async function callClaude(memories: any[], surname: string): Promise<string> {
   const memoryBlock = memoriesToPromptBlock(memories);
+
+  if (!ANTHROPIC_API_KEY) {
+    throw new Error("Missing ANTHROPIC_API_KEY");
+  }
 
   const systemPrompt = `You are the literary author of "The House of ${surname}" — a warm, lyrical family legacy book.
 Your voice is the voice of the existing chapters: measured, literary, emotionally grounded, in the register of Robert Macfarlane or Marilynne Robinson. Warm, never sentimental. Specific, never generic.
@@ -122,6 +126,10 @@ Deno.serve(async (req) => {
 
   const signature = buildSignature(memories);
 
+  console.log(
+    `[weave-memories-chapter] invoked user=${userId} memories=${memories.length} signature=${signature} model=${MODEL}`,
+  );
+
   // Check cache
   if (!force) {
     const { data: cached } = await supabase
@@ -130,6 +138,7 @@ Deno.serve(async (req) => {
       .eq("user_id", userId)
       .maybeSingle();
     if (cached && cached.signature === signature) {
+      console.log(`[weave-memories-chapter] cache hit user=${userId}`);
       return json(200, { prose: cached.prose, signature, cached: true });
     }
   }
@@ -148,6 +157,9 @@ Deno.serve(async (req) => {
   let prose: string;
   try {
     prose = await callClaude(memories, displaySurname);
+    console.log(
+      `[weave-memories-chapter] Claude success user=${userId} chars=${prose.length}`,
+    );
   } catch (e) {
     console.error("[weave-memories-chapter]", e);
     return json(500, { error: "claude_failed", detail: (e as Error).message });
