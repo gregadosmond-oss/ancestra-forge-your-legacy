@@ -273,6 +273,7 @@ async function triggerLegacyBookOrder({
   amountTotal,
   currency,
   userId,
+  env,
 }: {
   surname: string;
   shippingAddress: Record<string, string>;
@@ -282,6 +283,7 @@ async function triggerLegacyBookOrder({
   amountTotal?: number;
   currency?: string;
   userId?: string;
+  env: StripeEnv;
 }) {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
