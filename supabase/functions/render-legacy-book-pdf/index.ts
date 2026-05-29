@@ -117,18 +117,9 @@ function paragraphsWithDropCap(body: string): string {
   return paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n");
 }
 
-function notesMemoriesPage(chapterIndex: number): string {
-  const ruledLines = Array.from({ length: 13 }, () => '<div class="notes-line"></div>').join("\n");
-  return `
-<section class="notes-page chapter-${chapterIndex}-notes">
-  <h3>Notes &amp; Memories</h3>
-  <div class="notes-rule"></div>
-  <div class="notes-lines">
-    ${ruledLines}
-  </div>
-  <div class="notes-instruction">Use these pages to record names, dates, memories, or quotes that matter to your family.</div>
-</section>`;
-}
+// Ruled "Notes & Memories" filler pages were removed — the book now flows
+// straight from one chapter into the next.
+
 
 type PaletteMode = "print" | "digital";
 
@@ -374,17 +365,16 @@ function buildHtml(fixture: any, mode: PaletteMode = "print"): string {
       const body = chapterBodies[i] || "";
       const num = romanNumerals[i + 1];
       const chapterIndex = i + 2;
-      const chapterNotes = chapterIndex < 9 ? notesMemoriesPage(chapterIndex) : "";
       return `
 ${chapterTitlePage(num, title)}
 <section class="chapter chapter-${chapterIndex}-body">
   <div class="chapter-body">
     ${paragraphsWithDropCap(body)}
   </div>
-</section>
-${chapterNotes}`;
+</section>`;
     })
     .join("\n");
+
 
   // Pass 2: per-chapter running heads. Build one @page chapter-N rule + class
   // for each of the 9 chapters. Roman numeral · chapter title at top-center.
@@ -1093,7 +1083,7 @@ ${chapterNotes}`;
   </div>
 </section>
 
-${notesMemoriesPage(1)}
+
 
 ${laterChaptersHtml}
 
@@ -1157,6 +1147,8 @@ Deno.serve(async (req) => {
   let mode: PaletteMode = "print";
   let outputPath: string | null = null;
   let skipPageCap = false;
+  let userId: string | null = null;
+  let surnameInput: string | null = null;
   try {
     const body = await req.json().catch(() => ({}));
     if (body && typeof body.fixtureUrl === "string" && body.fixtureUrl.trim()) {
@@ -1171,13 +1163,51 @@ Deno.serve(async (req) => {
     if (body && body.skipPageCap === true) {
       skipPageCap = true;
     }
+    if (body && typeof body.user_id === "string" && body.user_id.trim()) {
+      userId = body.user_id.trim();
+    }
+    if (body && typeof body.surname === "string" && body.surname.trim()) {
+      surnameInput = body.surname.trim();
+    }
   } catch (_) {
     // keep defaults
   }
 
   let fixture: any;
   try {
-    if (fixtureUrl) {
+    if (userId) {
+      // Always re-assemble a fresh personalized payload so the printed book
+      // matches the user's current /novel chapters (no stale fixture cache).
+      const asmRes = await fetch(
+        `${SUPABASE_URL}/functions/v1/assemble-legacy-payload`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+            apikey: SERVICE_ROLE_KEY,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            surname: surnameInput || "Osmond",
+          }),
+        },
+      );
+      if (!asmRes.ok) {
+        return fail(
+          "assemble",
+          `HTTP ${asmRes.status}: ${(await asmRes.text()).slice(0, 500)}`,
+        );
+      }
+      const asmJson = await asmRes.json();
+      fixture = asmJson?.fixture;
+      if (!fixture) return fail("assemble", "no fixture in assemble response");
+      if (!fixture?.personal?.personalStoryUsed) {
+        console.warn(
+          `[render-legacy-book-pdf] user=${userId} assembled fixture missing personal story — book may show generic chapters`,
+        );
+      }
+    } else if (fixtureUrl) {
       const res = await fetch(fixtureUrl);
       if (!res.ok) {
         return fail("fixture", `HTTP ${res.status} fetching fixture`);
@@ -1196,6 +1226,7 @@ Deno.serve(async (req) => {
   } catch (err) {
     return fail("fixture", (err as Error).message);
   }
+
 
   const html = buildHtml(fixture, mode);
   const surname = inferSurname(fixture);
