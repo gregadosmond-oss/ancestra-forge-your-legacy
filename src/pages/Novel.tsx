@@ -507,6 +507,12 @@ const Novel = () => {
                       );
                     })}
                 </div>
+              ) : memoriesProsePhase === "loading" ? (
+                <div className="mx-auto max-w-xl text-center">
+                  <p className="font-serif italic leading-[1.85] text-amber-dim">
+                    Weaving these memories into the House chronicle…
+                  </p>
+                </div>
               ) : (
                 memories.map((m) => {
                   const entries = m.answers && typeof m.answers === "object"
