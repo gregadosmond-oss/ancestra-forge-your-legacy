@@ -7,6 +7,7 @@ import StripeEmbeddedCheckout from "@/components/StripeEmbeddedCheckout";
 import AuthGate from "@/components/AuthGate";
 import { useJourney } from "@/contexts/JourneyContext";
 import { usePurchase } from "@/hooks/usePurchase";
+import { formatSurname } from "@/lib/surname";
 
 type GiftState = { isGift?: boolean; recipientEmail?: string };
 
