@@ -38,6 +38,7 @@ type Fixture = {
 };
 
 type Phase = "loading" | "generating" | "ready" | "error";
+type MemoryProsePhase = "idle" | "loading" | "ready" | "error";
 
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"];
 
@@ -68,6 +69,7 @@ const Novel = () => {
   const [treeMembers, setTreeMembers] = useState<TreeRow[]>([]);
   const [memories, setMemories] = useState<MemoryRow[]>([]);
   const [memoriesProse, setMemoriesProse] = useState<string | null>(null);
+  const [memoriesProsePhase, setMemoriesProsePhase] = useState<MemoryProsePhase>("idle");
   const ranRef = useRef(false);
 
 
@@ -154,16 +156,27 @@ const Novel = () => {
 
         // Lazily refresh / fetch AI-woven memories chapter (only regenerates when memories changed)
         if (mems.length > 0) {
+          setMemoriesProsePhase("loading");
           supabase.functions
             .invoke<{ prose?: string | null }>("weave-memories-chapter", {
               body: { user_id: user.id },
             })
-            .then(({ data }) => {
-              if (data && typeof data.prose === "string") {
-                setMemoriesProse(data.prose);
+            .then(({ data, error }) => {
+              if (error) throw error;
+              const prose = typeof data?.prose === "string" ? data.prose.trim() : "";
+              if (prose.length > 0) {
+                setMemoriesProse(prose);
+                setMemoriesProsePhase("ready");
+              } else {
+                setMemoriesProsePhase("error");
               }
             })
-            .catch((e) => console.warn("weave-memories-chapter failed", e));
+            .catch((e) => {
+              console.warn("weave-memories-chapter failed", e);
+              setMemoriesProsePhase("error");
+            });
+        } else {
+          setMemoriesProsePhase("idle");
         }
 
         setPhase("ready");
