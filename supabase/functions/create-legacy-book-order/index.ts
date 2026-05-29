@@ -29,6 +29,7 @@ interface ShippingAddress {
 
 interface RequestBody {
   surname?: string;
+  user_id?: string;
   shippingAddress?: ShippingAddress;
   orderType?: "draft" | "order";
   quantity?: number;
