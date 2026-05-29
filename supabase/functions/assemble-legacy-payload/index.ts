@@ -216,8 +216,34 @@ Deno.serve(async (req) => {
       }
     : shared?.chapters;
 
+  // Per-user motto override: the crest is the single source of truth for the
+  // family motto. Look up this user's saved crest row and use its motto on the
+  // novel cover, printed book, cover PDF, and certificate. Falls back to the
+  // shared surname motto when the user hasn't forged a crest yet.
+  let mergedFacts: any = shared?.facts ?? {};
+  try {
+    const { data: crestRow } = await supabase
+      .from("crests")
+      .select("motto_latin, motto_english")
+      .eq("user_id", userId)
+      .not("motto_latin", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (crestRow?.motto_latin) {
+      mergedFacts = {
+        ...mergedFacts,
+        mottoLatin: crestRow.motto_latin,
+        mottoEnglish: crestRow.motto_english ?? mergedFacts?.mottoEnglish ?? "",
+      };
+    }
+  } catch (e) {
+    console.warn("[assemble-legacy-payload] crest motto lookup failed", e);
+  }
+
   const combined = {
     ...shared,
+    facts: mergedFacts,
     story: mergedStory,
     chapters: mergedChapters,
     personal: {
