@@ -82,6 +82,7 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession, env: Stri
       amountTotal: session.amount_total ?? undefined,
       currency: session.currency ?? undefined,
       userId: userId || undefined,
+      env,
     });
   }
 
@@ -272,6 +273,7 @@ async function triggerLegacyBookOrder({
   amountTotal,
   currency,
   userId,
+  env,
 }: {
   surname: string;
   shippingAddress: Record<string, string>;
@@ -281,6 +283,7 @@ async function triggerLegacyBookOrder({
   amountTotal?: number;
   currency?: string;
   userId?: string;
+  env: StripeEnv;
 }) {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -347,7 +350,8 @@ async function triggerLegacyBookOrder({
     const gelatoRes = await callFn("create-legacy-book-order", {
       surname: normalized,
       shippingAddress,
-      orderType: "order",
+      // Safety gate: sandbox/preview checkouts NEVER trigger a live print.
+      orderType: env === "sandbox" ? "draft" : "order",
       quantity: 1,
     });
 
