@@ -104,6 +104,11 @@ const CollectHistory = () => {
       setJustSavedName(form.relativeName.trim());
       setSavedCount((n) => n + 1);
       toast.success("Memory saved");
+      // Refresh the AI-woven memories chapter in the background (fire & forget)
+      supabase.functions
+        .invoke("weave-memories-chapter", { body: { user_id: user.id } })
+        .catch((e) => console.warn("weave-memories-chapter failed", e));
+
     } catch (err) {
       toast.error("Couldn't save", { description: (err as Error).message });
     } finally {
